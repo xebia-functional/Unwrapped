@@ -8,6 +8,8 @@
       <sourceFolder url="file://$MODULE_DIR$/../../project" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/../../project/project/target" />
       <excludeFolder url="file://$MODULE_DIR$/../../project/target" />
+      <excludeFolder url="file://$MODULE_DIR$/../../project/.bloop/scala-fx-build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../project/project/.bloop/scala-fx-build-build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -8,6 +8,11 @@
       <sourceFolder url="file://$MODULE_DIR$/../../src/main/scala" isTestSource="false" packagePrefix="fx" />
       <sourceFolder url="file://$MODULE_DIR$/../../src/test/scala" isTestSource="true" packagePrefix="fx" />
       <excludeFolder url="file://$MODULE_DIR$/../../target" />
+      <excludeFolder url="file://$MODULE_DIR$/../../.bloop/scala-fx/bloop-bsp-clients-classes/test-classes-Metals-fUcPEgLtSkSxz9pEHDCxDQ==" />
+      <excludeFolder url="file://$MODULE_DIR$/../../.bloop/scala-fx/bloop-internal-classes/classes-Metals-Koy5HJJWQt-QaSX5QxQdDA==-ggT9oNcwTVanKFnqNSbmFg==" />
+      <excludeFolder url="file://$MODULE_DIR$/../../.bloop/scala-fx/bloop-internal-classes/classes-Metals-nyIWmnmGSxqsKcdiZnbezw==-tBhdObyyT8yWrPClI5X1Tg==" />
+      <excludeFolder url="file://$MODULE_DIR$/../../.bloop/scala-fx/bloop-internal-classes/classes-Metals-OZb2Jd3yTy66iC_uL8PMJA==-qde0CchTTDeVi7kV1z0EqQ==" />
+      <excludeFolder url="file://$MODULE_DIR$/../../.bloop/scala-fx/scala-3" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
