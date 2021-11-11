@@ -1,0 +1,48 @@
+[0m[[0m[0mdebug[0m] [0m[0m[zinc] IncrementalCompile -----------[0m
+[0m[[0m[0mdebug[0m] [0m[0mIncrementalCompile.incrementalCompile[0m
+[0m[[0m[0mdebug[0m] [0m[0mprevious = Stamps for: 2 products, 1 sources, 2 libraries[0m
+[0m[[0m[0mdebug[0m] [0m[0mcurrent source = Set(${BASE}/src/test/scala/ContTests.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0m> initialChanges = InitialChanges(Changes(added = Set(), removed = Set(), changed = Set(${BASE}/src/test/scala/ContTests.scala), unmodified = ...),Set(${BASE}/target/scala-3.1.0/test-classes/fx/ContTests$.class, ${BASE}/target/scala-3.1.0/test-classes/fx/ContTests.class),Set(),API Changes: Set(NamesChange(fx.ContEffect$package$,ModifiedNames(changes = UsedName(bind,[Default]))), NamesChange(fx.Cont$package$,ModifiedNames(changes = UsedName(toIO,[Default])))))[0m
+[0m[[0m[0mdebug[0m] [0m[0mThe fx.ContEffect$package$ has the following regular definitions changed:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	UsedName(bind,[Default]).[0m
+[0m[[0m[0mdebug[0m] [0m[0mAll member reference dependencies will be considered within this context.[0m
+[0m[[0m[0mdebug[0m] [0m[0mFiles invalidated by inheriting from (external) fx.ContEffect$package$: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mNow invalidating by inheritance (internally).[0m
+[0m[[0m[0mdebug[0m] [0m[0mGetting direct dependencies of all classes transitively invalidated by inheritance.[0m
+[0m[[0m[0mdebug[0m] [0m[0mGetting classes that directly depend on (external) fx.ContEffect$package$.[0m
+[0m[[0m[0mdebug[0m] [0m[0mNone of the modified names appears in source file of fx.ContTests. This dependency is not being considered for invalidation.[0m
+[0m[[0m[0mdebug[0m] [0m[0mThe fx.Cont$package$ has the following regular definitions changed:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	UsedName(toIO,[Default]).[0m
+[0m[[0m[0mdebug[0m] [0m[0mAll member reference dependencies will be considered within this context.[0m
+[0m[[0m[0mdebug[0m] [0m[0mFiles invalidated by inheriting from (external) fx.Cont$package$: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mNow invalidating by inheritance (internally).[0m
+[0m[[0m[0mdebug[0m] [0m[0mGetting direct dependencies of all classes transitively invalidated by inheritance.[0m
+[0m[[0m[0mdebug[0m] [0m[0mGetting classes that directly depend on (external) fx.Cont$package$.[0m
+[0m[[0m[0mdebug[0m] [0m[0mNone of the modified names appears in source file of fx.ContTests. This dependency is not being considered for invalidation.[0m
+[0m[[0m[0mdebug[0m] [0m[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial source changes:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	removed: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0m	added: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0m	modified: Set(${BASE}/src/test/scala/ContTests.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0mInvalidated products: Set(${BASE}/target/scala-3.1.0/test-classes/fx/ContTests$.class, ${BASE}/target/scala-3.1.0/test-classes/fx/ContTests.class)[0m
+[0m[[0m[0mdebug[0m] [0m[0mExternal API changes: API Changes: Set(NamesChange(fx.ContEffect$package$,ModifiedNames(changes = UsedName(bind,[Default]))), NamesChange(fx.Cont$package$,ModifiedNames(changes = UsedName(toIO,[Default]))))[0m
+[0m[[0m[0mdebug[0m] [0m[0mModified binary dependencies: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial directly invalidated classes: Set(fx.ContTests)[0m
+[0m[[0m[0mdebug[0m] [0m[0mSources indirectly invalidated by:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	product: Set(${BASE}/src/test/scala/ContTests.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	binary dep: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0m	external source: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mall 1 sources are invalidated[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial set of included nodes: fx.ContTests[0m
+[0m[[0m[0mdebug[0m] [0m[0mRecompiling all sources: number of invalidated sources > 50.0% of all sources[0m
+[0m[[0m[0mdebug[0m] [0m[0mcompilation cycle 1[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to /Users/raulraja/workspace/scala-fx/target/scala-3.1.0/test-classes ...[0m
+[0m[[0m[0mdebug[0m] [0m[0mReturning already retrieved and compiled bridge: /Users/raulraja/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala3-sbt-bridge/3.1.0/scala3-sbt-bridge-3.1.0.jar.[0m
+[0m[[0m[0mdebug[0m] [0m[0m[zinc] Running cached compiler 53b01f68 for Scala Compiler version 3.1.0[0m
+[0m[[0m[0mdebug[0m] [0m[0m[zinc] The Scala compiler is invoked with:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	-bootclasspath[0m
+[0m[[0m[0mdebug[0m] [0m[0m	/Users/raulraja/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.1.0/scala3-library_3-3.1.0.jar:/Users/raulraja/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.6/scala-library-2.13.6.jar[0m
+[0m[[0m[0mdebug[0m] [0m[0m	-classpath[0m
+[0m[[0m[0mdebug[0m] [0m[0m	/Users/raulraja/workspace/scala-fx/target/scala-3.1.0/test-classes:/Users/raulraja/workspace/scala-fx/target/scala-3.1.0/classes:/Users/raulraja/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/typelevel/cats-effect_3/3.2.9/cats-effect_3-3.2.9.jar:/Users/raulraja/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalacheck/scalacheck_3/1.15.4/scalacheck_3-1.15.4.jar:/Users/raulraja/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/typelevel/cats-effect-kernel_3/3.2.9/cats-effect-kernel_3-3.2.9.jar:/Users/raulraja/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/typelevel/cats-effect-std_3/3.2.9/cats-effect-std_3-3.2.9.jar:/Users/raulraja/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar:/Users/raulraja/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/typelevel/cats-core_3/2.6.1/cats-core_3-2.6.1.jar:/Users/raulraja/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/typelevel/cats-kernel_3/2.6.1/cats-kernel_3-2.6.1.jar:/Users/raulraja/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/typelevel/simulacrum-scalafix-annotations_3/0.5.4/simulacrum-scalafix-annotations_3-0.5.4.jar[0m
+[0m[[0m[0mdebug[0m] [0m[0mScala compilation took 0.800368444 s[0m
+[0m[[0m[0mdebug[0m] [0m[0mdone compiling[0m

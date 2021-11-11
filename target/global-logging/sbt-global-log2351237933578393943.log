@@ -1,0 +1,20 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(compile, None, None)[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / compile[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: bloop.integrations.sbt.Offloader$$anon$1@5d18a787, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 4 Scala sources to /Users/raulraja/workspace/scala-fx/target/scala-3.1.0/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0mbad option '-target:jvm-1.7' was ignored[0m
+[0m[[0m[31merror[0m] [0m[0m[31m-- [E008] Not Found Error: /Users/raulraja/workspace/scala-fx/src/main/scala/Continuation.scala:3:19 [0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m3 |[0m[33mimport[0m java.lang.{ ContinuationScope, Continuation }[0m
+[0m[[0m[31merror[0m] [0m[0m  |                   [31m^^^^^^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  |                   value ContinuationScope is not a member of java.lang[0m
+[0m[[0m[31merror[0m] [0m[0m[31m-- [E008] Not Found Error: /Users/raulraja/workspace/scala-fx/src/main/scala/Continuation.scala:3:38 [0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m3 |[0m[33mimport[0m java.lang.{ ContinuationScope, Continuation }[0m
+[0m[[0m[31merror[0m] [0m[0m  |                                      [31m^^^^^^^^^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  |                           value Continuation is not a member of java.lang[0m
+[0m[[0m[33mwarn[0m] [0m[0mone warning found[0m
+[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m
+[0m[[0m[33mwarn[0m] [0m[0mone warning found[0m
+[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 2 s, completed 8 Nov 2021, 00:31:17[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m

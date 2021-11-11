@@ -1,0 +1,11 @@
+[0m[[0m[33mwarn[0m] [0m[0mjavaOptions will be ignored, fork is set to false[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(fx.ContTests, org.scalacheck.ScalaCheckFramework$$anon$1@15599b6f, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(fx.ContTests-0, org.scalacheck.ScalaCheckFramework$$anon$1@15599b6f, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(fx.ContTests-2, org.scalacheck.ScalaCheckFramework$$anon$1@15599b6f, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(fx.ContTests-1, org.scalacheck.ScalaCheckFramework$$anon$1@15599b6f, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m+ Cont laws.happy path: OK, passed 100 tests.[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m+ Cont laws.short-circuit: OK, passed 100 tests.[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m+ Cont laws.Can short-circuit immediately from nested blocks: OK, passed 100 tests.[0m[0m
+[0m[[0m[0minfo[0m] [0m[0mPassed: Total 3, Failed 0, Errors 0, Passed 3[0m
+[0m[[0m[0mdebug[0m] [0m[0mPassed tests:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	fx.ContTests[0m

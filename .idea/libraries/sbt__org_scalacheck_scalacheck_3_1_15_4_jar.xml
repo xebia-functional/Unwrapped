@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="sbt: org.scalacheck:scalacheck_3:1.15.4:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalacheck/scalacheck_3/1.15.4/scalacheck_3-1.15.4.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalacheck/scalacheck_3/1.15.4/scalacheck_3-1.15.4-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalacheck/scalacheck_3/1.15.4/scalacheck_3-1.15.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

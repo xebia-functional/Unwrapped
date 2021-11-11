@@ -1,0 +1,7 @@
+[0m[[0m[31merror[0m] [0m[0m[31m-- Error: /Users/raulraja/workspace/scala-fx/src/main/scala/ContEffect.scala:7:19 [0m[0m
+[0m[[0m[31merror[0m] [0m[0m[31m7 |[0m        [33mif[0m (value) Unit [33melse[0m shift(ensureShift)[0m
+[0m[[0m[31merror[0m] [0m[0m  |                   [31m^^^^[0m[0m
+[0m[[0m[31merror[0m] [0m[0m  |Reference to [33mobject[0m [35mUnit[0m in [33mpackage[0m [35mscala[0m should not have survived,[0m
+[0m[[0m[31merror[0m] [0m[0m  |it should have been processed and eliminated during expansion of an enclosing macro or term erasure.[0m
+[0m[[0m[31merror[0m] [0m[0mone error found[0m
+[0m[[0m[31merror[0m] [0m[0mone error found[0m
