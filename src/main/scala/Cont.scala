@@ -20,9 +20,6 @@ extension [R, A](c: Cont[R, A])
   def map[B](f: A => B): Cont[R, B] =
     cont(c.fold(shift(_), f))
 
-  def run: A | R =
-    c.fold(shift(identity), identity)
-
 extension [A](c: Cont[Option[A], A])
    
   def toOption: Option[A] =
