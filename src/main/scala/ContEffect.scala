@@ -3,25 +3,26 @@ package fx
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 
-trait Effect[R] {
-    def shift[A](r: R): A
-}
+trait Control[R] :
+  extension (r: R) 
+    def shift[A]: A
+  
+  def ensure[R](value: Boolean, ensureShift: => R): Unit |> Control[R] =
+    if (value) () else ensureShift.shift
 
 
-def shift[R : Effect, A](r: R)(using ce: Effect[R]): A =
-    ce.shift(r)
+class Bind:
+  extension [R, A](c: A |> Control[R])
+    def bind: A |> Control[R] = fold(c)(_.shift, identity)
 
-def ensure[R](value: Boolean, ensureShift: => R)(using ce: Effect[R]): Unit =
-    if (value) () else ce.shift(ensureShift)
+  extension [R, A](fa: Either[R, A])
+    def bind: A |> Control[R] = fa.fold(_.shift, identity)
 
-extension [R, A](c: Cont[R, A])(using ce: Effect[R])
-    def bind: A = c.fold(ce.shift, identity)
+  extension [R, A](fa: List[Either[R, A]])
+    def bind: List[A] |> Control[R] = fa.map(_.bind)
 
-extension [R, A](fa: Either[R, A])(using ce: Effect[R])
-    def bind: A = fa.fold(ce.shift, identity)
+  extension [R, A](fa: IO[Either[R, A]])
+    def bind: A |> Control[R] |> IORuntime = fa.unsafeRunSync().bind
 
-extension [R, A](fa: List[Either[R, A]])(using ce: Effect[R])
-    def bind: List[A] = fa.map(either => either.bind)
-
-extension [R, A](fa: IO[Either[R, A]])(using ce: Effect[R], ir: IORuntime)
-    def bind: A = fa.unsafeRunSync().bind
+object Bind :
+  given Bind = new Bind
