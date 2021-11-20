@@ -2,14 +2,17 @@ package fx
 
 import java.lang.{Continuation, ContinuationScope}
 import java.util.concurrent.CancellationException
+import scala.annotation.implicitNotFound
 
-inline def fold[R, A, B](inline fc: A |> Control[R])(inline f: R => B, inline g: A => B): B = {
+private[this]
+inline def fold[R, A, B](inline fc: A * Control[R])(inline f: R => B, inline g: A => B): B = {
   var result: A | B | Null = null
   new ContinuationScope("scala-fx continuation scope") with Control[R] {
 
     val cont = new java.lang.Continuation(
       this,
       () => {
+        given Control[R] = this
         result = g(fc(using this))
       }
     )

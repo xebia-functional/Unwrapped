@@ -1,19 +1,45 @@
 package whatever
 
 import fx._
+import java.time.Duration
 
-def program: Int |> Control[String] |> Bind =
-  val r =
-    "Boom".shift[Int] +
-      Right(1).bind +
-      Right(2).bind
-  println("Hello!")
-  r
+def program2: Int * Bind =
+  Right(1).bind +
+    Right(2).bind
 
-@main def hello() = 
-  val value : Int |> Control[String] = 
-    program + program
+def program: Int
+  * Control[String]
+  * Bind
+  * Errors =
+  Left[String, Int]("boom").bind +
+    Right(1).bind +
+    Right(2).bind +
+    "boom1".raise[Int]
 
-  val r: Int | String = run(value)
-  println(r)
+@main def hello() =
+  import fx.runtime
 
+  val value: Int | String =
+    run(program + program)
+
+  val value2: Int =
+    run(program2 + program2)
+
+  val threads = parMap(
+    {
+      Thread.sleep(Duration.ofSeconds(1))
+      throw RuntimeException("Boom")
+      Thread.currentThread.getId
+    }, {
+      Thread.sleep(Duration.ofSeconds(2))
+      println(
+        "should not reach this as it should be cancelled because of the other ex"
+      )
+      Thread.currentThread.getId
+    },
+    (a, b) => (a, b)
+  )
+
+  println(value)
+  println(value2)
+  println(threads)
