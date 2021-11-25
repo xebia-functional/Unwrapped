@@ -1,11 +1,12 @@
 package whatever
 
-import fx._
+import fx.*
 import java.time.Duration
+import java.util.concurrent.CancellationException
+import cats.syntax.validated
 
 def program2: Int * Bind =
-  Right(1).bind +
-    Right(2).bind
+  Right(1).bind + Right(2).bind
 
 def program: Int
   * Control[String]
@@ -25,21 +26,18 @@ def program: Int
   val value2: Int =
     run(program2 + program2)
 
-  val threads = parMap(
-    {
-      Thread.sleep(Duration.ofSeconds(1))
-      throw RuntimeException("Boom")
-      Thread.currentThread.getId
-    }, {
-      Thread.sleep(Duration.ofSeconds(2))
-      println(
-        "should not reach this as it should be cancelled because of the other ex"
-      )
-      Thread.currentThread.getId
-    },
-    (a, b) => (a, b)
+  val threads: Long *: Long *: Long *: String *: Long *: Long *: String *: EmptyTuple = parallel(
+    (
+      () => Thread.currentThread.getId,
+      () => Thread.currentThread.getId,
+      () => Thread.currentThread.getId,
+      () => "boom",
+      () => Thread.currentThread.getId,
+      () => Thread.currentThread.getId,
+      () => "boom"
+    )
   )
 
+  println(threads)
   println(value)
   println(value2)
-  println(threads)

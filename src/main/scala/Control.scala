@@ -9,6 +9,7 @@ import scala.annotation.implicitNotFound
   "this function may shift control to ${R} and requires capability:\n* Control[${R}]"
 )
 trait Control[-R]:
+  private[fx] val token: String
   /** Short-circuits the computation of [[A]] with a value of [[R]]
     */
   extension (r: R) def shift[A]: A
@@ -22,6 +23,8 @@ object Control:
     * compute through happy paths.
     */
   given Control[Nothing] = new Control[Nothing]:
+
+    private[fx] val token: String = "Control.nothing.token"
 
     /** ain't got nothing on me
       */

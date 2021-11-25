@@ -3,9 +3,9 @@ package fx
 import org.scalacheck.Properties
 import org.scalacheck.Prop.forAll
 
-object ContTests extends Properties("Cont laws"):
+object ControlTests extends Properties("Control Tests"):
 
-  property("Can short-circuit immediately from nested blocks") = forAll {
+  property("short-circuit from nested control") = forAll {
     (s: String) =>
       def outer: Int * Control[String] = 1
       def inner: Int * Control[String] =
@@ -14,13 +14,13 @@ object ContTests extends Properties("Cont laws"):
   }
 
   property("happy path") = forAll { (n: Int) =>
-    def effect: Int * Control[String] = n
+    def effect: Int * Control[Nothing] = n
     run(effect) == n
   }
 
-  property("short-circuit") = forAll { (s: String) =>
+  property("shift short-circuits") = forAll { (s: String) =>
     def effect: Int * Control[String] = s.shift
     run(effect) == s
   }
 
-end ContTests
+end ControlTests

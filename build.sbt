@@ -6,13 +6,19 @@ scalaVersion := "3.1.0"
 
 idePackagePrefix := Some("fx")
 
+fork in run := true
+
+classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
+
 javaOptions ++= Seq(
-  // "-source 18",
-  "-target 18",
+  "-XX:+IgnoreUnrecognizedVMOptions",
   "-XX:-DetectLocksInCompiledFrames",
   "-XX:+UnlockDiagnosticVMOptions",
   "-XX:+UnlockExperimentalVMOptions",
   "-XX:+UseNewCode",
+  "--add-modules=java.base",
+  "--add-opens java.base/jdk.internal.vm=ALL-UNNAMED",
+  "--add-exports java.base/jdk.internal.vm=ALL-UNNAMED",
   "--enable-preview")
 
 libraryDependencies ++= Seq(
