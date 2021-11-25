@@ -45,7 +45,7 @@ object StructuredTests extends Properties("Structured Concurrency Tests"):
     List(a, b).contains(value)
   }
 
-  property("concurrent shift - fork is not awaited") = forAll {
+  property("concurrent shift on non-awaited fork does not propagate") = forAll {
     (a: Int, b: Int, c: String) =>
       val x: String * Structured * Control[Int] =
         val fa = fork[Nothing](() => a.shift)

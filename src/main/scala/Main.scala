@@ -9,9 +9,8 @@ def program2: Int * Bind =
   Right(1).bind + Right(2).bind
 
 def program: Int
-  * Control[String]
   * Bind
-  * Errors =
+  * Errors[String] =
   Left[String, Int]("boom").bind +
     Right(1).bind +
     Right(2).bind +

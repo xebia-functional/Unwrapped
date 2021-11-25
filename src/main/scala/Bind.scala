@@ -26,10 +26,10 @@ object Bind:
   given Bind = ()
 
 extension [R, A](fa: Either[R, A])
-  def bind: A * Bind * Control[R] = fa.fold(_.shift, identity)
+  def bind: A * Bind * Errors[R] = fa.fold(_.shift, identity)
 
 extension [R, A](fa: List[Either[R, A]])
-  def bind: List[A] * Bind * Control[R] = fa.map(_.bind)
+  def bind: List[A] * Bind * Errors[R] = fa.map(_.bind)
 
 extension [R, A](fa: IO[A])
   /** TODO suspend Free monads like IO for integrations
