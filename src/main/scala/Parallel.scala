@@ -26,17 +26,11 @@ inline def parallel[X <: Tuple](
 )(using
     Tasks[X] =:= X
 ): TasksResults[X] = structured({
-  val tasks = f.toList
-    .map(fa => callableOf[Any](fa.asInstanceOf[() => Any]))
-    .asJava
   val results =
     f.toList
-      .map(fa => callableOf[Any](fa.asInstanceOf[() => Any]))
+      .map(fa => fa.asInstanceOf[() => Any])
       .map(fork(_))
-
-  //join
-
-
+  join
   Tuple
     .fromArray(results.map(_.get).toArray)
     .asInstanceOf[TasksResults[X]]
