@@ -23,21 +23,13 @@ inline def structured[B](f: B * Structured): B =
     scope.join
     scope.close()
 
-// inspired on https://github.com/AugustNagro/java-async-await/blob/master/src/main/java/com/augustnagro/jaa/Async.java#L14
-// todo refactor to use ScopeLocal when it's no longer a draft JEP.
-// https://openjdk.java.net/jeps/8263012
-private object Await:
-  private[fx] val context: ThreadLocal[Coroutine] = new ThreadLocal()
-
 def uncancellable[A](fn: () => A): () => A = {
   val promise = new CompletableFuture[A]()
   Thread
     .ofVirtual()
     .start(() => {
       try
-        Await.context.set(new Coroutine())
         promise.complete(fn())
-        Await.context.remove();
       catch
         case t: Throwable =>
           promise.completeExceptionally(t)
