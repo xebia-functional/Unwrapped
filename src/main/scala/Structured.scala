@@ -37,10 +37,6 @@ def uncancellable[A](fn: () => A): () => A = {
   () => promise.join
 }
 
-def never: Nothing =
-    val promise = CompletableFuture[Nothing]()
-    promise.join
-
 def fork[B](f: () => B): Future[B] * Structured =
   summon[Structured].fork(callableOf(f))
 

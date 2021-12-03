@@ -8,6 +8,7 @@ import cats.syntax.validated
 def program2: Int * Bind =
   Right(1).bind + Right(2).bind
 
+  
 def program: Int
   * Bind
   * Errors[String] =
@@ -25,15 +26,11 @@ def program: Int
   val value2: Int =
     run(program2 + program2)
 
-  val threads: Long *: Long *: Long *: String *: Long *: Long *: String *: EmptyTuple = parallel(
+  val threads = parallel(
     (
       () => Thread.currentThread.getId,
       () => Thread.currentThread.getId,
-      () => Thread.currentThread.getId,
-      () => "boom",
-      () => Thread.currentThread.getId,
-      () => Thread.currentThread.getId,
-      () => "boom"
+      () => Thread.currentThread.getId
     )
   )
 

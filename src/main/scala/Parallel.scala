@@ -24,8 +24,8 @@ object Parallel:
 inline def parallel[X <: Tuple](
     inline f: X
 )(using
-    Tasks[X] =:= X
-): TasksResults[X] = structured({
+    TupledVarargs[Function0, X]#Args =:= X
+): TupledVarargs[Function0, X]#Result = structured({
   val results =
     f.toList
       .map(fa => fa.asInstanceOf[() => Any])
@@ -33,18 +33,21 @@ inline def parallel[X <: Tuple](
   join
   Tuple
     .fromArray(results.map(_.get).toArray)
-    .asInstanceOf[TasksResults[X]]
+    .asInstanceOf[TupledVarargs[Function0, X]#Result]
 })
 
-type IsTask[A] <: Boolean = A match
-  case (() => ?) => true
-  case _         => false
-
-type Tasks[X <: Tuple] = Tuple.Filter[X, IsTask]
-
-type UnkindedTuple[F[_], T <: Tuple] <: Tuple =
-  T match
-    case EmptyTuple => EmptyTuple
-    case F[a] *: t  => a *: UnkindedTuple[F, t]
-
-type TasksResults[T <: Tuple] = UnkindedTuple[Function0, T]
+inline def parallelMap[X <: Tuple, C](
+    inline f: X,
+    fc: (TupledVarargs[Function0, X]#Result) => C
+)(using
+    TupledVarargs[Function0, X]#Args =:= X
+): C = structured({
+  val results =
+    f.toList
+      .map(fa => fa.asInstanceOf[() => Any])
+      .map(fork(_))
+  join
+  fc(Tuple
+    .fromArray(results.map(_.get).toArray)
+    .asInstanceOf[TupledVarargs[Function0, X]#Result])
+})
