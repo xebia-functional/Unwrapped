@@ -22,6 +22,6 @@ javaOptions ++= Seq(
   "--enable-preview")
 
 libraryDependencies ++= Seq(
-  "org.typelevel" %% "cats-effect" % "3.2.9",
+  "org.typelevel" %% "cats-effect" % "3.3.0",
   "org.scalacheck" %% "scalacheck" % "1.15.4" % "test"
 )
