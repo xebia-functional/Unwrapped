@@ -6,7 +6,7 @@ scalaVersion := "3.1.0"
 
 idePackagePrefix := Some("fx")
 
-fork in run := true
+run / fork := true
 
 classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
 
