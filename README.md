@@ -66,7 +66,7 @@ val results = parallel(
   )
 ```
 
-Continuations based on Control Throwable or a non blocking model like Loom are useful because they allow us to intermix async and sync programs in the same syntax witbout the need for boxing as frequently the case in most scala effect libraries.
+Continuations based on Control Throwable or a non blocking model like Loom are useful because they allow us to intermix async and sync programs in the same syntax without the need for boxing as is frequently the case in most scala effect libraries.
 
 ### Build and run in your local environment:
 
