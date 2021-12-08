@@ -30,9 +30,9 @@ inline def parallel[X <: Tuple](
     f.toList
       .map(fa => fa.asInstanceOf[() => Any])
       .map(fork(_))
-  join
+  joinAll
   Tuple
-    .fromArray(results.map(_.get).toArray)
+    .fromArray(results.map(_.join).toArray)
     .asInstanceOf[TupledVarargs[Function0, X]#Result]
 })
 
@@ -46,8 +46,8 @@ inline def parallelMap[X <: Tuple, C](
     f.toList
       .map(fa => fa.asInstanceOf[() => Any])
       .map(fork(_))
-  join
+  joinAll
   fc(Tuple
-    .fromArray(results.map(_.get).toArray)
+    .fromArray(results.map(_.join).toArray)
     .asInstanceOf[TupledVarargs[Function0, X]#Result])
 })

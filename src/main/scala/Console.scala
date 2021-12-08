@@ -56,16 +56,16 @@ class FakeConsole(var input: String) extends Console:
 
 @tailrec
 def program: String * Console * Errors[String] * Throws[EndOfLine] =
-  "what is your name?".write()
+  "what is your name?".writeLine()
   read() match
     case "" =>
       "empty name".writeLine()
       program
     case "me" =>
-      "wrong name".writeLine()
+      "wrong name!".writeLine()
       "wrong name".raise
     case name =>
-      name
+      s"hello $name"
 
 @main def consoleStandard() =
   import fx.runtime
