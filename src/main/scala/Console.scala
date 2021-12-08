@@ -12,23 +12,23 @@ class EndOfLine extends RuntimeException("reached end of line")
 )
 trait Console:
 
-  def read(): String * Throws[EndOfLine]
+  def read(): String 
 
   extension (s: String)
     def write(): Unit
     def writeLine(): Unit
 
 object Console:
-  given default: Console = StandardConsole
+  given default(using Throws[EndOfLine]): Console = StandardConsole()
 
 /** If your method is not an extension then it needs side syntax like these or
   * users would need to summon.
   */
-def read(): String * Console * Throws[EndOfLine] =
+def read(): String * Console =
   summon[Console].read()
 
-object StandardConsole extends Console:
-  def read(): String * Throws[EndOfLine] =
+class StandardConsole(using Throws[EndOfLine]) extends Console:
+  def read(): String =
     val r = readLine()
     if (r != null) r
     else throw EndOfLine()
@@ -40,7 +40,7 @@ object StandardConsole extends Console:
 class FakeConsole(var input: String) extends Console:
   var output: String = ""
 
-  def read(): String * Throws[EndOfLine] =
+  def read(): String =
     if input.isEmpty then throw EndOfLine()
     else
       input.split('\n') match
@@ -55,7 +55,7 @@ class FakeConsole(var input: String) extends Console:
     def writeLine(): Unit = output += (s + "\n")
 
 @tailrec
-def program: String * Console * Errors[String] * Throws[EndOfLine] =
+def program: String * Console * Errors[String] =
   "what is your name?".writeLine()
   read() match
     case "" =>
@@ -76,7 +76,6 @@ def program: String * Console * Errors[String] * Throws[EndOfLine] =
 
 @main def consoleFake() =
   import fx.runtime
-  import fx.unsafe.unsafeExceptions
   given Console = FakeConsole("")
   val value: String =
     try 
