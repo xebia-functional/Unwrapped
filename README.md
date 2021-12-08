@@ -12,7 +12,7 @@ val program: Int * Bind =
 ```
 
 Using Scala3 features such as context functions, infix types and erasable definitions we can can encode pure programs in terms of capabilities with minimal overhead.
-Capabilities can be introduced a la carte an will be carried as given contextual evidences trought call sites until you proof you can get rid of them.
+Capabilities can be introduced a la carte and will be carried as given contextual evidences through call sites until you proof you can get rid of them.
 
 ```scala
 val program: Int 
