@@ -3,13 +3,16 @@ package fx
 import fx.*
 import scala.annotation.implicitNotFound
 import scala.io.StdIn.readLine
+import scala.annotation.tailrec
+
+class EndOfLine extends RuntimeException("reached end of line")
 
 @implicitNotFound(
   "Missing capability:\n* Console"
 )
 trait Console:
 
-  def read(): String | Null
+  def read(): String * Throws[EndOfLine]
 
   extension (s: String)
     def write(): Unit
@@ -18,16 +21,17 @@ trait Console:
 object Console:
   given default: Console = StandardConsole
 
-/**
- * If your method is not an extension then it needs side syntax
- * like these or users would need to summon.
- **/
-def read(): (String | Null) * Console =
+/** If your method is not an extension then it needs side syntax like these or
+  * users would need to summon.
+  */
+def read(): String * Console * Throws[EndOfLine] =
   summon[Console].read()
 
 object StandardConsole extends Console:
-
-  def read(): String | Null = readLine()
+  def read(): String * Throws[EndOfLine] =
+    val r = readLine()
+    if (r != null) r
+    else throw EndOfLine()
 
   extension (s: String)
     def write(): Unit = print(s)
@@ -36,8 +40,8 @@ object StandardConsole extends Console:
 class FakeConsole(var input: String) extends Console:
   var output: String = ""
 
-  def read(): String | Null =
-    if input.isEmpty then null
+  def read(): String * Throws[EndOfLine] =
+    if input.isEmpty then throw EndOfLine()
     else
       input.split('\n') match
         case Array(r, rest*) =>
@@ -50,28 +54,13 @@ class FakeConsole(var input: String) extends Console:
     def write(): Unit = output += s
     def writeLine(): Unit = output += (s + "\n")
 
-def program1: String * Console * Errors[String] =
+@tailrec
+def program: String * Console * Errors[String] * Throws[EndOfLine] =
   "what is your name?".write()
   read() match
-    case null =>
-      "end of input".raise
     case "" =>
       "empty name".writeLine()
-      program1
-    case "me" =>
-      "wrong name".writeLine()
-      "wrong name".raise
-    case name =>
-      name
-
-def program2: String * Console * Errors[String] =
-  "what is your name?".write()
-  read() match
-    case null =>
-      "end of input".raise
-    case "" =>
-      "empty name".writeLine()
-      program2
+      program
     case "me" =>
       "wrong name".writeLine()
       "wrong name".raise
@@ -80,13 +69,19 @@ def program2: String * Console * Errors[String] =
 
 @main def consoleStandard() =
   import fx.runtime
+  import fx.unsafe.unsafeExceptions
 
   val value: String =
-    run(program2)
+    run(program)
 
 @main def consoleFake() =
   import fx.runtime
-  given Console = FakeConsole("Fake Input!")
+  import fx.unsafe.unsafeExceptions
+  given Console = FakeConsole("")
   val value: String =
-    run(program2)
+    try 
+      run(program)
+    catch 
+      case eol: EndOfLine => "Reached end"
+    
   println(value)
