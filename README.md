@@ -53,7 +53,7 @@ extension [R, A](fa: Either[R, A])
 Scala Fx supports a structured concurrency model backed by the non blocking [StructuredExecutor](https://download.java.net/java/early_access/loom/docs/api/java.base/java/util/concurrent/StructuredExecutor.html)
 where you can `fork` and `join` cancellable fibers and scopes.
 
-Popular functions like `parallel` support arbitrary typed artity in arguments and return types
+Popular functions like `parallel` support arbitrary typed arity in arguments and return types.
 
 ```scala
 // infers to TupledVarargs[[R] =>> () => R, (() => String, () => Int, () => Double)]#Result
