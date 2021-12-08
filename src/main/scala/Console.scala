@@ -37,7 +37,7 @@ class StandardConsole(using Throws[EndOfLine]) extends Console:
     def write(): Unit = print(s)
     def writeLine(): Unit = println(s)
 
-class FakeConsole(var input: String) extends Console:
+class FakeConsole(var input: String)(using Throws[EndOfLine]) extends Console:
   var output: String = ""
 
   def read(): String =
@@ -76,6 +76,7 @@ def program: String * Console * Errors[String] =
 
 @main def consoleFake() =
   import fx.runtime
+  import fx.unsafe.unsafeExceptions
   given Console = FakeConsole("")
   val value: String =
     try 
