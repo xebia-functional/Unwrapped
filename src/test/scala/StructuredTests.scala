@@ -21,7 +21,7 @@ object StructuredTests extends Properties("Structured Concurrency Tests"):
   property("parallel runs in parallel") = forAll { (a: Int, b: Int) =>
     val r = AtomicReference("")
     val modifyGate = CompletableFuture[Int]()
-    parallel(
+    structured(parallel(
       (
         () =>
           modifyGate.join
@@ -30,7 +30,7 @@ object StructuredTests extends Properties("Structured Concurrency Tests"):
           r.set(s"$b")
           modifyGate.complete(0)
       )
-    )
+    ))
     r.get() == s"$b$a"
   }
 

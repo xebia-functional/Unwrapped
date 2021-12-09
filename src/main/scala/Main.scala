@@ -20,13 +20,13 @@ def program: Int
   val value: Int | String =
     run(program + program)
 
-  val results: TupledVarargs[[R] =>> () => R, (() => String, () => Int, () => Double)]#Result = parallel(
+  val results = structured(parallel(
     (
       () => "1",
       () => 0,
       () => 47.0
     )
-  )
+  ))
 
   println(results)
   println(value)
