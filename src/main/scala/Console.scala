@@ -69,14 +69,14 @@ def program: String * Console * Errors[String] =
 
 @main def consoleStandard() =
   import fx.runtime
-  import fx.unsafe.unsafeExceptions
+  import fx.unsafeExceptions
 
   val value: String =
     run(program)
 
 @main def consoleFake() =
   import fx.runtime
-  import fx.unsafe.unsafeExceptions
+  import fx.unsafeExceptions
   given Console = FakeConsole("")
   val value: String =
     try 

@@ -22,11 +22,9 @@ object Control:
     * like Either, Option, etc to disregard the Control capability if users just
     * compute through happy paths.
     */
-  given Control[Nothing] = new Control[Nothing]:
+  given Pure: Control[Nothing] with
 
     private[fx] val token: String = "Control.nothing.token"
 
-    /** ain't got nothing on me
-      */
     extension (r: Nothing)
       def shift[A]: A = throw new RuntimeException("impossible")

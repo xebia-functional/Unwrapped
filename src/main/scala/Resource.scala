@@ -53,7 +53,7 @@ class Resources:
   )
 
 object Resources:
-    given Resources = new Resources
+  given Resources = new Resources
 
 enum ExitCase:
   case Completed
@@ -92,17 +92,17 @@ private[fx] def composeErrors(
 def parallelZip[X <: Tuple, C](
     fa: X,
     f: (TupledVarargs[Resource, X]#Result) => C
-)(using X =:= TupledVarargs[Resource, X]#Args): Resource[C] * Resources =
-  structured({
-    Resource({
-      val results =
-        fa.toList
-          .map(fa => () => fa.asInstanceOf[Resource[Any]].bind)
-          .map(fork(_))
-      joinAll
-      val r = Tuple
-        .fromArray(results.map(_.join).toArray)
-        .asInstanceOf[TupledVarargs[Resource, X]#Result]
-      f(r)
-    })
+)(using
+    X =:= TupledVarargs[Resource, X]#Args
+): Resource[C] * Resources * Structured =
+  Resource({
+    val results =
+      fa.toList
+        .map(fa => () => fa.asInstanceOf[Resource[Any]].bind)
+        .map(fork(_))
+    joinAll
+    val r = Tuple
+      .fromArray(results.map(_.join).toArray)
+      .asInstanceOf[TupledVarargs[Resource, X]#Result]
+    f(r)
   })
