@@ -25,6 +25,9 @@ opaque type Bind = Unit
 object Bind:
   given Bind = ()
 
+extension [A](fa: List[A])
+  def bind: A * Bind = ???
+
 extension [R, A](fa: Either[R, A])
   def bind: A * Bind * Errors[R] = fa.fold(_.shift, identity)
 

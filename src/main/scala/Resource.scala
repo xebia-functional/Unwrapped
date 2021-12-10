@@ -99,9 +99,9 @@ def parallelZip[X <: Tuple, C](
         fa.toList
           .map(fa => () => fa.asInstanceOf[Resource[Any]].bind)
           .map(fork(_))
-      join
+      joinAll
       val r = Tuple
-        .fromArray(results.map(_.get).toArray)
+        .fromArray(results.map(_.join).toArray)
         .asInstanceOf[TupledVarargs[Resource, X]#Result]
       f(r)
     })
