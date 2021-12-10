@@ -7,13 +7,17 @@ import java.util.concurrent.Future
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.concurrent.CompletableFuture
+
 import java.util.concurrent.CancellationException
 
 @implicitNotFound(
   "Structured concurrency requires capability:\n* Structured"
 )
 opaque type Structured = StructuredExecutor
+
+extension (s: Structured)
+  private[fx] def forked[A](callable: Callable[A]): Future[A] =
+    s.fork(callable)
 
 inline def structured[B](f: B * Structured): B =
   val scope = StructuredExecutor.open("scala fx structured scope")
@@ -23,24 +27,7 @@ inline def structured[B](f: B * Structured): B =
     scope.join
     scope.close()
 
-def uncancellable[A](fn: () => A): () => A = {
-  val promise = new CompletableFuture[A]()
-  Thread
-    .ofVirtual()
-    .start(() => {
-      try
-        promise.complete(fn())
-      catch
-        case t: Throwable =>
-          promise.completeExceptionally(t)
-    })
-  () => promise.join
-}
-
-def fork[B](f: () => B): Future[B] * Structured =
-  summon[Structured].fork(callableOf(f))
-
-def join: Unit * Structured =
+def joinAll: Unit * Structured =
   summon[Structured].join
 
 private[fx] inline def callableOf[A](f: () => A): Callable[A] =

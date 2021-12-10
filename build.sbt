@@ -8,6 +8,8 @@ idePackagePrefix := Some("fx")
 
 run / fork := true
 
+run / connectInput := true
+
 classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
 
 javaOptions ++= Seq(
