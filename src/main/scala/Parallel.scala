@@ -41,7 +41,7 @@ inline def parallelMap[X <: Tuple, C](
     fc: (TupledVarargs[Function0, X]#Result) => C
 )(using
     TupledVarargs[Function0, X]#Args =:= X
-): C = structured({
+): C * Structured = 
   val results =
     f.toList
       .map(fa => fa.asInstanceOf[() => Any])
@@ -50,4 +50,3 @@ inline def parallelMap[X <: Tuple, C](
   fc(Tuple
     .fromArray(results.map(_.join).toArray)
     .asInstanceOf[TupledVarargs[Function0, X]#Result])
-})

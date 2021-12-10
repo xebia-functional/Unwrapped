@@ -5,9 +5,7 @@ import java.time.Duration
 import java.util.concurrent.CancellationException
 import cats.syntax.validated
 
-
-def program: Int
-  * Bind
+val program: Int
   * Errors[String] =
   Left[String, Int]("boom").bind +
     Right(1).bind +
@@ -20,13 +18,14 @@ def program: Int
   val value: Int | String =
     run(program + program)
 
-  val results = structured(parallel(
-    (
-      () => "1",
-      () => 0,
-      () => 47.0
+  val results : (String, Int, Double) * Structured = 
+    parallel(
+      (
+        () => "1",
+        () => 0,
+        () => 47.0
+      )
     )
-  ))
 
-  println(results)
+  println(structured(results))
   println(value)
