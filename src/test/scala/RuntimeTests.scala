@@ -1,8 +1,8 @@
 package fx
 
-import cats.syntax.option._
 import org.scalacheck.Properties
 import org.scalacheck.Prop.forAll
+import fx.*
 
 object RuntimeTests extends Properties("Runtime Tests"):
   property("Either binding toOption") = forAll { (a: Int, b: Int) =>
@@ -21,4 +21,18 @@ object RuntimeTests extends Properties("Runtime Tests"):
       val effect: Int * Control[None.type] = Right(a).bind + Some(b).bind
       run(effect).toEither == Right(a + b)
   }
+
+  property("Short-circuiting with Either.Left toEither") = forAll {
+    (n: Int, s: String) =>
+      val effect: Int * Control[String | None.type] =
+        Left[String, Int](s).bind + Some(n).bind
+      toEither(effect) == Left[String, Int](s)
+  }
+
+  property("Short-circuiting with Option.None toOption") = forAll { (n: Int) =>
+    val effect: Int * Control[None.type] =
+      Right(n).bind + Option.empty[Int].bind
+    toOption(effect) == None
+  }
+
 end RuntimeTests
