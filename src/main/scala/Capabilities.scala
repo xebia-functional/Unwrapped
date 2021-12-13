@@ -3,5 +3,5 @@ package fx
 import scala.annotation.showAsInfix
 
 @showAsInfix
-infix type *[+Result, -Effect] = Control[Nothing] ?=> Effect ?=> Result
+infix type *[+Result, -Effect] = Effect ?=> Result
 

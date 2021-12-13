@@ -1,6 +1,5 @@
 package fx
 
-import cats.effect.IO
 import scala.annotation.implicitNotFound
 
 @implicitNotFound(
@@ -12,15 +11,11 @@ given runtime: Runtime = ()
 
 extension [R, A](c: A * Control[R])
 
-  def run: (R | A) * Runtime = fold(c)(identity, identity)
-
   def toEither: Either[R, A] * Runtime =
-    fold(c)(Left(_), Right(_))
+    Continuation.fold(c)(Left(_), Right(_))
 
   def toOption: Option[A] * Runtime =
-    fold(c)(_ => None, Some(_))
+    Continuation.fold(c)(_ => None, Some(_))
 
-  def toIO: IO[Either[R, A]] * Runtime = {
-    given Control[R] = summon[Control[R]]
-    IO(toEither)
-  }
+  def run: (R | A) * Runtime = Continuation.fold(c)(identity, identity)
+  

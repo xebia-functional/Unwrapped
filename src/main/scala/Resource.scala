@@ -1,10 +1,10 @@
 package fx
 
-import java.util.concurrent.CancellationException
 import java.util.concurrent.atomic.AtomicReference
 import scala.util.control.NonFatal
-import scala.annotation.varargs
-import cats.syntax.validated
+import fx.Tuples.mapK
+import Tuple.{Map, IsMappedBy, InverseMap}
+import scala.annotation.implicitNotFound
 
 class Resource[A](
     val acquire: A * Resources,
@@ -16,20 +16,17 @@ class Resource[A](
   def use[B](f: A => B): B * Resources = bracketCase(() => acquire, f, release)
 
   def map[B](f: (A) => B): Resource[B] =
-    given Resources = new Resources
     Resource(f(this.bind))
 
   def flatMap[B](f: (A) => Resource[B]): Resource[B] =
-    given Resources = new Resources
     Resource(f(this.bind).bind)
 
-  def bind: A * Resources =
-    given resources: Resources = summon[Resources]
+  def bind: A =
     bracketCase(
       () => {
         val a = acquire
         val finalizer: (ExitCase) => Unit = (ex: ExitCase) => release(a, ex)
-        resources.finalizers.updateAndGet(finalizer +: _)
+        summon[Resources].finalizers.updateAndGet(finalizer +: _)
         a
       },
       identity,
@@ -37,7 +34,7 @@ class Resource[A](
         // Only if ExitCase.Failure, or ExitCase.Cancelled during acquire we cancel
         // Otherwise we've saved the finalizer, and it will be called from somewhere else.
         if (ex != ExitCase.Completed)
-          val e = cancelAll(resources.finalizers.get(), ex, null)
+          val e = cancelAll(summon[Resources].finalizers.get(), ex, null)
           val e2 =
             try
               release(a, ex)
@@ -46,14 +43,13 @@ class Resource[A](
           val error = composeErrors(e, e2)
           throw error
     )
-
-class Resources:
-  val finalizers: AtomicReference[List[(ExitCase) => Unit]] = AtomicReference(
-    List.empty
-  )
+ 
+class Resources(val finalizers: AtomicReference[List[(ExitCase) => Unit]])
 
 object Resources:
-  given Resources = new Resources
+  given Resources = new Resources(AtomicReference(
+    List.empty
+  ))
 
 enum ExitCase:
   case Completed
@@ -89,20 +85,3 @@ private[fx] def composeErrors(
         case null => l
     case null => right
 
-def parallelZip[X <: Tuple, C](
-    fa: X,
-    f: (TupledVarargs[Resource, X]#Result) => C
-)(using
-    X =:= TupledVarargs[Resource, X]#Args
-): Resource[C] * Resources * Structured =
-  Resource({
-    val results =
-      fa.toList
-        .map(fa => () => fa.asInstanceOf[Resource[Any]].bind)
-        .map(fork(_))
-    joinAll
-    val r = Tuple
-      .fromArray(results.map(_.join).toArray)
-      .asInstanceOf[TupledVarargs[Resource, X]#Result]
-    f(r)
-  })

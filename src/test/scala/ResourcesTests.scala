@@ -5,6 +5,7 @@ import org.scalacheck.Prop.forAll
 import java.util.concurrent.CompletableFuture
 import scala.util.control.NonFatal
 import java.util.concurrent.CompletionException
+import java.util.concurrent.ExecutionException
 
 object ResourcesTests extends Properties("Resources Tests"):
 
@@ -30,7 +31,7 @@ object ResourcesTests extends Properties("Resources Tests"):
         r.use(_ + 1)
         "unexpected"
       catch
-        case e: CompletionException => e.getCause.asInstanceOf[CustomEx].token
+        case e: ExecutionException => e.getCause.asInstanceOf[CustomEx].token
     result == n
   }
 

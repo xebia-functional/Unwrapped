@@ -6,12 +6,12 @@ import org.scalacheck.Prop.forAll
 
 object BindTests extends Properties("Bind Tests"):
   property("Binding two values of the same type") = forAll { (a: Int, b: Int) =>
-    val effect: Int * Control[Nothing] = Right(a).bind + Right(b).bind
+    val effect: Int * Bind = Right(a).bind + Right(b).bind
     run(effect) == a + b
   }
 
   property("Binding two values of different types") = forAll { (a: Int, b: Int) =>
-    val effect: Int * Control[None.type] = Right(a).bind + Some(b).bind
+    val effect: Int * Bind = Right(a).bind + Some(b).bind
     run(effect) == a + b
   }
 
