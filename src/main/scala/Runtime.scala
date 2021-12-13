@@ -17,6 +17,9 @@ extension [R, A](c: A * Control[R])
   def toEither: Either[R, A] * Runtime =
     fold(c)(Left(_), Right(_))
 
+  def toOption: Option[A] * Runtime =
+    fold(c)(_ => None, Some(_))
+
   def toIO: IO[Either[R, A]] * Runtime = {
     given Control[R] = summon[Control[R]]
     IO(toEither)
