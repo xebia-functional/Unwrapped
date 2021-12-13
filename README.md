@@ -2,7 +2,7 @@
 
 ## Getting started
 
-Scala-fx is an effects library for Scala 3 that introduces structured concurrency and a abilities system to describe pure functions and programs. 
+Scala-fx is an effects library for Scala 3 that introduces structured concurrency and an abilities system to describe pure functions and programs. 
 
 The example below is a pure program that returns `Int` and requires the context capability `Bind`. Bind enables the `bind` syntax over values of Either and other types.
 

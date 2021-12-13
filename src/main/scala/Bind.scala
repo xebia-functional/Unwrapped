@@ -25,28 +25,14 @@ opaque type Bind = Unit
 object Bind:
   given Bind = ()
 
+extension [A](fa: List[A])
+  def bind: A * Bind = ???
+
 extension [R, A](fa: Either[R, A])
   def bind: A * Bind * Errors[R] = fa.fold(_.shift, identity)
 
 extension [R, A](fa: List[Either[R, A]])
   def bind: List[A] * Bind * Errors[R] = fa.map(_.bind)
 
-extension [R, A](fa: IO[A])
-  /** TODO suspend Free monads like IO for integrations
-    */
-  def bind: A * Bind * Control[Throwable] =
-    val ec = new ExecutionContext {
-      def execute(runnable: Runnable): Unit =
-        Thread.startVirtualThread(runnable)
-      def reportFailure(cause: Throwable): Unit =
-        cause.printStackTrace
-    }
-    val sc: Scheduler = ???
-    given IORuntime = IORuntime(
-      compute = ec,
-      blocking = ec,
-      scheduler = sc,
-      shutdown = () => (),
-      config = IORuntimeConfig()
-    )
-    fa.unsafeRunSync()
+extension [A](fa: Option[A])
+  def bind: A * Bind * Errors[None.type] = fa.fold(None.shift)(identity)
