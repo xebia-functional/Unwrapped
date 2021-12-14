@@ -2,7 +2,7 @@ name := "scala-fx"
 
 version := "0.1"
 
-scalaVersion := "3.1.0"
+scalaVersion := "3.1.1-RC1"
 
 idePackagePrefix := Some("fx")
 

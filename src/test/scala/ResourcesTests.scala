@@ -5,6 +5,7 @@ import org.scalacheck.Prop.forAll
 import java.util.concurrent.CompletableFuture
 import scala.util.control.NonFatal
 import java.util.concurrent.CompletionException
+import java.util.concurrent.ExecutionException
 
 object ResourcesTests extends Properties("Resources Tests"):
 

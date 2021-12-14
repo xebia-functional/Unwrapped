@@ -8,15 +8,16 @@ import cats.effect.unsafe.Scheduler
 import cats.effect.unsafe.IORuntimeConfig
 
 /** Brings the capability to perform Monad bind in place to any type. Types may
-  * access [[Control]] to short-circuit as necessary
-  *
-  * ```scala
-  * import fx.Bind
-  *
-  * extension [R, A](fa: Either[R, A])
-  *   def bind: A * Bind * Control[R] = fa.fold(_.shift, identity)
-  * ```
-  */
+ * access [[Control]] to short-circuit as necessary
+ *
+ * ```scala
+ * import fx.Bind
+ * import fx.Control
+ *
+ * extension [R, A](fa: Either[R, A])
+ *   def bind: A * Bind * Control[R] = fa.fold(_.shift, identity)
+ * ```
+ */
 @implicitNotFound(
   "Monadic bind requires capability:\n* Bind"
 )
@@ -36,3 +37,6 @@ extension [R, A](fa: List[Either[R, A]])
 
 extension [A](fa: Option[A])
   def bind: A * Bind * Errors[None.type] = fa.fold(None.shift)(identity)
+
+extension [A](fa: Some[A])
+  def bind: A * Bind = fa.get

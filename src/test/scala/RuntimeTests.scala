@@ -5,19 +5,18 @@ import org.scalacheck.Prop.forAll
 
 object RuntimeTests extends Properties("Runtime Tests"):
   property("Either binding toOption") = forAll { (a: Int, b: Int) =>
-    val effect: Int * Control[Nothing] = Right(a).bind + Right(b).bind
+    val effect: Int * Bind = Right(a).bind + Right(b).bind
     toOption(effect) == Some(a + b)
   }
 
   property("Option binding toEither") = forAll { (a: Int, b: Int) =>
-    val effect: Int * Control[None.type] =
-      Some(a).bind + Some(b).bind
+    val effect: Int * Bind = Some(a).bind + Some(b).bind
     toEither(effect) == Right(a + b)
   }
 
   property("Binding two values of different types toEither") = forAll {
     (a: Int, b: Int) =>
-      val effect: Int * Control[None.type] = Right(a).bind + Some(b).bind
+      val effect: Int * Bind = Right(a).bind + Some(b).bind
       toEither(effect) == Right(a + b)
   }
 

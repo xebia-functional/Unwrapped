@@ -1,53 +1,50 @@
 package fx
 
 import scala.annotation.implicitNotFound
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.Callable
-import java.util.concurrent.Future
-import java.util.concurrent.CompletableFuture
-import java.util.Collection
-import scala.jdk.CollectionConverters.*
-import java.util.concurrent.ThreadFactory
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.StructuredExecutor
-import java.time.Instant
+import Tuple.{Map, IsMappedBy, InverseMap}
+import scala.annotation.tailrec
+import fx.Tuples.mapK
 
-@implicitNotFound(
-  "parallel requires capability:\n* Parallel"
-)
-opaque type Parallel = Unit
+type ParTupled = [F[_], X <: Tuple] =>> MapK[Fiber, Id, MapK[F, Fiber, X]]
 
-object Parallel:
-  given Parallel = ()
+type ParBind = [F[_]] =>> [t] => F[t] => t
 
-inline def parallel[X <: Tuple](
-    inline f: X
-)(using
-    TupledVarargs[Function0, X]#Args =:= X
-): TupledVarargs[Function0, X]#Result * Structured = 
-  val results =
-    f.toList
-      .map(fa => fa.asInstanceOf[() => Any])
-      .map(fork(_))
-  joinAll
-  Tuple
-    .fromArray(results.map(_.join).toArray)
-    .asInstanceOf[TupledVarargs[Function0, X]#Result]
+given idParBind: ParBind[Id] =
+  [t] => (f: Id[t]) => f
 
+given function0ParBind: ParBind[Function0] =
+  [t] => (f: Function0[t]) => f.apply
 
-inline def parallelMap[X <: Tuple, C](
-    inline f: X,
-    fc: (TupledVarargs[Function0, X]#Result) => C
-)(using
-    TupledVarargs[Function0, X]#Args =:= X
-): C = structured({
-  val results =
-    f.toList
-      .map(fa => fa.asInstanceOf[() => Any])
-      .map(fork(_))
-  joinAll
-  fc(Tuple
-    .fromArray(results.map(_.join).toArray)
-    .asInstanceOf[TupledVarargs[Function0, X]#Result])
-})
+given resourceParBind: ParBind[Resource] =
+  [t] => (f: Resource[t]) => f.bind
+
+extension [X <: Tuple](x: X)
+  def par[F[_]](using
+      IsMappedBy[F][X],
+      ParBind[F]
+  ): ParTupled[F, X] * Structured =
+    val fibers =
+      x.mapK[F, Fiber](
+        [r] => (r: F[r]) => fork(() => summon[ParBind[F]](r))
+      )
+    joinAll
+    val awaited =
+      fibers.mapK[Fiber, Id](
+        [r] => (r: Fiber[r]) => r.join
+      )
+    awaited
+
+@main def ParallelFunctionExample =
+  val results: (String, Int, Double) * Structured =
+    (
+      () => "1",
+      () => 0,
+      () => 47.03
+    ).par[Function0]
+  println(structured(results))
+
+@main def ParallelResourceExample =
+  val results: (Int, String, Double) * Structured =
+    (Resource(1), Resource("a"), Resource(47.0)).par[Resource]
+
+  println(structured(results))

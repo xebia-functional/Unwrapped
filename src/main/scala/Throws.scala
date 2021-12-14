@@ -8,16 +8,18 @@ import scala.annotation.implicitNotFound
     "* Throws[${R}]\n" +
     "alternatively you may resolve this call with \n" +
     "```scala\nhandle(f)(recover)\n```\n" +
-    "or\n ignored thrown exceptions with import fx.unsafe.unsafeExceptions`"
+    "or\n ignore thrown exceptions with import fx.unsafe.unsafeExceptions`"
 )
-sealed trait Throws[-R <: Exception]
-private[fx] object Handled extends Throws[Nothing]
+opaque type Throws[-R <: Exception] = Unit
+
+object Throws :
+  given unsafeExceptions[R <: Exception]: Throws[R] = ()
 
 inline def handle[R <: Exception, A](
     inline f: A * Throws[R]
 )(inline recover: (R) => A): A =
   try
-    import fx.unsafe.unsafeExceptions
+    import fx.Throws.unsafeExceptions
     f
   catch
     case r: R =>
