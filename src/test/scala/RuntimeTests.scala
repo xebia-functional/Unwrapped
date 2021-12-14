@@ -2,7 +2,6 @@ package fx
 
 import org.scalacheck.Properties
 import org.scalacheck.Prop.forAll
-import fx.*
 
 object RuntimeTests extends Properties("Runtime Tests"):
   property("Either binding toOption") = forAll { (a: Int, b: Int) =>
