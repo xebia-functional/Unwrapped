@@ -29,5 +29,7 @@ jobs:
           architecture: x64
       - name: Setup Scala
         uses: olafurpg/setup-scala@v13
+        with:
+          java-version: '18.0.0'
       - name: Run checks
         run: sbt test
