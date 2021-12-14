@@ -18,15 +18,6 @@ jobs:
       - name: Checkout project (main)
         if: github.event_name == 'push'
         uses: actions/checkout@v2
-      - run: |
-          download_url="https://download.java.net/java/early_access/loom/7/openjdk-18-loom+7-288_linux-x64_bin.tar.gz"
-          wget -O $RUNNER_TEMP/java_package.tar.gz $download_url
-      - uses: actions/setup-java@v2
-        with:
-          distribution: 'jdkfile'
-          jdkFile: ${{ runner.temp }}/java_package.tar.gz
-          java-version: '18.0.0'
-          architecture: x64
       - name: Setup Scala
         uses: olafurpg/setup-scala@v13
         with:
