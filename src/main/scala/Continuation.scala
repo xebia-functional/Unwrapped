@@ -9,7 +9,7 @@ import scala.annotation.tailrec
 
 object Continuation: 
   inline def fold[R, A, B](
-      inline program: A * Control[R]
+      inline program: A % Control[R]
   )(inline recover: R => B, inline transform: A => B): B = {
     var result: Any | Null = null
     implicit val control = new Control[R] {
