@@ -10,7 +10,7 @@ extension [A](fiber: Fiber[A])
   def cancel(mayInterrupt: Boolean = true): Boolean * Structured =
     fiber.cancel(mayInterrupt)
 
-def uncancellable[A](fn: () => A): Fiber[A] = {
+def uncancellable[A](fn: () => A): A = {
   val promise = new CompletableFuture[A]()
   Thread
     .ofVirtual()
@@ -20,7 +20,7 @@ def uncancellable[A](fn: () => A): Fiber[A] = {
         case t: Throwable =>
           promise.completeExceptionally(t)
     })
-  promise
+  promise.join
 }
 
 def fork[B](f: () => B): Fiber[B] * Structured =

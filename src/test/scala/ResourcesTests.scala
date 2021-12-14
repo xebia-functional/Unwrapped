@@ -31,7 +31,7 @@ object ResourcesTests extends Properties("Resources Tests"):
         r.use(_ + 1)
         "unexpected"
       catch
-        case e: ExecutionException => e.getCause.asInstanceOf[CustomEx].token
+        case e: CompletionException => e.getCause.asInstanceOf[CustomEx].token
     result == n
   }
 

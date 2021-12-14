@@ -15,14 +15,14 @@ extension [A](r: Receive[Receive[A]])
 
   def flattenMerge[B](
       concurrency: Int
-  ): Receive[B] * Structured * Send[Receive[A]] =
+  ): Receive[B] * Send[Receive[A]] =
     val semaphore = Semaphore(concurrency)
     streamed(receive { (inner: Receive[A]) =>
       semaphore.acquire()
       uncancellable(() => {
         try send(inner)
         finally semaphore.release()
-      }).join
+      })
     }(using r))
 
 extension [A](r: Receive[A])

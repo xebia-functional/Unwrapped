@@ -9,7 +9,7 @@ inline def runReleaseAndRethrow(
     inline f: () => Unit
 ): Nothing =
   try {
-    structured(uncancellable(f))
+    uncancellable(f)
   } catch
     case NonFatal(e) =>
       original.addSuppressed(e)
@@ -55,7 +55,7 @@ inline def bracket[A, B](
     inline use: (A) => B,
     inline release: (A) => Unit
 ): B =
-  val acquired = structured(uncancellable(acquire).join)
+  val acquired = uncancellable(acquire)
   val res =
     try use(acquired)
     catch
@@ -73,7 +73,7 @@ inline def bracketCase[A, B](
     inline use: (A) => B,
     inline release: (A, ExitCase) => Unit
 ): B =
-  val acquired = structured(uncancellable(acquire).join)
+  val acquired = uncancellable(acquire)
   val res =
     try use(acquired)
     catch
@@ -86,5 +86,5 @@ inline def bracketCase[A, B](
         )
       case NonFatal(t) =>
         runReleaseAndRethrow(t, () => release(acquired, ExitCase.Failure(t)))
-  structured(uncancellable(() => release(acquired, ExitCase.Completed)).join)
+  uncancellable(() => release(acquired, ExitCase.Completed))
   res
