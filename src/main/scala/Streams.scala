@@ -15,12 +15,12 @@ extension [A](r: Receive[Receive[A]])
 
   def flattenMerge[B](
       concurrency: Int
-  ): Receive[B] * Send[Receive[A]] =
+  ): Receive[B] * Send[Receive[A]] * Send[A] =
     val semaphore = Semaphore(concurrency)
     streamed(receive { (inner: Receive[A]) =>
       semaphore.acquire()
       uncancellable(() => {
-        try send(inner)
+        try sendAll(inner)
         finally semaphore.release()
       })
     }(using r))
@@ -35,7 +35,7 @@ extension [A](r: Receive[A])
       if (predicate(value)) send(value)
     }
 
-  def map[B](f: (A => B) * Send[B]): Receive[B] =
+  def map[B](f: (A => B)): Receive[B] =
     transform { v => send(f(v)) }
 
   def flatMap[B](transform: A => Receive[B]): Receive[B] =
@@ -43,7 +43,7 @@ extension [A](r: Receive[A])
 
   def flatMapMerge[B](concurrency: Int)(
       transform: A => Receive[B]
-  ): Receive[B] * Structured * Send[Receive[B]] =
+  ): Receive[B] * Structured * Send[Receive[B]] * Send[B] =
     map(transform).flattenMerge(concurrency)
 
   def indexed: Receive[(Int, A)] =
