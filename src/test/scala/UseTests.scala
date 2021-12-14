@@ -24,17 +24,16 @@ object UseTests extends Properties("Use Tests"):
     p.join == s && res == i
   }
 
-  property("finalizer is invoked on exception") = forAll {
-    (i: Int, s: String) =>
-      val p = CompletableFuture[String]()
-      val res =
-        try
-          guarantee(
-            fa = () => throw RuntimeException("boom"),
-            finalizer = () => p.complete(s)
-          )
-        catch case e: RuntimeException => i
-      p.join == s && res == i
+  property("finalizer is invoked on exception") = forAll { (i: Int, s: String) =>
+    val p = CompletableFuture[String]()
+    val res =
+      try
+        guarantee(
+          fa = () => throw RuntimeException("boom"),
+          finalizer = () => p.complete(s)
+        )
+      catch case e: RuntimeException => i
+    p.join == s && res == i
   }
 
 end UseTests

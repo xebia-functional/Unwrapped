@@ -12,7 +12,7 @@ import scala.annotation.implicitNotFound
 )
 opaque type Throws[-R <: Exception] = Unit
 
-object Throws :
+object Throws:
   given unsafeExceptions[R <: Exception]: Throws[R] = ()
 
 inline def handle[R <: Exception, A](

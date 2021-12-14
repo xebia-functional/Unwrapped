@@ -18,4 +18,3 @@ extension [R, A](c: A % Control[R])
     Continuation.fold(c)(_ => None, Some(_))
 
   def run: (R | A) % Runtime = Continuation.fold(c)(identity, identity)
-  

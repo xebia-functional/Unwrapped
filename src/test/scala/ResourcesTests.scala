@@ -17,7 +17,7 @@ object ResourcesTests extends Properties("Resources Tests"):
   property("value resource is released with Complete") = forAll { (n: Int) =>
     val p = CompletableFuture[ExitCase]()
     val r = Resource(n, (_, ex) => require(p.complete(ex)))
-    r.use((_) => ())
+    r.use(_ => ())
     p.join == ExitCase.Completed
   }
 
@@ -30,8 +30,7 @@ object ResourcesTests extends Properties("Resources Tests"):
       try
         r.use(_ + 1)
         "unexpected"
-      catch
-        case e: CompletionException => e.getCause.asInstanceOf[CustomEx].token
+      catch case e: CompletionException => e.getCause.asInstanceOf[CustomEx].token
     result == n
   }
 

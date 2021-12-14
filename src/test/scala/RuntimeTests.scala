@@ -14,17 +14,15 @@ object RuntimeTests extends Properties("Runtime Tests"):
     toEither(effect) == Right(a + b)
   }
 
-  property("Binding two values of different types toEither") = forAll {
-    (a: Int, b: Int) =>
-      val effect: Int % Bind = Right(a).bind + Some(b).bind
-      toEither(effect) == Right(a + b)
+  property("Binding two values of different types toEither") = forAll { (a: Int, b: Int) =>
+    val effect: Int % Bind = Right(a).bind + Some(b).bind
+    toEither(effect) == Right(a + b)
   }
 
-  property("Short-circuiting with Either.Left toEither") = forAll {
-    (n: Int, s: String) =>
-      val effect: Int % Control[String | None.type] =
-        Left[String, Int](s).bind + Some(n).bind
-      toEither(effect) == Left[String, Int](s)
+  property("Short-circuiting with Either.Left toEither") = forAll { (n: Int, s: String) =>
+    val effect: Int % Control[String | None.type] =
+      Left[String, Int](s).bind + Some(n).bind
+    toEither(effect) == Left[String, Int](s)
   }
 
   property("Short-circuiting with Option.None toOption") = forAll { (n: Int) =>
