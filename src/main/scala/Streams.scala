@@ -3,7 +3,6 @@ package fx
 import java.util.concurrent.Semaphore
 import scala.annotation.implicitNotFound
 import scala.collection.mutable.ArrayBuffer
-import cats.syntax.validated
 
 @implicitNotFound(
   "Receiving values from streams or channels require capability:\n% Receive[${A}]"
