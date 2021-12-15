@@ -19,4 +19,12 @@ object StreamsTests extends Properties("Streams tests"):
     streamOf(n).flatMap(n => streamOf(n + 1)).toList == List(n + 1)
   }
 
+  property("comprehensions") = forAll { (n: Int) =>
+    val r = for {
+      a <- streamOf(n)
+      b <- streamOf(n)
+    } yield a + b
+    r.toList == List(n + n)
+  }
+
 end StreamsTests
