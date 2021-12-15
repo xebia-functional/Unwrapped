@@ -4,7 +4,7 @@ import java.util.concurrent.Semaphore
 import scala.annotation.implicitNotFound
 
 @implicitNotFound(
-  "Receiving values from streams or channels require capability:\n* Receive[${A}]"
+  "Receiving values from streams or channels require capability:\n% Receive[${A}]"
 )
 trait Receive[+A]:
   def receive(f: A => Unit): Unit
@@ -15,7 +15,7 @@ extension [A](r: Receive[Receive[A]])
 
   def flattenMerge[B](
       concurrency: Int
-  ): Receive[B] * Send[Receive[A]] * Send[A] =
+  ): Receive[B] % Send[Receive[A]] % Send[A] =
     val semaphore = Semaphore(concurrency)
     streamed(receive { (inner: Receive[A]) =>
       semaphore.acquire()
@@ -27,10 +27,10 @@ extension [A](r: Receive[Receive[A]])
 
 extension [A](r: Receive[A])
 
-  def transform[B](f: (A => Unit) * Send[B]): Receive[B] =
+  def transform[B](f: (A => Unit) % Send[B]): Receive[B] =
     streamed(receive(f)(using r))
 
-  def filter(predicate: (A => Boolean) * Send[A]): Receive[A] =
+  def filter(predicate: (A => Boolean) % Send[A]): Receive[A] =
     transform { value =>
       if (predicate(value)) send(value)
     }
@@ -43,7 +43,7 @@ extension [A](r: Receive[A])
 
   def flatMapMerge[B](concurrency: Int)(
       transform: A => Receive[B]
-  ): Receive[B] * Structured * Send[Receive[B]] * Send[B] =
+  ): Receive[B] % Structured % Send[Receive[B]] % Send[B] =
     map(transform).flattenMerge(concurrency)
 
   def indexed: Receive[(Int, A)] =
@@ -64,24 +64,24 @@ extension [A](r: Receive[A])
       }
     }
 
-def receive[A](f: A => Unit): Unit * Receive[A] =
+def receive[A](f: A => Unit): Unit % Receive[A] =
   summon[Receive[A]].receive(f)
 
 @implicitNotFound(
-  "Sending values to streams or channels require capability:\n* Send[${A}]"
+  "Sending values to streams or channels require capability:\n% Send[${A}]"
 )
 trait Send[A]:
   def send(value: A): Unit
   def sendAll(receive: Receive[A]): Unit =
     receive.receive(send)
 
-def send[A](value: A): Unit * Send[A] =
+def send[A](value: A): Unit % Send[A] =
   summon[Send[A]].send(value)
 
-def sendAll[A](receive: Receive[A]): Unit * Send[A] =
+def sendAll[A](receive: Receive[A]): Unit % Send[A] =
   summon[Send[A]].sendAll(receive)
 
-def streamed[A](f: Unit * Send[A]): Receive[A] =
+def streamed[A](f: Unit % Send[A]): Receive[A] =
   (receive: (A) => Unit) =>
     given Send[A] = (a: A) => receive(a)
     f
@@ -89,10 +89,10 @@ def streamed[A](f: Unit * Send[A]): Receive[A] =
 private[this] def repeat(n: Int)(f: (Int) => Unit): Unit =
   for (i <- 0 to n) f(i)
 
-val sent: Unit * Send[Int] =
+val sent: Unit % Send[Int] =
   repeat(100)(send)
 
-val received: Unit * Receive[(Int, Int)] =
+val received: Unit % Receive[(Int, Int)] =
   receive(println)
 
 @main def SimpleFlow: Unit =

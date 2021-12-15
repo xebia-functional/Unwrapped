@@ -22,7 +22,7 @@ extension [X <: Tuple](x: X)
   def par[F[_]](using
       IsMappedBy[F][X],
       ParBind[F]
-  ): ParTupled[F, X] * Structured =
+  ): ParTupled[F, X] % Structured =
     val fibers =
       x.mapK[F, Fiber](
         [r] => (r: F[r]) => fork(() => summon[ParBind[F]](r))
@@ -35,7 +35,7 @@ extension [X <: Tuple](x: X)
     awaited
 
 @main def ParallelFunctionExample =
-  val results: (String, Int, Double) * Structured =
+  val results: (String, Int, Double) % Structured =
     (
       () => "1",
       () => 0,
@@ -44,7 +44,7 @@ extension [X <: Tuple](x: X)
   println(structured(results))
 
 @main def ParallelResourceExample =
-  val results: (Int, String, Double) * Structured =
+  val results: (Int, String, Double) % Structured =
     (Resource(1), Resource("a"), Resource(47.0)).par[Resource]
 
   println(structured(results))

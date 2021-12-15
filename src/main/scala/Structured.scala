@@ -11,7 +11,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.CancellationException
 
 @implicitNotFound(
-  "Structured concurrency requires capability:\n* Structured"
+  "Structured concurrency requires capability:\n% Structured"
 )
 opaque type Structured = StructuredExecutor
 
@@ -19,7 +19,7 @@ extension (s: Structured)
   private[fx] def forked[A](callable: Callable[A]): Future[A] =
     s.fork(callable)
 
-inline def structured[B](f: B * Structured): B =
+inline def structured[B](f: B % Structured): B =
   val scope = StructuredExecutor.open("scala fx structured scope")
   given Structured = scope
   try f
@@ -27,7 +27,7 @@ inline def structured[B](f: B * Structured): B =
     scope.join
     scope.close()
 
-def joinAll: Unit * Structured =
+def joinAll: Unit % Structured =
   summon[Structured].join
 
 private[fx] inline def callableOf[A](f: () => A): Callable[A] =

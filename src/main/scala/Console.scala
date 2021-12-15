@@ -8,7 +8,7 @@ import scala.annotation.tailrec
 class EndOfLine extends RuntimeException("reached end of line")
 
 @implicitNotFound(
-  "Missing capability:\n* Console"
+  "Missing capability:\n% Console"
 )
 trait Console:
 
@@ -24,7 +24,7 @@ object Console:
 /** If your method is not an extension then it needs side syntax like these or
   * users would need to summon.
   */
-def read(): String * Console =
+def read(): String % Console =
   summon[Console].read()
 
 class StandardConsole(using Throws[EndOfLine]) extends Console:
@@ -55,7 +55,7 @@ class FakeConsole(var input: String)(using Throws[EndOfLine]) extends Console:
     def writeLine(): Unit = output += (s + "\n")
 
 @tailrec
-def program: String * Console * Errors[String] =
+def program: String % Console % Errors[String] =
   "what is your name?".writeLine()
   read() match
     case "" =>

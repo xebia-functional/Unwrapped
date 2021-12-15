@@ -7,7 +7,7 @@ Scala-fx is an effects library for Scala 3 that introduces structured concurrenc
 The example below is a pure program that returns `Int` and requires the context capability `Bind`. Bind enables the `bind` syntax over values of Either and other types.
 
 ```scala
-val program: Int * Bind =
+val program: Int % Bind =
   Right(1).bind + Right(2).bind
 ```
 
@@ -16,13 +16,13 @@ Capabilities can be introduced a la carte and will be carried as given contextua
 
 ```scala
 val program: Int 
-  * Bind 
-  * Errors[String] =
+  % Bind 
+  % Errors[String] =
   Right(1).bind + Right(2).bind + "oops".raise[Int] 
 
 val x: Int = program 
 // e: this function may shift control to String and requires capability:
-//    * Control[String]
+//    % Control[String]
 ```
 
 Users and library authors may define their own Capabilities. Here is how `Bind` for `Either[E, A]` is declared
@@ -35,11 +35,11 @@ Users and library authors may define their own Capabilities. Here is how `Bind` 
   * import fx.Bind
   *
   * extension [R, A](fa: Either[R, A])
-  *   def bind: A * Bind * Control[R] = fa.fold(_.shift, identity)
+  *   def bind: A % Bind % Control[R] = fa.fold(_.shift, identity)
   * ```
   */
 @implicitNotFound(
-  "Monadic bind requires capability:\n* Bind"
+  "Monadic bind requires capability:\n% Bind"
 )
 opaque type Bind = Unit
 
@@ -47,7 +47,7 @@ object Bind:
   given Bind = ()
 
 extension [R, A](fa: Either[R, A])
-  def bind: A * Bind * Errors[R] = fa.fold(_.shift, identity)
+  def bind: A % Bind % Errors[R] = fa.fold(_.shift, identity)
 ```
 
 Scala Fx supports a structured concurrency model backed by the non blocking [StructuredExecutor](https://download.java.net/java/early_access/loom/docs/api/java.base/java/util/concurrent/StructuredExecutor.html)

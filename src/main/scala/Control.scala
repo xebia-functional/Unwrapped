@@ -6,7 +6,7 @@ import scala.annotation.implicitNotFound
   * with a value of [[R]]
   */
 @implicitNotFound(
-  "this function may shift control to ${R} and requires capability:\n* Control[${R}]"
+  "this function may shift control to ${R} and requires capability:\n% Control[${R}]"
 )
 trait Control[-R]:
   private[fx] val token: String
