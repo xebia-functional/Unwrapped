@@ -2,6 +2,7 @@ package fx
 
 import java.util.concurrent.Semaphore
 import scala.annotation.implicitNotFound
+import scala.collection.mutable.ListBuffer
 
 @implicitNotFound(
   "Receiving values from streams or channels require capability:\n% Receive[${A}]"
@@ -44,12 +45,13 @@ extension [A](r: Receive[A])
   ): Receive[B] % Structured % Send[Receive[B]] % Send[B] =
     map(transform).flattenMerge(concurrency)
 
-  def indexed: Receive[(Int, A)] =
+  def zipWithIndex: Receive[(A, Int)] =
     var index = 0
     map { (value: A) =>
-      index = index + 1
       if (index < 0) throw ArithmeticException("Overflow")
-      (index, value)
+      val v = (value, index)
+      index = index + 1
+      v
     }
 
   def fold[R](initial: R, operation: (R, A) => R): Receive[R] =
@@ -61,6 +63,11 @@ extension [A](r: Receive[A])
         send(acc)
       }
     }
+
+  def toList: List[A] =
+    val buffer = new ListBuffer[A]
+    r.receive(buffer.addOne)
+    buffer.toList
 
 def receive[A](f: A => Unit): Unit % Receive[A] =
   summon[Receive[A]].receive(f)
@@ -84,6 +91,11 @@ def streamed[A](f: Unit % Send[A]): Receive[A] =
     given Send[A] = (a: A) => receive(a)
     f
 
+def streamOf[A](values: A*): Receive[A] =
+  streamed {
+    for (value <- values) send(value)
+  }
+
 private[this] def repeat(n: Int)(f: (Int) => Unit): Unit =
   for (i <- 0 to n) f(i)
 
@@ -94,9 +106,12 @@ val received: Unit % Receive[(Int, Int)] =
   receive(println)
 
 @main def SimpleFlow: Unit =
-  received(
-    using streamed(sent)
-      .transform((n: Int) => send(n + 1))
-      .filter((n: Int) => n % 2 == 0)
-      .map((n: Int) => n * 10)
-      .indexed)
+
+  val listed = streamed(sent)
+    .transform((n: Int) => send(n + 1))
+    .filter((n: Int) => n % 2 == 0)
+    .map((n: Int) => n * 10)
+    .zipWithIndex
+    .toList
+
+  println(listed)
