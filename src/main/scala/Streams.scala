@@ -66,7 +66,7 @@ extension [A](r: Receive[A])
 
   def toList: List[A] =
     val buffer = new ArrayBuffer[A]
-    r.receive { (value: A) => buffer.addOne(value) }
+    r.receive(buffer.addOne)
     buffer.toList
 
 def receive[A](f: A => Unit): Unit % Receive[A] =
