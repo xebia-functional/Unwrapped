@@ -67,9 +67,7 @@ extension [A](r: Receive[A])
 
   def toList: List[A] =
     val buffer = new ArrayBuffer[A]
-    r.receive { (value: A) =>
-      buffer.addOne(value)
-    }
+    r.receive { (value: A) => buffer.addOne(value) }
     buffer.toList
 
 def receive[A](f: A => Unit): Unit % Receive[A] =
@@ -94,7 +92,7 @@ def streamed[A](f: Unit % Send[A]): Receive[A] =
     given Send[A] = (a: A) => receive(a)
     f
 
-def streamOf[A](values : A*): Receive[A] =
+def streamOf[A](values: A*): Receive[A] =
   streamed {
     for (value <- values) send(value)
   }
