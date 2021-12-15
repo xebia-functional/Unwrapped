@@ -26,7 +26,8 @@ object StructuredTests extends Properties("Structured Concurrency Tests"):
       (
         () =>
           modifyGate.join
-          r.updateAndGet { i => s"$i$a" },
+          r.updateAndGet { i => s"$i$a" }
+        ,
         () =>
           r.set(s"$b")
           modifyGate.complete(0)
@@ -35,27 +36,26 @@ object StructuredTests extends Properties("Structured Concurrency Tests"):
     r.get() == s"$b$a"
   }
 
-  property("concurrent shift on fork join propagates") = forAll {
-    (a: Int, b: Int) =>
-      val x: String % Structured % Control[Int] =
-        val fa = fork[String](() => a.shift)
-        val fb = fork[String](() => b.shift)
-        fa.join + fb.join
+  property("concurrent shift on fork join propagates") = forAll { (a: Int, b: Int) =>
+    val x: String % Structured % Control[Int] =
+      val fa = fork[String](() => a.shift)
+      val fb = fork[String](() => b.shift)
+      fa.join + fb.join
 
-      val value: String | Int = run(structured(x))
+    val value: String | Int = run(structured(x))
 
-      List(a, b).contains(value)
+    List(a, b).contains(value)
   }
 
-  property("concurrent shift on fork that doesn't join does not propagate") =
-    forAll { (a: Int, b: Int, c: String) =>
+  property("concurrent shift on fork that doesn't join does not propagate") = forAll {
+    (a: Int, b: Int, c: String) =>
       val x: String % Structured % Control[Int] =
         val fa = fork[Nothing](() => a.shift)
         val fb = fork[Nothing](() => b.shift)
         c
 
       c == run(structured(x))
-    }
+  }
 
   property("tupleXXL par") = forAll { (t20a: TestTuple20, t20b: TestTuple20) =>
     val tupleXXL: TestTupleXXL = t20a ++ t20b

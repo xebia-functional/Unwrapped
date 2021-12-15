@@ -1,7 +1,7 @@
 package fx
 
 import scala.annotation.implicitNotFound
-import Tuple.{Map, IsMappedBy, InverseMap}
+import Tuple.{InverseMap, IsMappedBy, Map}
 import scala.annotation.tailrec
 import fx.Tuples.mapK
 
@@ -19,10 +19,7 @@ given resourceParBind: ParBind[Resource] =
   [t] => (f: Resource[t]) => f.bind
 
 extension [X <: Tuple](x: X)
-  def par[F[_]](using
-      IsMappedBy[F][X],
-      ParBind[F]
-  ): ParTupled[F, X] % Structured =
+  def par[F[_]](using IsMappedBy[F][X], ParBind[F]): ParTupled[F, X] % Structured =
     val fibers =
       x.mapK[F, Fiber](
         [r] => (r: F[r]) => fork(() => summon[ParBind[F]](r))

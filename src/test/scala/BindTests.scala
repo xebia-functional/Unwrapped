@@ -14,11 +14,10 @@ object BindTests extends Properties("Bind Tests"):
     run(effect) == a + b
   }
 
-  property("Short-circuiting with Either.Left") = forAll {
-    (n: Int, s: String) =>
-      val effect: Int % Control[String | None.type] =
-        Left[String, Int](s).bind + Option(n).bind
-      run(effect) == s
+  property("Short-circuiting with Either.Left") = forAll { (n: Int, s: String) =>
+    val effect: Int % Control[String | None.type] =
+      Left[String, Int](s).bind + Option(n).bind
+    run(effect) == s
   }
 
   property("Short-circuiting with Option.None") = forAll { (n: Int) =>

@@ -12,7 +12,7 @@ class EndOfLine extends RuntimeException("reached end of line")
 )
 trait Console:
 
-  def read(): String 
+  def read(): String
 
   extension (s: String)
     def write(): Unit
@@ -21,9 +21,10 @@ trait Console:
 object Console:
   given default(using Throws[EndOfLine]): Console = StandardConsole()
 
-/** If your method is not an extension then it needs side syntax like these or
-  * users would need to summon.
-  */
+/**
+ * If your method is not an extension then it needs side syntax like these or users would need
+ * to summon.
+ */
 def read(): String % Console =
   summon[Console].read()
 
@@ -79,9 +80,7 @@ def program: String % Console % Errors[String] =
   import fx.Throws.unsafeExceptions
   given Console = FakeConsole("")
   val value: String =
-    try 
-      run(program)
-    catch 
-      case eol: EndOfLine => "Reached end"
-    
+    try run(program)
+    catch case eol: EndOfLine => "Reached end"
+
   println(value)

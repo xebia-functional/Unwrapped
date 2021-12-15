@@ -7,7 +7,7 @@ import scala.util.control.NonFatal
 import java.util.concurrent.ExecutionException
 import scala.annotation.tailrec
 
-object Continuation: 
+object Continuation:
   inline def fold[R, A, B](
       inline program: A % Control[R]
   )(inline recover: R => B, inline transform: A => B): B = {
