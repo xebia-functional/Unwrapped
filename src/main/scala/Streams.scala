@@ -33,9 +33,7 @@ extension [A](r: Receive[A])
     streamed(receive(f)(using r))
 
   def filter(predicate: (A => Boolean) % Send[A]): Receive[A] =
-    transform { value =>
-      if (predicate(value)) send(value)
-    }
+    transform { value => if (predicate(value)) send(value) }
 
   def map[B](f: (A => B)): Receive[B] =
     transform { v => send(f(v)) }
@@ -118,5 +116,5 @@ val received: Unit % Receive[(Int, Int)] =
     .map((n: Int) => n * 10)
     .zipWithIndex
     .toList
-  
+
   println(listed)

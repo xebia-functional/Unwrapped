@@ -3,12 +3,12 @@ package fx
 import java.util.concurrent.atomic.AtomicReference
 import scala.util.control.NonFatal
 import fx.Tuples.mapK
-import Tuple.{Map, IsMappedBy, InverseMap}
+import Tuple.{InverseMap, IsMappedBy, Map}
 import scala.annotation.implicitNotFound
 
 class Resource[A](
-                   val acquire: A % Resources,
-                   val release: (A, ExitCase) => Unit
+    val acquire: A % Resources,
+    val release: (A, ExitCase) => Unit
 ):
 
   def this(value: A % Resources) = this(value, (_, _) => ())
@@ -43,13 +43,14 @@ class Resource[A](
           val error = composeErrors(e, e2)
           throw error
     )
- 
+
 class Resources(val finalizers: AtomicReference[List[(ExitCase) => Unit]])
 
 object Resources:
-  given Resources = new Resources(AtomicReference(
-    List.empty
-  ))
+  given Resources = new Resources(
+    AtomicReference(
+      List.empty
+    ))
 
 enum ExitCase:
   case Completed
@@ -69,8 +70,7 @@ private[fx] def cancelAll(
   })
   .fold(first)((it, acc) =>
     if (acc != null) composeErrors(acc, it)
-    else it
-  )
+    else it)
 
 private[fx] def composeErrors(
     left: Throwable | Null,
@@ -84,4 +84,3 @@ private[fx] def composeErrors(
           l
         case null => l
     case null => right
-
