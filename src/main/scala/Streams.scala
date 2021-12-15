@@ -3,6 +3,7 @@ package fx
 import java.util.concurrent.Semaphore
 import scala.annotation.implicitNotFound
 import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.ListBuffer
 
 @implicitNotFound(
   "Receiving values from streams or channels require capability:\n% Receive[${A}]"
@@ -65,7 +66,7 @@ extension [A](r: Receive[A])
     }
 
   def toList: List[A] =
-    val buffer = new ArrayBuffer[A]
+    val buffer = new ListBuffer[A]
     r.receive { (value: A) => buffer.addOne(value) }
     buffer.toList
 
