@@ -1,6 +1,9 @@
 ThisBuild / scalaVersion := "3.1.1-RC1"
 ThisBuild / organization := "com.47deg"
 
+addCommandAlias("ci-test", "scalafmtCheckAll; scalafmtSbtCheck; test")
+addCommandAlias("ci-publish", "github; ci-release")
+
 publish / skip := true
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
