@@ -42,7 +42,7 @@ extension [A](r: Receive[A])
 
   def flatMapMerge[B](concurrency: Int)(
       transform: A => Receive[B]
-  ): Receive[B] % Structured % Send[Receive[B]] % Send[B] =
+  ): Receive[B] % Structured =
     map(transform).flattenMerge(concurrency)
 
   def zipWithIndex: Receive[(A, Int)] =
