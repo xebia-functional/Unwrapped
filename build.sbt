@@ -1,5 +1,6 @@
 ThisBuild / scalaVersion := "3.1.1-RC1"
 ThisBuild / organization := "com.47deg"
+ThisBuild / versionScheme := Some("early-semver")
 
 addCommandAlias("ci-test", "scalafmtCheckAll; scalafmtSbtCheck; test")
 addCommandAlias("ci-publish", "github; ci-release")
