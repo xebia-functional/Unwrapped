@@ -6,33 +6,31 @@ Scala-fx is an effects library for Scala 3 that introduces structured concurrenc
 
 The example below is a pure program that returns `Int` and requires the context capability `Bind`. Bind enables the `bind` syntax over values of Either and other types.
 
-```scala mdoc:silent
-import fx._
-import scala.annotation.implicitNotFound
-```
+```scala mdoc:reset
+import fx.*
 
-```scala mdoc
 val program: Int % Bind =
-  Right(1).bind + Right(2).bind
+    Right(1).bind + Right(2).bind
 ```
 
 Using Scala3 features such as context functions, infix types and erasable definitions we can can encode pure programs in terms of capabilities with minimal overhead.
 Capabilities can be introduced a la carte and will be carried as given contextual evidences through call sites until you proof you can get rid of them.
 
-```scala mdoc
-val program2: Int 
+```scala mdoc:compile-only
+import fx.*
+import fx.runtime
+
+val program: Int
   % Bind 
   % Errors[String] =
-  Right(1).bind + Right(2).bind + "oops".raise[Int] 
+  Right(1).bind + Right(2).bind + "oops".raise[Int]
 
-val x: Int = program2
-// e: this function may shift control to String and requires capability:
-//    % Control[String]
+val x: Int | String = run(program)
 ```
 
 Users and library authors may define their own Capabilities. Here is how `Bind` for `Either[E, A]` is declared
 
-```scala mdoc
+```scala
 /** Brings the capability to perform Monad bind in place. Types may
   * access [[Control]] to short-circuit as necessary
   *
@@ -60,14 +58,18 @@ where you can `fork` and `join` cancellable fibers and scopes.
 
 Popular functions like `par` support arbitrary typed arity in arguments and return types.
 
-```scala mdoc
+```scala mdoc:compile-only
+import fx.*
+import fx.function0ParBind
+
 val results: (String, Int, Double) % Structured =
     (
       () => "1",
       () => 0,
       () => 47.03
     ).par[Function0]
-results
+
+structured(results)
 ```
 
 Continuations based on Control Throwable or a non blocking model like Loom are useful because they allow us to intermix async and sync programs in the same syntax without the need for boxing as is frequently the case in most scala effect libraries.
