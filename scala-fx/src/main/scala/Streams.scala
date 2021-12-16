@@ -99,12 +99,12 @@ def streamOf[A](values: A*): Receive[A] =
 private[this] def repeat(n: Int)(f: (Int) => Unit): Unit =
   for (i <- 0 to n) f(i)
 
-val sent: Unit % Send[Int] =
+val source: Unit % Send[Int] =
   repeat(100)(send)
 
 @main def SimpleFlow: Unit =
 
-  val listed = streamed(sent)
+  val listed = streamed(source)
     .transform((n: Int) => send(n + 1))
     .filter((n: Int) => n % 2 == 0)
     .map((n: Int) => n * 10)
