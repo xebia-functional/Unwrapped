@@ -3,12 +3,9 @@ ThisBuild / scalaVersion := "3.1.1-RC1"
 
 publish / skip := true
 
-lazy val `scala-fx` = project
-  .settings(scalafxSettings: _*)
+lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
-lazy val benchmarks = project
-  .dependsOn(`scala-fx`)
-  .enablePlugins(JmhPlugin)
+lazy val benchmarks = project.dependsOn(`scala-fx`).enablePlugins(JmhPlugin)
 
 lazy val scalafxSettings: Seq[Def.Setting[_]] =
   Seq(
