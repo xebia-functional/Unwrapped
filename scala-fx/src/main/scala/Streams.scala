@@ -102,9 +102,6 @@ private[this] def repeat(n: Int)(f: (Int) => Unit): Unit =
 val sent: Unit % Send[Int] =
   repeat(100)(send)
 
-val received: Unit % Receive[(Int, Int)] =
-  receive(println)
-
 @main def SimpleFlow: Unit =
 
   val listed = streamed(sent)
