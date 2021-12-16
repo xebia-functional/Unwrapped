@@ -1,7 +1,5 @@
 package fx
 
-import cats.effect.IO
-import cats.effect.unsafe.IORuntime
 import scala.annotation.implicitNotFound
 
 @implicitNotFound(
