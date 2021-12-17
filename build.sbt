@@ -2,7 +2,8 @@ ThisBuild / scalaVersion := "3.1.1-RC1"
 ThisBuild / organization := "com.47deg"
 ThisBuild / versionScheme := Some("early-semver")
 
-addCommandAlias("ci-test", "scalafmtCheckAll; scalafmtSbtCheck; test")
+addCommandAlias("ci-test", "scalafmtCheckAll; scalafmtSbtCheck; mdoc; test")
+addCommandAlias("ci-docs", "github; mdoc")
 addCommandAlias("ci-publish", "github; ci-release")
 
 publish / skip := true
@@ -11,6 +12,12 @@ lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
 lazy val benchmarks =
   project.dependsOn(`scala-fx`).settings(publish / skip := true).enablePlugins(JmhPlugin)
+
+lazy val documentation = project
+  .dependsOn(`scala-fx`)
+  .enablePlugins(MdocPlugin)
+  .settings(mdocOut := file("."))
+  .settings(publish / skip := true)
 
 lazy val scalafxSettings: Seq[Def.Setting[_]] =
   Seq(

@@ -6,18 +6,17 @@ Scala-fx is an effects library for Scala 3 that introduces structured concurrenc
 
 The example below is a pure program that returns `Int` and requires the context capability `Bind`. Bind enables the `bind` syntax over values of Either and other types.
 
-```scala
+```scala mdoc:reset
 import fx.*
 
 val program: Int % Bind =
     Right(1).bind + Right(2).bind
-// program: Int = 3
 ```
 
 Using Scala3 features such as context functions, infix types and erasable definitions we can can encode pure programs in terms of capabilities with minimal overhead.
 Capabilities can be introduced a la carte and will be carried as given contextual evidences through call sites until you proof you can get rid of them.
 
-```scala
+```scala mdoc:reset
 import fx.*
 import fx.runtime
 
@@ -28,7 +27,6 @@ def runProgram: Int | String =
     run(program)
 
 println(runProgram)
-// oops
 ```
 
 Users and library authors may define their own Capabilities. Here is how `Bind` for `Either[E, A]` is declared
@@ -61,7 +59,7 @@ where you can `fork` and `join` cancellable fibers and scopes.
 
 Popular functions like `par` support arbitrary typed arity in arguments and return types.
 
-```scala
+```scala mdoc:reset
 import fx.*
 import fx.function0ParBind
 
@@ -76,7 +74,6 @@ def runProgram: (String, Int, Double) =
   structured(results)
 
 println(runProgram)
-// (1,0,47.03)
 ```
 
 Continuations based on Control Throwable or a non blocking model like Loom are useful because they allow us to intermix async and sync programs in the same syntax without the need for boxing as is frequently the case in most scala effect libraries.

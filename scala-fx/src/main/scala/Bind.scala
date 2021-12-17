@@ -1,7 +1,6 @@
 package fx
 
 import scala.annotation.implicitNotFound
-import scala.concurrent.ExecutionContext
 
 /**
  * Brings the capability to perform Monad bind in place to any type. Types may access
