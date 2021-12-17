@@ -10,26 +10,6 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.CancellationException
 import java.util.concurrent.StructuredExecutor
 
-opaque type ConcurrentQueue[A] = SynchronousQueue[A]
-
-class StructuredSynchronousQueue[A](s: Structured, fair: Boolean = false)
-    extends SynchronousQueue[A](fair) {
-
-  private val stack: AtomicReference[List[Fiber[A]]] = AtomicReference(Nil)
-
-  var isClosing = false
-  override def take(): A =
-    given Structured = s
-    val x = fork(() => super.take())
-    stack.updateAndGet(_ :+ x)
-    x.join
-
-  def shutdown(): Unit =
-    given Structured = s
-    isClosing = true
-    stack.get.foreach((f: Fiber[A]) => f.cancel(true))
-}
-
 def streamed[A](f: Unit % Send[A] % Structured): Receive[A] =
   (receive: (A) => Unit) => {
     val scope = StructuredExecutor.open("Scala Fx Stream Scope")
@@ -38,17 +18,17 @@ def streamed[A](f: Unit % Send[A] % Structured): Receive[A] =
     given Send[A] = (a: A) => q.put(a)
 
     val downstream = fork(() => {
-      try {
-        while (!Thread.currentThread.isInterrupted) {
-          receive(q.take())
+      try
+        while (true) {
+          receive(q.take)
         }
-      } catch 
-        case e: InterruptedException => 
-          //e.printStackTrace
+      catch case e: InterruptedException => ()
     })
     forkAndComplete(() => {
       f
-    }) { (str, fiber) => downstream.cancel(true) }
+    }) { (str, fiber) => 
+      downstream.cancel(true) 
+    }
 
     scope.join
     scope.close
