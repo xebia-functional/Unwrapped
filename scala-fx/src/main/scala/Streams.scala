@@ -57,11 +57,8 @@ extension [A](r: Receive[A])
   def fold[R](initial: R, operation: (R, A) => R): Receive[R] =
     streamed {
       var acc: R = initial
+      r.receive { (value: A) => acc = operation(acc, value) }
       send(acc)
-      r.receive { (value: A) =>
-        acc = operation(acc, value)
-        send(acc)
-      }
     }
 
   def toList: List[A] =
