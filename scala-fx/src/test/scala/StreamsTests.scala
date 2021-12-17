@@ -22,8 +22,8 @@ object StreamsTests extends Properties("Streams tests"):
       List(i, i + 1))
   }
 
-  property("fold") = forAll { (initial: Int, a: Int, b: Int) =>
-    streamOf(a, b).fold(initial, _ + _).toList == List(initial, initial + a, initial + a + b)
+  property("fold") = forAll { (initial: Int, a: Int, b: Int, operation: Function2[Int, Int, Int]) =>
+    streamOf(a, b).fold(initial, operation).toList == List(operation(operation(initial, a), b))
   }
 
   property("map") = forAll { (n: Int) => streamOf(n).map(_ + 1).toList == List(n + 1) }
