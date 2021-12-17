@@ -16,16 +16,17 @@ val program: Int % Bind =
 Using Scala3 features such as context functions, infix types and erasable definitions we can can encode pure programs in terms of capabilities with minimal overhead.
 Capabilities can be introduced a la carte and will be carried as given contextual evidences through call sites until you proof you can get rid of them.
 
-```scala mdoc:compile-only
+```scala mdoc:reset
 import fx.*
 import fx.runtime
 
-val program: Int
-  % Bind 
-  % Errors[String] =
-  Right(1).bind + Right(2).bind + "oops".raise[Int]
+def runProgram: Int | String =
+    val program: Int % Bind % Errors[String] =
+      Right(1).bind + Right(2).bind + "oops".raise[Int]
 
-val x: Int | String = run(program)
+    run(program)
+
+println(runProgram)
 ```
 
 Users and library authors may define their own Capabilities. Here is how `Bind` for `Either[E, A]` is declared
@@ -58,18 +59,21 @@ where you can `fork` and `join` cancellable fibers and scopes.
 
 Popular functions like `par` support arbitrary typed arity in arguments and return types.
 
-```scala mdoc:compile-only
+```scala mdoc:reset
 import fx.*
 import fx.function0ParBind
 
-val results: (String, Int, Double) % Structured =
+def runProgram: (String, Int, Double) =
+  val results: (String, Int, Double) % Structured =
     (
       () => "1",
       () => 0,
       () => 47.03
     ).par[Function0]
 
-structured(results)
+  structured(results)
+
+println(runProgram)
 ```
 
 Continuations based on Control Throwable or a non blocking model like Loom are useful because they allow us to intermix async and sync programs in the same syntax without the need for boxing as is frequently the case in most scala effect libraries.

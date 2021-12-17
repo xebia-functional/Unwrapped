@@ -21,12 +21,14 @@ Capabilities can be introduced a la carte and will be carried as given contextua
 import fx.*
 import fx.runtime
 
-val program: Int
-  % Bind 
-  % Errors[String] =
-  Right(1).bind + Right(2).bind + "oops".raise[Int]
+def runProgram: Int | String =
+    val program: Int % Bind % Errors[String] =
+      Right(1).bind + Right(2).bind + "oops".raise[Int]
 
-val x: Int | String = run(program)
+    run(program)
+
+println(runProgram)
+// oops
 ```
 
 Users and library authors may define their own Capabilities. Here is how `Bind` for `Either[E, A]` is declared
@@ -63,14 +65,18 @@ Popular functions like `par` support arbitrary typed arity in arguments and retu
 import fx.*
 import fx.function0ParBind
 
-val results: (String, Int, Double) % Structured =
+def runProgram: (String, Int, Double) =
+  val results: (String, Int, Double) % Structured =
     (
       () => "1",
       () => 0,
       () => 47.03
     ).par[Function0]
 
-structured(results)
+  structured(results)
+
+println(runProgram)
+// (1,0,47.03)
 ```
 
 Continuations based on Control Throwable or a non blocking model like Loom are useful because they allow us to intermix async and sync programs in the same syntax without the need for boxing as is frequently the case in most scala effect libraries.
