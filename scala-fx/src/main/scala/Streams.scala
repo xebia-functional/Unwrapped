@@ -3,6 +3,56 @@ package fx
 import java.util.concurrent.Semaphore
 import scala.annotation.implicitNotFound
 import scala.collection.mutable.ListBuffer
+import java.util.concurrent.SynchronousQueue
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.CancellationException
+import java.util.concurrent.StructuredExecutor
+
+opaque type ConcurrentQueue[A] = SynchronousQueue[A]
+
+class StructuredSynchronousQueue[A](s: Structured, fair: Boolean = false)
+    extends SynchronousQueue[A](fair) {
+
+  private val stack: AtomicReference[List[Fiber[A]]] = AtomicReference(Nil)
+
+  var isClosing = false
+  override def take(): A =
+    given Structured = s
+    val x = fork(() => super.take())
+    stack.updateAndGet(_ :+ x)
+    x.join
+
+  def shutdown(): Unit =
+    given Structured = s
+    isClosing = true
+    stack.get.foreach((f: Fiber[A]) => f.cancel(true))
+}
+
+def streamed[A](f: Unit % Send[A] % Structured): Receive[A] =
+  (receive: (A) => Unit) => {
+    val scope = StructuredExecutor.open("Scala Fx Stream Scope")
+    given Structured = scope.asInstanceOf[Structured]
+    val q = new SynchronousQueue[A]()
+    given Send[A] = (a: A) => q.put(a)
+
+    val downstream = fork(() => {
+      try {
+        while (!Thread.currentThread.isInterrupted) {
+          receive(q.take())
+        }
+      } catch 
+        case e: InterruptedException => 
+          //e.printStackTrace
+    })
+    forkAndComplete(() => {
+      f
+    }) { (str, fiber) => downstream.cancel(true) }
+
+    scope.join
+    scope.close
+  }
 
 @implicitNotFound(
   "Receiving values from streams or channels require capability:\n% Receive[${A}]"
@@ -14,17 +64,19 @@ extension [A](r: Receive[Receive[A]])
   def flatten: Receive[A] =
     streamed(r.receive(sendAll))
 
-  def flattenMerge[B](
+  def flattenMerge(
       concurrency: Int
-  ): Receive[B] % Send[Receive[A]] % Send[A] =
+  ): Receive[A] =
     val semaphore = Semaphore(concurrency)
-    streamed(receive { (inner: Receive[A]) =>
-      semaphore.acquire()
-      uncancellable(() => {
-        try sendAll(inner)
-        finally semaphore.release()
+    streamed {
+      r.receive((inner: Receive[A]) => {
+        semaphore.acquire()
+        fork(() => {
+          try sendAll(inner)
+          finally semaphore.release()
+        })
       })
-    }(using r))
+    }
 
 extension [A](r: Receive[A])
 
@@ -75,6 +127,7 @@ def receive[A](f: A => Unit): Unit % Receive[A] =
 @implicitNotFound(
   "Sending values to streams or channels require capability:\n% Send[${A}]"
 )
+@FunctionalInterface
 trait Send[A]:
   def send(value: A): Unit
   def sendAll(receive: Receive[A]): Unit =
@@ -85,11 +138,6 @@ def send[A](value: A): Unit % Send[A] =
 
 def sendAll[A](receive: Receive[A]): Unit % Send[A] =
   summon[Send[A]].sendAll(receive)
-
-def streamed[A](f: Unit % Send[A]): Receive[A] =
-  (receive: (A) => Unit) =>
-    given Send[A] = (a: A) => receive(a)
-    f
 
 def streamOf[A](values: A*): Receive[A] =
   streamed {
