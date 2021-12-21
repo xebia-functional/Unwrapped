@@ -10,28 +10,23 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.CancellationException
 import java.util.concurrent.StructuredExecutor
 
-def streamed[A](f: Unit % Send[A] % Structured): Receive[A] =
+def streamed[A](f: Unit % Send[A] % Structured): Receive[A] % Structured =
   (receive: (A) => Unit) => {
-    val scope = StructuredExecutor.open("Scala Fx Stream Scope")
-    given Structured = scope.asInstanceOf[Structured]
     val q = new SynchronousQueue[A]()
-    given Send[A] = (a: A) => q.put(a)
-
     val downstream = fork(() => {
       try
         while (true) {
           receive(q.take)
         }
-      catch case e: InterruptedException => ()
+      catch
+        case e: InterruptedException => ()
     })
     forkAndComplete(() => {
+      given Send[A] = (a: A) => q.put(a)
       f
     }) { (str, fiber) => 
-      downstream.cancel(true) 
+      downstream.cancel(true)
     }
-
-    scope.join
-    scope.close
   }
 
 @implicitNotFound(
@@ -40,13 +35,13 @@ def streamed[A](f: Unit % Send[A] % Structured): Receive[A] =
 trait Receive[+A]:
   def receive(f: A => Unit): Unit
 
-extension [A](r: Receive[Receive[A]])
-  def flatten: Receive[A] =
+extension [A](r: Receive[Receive[A]] % Structured)
+  def flatten: Receive[A] % Structured =
     streamed(r.receive(sendAll))
 
   def flattenMerge(
       concurrency: Int
-  ): Receive[A] =
+  ): Receive[A] % Structured =
     val semaphore = Semaphore(concurrency)
     streamed {
       r.receive((inner: Receive[A]) => {
@@ -58,18 +53,18 @@ extension [A](r: Receive[Receive[A]])
       })
     }
 
-extension [A](r: Receive[A])
+extension [A](r: Receive[A] % Structured)
 
-  def transform[B](f: (A => Unit) % Send[B]): Receive[B] =
-    streamed(receive(f)(using r))
+  def transform[B](f: (A => Unit) % Send[B]): Receive[B] % Structured =
+    streamed(r.receive(f))
 
-  def filter(predicate: (A => Boolean) % Send[A]): Receive[A] =
+  def filter(predicate: (A => Boolean) % Send[A]): Receive[A] % Structured =
     transform { value => if (predicate(value)) send(value) }
 
-  def map[B](f: (A => B)): Receive[B] =
+  def map[B](f: (A => B)): Receive[B] % Structured =
     transform { v => send(f(v)) }
 
-  def flatMap[B](transform: A => Receive[B]): Receive[B] =
+  def flatMap[B](transform: A => Receive[B]): Receive[B] % Structured =
     map(transform).flatten
 
   def flatMapMerge[B](concurrency: Int)(
@@ -77,7 +72,7 @@ extension [A](r: Receive[A])
   ): Receive[B] % Structured % Send[Receive[B]] % Send[B] =
     map(transform).flattenMerge(concurrency)
 
-  def zipWithIndex: Receive[(A, Int)] =
+  def zipWithIndex: Receive[(A, Int)] % Structured =
     var index = 0
     map { (value: A) =>
       if (index < 0) throw ArithmeticException("Overflow")
@@ -86,7 +81,7 @@ extension [A](r: Receive[A])
       v
     }
 
-  def fold[R](initial: R, operation: (R, A) => R): Receive[R] =
+  def fold[R](initial: R, operation: (R, A) => R): Receive[R] % Structured =
     streamed {
       var acc: R = initial
       send(acc)
@@ -96,7 +91,7 @@ extension [A](r: Receive[A])
       }
     }
 
-  def toList: List[A] =
+  def toList: List[A] % Structured =
     val buffer = new ListBuffer[A]
     r.receive(buffer.addOne)
     buffer.toList
@@ -119,7 +114,7 @@ def send[A](value: A): Unit % Send[A] =
 def sendAll[A](receive: Receive[A]): Unit % Send[A] =
   summon[Send[A]].sendAll(receive)
 
-def streamOf[A](values: A*): Receive[A] =
+def streamOf[A](values: A*): Receive[A] % Structured =
   streamed {
     for (value <- values) send(value)
   }
@@ -135,11 +130,13 @@ val received: Unit % Receive[(Int, Int)] =
 
 @main def SimpleFlow: Unit =
 
-  val listed = streamed(sent)
-    .transform((n: Int) => send(n + 1))
-    .filter((n: Int) => n % 2 == 0)
-    .map((n: Int) => n * 10)
-    .zipWithIndex
-    .toList
+  val listed = structured {
+    streamed(sent)
+      .transform((n: Int) => send(n + 1))
+      .filter((n: Int) => n % 2 == 0)
+      .map((n: Int) => n * 10)
+      .zipWithIndex
+      .toList
+  }
 
   println(listed)
