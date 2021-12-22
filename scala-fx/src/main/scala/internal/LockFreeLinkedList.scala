@@ -5,6 +5,7 @@ import scala.annotation.tailrec
 import scala.annotation.targetName
 import scala.util.control.Breaks._
 import fx.internal.LockFreeLinkedList.Node
+import scala.reflect.TypeTest
 
 extension [A](ref: AtomicReference[A])
   def loop(action: (A) => Unit): Nothing =
@@ -23,12 +24,12 @@ object LockFreeLinkedList:
     case Success
     case Failure
 
+  class Removed(val ref: Node)
+
   class Node:
     private[internal] val _next: AtomicReference[Any] = AtomicReference(this)
     private[internal] val _prev: AtomicReference[Node] = AtomicReference(this)
     private[internal] val _removedRef: AtomicReference[Removed | Null] = AtomicReference(null)
-
-    class Removed(val ref: Node)
 
     extension (value: Any)
       private[fx] def unwrap(): Node =
@@ -149,6 +150,10 @@ object LockFreeLinkedList:
           case _ => ()
       }
 
+    protected def nextIfRemoved(): Node | Null =
+      if (next.isInstanceOf[Removed]) next.asInstanceOf[Removed].ref
+      else null
+
     private[internal] def finishAdd(next: Node): Unit =
       next._prev.loop { nextPrev =>
         if (this.next != next)
@@ -171,6 +176,10 @@ object LockFreeLinkedList:
         f(())
       }
       throw RuntimeException("impossible reached")
+
+    private[internal] def validateNode(prev: Node, next: Node): Unit =
+      assert { prev == this._prev.get }
+      assert { next == this._next.get }
 
     // @tailrec can't make this tailrec
     private[internal] def correctPrev(op: AtomicOpDescriptor | Null): Node | Null =
@@ -264,3 +273,102 @@ object LockFreeLinkedList:
         if (first.remove()) return first
         first.helpRemove() // must help remove to ensure lock-freedom
       }
+
+    def describeRemoveFirst(): RemoveFirstDesc[Node] = RemoveFirstDesc(this)
+
+    // just peek at item when predicate is true
+    def removeFirstIfIsInstanceOfOrPeekIf[T](predicate: (T) => Boolean)(
+        using tt: TypeTest[Node, T]): T | Null =
+      forever { _ =>
+        val first = this.next.asInstanceOf[Node]
+        if (first == this) return null // got list head -- nothing to remove
+        if (tt.unapply(first) == None) return null
+        val fst = first.asInstanceOf[T]
+        if (predicate(fst)) {
+          // check for removal of the current node to make sure "peek" operation is linearizable
+          if (!first.isRemoved) return fst
+        }
+        val next = first.removeOrNext()
+        if (next == null) return fst // removed successfully -- return it
+        // help and start from the beginning
+        next.helpRemovePrev()
+      }
+
+  class RemoveFirstDesc[T](
+      val queue: Node
+  ) extends AbstractAtomicDesc():
+    private val _affectedNode: AtomicReference[Node | Null] = AtomicReference(null)
+    private val _originalNext: AtomicReference[Node | Null] = AtomicReference(null)
+
+    def result: T = affectedNode.asInstanceOf[T]
+
+    override def takeAffectedNode(op: AtomicOpDescriptor): Node | Null =
+      queue._next.loop { next =>
+        if (next.isInstanceOf[AtomicOpDescriptor]) {
+          val n = next.asInstanceOf[AtomicOpDescriptor]
+          if (op.isEarlierThan(n))
+            return null // RETRY_ATOMIC
+          n.perform(queue)
+        } else {
+          return next.asInstanceOf[Node]
+        }
+      }
+
+    final override val affectedNode: Node | Null = _affectedNode.get
+    final override val originalNext: Node | Null = _originalNext.get
+
+    // check node predicates here, must signal failure if affect is not of type T
+    protected override def failure(affected: Node): Any | Null =
+      if (affected == queue) ListEmpty else null
+
+    final override def retry(affected: Node, next: Any): Boolean =
+      if (!next.isInstanceOf[Removed]) return false
+      next.asInstanceOf[Removed].ref.helpRemovePrev() // must help delete to ensure lock-freedom
+      true
+
+    override def finishPrepare(prepareOp: PrepareOp): Unit =
+      // Note: finishPrepare must use CAS to make sure the stale invocation is not
+      // going to overwrite the previous decision on successful preparation.
+      // Result of CAS is irrelevant, but we must ensure that it is set when invoker completes
+      _affectedNode.compareAndSet(null, prepareOp.affected)
+      _originalNext.compareAndSet(null, prepareOp.next)
+
+    final override def updatedNext(affected: Node, next: Node): Any = next.removed()
+
+    final override def finishOnSuccess(affected: Node, next: Node) =
+      // Complete removal operation here. It bails out if next node is also removed. It becomes
+      // responsibility of the next's removes to call correctPrev which would help fix all the links.
+      next.correctPrev(null)
+
+  class Head extends Node {
+    def isEmpty: Boolean = next == this
+
+    /**
+     * Iterates over all elements in this list of a specified type.
+     */
+    inline def forEach[T <: Node](block: (T) => Unit)(using tt: TypeTest[Node, T]) =
+      var cur: Node = next.asInstanceOf[Node]
+      while (cur != this) {
+        if (tt.unapply(cur).isInstanceOf[Some.type]) block(cur.asInstanceOf[T])
+        cur = cur.nextNode
+      }
+
+    // just a defensive programming -- makes sure that list head sentinel is never removed
+    override def remove(): Nothing = throw IllegalStateException("head cannot be removed")
+
+    // optimization: because head is never removed, we don't have to read _next.value to check these:
+    override val isRemoved: Boolean = false
+    override def nextIfRemoved(): Node | Null = null
+
+    private[internal] def validate() =
+      var prev: Node = this
+      var cur: Node = next.asInstanceOf[Node]
+      while (cur != this) {
+        val next = cur.nextNode
+        cur.validateNode(prev, next)
+        prev = cur
+        cur = next
+      }
+      validateNode(prev, next.asInstanceOf[Node])
+
+  }

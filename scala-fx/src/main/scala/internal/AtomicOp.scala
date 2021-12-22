@@ -27,6 +27,7 @@ private[internal] val Undecided: Symbol = Symbol("Undecided")
 private[internal] val RetryAtomic: Symbol = Symbol("RetryAtomic")
 private[internal] val RemovePrepared: Symbol = Symbol("RemovePrepared")
 private[internal] val ConditionFalse: Symbol = Symbol("ConditionFalse")
+private[internal] val ListEmpty: Symbol = Symbol("ListEmpty")
 
 private[fx] abstract class AtomicOp[-T] extends AtomicOpDescriptor:
   private val _consensus: AtomicReference[Any] = AtomicReference(Undecided)
