@@ -23,9 +23,10 @@ private[fx] abstract class AtomicOpDescriptor:
 
 class Symbol(val value: String) extends AnyVal
 
-private val Undecided: Symbol = Symbol("Undecided")
-private val RetryAtomic: Symbol = Symbol("RetryAtomic")
-private val RemovePrepared: Symbol = Symbol("RemovePrepared")
+private[internal] val Undecided: Symbol = Symbol("Undecided")
+private[internal] val RetryAtomic: Symbol = Symbol("RetryAtomic")
+private[internal] val RemovePrepared: Symbol = Symbol("RemovePrepared")
+private[internal] val ConditionFalse: Symbol = Symbol("ConditionFalse")
 
 private[fx] abstract class AtomicOp[-T] extends AtomicOpDescriptor:
   private val _consensus: AtomicReference[Any] = AtomicReference(Undecided)

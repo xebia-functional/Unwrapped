@@ -12,10 +12,10 @@ extension [A](ref: AtomicReference[A])
     throw RuntimeException("impossible")
 
 /**
- * LockFree List impl based on 
+ * LockFree List impl based on
  * https://github.com/Kotlin/kotlinx.coroutines/blob/a4ae389503cc9b3c940e5d5539fe359b5e4a4950/kotlinx-coroutines-core/concurrent/src/internal/LockFreeLinkedList.kt#L63
  * TODO add LICENSE if we use this prototype internal impl in the stream channels.
- **/
+ */
 object LockFreeLinkedList:
 
   enum State:
@@ -39,11 +39,11 @@ object LockFreeLinkedList:
     def isRemoved: Boolean = next.isInstanceOf[Removed]
 
     private[internal] def removed(): Removed =
-        if (_removedRef.get == null)
-          val r = Removed(this)
-          _removedRef.lazySet(r)
-          r
-        else _removedRef.get
+      if (_removedRef.get == null)
+        val r = Removed(this)
+        _removedRef.lazySet(r)
+        r
+      else _removedRef.get
 
     def next: Any =
       _next.loop { n =>
@@ -99,7 +99,7 @@ object LockFreeLinkedList:
           if (success) newNode.finishAdd(oldNext)
         }
 
-    def tryCondAddNext(node: Node, next: Node, condAdd: CondAddOp): State =
+    def tryCondAddNext(node: Node, next: Node, condAdd: node.CondAddOp): State =
       node._prev.lazySet(this)
       node._next.lazySet(next)
       condAdd.oldNext = next
@@ -108,6 +108,46 @@ object LockFreeLinkedList:
       if (condAdd.perform(this) == null) State.Success else State.Failure
 
     def describeAddLast[T <: Node](node: T): AddLastDesc[T] = AddLastDesc(this, node)
+
+    inline def makeCondAddOp(node: Node, condition: () => Boolean): node.CondAddOp =
+      new node.CondAddOp(node) {
+        override def prepare(affected: Any): Any | Null =
+          if (condition()) null else ConditionFalse
+      }
+
+    def addLastIf(node: Node, condition: () => Boolean): Boolean =
+      val condAdd = makeCondAddOp(node, condition)
+      forever { _ => // lock-free loop on prev.next
+        val prev = prevNode // sentinel node is never removed, so prev is always defined
+        val state = prev.tryCondAddNext(node, this, condAdd)
+        state match
+          case State.Success => return true
+          case State.Failure => return false
+          case _ => ()
+      }
+
+    def addLastIfPrev(node: Node, predicate: (Node) => Boolean): Boolean =
+      forever { _ => // lock-free loop on prev.next
+        val prev = prevNode // sentinel node is never removed, so prev is always defined
+        if (!predicate(prev)) return false
+        if (prev.addNext(node, this)) return true
+      }
+
+    def addLastIfPrevAndIf(
+        node: Node,
+        predicate: (Node) => Boolean, // prev node predicate
+        condition: () => Boolean // atomically checked condition
+    ): Boolean =
+      val condAdd = makeCondAddOp(node, condition)
+      forever { _ => // lock-free loop on prev.next
+        val prev = prevNode // sentinel node is never removed, so prev is always defined
+        if (!predicate(prev)) return false
+        val state = prev.tryCondAddNext(node, this, condAdd)
+        state match
+          case State.Success => return true
+          case State.Failure => return false
+          case _ => ()
+      }
 
     private[internal] def finishAdd(next: Node): Unit =
       next._prev.loop { nextPrev =>
@@ -179,4 +219,48 @@ object LockFreeLinkedList:
         }
       }
 
+    def remove(): Boolean =
+      removeOrNext() == null
 
+    // returns null if removed successfully or next node if this node is already removed
+    private[internal] def removeOrNext(): Node | Null =
+      forever { _ => // lock-free loop on next
+        val next = this.next
+        if (next.isInstanceOf[Removed])
+          return next
+            .asInstanceOf[Removed]
+            .ref // was already removed -- don't try to help (original thread will take care)
+        if (next == this) return next.asInstanceOf[Node] // was not even added
+        val removed = next.asInstanceOf[Node].removed()
+        if (_next.compareAndSet(next, removed)) {
+          // was removed successfully (linearized remove) -- fixup the list
+          next.asInstanceOf[Node].correctPrev(null)
+          return null
+        }
+      }
+
+    // Helps with removal of this node
+    def helpRemove(): Node | Null =
+      // Note: this node must be already removed
+      next.asInstanceOf[Removed].ref.helpRemovePrev()
+
+    // Helps with removal of nodes that are previous to this
+    private[internal] def helpRemovePrev(): Node | Null =
+      // We need to call correctPrev on a non-removed node to ensure progress, since correctPrev bails out when
+      // called on a removed node. There's always at least one non-removed node (list head).
+      var node = this
+      forever { _ =>
+        val next = node.next
+        if (!next.isInstanceOf[Removed]) break
+        node = next.asInstanceOf[Removed].ref
+      }
+      // Found a non-removed node
+      node.correctPrev(null)
+
+    def removeFirstOrNull(): Node | Null =
+      forever { _ => // try to linearize
+        val first = next.asInstanceOf[Node]
+        if (first == this) return null
+        if (first.remove()) return first
+        first.helpRemove() // must help remove to ensure lock-freedom
+      }
