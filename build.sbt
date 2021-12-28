@@ -1,32 +1,42 @@
-name := "scala-fx"
-
-ThisBuild / version := "0.1"
 ThisBuild / scalaVersion := "3.1.1-RC1"
+ThisBuild / organization := "com.47deg"
+ThisBuild / versionScheme := Some("early-semver")
 
-idePackagePrefix := Some("fx")
+addCommandAlias("ci-test", "scalafmtCheckAll; scalafmtSbtCheck; mdoc; test")
+addCommandAlias("ci-docs", "github; mdoc")
+addCommandAlias("ci-publish", "github; ci-release")
 
-run / fork := true
+publish / skip := true
 
-run / connectInput := true
+lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
-classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
+lazy val benchmarks =
+  project.dependsOn(`scala-fx`).settings(publish / skip := true).enablePlugins(JmhPlugin)
 
-javaOptions ++= Seq(
-  "-XX:+IgnoreUnrecognizedVMOptions",
-  "-XX:-DetectLocksInCompiledFrames",
-  "-XX:+UnlockDiagnosticVMOptions",
-  "-XX:+UnlockExperimentalVMOptions",
-  "-XX:+UseNewCode",
-  "--add-modules=java.base",
-  "--add-opens java.base/jdk.internal.vm=ALL-UNNAMED",
-  "--add-exports java.base/jdk.internal.vm=ALL-UNNAMED",
-  "--enable-preview"
-)
+lazy val documentation = project
+  .dependsOn(`scala-fx`)
+  .enablePlugins(MdocPlugin)
+  .settings(mdocOut := file("."))
+  .settings(publish / skip := true)
 
-libraryDependencies ++= Seq(
-  "org.typelevel" %% "cats-effect" % "3.3.0",
-  "org.scalacheck" %% "scalacheck" % "1.15.4" % "test"
-)
+lazy val scalafxSettings: Seq[Def.Setting[_]] =
+  Seq(
+    classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
+    javaOptions ++= Seq(
+      "-XX:+IgnoreUnrecognizedVMOptions",
+      "-XX:-DetectLocksInCompiledFrames",
+      "-XX:+UnlockDiagnosticVMOptions",
+      "-XX:+UnlockExperimentalVMOptions",
+      "-XX:+UseNewCode",
+      "--add-modules=java.base",
+      "--add-opens java.base/jdk.internal.vm=ALL-UNNAMED",
+      "--add-exports java.base/jdk.internal.vm=ALL-UNNAMED",
+      "--enable-preview"
+    ),
+    libraryDependencies ++= Seq(
+      "org.scalacheck" %% "scalacheck" % "1.15.4" % Test
+    )
+  )
 
 lazy val examples = (project in file("examples")).settings(
   name := "examples",

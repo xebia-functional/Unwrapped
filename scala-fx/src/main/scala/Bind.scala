@@ -1,11 +1,6 @@
 package fx
 
 import scala.annotation.implicitNotFound
-import cats.effect.IO
-import cats.effect.unsafe.IORuntime
-import scala.concurrent.ExecutionContext
-import cats.effect.unsafe.Scheduler
-import cats.effect.unsafe.IORuntimeConfig
 
 /**
  * Brings the capability to perform Monad bind in place to any type. Types may access

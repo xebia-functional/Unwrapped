@@ -23,4 +23,4 @@ jobs:
         with:
           java-version: 'openjdk@18.0.0=tgz+https://download.java.net/java/early_access/loom/7/openjdk-18-loom+7-288_linux-x64_bin.tar.gz'
       - name: Run checks
-        run: sbt scalafmtCheckAll scalafmtSbtCheck test
+        run: sbt ci-test
