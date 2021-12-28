@@ -20,7 +20,7 @@ import io.circe.generic.auto._
 
 import scala.collection.mutable
 
-//Assuming that for cats IO binding is something like this
+//Assuming the cats IO binding is something like this
 object IOBind:
   extension [A](io: IO[A])
     def bind: A % Bind = {
@@ -57,7 +57,7 @@ end FxService
 
 object FxRouting extends Http4sDsl[IO]:
 
-  import IOBind._ // Requires IO Binding
+  import IOBind._ // Lines 66, 70, 75, 79 Require IO Binding
 
   private val FxUserRoutes: HttpRoutes[IO] % Bind % Control[None.type] = HttpRoutes.of[IO] {
     case GET -> Root => Ok(IO(FxService.findAll).bind)
@@ -85,7 +85,7 @@ object FxRouting extends Http4sDsl[IO]:
 end FxRouting
 
 @main def http4sFxExample =
-  import IOBind._ // Requires IO Binding
+  import IOBind._ // effect Require IO Binding
   import fx.runtime
 
   val effect: Unit % Bind % Control[None.type] =

@@ -38,15 +38,15 @@ lazy val scalafxSettings: Seq[Def.Setting[_]] =
     )
   )
 
-lazy val examples = (project in file("examples")).settings(
-  name := "examples",
-  Compile / unmanagedSourceDirectories += file("src/main/scala"),
-  libraryDependencies ++= Seq(
-    "org.typelevel" %% "cats-effect" % "3.3.0",
-    "org.http4s" %% "http4s-dsl" % "0.23.6",
-    "org.http4s" %% "http4s-blaze-server" % "0.23.6",
-    "org.http4s" %% "http4s-circe" % "0.23.6",
-    "io.circe" %% "circe-core" % "0.14.1",
-    "io.circe" %% "circe-generic" % "0.14.1"
+lazy val examples = project
+  .dependsOn(`scala-fx`)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-effect" % "3.3.0",
+      "org.http4s" %% "http4s-dsl" % "0.23.6",
+      "org.http4s" %% "http4s-blaze-server" % "0.23.6",
+      "org.http4s" %% "http4s-circe" % "0.23.6",
+      "io.circe" %% "circe-core" % "0.14.1",
+      "io.circe" %% "circe-generic" % "0.14.1"
+    )
   )
-)
