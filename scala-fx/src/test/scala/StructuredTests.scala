@@ -23,7 +23,7 @@ object StructuredTests extends Properties("Structured Concurrency Tests"):
     val r = AtomicReference("")
     val modifyGate = CompletableFuture[Int]()
     structured(
-      (
+      parallel(
         () =>
           modifyGate.join
           r.updateAndGet { i => s"$i$a" }
@@ -31,7 +31,7 @@ object StructuredTests extends Properties("Structured Concurrency Tests"):
         () =>
           r.set(s"$b")
           modifyGate.complete(0)
-      ).par[Function0]
+      )
     )
     r.get() == s"$b$a"
   }
@@ -55,11 +55,6 @@ object StructuredTests extends Properties("Structured Concurrency Tests"):
         c
 
       c == run(structured(x))
-  }
-
-  property("tupleXXL par") = forAll { (t20a: TestTuple20, t20b: TestTuple20) =>
-    val tupleXXL: TestTupleXXL = t20a ++ t20b
-    tupleXXL == run(structured(tupleXXL.par[Id]))
   }
 
 end StructuredTests

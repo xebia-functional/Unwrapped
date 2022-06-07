@@ -1,6 +1,6 @@
 package fx
 
-import java.util.concurrent.StructuredExecutor
+import jdk.incubator.concurrent.StructuredTaskScope
 import scala.annotation.implicitNotFound
 import java.util.concurrent.Callable
 import java.util.concurrent.Future
@@ -13,14 +13,14 @@ import java.util.concurrent.CancellationException
 @implicitNotFound(
   "Structured concurrency requires capability:\n% Structured"
 )
-opaque type Structured = StructuredExecutor
+opaque type Structured = StructuredTaskScope[Any]
 
 extension (s: Structured)
   private[fx] def forked[A](callable: Callable[A]): Future[A] =
     s.fork(callable)
 
 inline def structured[B](f: B % Structured): B =
-  val scope = StructuredExecutor.open("scala fx structured scope")
+  val scope = new StructuredTaskScope[Any]()
   given Structured = scope
   try f
   finally

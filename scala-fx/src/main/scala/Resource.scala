@@ -2,7 +2,6 @@ package fx
 
 import java.util.concurrent.atomic.AtomicReference
 import scala.util.control.NonFatal
-import fx.Tuples.mapK
 import Tuple.{InverseMap, IsMappedBy, Map}
 import scala.annotation.implicitNotFound
 
