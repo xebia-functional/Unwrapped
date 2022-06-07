@@ -1,10 +1,8 @@
 package fx
 
-extension [R, A](fa: Either[R, A]) 
-  def bind(using Errors[R]): A = fa.fold(_.shift, identity)
+extension [R, A](fa: Either[R, A]) def bind(using Errors[R]): A = fa.fold(_.shift, identity)
 
-extension [R, A](fa: List[Either[R, A]]) 
-  def bind(using Errors[R]): List[A] = fa.map(_.bind)
+extension [R, A](fa: List[Either[R, A]]) def bind(using Errors[R]): List[A] = fa.map(_.bind)
 
 extension [A](fa: Option[A])
   def bind(using Errors[None.type]): A = fa.fold(None.shift)(identity)
