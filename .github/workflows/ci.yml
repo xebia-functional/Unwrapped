@@ -23,4 +23,4 @@ jobs:
         with:
           java-version: 'openjdk@19.0.0=tgz+https://download.java.net/java/early_access/loom/6/openjdk-19-loom+6-625_linux-x64_bin.tar.gz'
       - name: Run checks
-        run: sbt ci-test
+        run: env SBT_OPTS='--add-modules jdk.incubator.concurrent' sbt ci-test
