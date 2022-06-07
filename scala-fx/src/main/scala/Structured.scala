@@ -19,7 +19,7 @@ extension (s: Structured)
   private[fx] def forked[A](callable: Callable[A]): Future[A] =
     s.fork(callable)
 
-inline def structured[B](f: B % Structured): B =
+inline def structured[B](f: Structured ?=> B): B =
   val scope = new StructuredTaskScope[Any]()
   given Structured = scope
   try f
@@ -27,8 +27,8 @@ inline def structured[B](f: B % Structured): B =
     scope.join
     scope.close()
 
-def joinAll: Unit % Structured =
-  summon[Structured].join
+def joinAll(using structured: Structured): Unit =
+  structured.join
 
 private[fx] inline def callableOf[A](f: () => A): Callable[A] =
-  new Callable[A] { def call() = f() }
+  new Callable[A] { def call(): A = f() }

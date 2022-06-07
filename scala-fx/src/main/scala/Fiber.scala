@@ -6,8 +6,8 @@ import java.util.concurrent.CompletableFuture
 opaque type Fiber[A] = Future[A]
 
 extension [A](fiber: Fiber[A])
-  def join: A % Structured = fiber.get
-  def cancel(mayInterrupt: Boolean = true): Boolean % Structured =
+  def join: A = fiber.get
+  def cancel(mayInterrupt: Boolean = true): Boolean =
     fiber.cancel(mayInterrupt)
 
 def uncancellable[A](fn: () => A): A = {
@@ -23,5 +23,5 @@ def uncancellable[A](fn: () => A): A = {
   promise.join
 }
 
-def fork[B](f: () => B): Fiber[B] % Structured =
-  summon[Structured].forked(callableOf(f))
+def fork[B](f: () => B)(using structured: Structured): Fiber[B] =
+  structured.forked(callableOf(f))

@@ -28,13 +28,13 @@ extension [A](r: Receive[Receive[A]])
 
 extension [A](r: Receive[A])
 
-  def transform[B](f: (A => Unit) % Send[B]): Receive[B] =
+  def transform[B](f: Send[B] ?=> (A => Unit)): Receive[B] =
     streamed(receive(f)(using r))
 
-  def filter(predicate: (A => Boolean) % Send[A]): Receive[A] =
+  def filter(predicate: Send[A] ?=> A => Boolean): Receive[A] =
     transform { value => if (predicate(value)) send(value) }
 
-  def map[B](f: (A => B)): Receive[B] =
+  def map[B](f: A => B): Receive[B] =
     transform { v => send(f(v)) }
 
   def flatMap[B](transform: A => Receive[B]): Receive[B] =
@@ -42,7 +42,7 @@ extension [A](r: Receive[A])
 
   def flatMapMerge[B](concurrency: Int)(
       transform: A => Receive[B]
-  ): Receive[B] % Structured =
+  )(using Structured): Receive[B] =
     map(transform).flattenMerge(concurrency)
 
   def zipWithIndex: Receive[(A, Int)] =
@@ -66,8 +66,8 @@ extension [A](r: Receive[A])
     r.receive(buffer.addOne)
     buffer.toList
 
-def receive[A](f: A => Unit): Unit % Receive[A] =
-  summon[Receive[A]].receive(f)
+def receive[A](f: A => Unit)(using r: Receive[A]): Unit =
+  r.receive(f)
 
 @implicitNotFound(
   "Sending values to streams or channels require capability:\n% Send[${A}]"
@@ -77,13 +77,13 @@ trait Send[A]:
   def sendAll(receive: Receive[A]): Unit =
     receive.receive(send)
 
-def send[A](value: A): Unit % Send[A] =
-  summon[Send[A]].send(value)
+def send[A](value: A)(using s: Send[A]): Unit =
+  s.send(value)
 
-def sendAll[A](receive: Receive[A]): Unit % Send[A] =
-  summon[Send[A]].sendAll(receive)
+def sendAll[A](receive: Receive[A])(using s: Send[A]): Unit =
+  s.sendAll(receive)
 
-def streamed[A](f: Unit % Send[A]): Receive[A] =
+def streamed[A](f: Send[A] ?=> Unit): Receive[A] =
   (receive: (A) => Unit) =>
     given Send[A] = (a: A) => receive(a)
     f
@@ -96,7 +96,7 @@ def streamOf[A](values: A*): Receive[A] =
 private[this] def repeat(n: Int)(f: (Int) => Unit): Unit =
   for (i <- 0 to n) f(i)
 
-val source: Unit % Send[Int] =
+val source: Send[Int] ?=> Unit =
   repeat(100)(send)
 
 @main def SimpleFlow: Unit =

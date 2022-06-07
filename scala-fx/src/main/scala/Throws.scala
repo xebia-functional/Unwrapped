@@ -16,7 +16,7 @@ object Throws:
   given unsafeExceptions[R <: Exception]: Throws[R] = ()
 
 inline def handle[R <: Exception, A](
-    inline f: A % Throws[R]
+    inline f: Throws[R] ?=> A
 )(inline recover: (R) => A): A =
   try
     import fx.Throws.unsafeExceptions

@@ -6,13 +6,13 @@ import Tuple.{InverseMap, IsMappedBy, Map}
 import scala.annotation.implicitNotFound
 
 class Resource[A](
-    val acquire: A % Resources,
+    val acquire: Resources ?=> A,
     val release: (A, ExitCase) => Unit
 ):
 
-  def this(value: A % Resources) = this(value, (_, _) => ())
+  def this(value: Resources ?=> A) = this(value, (_, _) => ())
 
-  def use[B](f: A => B): B % Resources = bracketCase(() => acquire, f, release)
+  def use[B](f: A => B): B = bracketCase(() => acquire, f, release)
 
   def map[B](f: (A) => B): Resource[B] =
     Resource(f(this.bind))

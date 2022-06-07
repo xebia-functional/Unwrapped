@@ -25,8 +25,8 @@ object Console:
  * If your method is not an extension then it needs side syntax like these or users would need
  * to summon.
  */
-def read(): String % Console =
-  summon[Console].read()
+def read()(using console: Console): String =
+  console.read()
 
 class StandardConsole(using Throws[EndOfLine]) extends Console:
   def read(): String =
@@ -56,7 +56,7 @@ class FakeConsole(var input: String)(using Throws[EndOfLine]) extends Console:
     def writeLine(): Unit = output += (s + "\n")
 
 @tailrec
-def program: String % Console % Errors[String] =
+def program(using Errors[String], Console): String =
   "what is your name?".writeLine()
   read() match
     case "" =>
@@ -69,14 +69,12 @@ def program: String % Console % Errors[String] =
       s"hello $name"
 
 @main def consoleStandard() =
-  import fx.runtime
   import fx.Throws.unsafeExceptions
 
   val value: String =
     run(program)
 
 @main def consoleFake() =
-  import fx.runtime
   import fx.Throws.unsafeExceptions
   given Console = FakeConsole("")
   val value: String =
