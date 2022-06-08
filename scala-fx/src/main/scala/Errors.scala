@@ -8,6 +8,6 @@ import scala.annotation.implicitNotFound
 type Errors[R] = Control[R]
 
 extension [R](r: R)
-  def raise[A]: A % Errors[R] = r.shift
-  def ensure(value: Boolean): Unit % Errors[R] =
+  def raise[A](using Errors[R]): A = r.shift
+  def ensure(value: Boolean)(using Errors[R]): Unit =
     if (value) () else r.shift

@@ -9,19 +9,18 @@ The example below is a pure program that returns `Int` and requires the context 
 ```scala mdoc:reset
 import fx.*
 
-val program: Int % Bind =
+val program: Int =
     Right(1).bind + Right(2).bind
 ```
 
-Using Scala3 features such as context functions, infix types and erasable definitions we can can encode pure programs in terms of capabilities with minimal overhead.
+Using Scala3 features such as context functions we can encode pure programs in terms of capabilities with minimal overhead.
 Capabilities can be introduced a la carte and will be carried as given contextual evidences through call sites until you proof you can get rid of them.
 
 ```scala mdoc:reset
 import fx.*
-import fx.runtime
 
 def runProgram: Int | String =
-    val program: Int % Bind % Errors[String] =
+    val program: Errors[String] ?=> Int =
       Right(1).bind + Right(2).bind + "oops".raise[Int]
 
     run(program)
@@ -34,27 +33,12 @@ Users and library authors may define their own Capabilities. Here is how `Bind` 
 ```scala
 /** Brings the capability to perform Monad bind in place. Types may
   * access [[Control]] to short-circuit as necessary
-  *
-  * ```scala
-  * import fx.Bind
-  *
-  * extension [R, A](fa: Either[R, A])
-  *   def bind: A % Bind % Control[R] = fa.fold(_.shift, identity)
-  * ```
   */
-@implicitNotFound(
-  "Monadic bind requires capability:\n% Bind"
-)
-opaque type Bind = Unit
-
-object Bind:
-  given Bind = ()
-
 extension [R, A](fa: Either[R, A])
-  def bind: A % Bind % Errors[R] = fa.fold(_.shift, identity)
+  def bind: Errors[R] ?=> A = fa.fold(_.shift, identity)
 ```
 
-Scala Fx supports a structured concurrency model backed by the non-blocking [StructuredExecutor](https://download.java.net/java/early_access/loom/docs/api/java.base/java/util/concurrent/StructuredExecutor.html)
+Scala Fx supports a structured concurrency model backed by the non-blocking [StructuredExecutorTask](https://openjdk.java.net/jeps/428)
 where you can `fork` and `join` cancellable fibers and scopes.
 
 Popular functions like `parallel` support arbitrary typed arity in arguments and return types.
@@ -63,19 +47,19 @@ Popular functions like `parallel` support arbitrary typed arity in arguments and
 import fx.*
 
 def runProgram: (String, Int, Double) =
-  val results: (String, Int, Double) % Structured =
-    (
+  val results: Structured ?=> (String, Int, Double) =
+    parallel(
       () => "1",
       () => 0,
       () => 47.03
-    ).parallel
+    )
 
   structured(results)
 
 println(runProgram)
 ```
 
-Continuations based on Control Throwable or a non blocking model like Loom are useful because they allow us to intermix async and sync programs in the same syntax without the need for boxing as is frequently the case in most scala effect libraries.
+Continuations based on Control Throwable or a non-blocking model like Loom are useful because they allow us to intermix async and sync programs in the same syntax without the need for boxing as is frequently the case in most scala effect libraries.
 
 ### Build and run in your local environment:
 
@@ -90,5 +74,8 @@ Pre-requisites:
 You can now compile and run the tests:
 
 ```shell
-sbt "clean; compile; test"
+env JAVA_OPTS='--add-modules jdk.incubator.concurrent' sbt "clean; compile; test"
 ```
+
+**NOTE**: The Loom project is defined as an incubator module that is a means to distribute APIs which are not final or completed to get feedback from the developers.
+You should include the `-add-module` Java option to add the module to the class path of the project.

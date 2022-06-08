@@ -11,7 +11,7 @@ private type Id[+A] = A
 
 def par[F[_], X <: Tuple](x: X, parBind: ParBind[F])(
     using IsMappedBy[F][X],
-    Structured): InverseMap[X, F] % Structured =
+    Structured): InverseMap[X, F] =
   val fibers =
     x.map[Fiber](
       [r] => (r: r) => fork(() => parBind(r.asInstanceOf[F[r]]))
@@ -28,7 +28,7 @@ extension [X <: Tuple](x: X)(using IsMappedBy[Function0][X], Structured)
     par(x, [t] => (f: () => t) => f.apply)
 
 @main def ParallelFunctionExample =
-  val results: (String, Int, Double) % Structured =
+  val results: Structured ?=> (String, Int, Double) =
     parallel(
       () => "1",
       () => 0,
