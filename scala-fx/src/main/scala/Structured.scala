@@ -1,14 +1,14 @@
 package fx
 
 import jdk.incubator.concurrent.StructuredTaskScope
-import scala.annotation.implicitNotFound
+
 import java.util.concurrent.Callable
-import java.util.concurrent.Future
+import java.util.concurrent.CancellationException
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
-import java.util.concurrent.CancellationException
+import java.util.concurrent.Future
+import scala.annotation.implicitNotFound
 
 @implicitNotFound(
   "Structured concurrency requires capability:\n% Structured"
@@ -31,4 +31,4 @@ def joinAll: Unit % Structured =
   summon[Structured].join
 
 private[fx] inline def callableOf[A](f: () => A): Callable[A] =
-  new Callable[A] { def call() = f() }
+  new Callable[A] { def call(): A = f() }
