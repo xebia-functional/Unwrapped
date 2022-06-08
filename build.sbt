@@ -35,6 +35,6 @@ lazy val scalafxSettings: Seq[Def.Setting[_]] =
       "--enable-preview"
     ),
     libraryDependencies ++= Seq(
-      "org.scalacheck" %% "scalacheck" % "1.15.4" % Test
+      "org.scalacheck" %% "scalacheck" % "1.16.0" % Test
     )
   )

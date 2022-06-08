@@ -1,18 +1,14 @@
 package fx
 
-import org.scalacheck.Properties
 import org.scalacheck.Prop.forAll
-import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.CompletableFuture
+import org.scalacheck.Properties
 import org.scalacheck.Test.Parameters
-import java.util.concurrent.Semaphore
-import scala.util.control.NonFatal
-import java.time.Duration
 
-type TestTuple5 = (Int, String, Double, Long, Char)
-type TestTuple10 = Tuple.Concat[TestTuple5, TestTuple5]
-type TestTuple20 = Tuple.Concat[TestTuple10, TestTuple10]
-type TestTupleXXL = Tuple.Concat[TestTuple20, TestTuple20]
+import java.time.Duration
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Semaphore
+import java.util.concurrent.atomic.AtomicReference
+import scala.util.control.NonFatal
 
 object StructuredTests extends Properties("Structured Concurrency Tests"):
 
