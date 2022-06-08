@@ -54,14 +54,13 @@ extension [R, A](fa: Either[R, A])
   def bind: A % Bind % Errors[R] = fa.fold(_.shift, identity)
 ```
 
-Scala Fx supports a structured concurrency model backed by the non blocking [StructuredExecutor](https://download.java.net/java/early_access/loom/docs/api/java.base/java/util/concurrent/StructuredExecutor.html)
+Scala Fx supports a structured concurrency model backed by the non-blocking [StructuredExecutor](https://download.java.net/java/early_access/loom/docs/api/java.base/java/util/concurrent/StructuredExecutor.html)
 where you can `fork` and `join` cancellable fibers and scopes.
 
-Popular functions like `par` support arbitrary typed arity in arguments and return types.
+Popular functions like `parallel` support arbitrary typed arity in arguments and return types.
 
 ```scala mdoc:reset
 import fx.*
-import fx.function0ParBind
 
 def runProgram: (String, Int, Double) =
   val results: (String, Int, Double) % Structured =
@@ -69,7 +68,7 @@ def runProgram: (String, Int, Double) =
       () => "1",
       () => 0,
       () => 47.03
-    ).par[Function0]
+    ).parallel
 
   structured(results)
 
