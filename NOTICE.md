@@ -1,5 +1,5 @@
 scala-fx
 
-Copyright (c)  com.47deg. All rights reserved.
+Copyright (c) 2021-2022 47 Degrees. All rights reserved.
 
-Licensed under . See [LICENSE](LICENSE.md) for terms.
+Licensed under Apache-2.0. See [LICENSE](LICENSE.md) for terms.
