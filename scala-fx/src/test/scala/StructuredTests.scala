@@ -1,18 +1,14 @@
 package fx
 
-import org.scalacheck.Properties
 import org.scalacheck.Prop.forAll
-import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.CompletableFuture
+import org.scalacheck.Properties
 import org.scalacheck.Test.Parameters
-import java.util.concurrent.Semaphore
-import scala.util.control.NonFatal
-import java.time.Duration
 
-type TestTuple5 = (Int, String, Double, Long, Char)
-type TestTuple10 = Tuple.Concat[TestTuple5, TestTuple5]
-type TestTuple20 = Tuple.Concat[TestTuple10, TestTuple10]
-type TestTupleXXL = Tuple.Concat[TestTuple20, TestTuple20]
+import java.time.Duration
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Semaphore
+import java.util.concurrent.atomic.AtomicReference
+import scala.util.control.NonFatal
 
 object StructuredTests extends Properties("Structured Concurrency Tests"):
 
@@ -23,7 +19,7 @@ object StructuredTests extends Properties("Structured Concurrency Tests"):
     val r = AtomicReference("")
     val modifyGate = CompletableFuture[Int]()
     structured(
-      (
+      parallel(
         () =>
           modifyGate.join
           r.updateAndGet { i => s"$i$a" }
@@ -31,7 +27,7 @@ object StructuredTests extends Properties("Structured Concurrency Tests"):
         () =>
           r.set(s"$b")
           modifyGate.complete(0)
-      ).par[Function0]
+      )
     )
     r.get() == s"$b$a"
   }
@@ -55,11 +51,6 @@ object StructuredTests extends Properties("Structured Concurrency Tests"):
         c
 
       c == run(structured(x))
-  }
-
-  property("tupleXXL par") = forAll { (t20a: TestTuple20, t20b: TestTuple20) =>
-    val tupleXXL: TestTupleXXL = t20a ++ t20b
-    tupleXXL == run(structured(tupleXXL.par[Id]))
   }
 
 end StructuredTests

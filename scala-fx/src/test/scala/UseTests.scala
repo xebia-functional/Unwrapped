@@ -9,7 +9,6 @@ import org.scalacheck.Test.Parameters
 import java.util.concurrent.Semaphore
 import java.util.concurrent.CancellationException
 import scala.util.control.NonFatal
-import java.util.concurrent.StructuredExecutor.ShutdownOnFailure
 import java.time.Duration
 import java.time.temporal.TemporalUnit
 

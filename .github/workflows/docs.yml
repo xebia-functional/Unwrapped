@@ -14,9 +14,11 @@ jobs:
   documentation:
     if: "!contains(github.event.head_commit.message, 'skip ci')"
     runs-on: ubuntu-latest
+    env:
+      JAVA_OPTS: --add-modules jdk.incubator.concurrent
     steps:
       - name: Checkout project
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
           ref: main
@@ -25,7 +27,7 @@ jobs:
       - name: Setup Scala
         uses: olafurpg/setup-scala@v13
         with:
-          java-version: 'openjdk@18.0.0=tgz+https://download.java.net/java/early_access/loom/7/openjdk-18-loom+7-288_linux-x64_bin.tar.gz'
+          java-version: 'openjdk@19.0.0=tgz+https://download.java.net/java/early_access/loom/6/openjdk-19-loom+6-625_linux-x64_bin.tar.gz'
       - name: Generate documentation
         run: sbt ci-docs
         env:

@@ -1,47 +1,37 @@
 package fx
 
-import scala.annotation.implicitNotFound
-import Tuple.{InverseMap, IsMappedBy, Map}
-import scala.annotation.tailrec
-import fx.Tuples.mapK
+import scala.annotation.{implicitNotFound, tailrec, targetName}
+import fx.Id
 
-type ParTupled = [F[_], X <: Tuple] =>> MapK[Fiber, Id, MapK[F, Fiber, X]]
+import scala.Tuple.{InverseMap, IsMappedBy}
 
-type ParBind = [F[_]] =>> [t] => F[t] => t
+type ParBind[F[_]] = [t] => F[t] => t
 
-given idParBind: ParBind[Id] =
-  [t] => (f: Id[t]) => f
+private type Id[+A] = A
 
-given function0ParBind: ParBind[Function0] =
-  [t] => (f: Function0[t]) => f.apply
+def par[F[_], X <: Tuple](x: X, parBind: ParBind[F])(
+    using IsMappedBy[F][X],
+    Structured): InverseMap[X, F] % Structured =
+  val fibers =
+    x.map[Fiber](
+      [r] => (r: r) => fork(() => parBind(r.asInstanceOf[F[r]]))
+    )
+  joinAll
+  val awaited =
+    fibers.map[Id](
+      [r] => (r: r) => r.asInstanceOf[Fiber[r]].join
+    )
+  awaited.asInstanceOf[InverseMap[X, F]]
 
-given resourceParBind: ParBind[Resource] =
-  [t] => (f: Resource[t]) => f.bind
-
-extension [X <: Tuple](x: X)
-  def par[F[_]](using IsMappedBy[F][X], ParBind[F]): ParTupled[F, X] % Structured =
-    val fibers =
-      x.mapK[F, Fiber](
-        [r] => (r: F[r]) => fork(() => summon[ParBind[F]](r))
-      )
-    joinAll
-    val awaited =
-      fibers.mapK[Fiber, Id](
-        [r] => (r: Fiber[r]) => r.join
-      )
-    awaited
+extension [X <: Tuple](x: X)(using IsMappedBy[Function0][X], Structured)
+  def parallel: InverseMap[X, Function0] =
+    par(x, [t] => (f: () => t) => f.apply)
 
 @main def ParallelFunctionExample =
   val results: (String, Int, Double) % Structured =
-    (
+    parallel(
       () => "1",
       () => 0,
       () => 47.03
-    ).par[Function0]
-  println(structured(results))
-
-@main def ParallelResourceExample =
-  val results: (Int, String, Double) % Structured =
-    (Resource(1), Resource("a"), Resource(47.0)).par[Resource]
-
+    )
   println(structured(results))

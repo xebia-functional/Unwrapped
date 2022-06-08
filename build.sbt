@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion := "3.1.1-RC1"
+ThisBuild / scalaVersion := "3.1.2"
 ThisBuild / organization := "com.47deg"
 ThisBuild / versionScheme := Some("early-semver")
 
@@ -29,11 +29,12 @@ lazy val scalafxSettings: Seq[Def.Setting[_]] =
       "-XX:+UnlockExperimentalVMOptions",
       "-XX:+UseNewCode",
       "--add-modules=java.base",
+      "--add-modules=jdk.incubator.concurrent",
       "--add-opens java.base/jdk.internal.vm=ALL-UNNAMED",
       "--add-exports java.base/jdk.internal.vm=ALL-UNNAMED",
       "--enable-preview"
     ),
     libraryDependencies ++= Seq(
-      "org.scalacheck" %% "scalacheck" % "1.15.4" % Test
+      "org.scalacheck" %% "scalacheck" % "1.16.0" % Test
     )
   )
