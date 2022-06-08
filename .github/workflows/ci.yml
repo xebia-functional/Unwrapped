@@ -8,6 +8,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      JAVA_OPTS: --add-modules jdk.incubator.concurrent
     steps:
       - name: Checkout project (pull-request)
         if: github.event_name == 'pull_request'

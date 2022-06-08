@@ -14,6 +14,8 @@ jobs:
   documentation:
     if: "!contains(github.event.head_commit.message, 'skip ci')"
     runs-on: ubuntu-latest
+    env:
+      JAVA_OPTS: --add-modules jdk.incubator.concurrent
     steps:
       - name: Checkout project
         uses: actions/checkout@v3
