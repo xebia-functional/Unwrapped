@@ -29,7 +29,7 @@ jobs:
         with:
           java-version: 'openjdk@19.0.0=tgz+https://download.java.net/java/early_access/loom/6/openjdk-19-loom+6-625_linux-x64_bin.tar.gz'
       - name: Generate documentation
-        run: env SBT_OPTS='--add-modules jdk.incubator.concurrent' sbt ci-docs
+        run: sbt ci-docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOWNLOAD_INFO_FROM_GITHUB: true
