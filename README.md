@@ -35,19 +35,12 @@ Users and library authors may define their own Capabilities. Here is how `Bind` 
 ```scala
 /** Brings the capability to perform Monad bind in place. Types may
   * access [[Control]] to short-circuit as necessary
-  *
-  * ```scala
-  * import fx
-  *
-  * extension [R, A](fa: Either[R, A])
-  *   def bind: Control[R] ?=> A = fa.fold(_.shift, identity)
-  * ```
   */
 extension [R, A](fa: Either[R, A])
   def bind: Errors[R] ?=> A = fa.fold(_.shift, identity)
 ```
 
-Scala Fx supports a structured concurrency model backed by the non blocking [StructuredExecutorTask](https://openjdk.java.net/jeps/428)
+Scala Fx supports a structured concurrency model backed by the non-blocking [StructuredExecutorTask](https://openjdk.java.net/jeps/428)
 where you can `fork` and `join` cancellable fibers and scopes.
 
 Popular functions like `parallel` support arbitrary typed arity in arguments and return types.
@@ -84,5 +77,8 @@ Pre-requisites:
 You can now compile and run the tests:
 
 ```shell
-sbt "clean; compile; test"
+env JAVA_OPTS='--add-modules jdk.incubator.concurrent' sbt "clean; compile; test"
 ```
+
+**NOTE**: The Loom project is defined as an incubator module that is a means to distribute APIs which are not final or completed to get feedback from the developers.
+You should include the `-add-module` Java option to add the module to the class path of the project.
