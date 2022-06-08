@@ -10,11 +10,6 @@ import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicReference
 import scala.util.control.NonFatal
 
-type TestTuple5 = (Int, String, Double, Long, Char)
-type TestTuple10 = Tuple.Concat[TestTuple5, TestTuple5]
-type TestTuple20 = Tuple.Concat[TestTuple10, TestTuple10]
-type TestTupleXXL = Tuple.Concat[TestTuple20, TestTuple20]
-
 object StructuredTests extends Properties("Structured Concurrency Tests"):
 
   override def overrideParameters(p: Parameters) =
