@@ -19,7 +19,7 @@ trait Control[-R]:
 
 object Control:
   /**
-   * All functions that follow the happy path and consider no control automatically obtain de
+   * All functions that follow the happy path and consider no control automatically obtain the
    * ability of no Control.
    *
    * Evidence of no control helps monadic values that frequently short-circuit like Either,
