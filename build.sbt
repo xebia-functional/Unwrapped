@@ -38,3 +38,16 @@ lazy val scalafxSettings: Seq[Def.Setting[_]] =
       "org.scalacheck" %% "scalacheck" % "1.16.0" % Test
     )
   )
+
+lazy val examples = project
+  .dependsOn(`scala-fx`)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-effect" % "3.3.0",
+      "org.http4s" %% "http4s-dsl" % "0.23.6",
+      "org.http4s" %% "http4s-blaze-server" % "0.23.6",
+      "org.http4s" %% "http4s-circe" % "0.23.6",
+      "io.circe" %% "circe-core" % "0.14.1",
+      "io.circe" %% "circe-generic" % "0.14.1"
+    )
+  )
