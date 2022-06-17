@@ -205,4 +205,3 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
       }
     }
   }
-
