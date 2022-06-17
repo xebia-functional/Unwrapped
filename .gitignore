@@ -30,3 +30,4 @@ out/
 .vscode/
 project/metals.sbt
 project/project/
+!project/project/Dependencies.scala
