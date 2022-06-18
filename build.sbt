@@ -41,6 +41,14 @@ lazy val `scalike-jdbc-scala-fx` = project
   .settings(publish / skip := true)
   .settings(scalalikeSettings)
 
+lazy val `http-scala-fx` = (project in file("./http-scala-fx"))
+  .settings(httpScalaFXSettings)
+  .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
+
+lazy val `sttp-scala-fx` = (project in file("./sttp-scala-fx"))
+  .settings(sttpScalaFXSettings)
+  .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
+
 lazy val scalafxSettings: Seq[Def.Setting[_]] =
   Seq(
     classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
@@ -80,6 +88,19 @@ lazy val scalalikeSettings: Seq[Def.Setting[_]] =
       flyway % Test
     )
   )
+
+lazy val httpScalaFXSettings = Seq(
+  Test / fork := true,
+  javaOptions ++= javaOptionsSettings,
+  autoAPIMappings := true
+)
+
+lazy val sttpScalaFXSettings = Seq(
+  fork := true,
+  javaOptions ++= javaOptionsSettings,
+  autoAPIMappings := true,
+  libraryDependencies += "com.softwaremill.sttp.client3" %% "core" % "3.6.2"
+)
 
 lazy val javaOptionsSettings = Seq(
   "-XX:+IgnoreUnrecognizedVMOptions",
