@@ -31,6 +31,14 @@ lazy val `munit-scala-fx` = (project in file("./munit-scalafx"))
   )
   .dependsOn(`scala-fx`)
 
+lazy val `http-scala-fx` = (project in file("./http-scala-fx"))
+  .settings(httpScalaFXSettings)
+  .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
+
+lazy val `sttp-scala-fx` = (project in file("./sttp-scala-fx"))
+  .settings(sttpScalaFXSettings)
+  .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
+
 lazy val scalafxSettings: Seq[Def.Setting[_]] =
   Seq(
     classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
@@ -51,6 +59,19 @@ lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
     munit,
     junitInterface
   )
+)
+
+lazy val httpScalaFXSettings = Seq(
+  Test / fork := true,
+  javaOptions ++= javaOptionsSettings,
+  autoAPIMappings := true
+)
+
+lazy val sttpScalaFXSettings = Seq(
+  fork := true,
+  javaOptions ++= javaOptionsSettings,
+  autoAPIMappings := true,
+  libraryDependencies += "com.softwaremill.sttp.client3" %% "core" % "3.6.2"
 )
 
 lazy val javaOptionsSettings = Seq(
