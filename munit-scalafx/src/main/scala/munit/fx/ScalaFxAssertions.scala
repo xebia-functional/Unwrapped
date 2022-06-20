@@ -22,7 +22,7 @@ trait ScalaFxAssertions:
    */
   def assertFX(
       cond: => Boolean,
-      clue: => Any = "assertion failed"): Location ?=> Errors[AssertionError] ?=> Unit =
+      clue: => Any = "assertion failed"): (Location, Errors[AssertionError]) ?=> Unit =
     liftToFX(assert(cond, clue))
 
   /**
@@ -44,7 +44,7 @@ trait ScalaFxAssertions:
       obtained: A,
       expected: B,
       clue: => Any = "values are not the same"
-  ): Location ?=> B <:< A ?=> Errors[AssertionError] ?=> Unit =
+  ): (Location, B <:< A, Errors[AssertionError]) ?=> Unit =
     liftToFX(assertEquals(obtained, expected, clue))
 
   /**
@@ -58,7 +58,7 @@ trait ScalaFxAssertions:
    *   [munit.Clue]
    */
   def assumeFX(cond: => Boolean, clue: => Any = "assumption failed")
-      : Location ?=> Errors[AssumptionViolatedException] ?=> Unit =
+      : (Location, Errors[AssumptionViolatedException]) ?=> Unit =
     try assume(cond, clue)
     catch case ex: AssumptionViolatedException => ex.raise
 
@@ -76,7 +76,7 @@ trait ScalaFxAssertions:
   def assertNoDiffFX(
       obtained: String,
       expected: String,
-      clue: => Any = "diff assertion failed"): Location ?=> Errors[AssertionError] ?=> Unit =
+      clue: => Any = "diff assertion failed"): (Location, Errors[AssertionError]) ?=> Unit =
     liftToFX(assertNoDiff(obtained, expected, clue))
 
   /**
@@ -98,7 +98,7 @@ trait ScalaFxAssertions:
       obtained: A,
       expected: B,
       clue: => Any = "values are the same"
-  ): Location ?=> A =:= B ?=> Errors[AssertionError] ?=> Unit =
+  ): (Location, A =:= B, Errors[AssertionError]) ?=> Unit =
     liftToFX(assertNotEquals(obtained, expected, clue))
 
   /**
@@ -119,7 +119,7 @@ trait ScalaFxAssertions:
       expected: Double,
       delta: Double,
       clue: => Any = "values are not the same"
-  ): Location ?=> Errors[AssertionError] ?=> Unit = liftToFX(
+  ): (Location, Errors[AssertionError]) ?=> Unit = liftToFX(
     assertEqualsDouble(obtained, expected, delta, clue))
 
   /**
@@ -140,8 +140,17 @@ trait ScalaFxAssertions:
       expected: Float,
       delta: Float,
       clue: => Any = "values are not the same"
-  ): Location ?=> Errors[AssertionError] ?=> Unit = liftToFX(
+  ): (Location, Errors[AssertionError]) ?=> Unit = liftToFX(
     assertEqualsFloat(obtained, expected, delta, clue))
+
+  def assertsShiftsToFX[R, T, A](
+      obtained: Errors[R] ?=> A,
+      expected: T): (Location, Errors[R], Errors[AssertionError]) ?=> Unit =
+    obtained
+      .toEither
+      .fold(
+        r => assertEqualsFX(r, expected),
+        a => FailException(s"expected $expected got $a", summon[Location]))
 
   private def liftToFX[A](
       body: Asserts[AssertionError] ?=> A): Errors[AssertionError] ?=> Unit =
