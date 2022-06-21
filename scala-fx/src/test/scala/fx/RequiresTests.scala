@@ -14,14 +14,14 @@ object RequiresTests extends Properties("requires compile-time assertions"):
         val x = typeChecks("""
 import fx.*
 
-requires(true, "Expected true, was false.")""")
+val x: Boolean = requires(true, "Expected true, was false.", true)""")
         x
       }
       (!assertion) ==> {
         val x = typeCheckErrors("""
 import fx.*
 
-requires(false, "Some Error Message.")""")
+val x: Boolean = requires(false, "Some Error Message.", false)""")
         x.head.message == "Some Error Message."
       }
   }

@@ -3,6 +3,7 @@ package fx
 import scala.compiletime.error
 import scala.quoted.Expr
 import scala.quoted.Quotes
+import scala.quoted.Type
 
 /**
  * Super-simple compile time requirements.
@@ -21,12 +22,17 @@ import scala.quoted.Quotes
  * MyInt(7) // fails compilation with "MyInt must be less than 5"
  * }}}
  */
-inline def requires[A](inline assertion: Boolean, inline errorMessage: String): Unit =
-  ${ requiresImpl('assertion, 'errorMessage) }
+inline def requires[A](
+    inline assertion: Boolean,
+    inline errorMessage: String,
+    inline value: A): A =
+  ${ requiresImpl('assertion, 'errorMessage, 'value) }
 
-private[fx] def requiresImpl(
+private[fx] def requiresImpl[A](
     assertionExpression: Expr[Boolean],
-    errorMessageExpression: Expr[String])(using Quotes): Expr[Unit] =
+    errorMessageExpression: Expr[String],
+    valueExpression: Expr[A])(using Type[A])(using Quotes): Expr[A] =
   '{
     if ! $assertionExpression then error($errorMessageExpression)
+    $valueExpression
   }
