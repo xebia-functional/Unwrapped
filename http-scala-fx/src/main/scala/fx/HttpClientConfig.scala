@@ -1,5 +1,7 @@
 package fx
 
+import scala.quoted.*
+
 /**
  * Defines the client configuration options for an http client. Not open for extension.
  */
