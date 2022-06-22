@@ -15,11 +15,11 @@ object HttpConnectionTimeout:
   inline def apply(durationInSeconds: Long): HttpConnectionTimeout =
     requires(durationInSeconds > 0, "Durations must be positive", durationInSeconds)
 
-  def of(durationInSeconds: Long): Either[String, HttpConnectionTimeout] =
+  def of(durationInSeconds: Long): Errors[String] ?=> HttpConnectionTimeout =
     if (durationInSeconds > 0)
-      Right(durationInSeconds)
+      durationInSeconds
     else
-      Left("Durations must be positive")
+      "Durations must be positive".shift
   
   /**
    * Default connection timeout is 30 seconds
