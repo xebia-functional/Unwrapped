@@ -5,9 +5,6 @@ package fx
  */
 opaque type HttpConnectionTimeout = Long
 
-extension (h: HttpConnectionTimeout)
-  def toLong:Long = h
-
 object HttpConnectionTimeout:
   /**
    * @constructor
@@ -20,9 +17,16 @@ object HttpConnectionTimeout:
       durationInSeconds
     else
       "Durations must be positive".shift
-  
+
   /**
    * Default connection timeout is 30 seconds
    */
   given defaultHttpConnectionTimeout: HttpConnectionTimeout =
     HttpConnectionTimeout(30)
+
+  extension (h: HttpConnectionTimeout)
+    /**
+     * @return
+     *   The long value of the HttpConnectionTimeout
+     */
+    def value: Long = h
