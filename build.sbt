@@ -31,6 +31,11 @@ lazy val `munit-scala-fx` = (project in file("./munit-scalafx"))
   )
   .dependsOn(`scala-fx`)
 
+lazy val `scalike-jdbc-scala-fx` = project
+  .dependsOn(`scala-fx`)
+  .settings(publish / skip := true)
+  .settings(scalalikeSettings)
+
 lazy val scalafxSettings: Seq[Def.Setting[_]] =
   Seq(
     classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
@@ -52,6 +57,18 @@ lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
     junitInterface
   )
 )
+
+lazy val scalalikeSettings: Seq[Def.Setting[_]] =
+  Seq(
+    classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
+    javaOptions ++= javaOptionsSettings,
+    autoAPIMappings := true,
+    libraryDependencies ++= Seq(
+      scalikejdbc,
+      h2Database,
+      logback
+    )
+  )
 
 lazy val javaOptionsSettings = Seq(
   "-XX:+IgnoreUnrecognizedVMOptions",

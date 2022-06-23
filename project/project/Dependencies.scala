@@ -20,6 +20,9 @@ object Dependencies {
     val sbtDependencyUpdates = "1.2.1"
     val jmhGeneratorReflection = "1.35"
     val sbtExplicitDependencies = "0.2.16"
+    val scalikeJdbc = "4.0.0"
+    val h2Database = "2.1.212"
+    val logback = "1.2.11"
   }
 
   object Compile {
@@ -29,6 +32,9 @@ object Dependencies {
     val junit = "junit" % "junit" % Versions.junit
     val munit = "org.scalameta" %% "munit" % Versions.munit
     val junitInterface = "org.scalameta" % "junit-interface" % Versions.junitInterface
+    val scalikejdbc = "org.scalikejdbc" %% "scalikejdbc" % Versions.scalikeJdbc
+    val h2Database = "com.h2database" % "h2" % Versions.h2Database
+    val logback = "ch.qos.logback" % "logback-classic" % Versions.logback
   }
 
   object Test {
