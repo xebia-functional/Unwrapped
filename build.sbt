@@ -60,6 +60,11 @@ lazy val `cats-scala-fx` = (project in file("./cats-scalafx"))
   )
   .dependsOn(`scala-fx`)
 
+lazy val `scalike-jdbc-scala-fx` = project
+  .dependsOn(`scala-fx`)
+  .settings(publish / skip := true)
+  .settings(scalalikeSettings)
+
 lazy val scalafxSettings: Seq[Def.Setting[_]] =
   Seq(
     classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
@@ -109,6 +114,18 @@ lazy val catsScalaFXSettings = Seq(
     scalacheck % Test
   )
 )
+lazy val scalalikeSettings: Seq[Def.Setting[_]] =
+  Seq(
+    classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
+    javaOptions ++= javaOptionsSettings,
+    autoAPIMappings := true,
+    libraryDependencies ++= Seq(
+      scalikejdbc,
+      h2Database,
+      logback
+    )
+  )
+
 
 lazy val javaOptionsSettings = Seq(
   "-XX:+IgnoreUnrecognizedVMOptions",
