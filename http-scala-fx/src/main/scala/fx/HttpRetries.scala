@@ -28,3 +28,6 @@ object HttpRetries:
      *   The int value of the HttpRetries object
      */
     def value: Int = h
+
+  given HttpRetries =
+    HttpRetries(3)
