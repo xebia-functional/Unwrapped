@@ -29,3 +29,23 @@ def setupCancellation[A](fiber: Future[A], future: CompletableFuture[A]) =
     if (exception != null && exception.isInstanceOf[CancellationException])
       fiber.cancel()
   }
+
+/*
+private fun Job.setupCancellation(future: CompletableFuture<*>) {
+    future.whenComplete { _, exception ->
+        cancel(exception?.let {
+            it as? CancellationException ?: CancellationException("CompletableFuture was completed exceptionally", it)
+        })
+    }
+}
+*/
+
+/*
+suspend fun suspended(): A = suspendCoroutine { cont ->
+    val connection = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
+
+    IORunLoop.startCancellable(this, connection) {
+      it.fold(cont::resumeWithException, cont::resume)
+    }
+  }
+*/
