@@ -15,7 +15,9 @@ import scala.annotation.implicitNotFound
 @implicitNotFound(
   "Structured concurrency requires capability:\n% Structured"
 )
-case class Structured(externalFibers: AtomicReference[List[Fiber[Any]]], scope: StructuredTaskScope[Any])
+case class Structured(
+    externalFibers: AtomicReference[List[Fiber[Any]]],
+    scope: StructuredTaskScope[Any])
 
 extension (s: Structured)
   private[fx] def forked[A](callable: Callable[A]): Future[A] =
