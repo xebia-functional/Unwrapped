@@ -13,9 +13,9 @@ final class HttpClientConfig(
 )
 
 object HttpClientConfig:
-  lazy val defaultHttpClientConfig: Errors[DurationParseException] ?=> HttpClientConfig = HttpClientConfig(
-    HttpConnectionTimeout.defaultHttpConnectionTimeout,
-    HttpRetryPolicy.defaultRetryPolicy,
-    HttpFollowRedirects.normal,
-    HttpRetries(3))
-
+  lazy val defaultHttpClientConfig: HttpClientConfig =
+    HttpClientConfig(
+      HttpConnectionTimeout.defaultHttpConnectionTimeout,
+      HttpRetryPolicy.defaultRetryPolicy,
+      HttpFollowRedirects.normal,
+      HttpRetries(3))
