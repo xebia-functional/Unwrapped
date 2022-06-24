@@ -53,6 +53,13 @@ lazy val `munit-scala-fx` = (project in file("./munit-scalafx"))
   )
   .dependsOn(`scala-fx`)
 
+lazy val `cats-scala-fx` = (project in file("./cats-scalafx"))
+  .configs(IntegrationTest)
+  .settings(
+    catsScalaFXSettings
+  )
+  .dependsOn(`scala-fx`)
+
 lazy val scalafxSettings: Seq[Def.Setting[_]] =
   Seq(
     classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
@@ -90,6 +97,16 @@ lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
     junit,
     munit,
     junitInterface
+  )
+)
+
+lazy val catsScalaFXSettings = Seq(
+  classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
+  javaOptions ++= javaOptionsSettings,
+  autoAPIMappings := true,
+  libraryDependencies ++= Seq(
+    catsEffect,
+    scalacheck % Test
   )
 )
 
