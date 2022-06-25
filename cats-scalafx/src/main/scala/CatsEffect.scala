@@ -30,7 +30,7 @@ def fromIO[A](program: IO[A]): Structured ?=> Fiber[A] =
   val future = program.unsafeToCompletableFuture()
   setupCancellation(fiber, future)
   future.whenComplete { (a, exception) =>
-    if (a != null)
+    if (exception == null)
       fiber.complete(a)
     else fiber.completeExceptionally(exception)
   }
