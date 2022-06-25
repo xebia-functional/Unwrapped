@@ -50,10 +50,19 @@ object CatsEffectTests extends Properties("Cats Effect Tests"):
 
   property("fx happy programs to IO") = forAll { (a: Int) =>
     val effect: Control[String] ?=> Int = a
-    toIO(effect).unsafeRunSync() == a
+    toCatsEffect[IO, String, Int](effect).unsafeRunSync() == a
+  }
+
+  property("fx failing programs with Control[Throwable] to IO") = forAll { (b: String) =>
+    val effect: Control[Throwable] ?=> Int = new RuntimeException(b).shift
+    toCatsEffect[IO, Throwable, Int](effect).attempt.unsafeRunSync().leftMap { e =>
+      e.getMessage
+    } == Left(b)
   }
 
   property("fx failing programs to IO") = forAll { (b: String) =>
     val effect: Control[String] ?=> Int = b.shift
-    toIO(effect).unsafeRunSync() == b
+    toCatsEffect[IO, String, Int](effect).attempt.unsafeRunSync() == Left(
+      NonThrowableFXToCatsException(b))
+
   }
