@@ -1,15 +1,20 @@
 package fx
 package cats
 
-import org.scalacheck.Properties
+import _root_.{cats => c}
+import c.effect.*
+import c.effect.unsafe.implicits.*
+import c.syntax.either._
 import org.scalacheck.Prop.forAll
-import _root_.cats.effect.*
-import _root_.cats.effect.unsafe.implicits.*
+import org.scalacheck.Properties
 
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.{AtomicInteger, AtomicReference}
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 import scala.concurrent.CancellationException
-import scala.concurrent.duration.{Duration, FiniteDuration}
+import scala.concurrent.duration.Duration
+import scala.concurrent.duration.FiniteDuration
+
 
 object CatsEffectTests extends Properties("Cats Effect Tests"):
   property("IO happy programs to fx") = forAll { (a: Int, b: Int) =>
