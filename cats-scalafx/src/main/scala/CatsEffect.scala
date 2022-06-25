@@ -9,8 +9,20 @@ import fx.Fiber
 import java.util.concurrent.{CancellationException, CompletableFuture, Future}
 import scala.concurrent.ExecutionException
 
-def toIO[R, A](program: Control[R] ?=> A): IO[R | A] =
-  IO(run(program))
+case class NonThrowableFXToCatsException[R](underlying: R)
+    extends RuntimeException(
+      s"Control was shifted to when running a scala-fx program $underlying")
+
+def toCatsEffect[F[_]: [g[_]] =>> ApplicativeError[g, Throwable], R: Manifest, A: Manifest](
+  program: Control[R] ?=> A): F[A] =
+  val x = run(program)
+  x match {
+    case x:A => x.pure
+    case err: Throwable => ApplicativeError[F, Throwable].raiseError[A](err)
+    case err: R => ApplicativeError[F, Throwable].raiseError[A](NonThrowableFXToCatsException(err))
+    case _ => ApplicativeError[F, Throwable].raiseError[A](RuntimeException("Impossible!"))
+  }
+
 
 def fromIO[A](program: IO[A]): Structured ?=> Fiber[A] =
   val fiber = CompletableFuture[A]()
