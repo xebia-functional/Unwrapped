@@ -4,12 +4,15 @@ package cats
 import _root_.cats.*
 import _root_.cats.implicits.*
 import _root_.cats.effect.*
-import _root_.cats.effect.unsafe.implicits.*
+import _root_.cats.effect.unsafe.*
 import fx.run
 import fx.Fiber
 
-import java.util.concurrent.{CancellationException, CompletableFuture, Future}
-import scala.concurrent.ExecutionException
+import java.util.concurrent.{CancellationException, CompletableFuture, Executors, Future}
+import scala.annotation.unchecked.uncheckedVariance
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, ExecutionException}
+import scala.util.{Failure, Success}
 
 case class NonThrowableFXToCatsException[R](underlying: R)
     extends RuntimeException(
@@ -25,21 +28,21 @@ def toCatsEffect[F[_]: [g[_]] =>> ApplicativeError[g, Throwable], R: Manifest, A
     case _ => ApplicativeError[F, Throwable].raiseError[A](RuntimeException("Impossible!"))
   }
 
-
-def fromIO[A](program: IO[A]): Structured ?=> Fiber[A] =
+def fromIO[A](program: IO[A])(using runtime: IORuntime): Structured ?=> Fiber[A] =
   val fiber = CompletableFuture[A]()
   track(fiber)
-  val future = program.unsafeToCompletableFuture()
-  setupCancellation(fiber, future)
-  future.whenComplete { (a, exception) =>
-    if (exception == null)
-      fiber.complete(a)
-    else fiber.completeExceptionally(exception)
+  val (future, close) = program.unsafeToFutureCancelable()
+  setupCancellation(fiber, close)
+  given ExecutionContext = runtime.compute
+  future.onComplete { trying =>
+    trying match
+      case s: Success[a] => fiber.complete(s.get)
+      case f: Failure[a] => fiber.completeExceptionally(f.exception)
   }
   fiber.asInstanceOf[Fiber[A]]
 
-def setupCancellation[A](fiber: Future[A], future: CompletableFuture[A]) =
-  future.whenComplete { (_, exception) =>
+def setupCancellation[A](fiber: CompletableFuture[A], close: () => scala.concurrent.Future[Unit]) =
+  fiber.whenComplete { (_, exception) =>
     if (exception != null && exception.isInstanceOf[CancellationException])
-      fiber.cancel()
+      Await.result(close(), Duration.Inf)
   }
