@@ -3,12 +3,14 @@ package cats
 
 import _root_.{cats => c}
 import c.effect.*
+import c.implicits.*
+import c.effect.implicits.*
 import c.effect.unsafe.implicits.*
 import c.syntax.either._
 import org.scalacheck.Prop.forAll
 import org.scalacheck.Properties
 
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.{CompletableFuture, TimeUnit}
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import scala.concurrent.CancellationException
@@ -72,9 +74,23 @@ object CatsEffectTests extends Properties("Cats Effect Tests"):
     structured {
       val actual = fromIO(IO[Int] {
         throw t
-      }.handleErrorWith { _ =>
-        IO.pure(expected)
-      })
+      }.handleErrorWith { _ => IO.pure(expected) })
       actual.join == expected
+    }
+  }
+
+  property("structured cancellation should cancel IO") = forAll { (i: Int) =>
+    val promise = CompletableFuture[Int]()
+    val latch = CompletableFuture[Unit]()
+    structured {
+      val fiber = fromIO(IO {
+        latch.complete(())
+      }.flatMap(_ => IO.never[Int]).onCancel {
+        IO(promise.complete(i))
+      })
+      latch.get()
+      try fiber.cancel(true)
+      catch case e: Throwable => () // ignore blow up
+      promise.get() == i
     }
   }
