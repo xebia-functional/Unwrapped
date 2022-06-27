@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicReference
 import scala.concurrent.CancellationException
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration._
 
 object CatsEffectTests extends Properties("Cats Effect Tests"):
   property("IO happy programs to fx") = forAll { (a: Int, b: Int) =>
@@ -93,4 +94,18 @@ object CatsEffectTests extends Properties("Cats Effect Tests"):
       catch case e: Throwable => () // ignore blow up
       promise.get() == i
     }
+  }
+
+  property("fromIO can cancel nested async IOs") = forAll { (i: Int) =>
+    IO.async_[Int] { cb =>
+      structured {
+        val fiber = fromIO(
+          IO.async_[Int] { _ => }
+            .onCancel(IO {
+              cb(Right(i))
+            }))
+        try fiber.cancel(true)
+        catch case e: Throwable => () // ignore blow up
+      }
+    }.unsafeRunSync() == i
   }
