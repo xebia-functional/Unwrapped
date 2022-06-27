@@ -4,7 +4,15 @@ import jdk.incubator.concurrent.StructuredTaskScope
 import jdk.incubator.concurrent.StructuredTaskScope.FactoryHolder
 
 import scala.annotation.implicitNotFound
-import java.util.concurrent.{Callable, CancellationException, Executor, ExecutorService, Executors, Future, ThreadFactory}
+import java.util.concurrent.{
+  Callable,
+  CancellationException,
+  Executor,
+  ExecutorService,
+  Executors,
+  Future,
+  ThreadFactory
+}
 import java.util.concurrent.atomic.AtomicReference
 import scala.annotation.implicitNotFound
 
@@ -32,9 +40,7 @@ inline def structured[B](f: Structured ?=> B): B =
     scope.close()
 
 def joinAll(using structured: Structured): Unit =
-  structured.externalFibers.get().foreach { fiber =>
-    if (!fiber.isCancelled) fiber.join
-  }
+  structured.externalFibers.get().foreach { fiber => if (!fiber.isCancelled) fiber.join }
   structured.scope.join
 
 def track[A](fiber: Future[A])(using structured: Structured): Unit =
