@@ -1,6 +1,8 @@
 package fx
 package cats
 
+import _root_.cats.*
+import _root_.cats.implicits.*
 import _root_.cats.effect.*
 import _root_.cats.effect.unsafe.implicits.*
 import fx.run

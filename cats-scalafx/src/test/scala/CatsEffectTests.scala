@@ -15,7 +15,6 @@ import scala.concurrent.CancellationException
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration.FiniteDuration
 
-
 object CatsEffectTests extends Properties("Cats Effect Tests"):
   property("IO happy programs to fx") = forAll { (a: Int, b: Int) =>
     val effect: IO[Int] = IO.pure(a).map(_ + b)
@@ -36,9 +35,11 @@ object CatsEffectTests extends Properties("Cats Effect Tests"):
     var aa: Int | Null = null
     try
       structured {
-        fromIO(IO.canceled.onCancel(IO {
-          aa = a
-        }))
+        fromIO(
+          IO.canceled
+            .onCancel(IO {
+              aa = a
+            }))
       }
       false
     catch
@@ -65,4 +66,15 @@ object CatsEffectTests extends Properties("Cats Effect Tests"):
     toCatsEffect[IO, String, Int](effect).attempt.unsafeRunSync() == Left(
       NonThrowableFXToCatsException(b))
 
+  }
+
+  property("fromIO can handle errors through IO") = forAll { (t: Throwable, expected: Int) =>
+    structured {
+      val actual = fromIO(IO[Int] {
+        throw t
+      }.handleErrorWith { _ =>
+        IO.pure(expected)
+      })
+      actual.join == expected
+    }
   }
