@@ -2,41 +2,31 @@ package fx
 
 import java.net.http.HttpResponse
 import java.net.http.HttpResponse.BodyHandlers
-import java.net.http.HttpResponse.BodyHandler
-import java.util.function.Consumer
-import java.util.Optional
 import java.io.InputStream
-import java.nio.charset.Charset
-import java.net.http.HttpResponse.BodySubscriber
-import java.util.concurrent.CompletionStage
+import java.nio.file.Path
+import java.nio.file.OpenOption
+import java.net.http.HttpHeaders
+import java.net.http.HttpResponse.BodyHandler
+import java.net.http.HttpResponse.ResponseInfo
 
-trait HttpResponseMapper[-A]:
-  extension (h: Http[A]) def bodyHandler: BodyHandler[A]
+trait HttpResponseMapper[A]:
+  def bodyHandler: HttpResponse.BodyHandler[A]
 
-object HttpMapper:
+object HttpResponseMapper:
 
-  class StringHttpResponseMapper[String] extends HttpResponseMapper[String]:
-    extension (h: Http[String])
-      def bodyHandler =
-        BodyHandlers.ofString()
+  given HttpResponseMapper[Void] with
+    def bodyHandler = BodyHandlers.discarding
 
-  class ByteArrayHttpResponseMapper[Array[Byte]] extends HttpResponseMapper[Array[Byte]]:
-    extension (h: Http[Array[Byte]])
-      def bodyHandler =
-        BodyHandlers.ofByteArray()
+  given HttpResponseMapper[String] with
+    def bodyHandler = BodyHandlers.ofString()
 
-  class InputStreamHttpResponseMapper[InputStream] extends HttpResponseMapper[InputStream]:
-    extension (h: Http[InputStream])
-      def bodyHandler =
-        BodyHandlers.ofInputStream()
+  given HttpResponseMapper[Array[Byte]] with
+    def bodyHandler = BodyHandlers.ofByteArray()
 
-  class CharsetHttpResponseMapper[String](charset: Charset) extends HttpResponseMapper[String]:
-    extension (h: Http[String])
-      def bodyHandler =
-        BodyHandlers.ofString(charset)
+  given HttpResponseMapper[InputStream] with
+    def bodyHandler = BodyHandlers.buffering(BodyHandlers.ofInputStream(), 4096)
 
-
-  class ReceiveHttpResponseMapper extends HttpResponseMapper[Receive[Byte]]:
-    extension (h: Http[Receive[String]])
-      def bodyHandler = ??? // todo figure out how to make this stream
-        
+  given fileDownloadHttpResponseMapper(using Path, Seq[OpenOption]): HttpResponseMapper[Path] =
+    new HttpResponseMapper[Path] {
+      def bodyHandler = BodyHandlers.ofFile(summon[Path], summon[Seq[OpenOption]]: _*)
+    }
