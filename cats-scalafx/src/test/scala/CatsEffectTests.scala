@@ -19,19 +19,25 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.duration._
 
 object CatsEffectTests extends Properties("Cats Effect Tests"):
-  property("IO happy programs to fx") = forAll { (a: Int, b: Int) =>
-    val effect: IO[Int] = IO.pure(a).map(_ + b)
-    run(structured(fromIO(effect).join)) == a + b
+  property("fx happy programs to IO") = forAll { (a: Int) =>
+    val effect: Control[Throwable] ?=> Int = a
+    toEffect[IO, Throwable, Int](effect).unsafeRunSync() == a
   }
 
-  property("IO failing programs to fx") = forAll { (b: Throwable) =>
-    val effect: IO[Int] = IO(throw b)
-    val result =
-      try run(structured(fromIO(effect).join))
-      catch
-        case e: Throwable =>
-          e
-    result == b
+  property("fx failing programs to ApplicativeError effects") = forAll { (b: String) =>
+    val effect: Control[String] ?=> Int = b.shift
+    implicit val ae: ApplicativeError[[a] =>> Either[String, a], String] =
+      catsStdInstancesForEither
+    toEffect[[a] =>> Either[String, a], String, Int](effect) == Left(b)
+
+  }
+
+  property("fx failing throwable programs to IO effects") = forAll { (b: String) =>
+    val expectedException = RuntimeException(b)
+    val effect: Control[Throwable] ?=> Int = expectedException.shift
+
+    toEffect[IO, Throwable, Int](effect).attempt.unsafeRunSync() == Left(expectedException)
+
   }
 
   property("IO cancellation is propagated through fx structure") = forAll { (a: Int) =>
