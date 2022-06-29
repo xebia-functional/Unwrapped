@@ -14,18 +14,13 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, ExecutionException}
 import scala.util.{Failure, Success}
 
-case class NonThrowableFXToCatsException[R](underlying: R)
-    extends RuntimeException(
-      s"Control was shifted to when running a scala-fx program $underlying")
-
-def toCatsEffect[F[_]: [g[_]] =>> ApplicativeError[g, Throwable], R: Manifest, A: Manifest](
-  program: Control[R] ?=> A): F[A] =
+def toEffect[F[*]: [g[*]] =>> ApplicativeError[g, R], R: Manifest, A: Manifest](
+    program: Control[R] ?=> A): F[A] =
   val x = run(program)
   x match {
-    case x:A => x.pure
-    case err: Throwable => ApplicativeError[F, Throwable].raiseError[A](err)
-    case err: R => ApplicativeError[F, Throwable].raiseError[A](NonThrowableFXToCatsException(err))
-    case _ => ApplicativeError[F, Throwable].raiseError[A](RuntimeException("Impossible!"))
+    case x: A => x.pure
+    case err: R => ApplicativeError[F, R].raiseError[A](err)
+    case _ => throw RuntimeException("impossible!") // exhaustivity checker is wrong
   }
 
 def fromIO[A](program: IO[A])(using runtime: IORuntime): Structured ?=> Fiber[A] =
