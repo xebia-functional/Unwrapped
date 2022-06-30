@@ -126,9 +126,8 @@ abstractions that result in simpler programs than those expressed in boxed data 
 All is needed for direct syntax that removes callbacks and boxing is a continuation system with some form of compiler
 CPS. We don't expect functions like `bind` or `join` to be available in the language, but we do expect `suspend` or similar to be available.
 
-Back to the original paper from [link Filinski paper] and based on previous work in the [link to Arrow Fx framework]
-
-The following examples demonstrate the basics of a small functional library on top of the proposed continuation system
+Back to the original paper from [Andrzej Filinski](https://www.researchgate.net/publication/2309983_Representing_Monads) and based on previous work in the [Arrow FX framework](https://arrow-kt.io/docs/fx/)
+the following examples demonstrate the basics of a small functional library on top of the proposed continuation system
 model after the abstractions found in `Arrow` which provides complementary functional abstractions for Kotlin and KotlinX coroutines.
 
 A continuation is a program producing `A` that may be interrupted at any point with a value of `R`.
@@ -140,7 +139,7 @@ trait Control[-R]: //can also be implemented in terms of `canThrow`
     suspend def shift[A]: A // can throw R when otherwise expected R
 ```
 
-All programs requiring `Control` are foldable.
+All programs requiring `Control` are foldable:
 
 ```scala
 suspend fun fold[R, A, B](
@@ -191,10 +190,10 @@ extension [R, A](c: Control[R] ?=> A)
 
 ## Improvements
 
-We believe that introducing continuations in Scala 3 coupled or not to the capture checking system or context function results in the following improvements.
+We believe that introducing continuations in Scala 3 coupled or not to the capture checking system or context function results in the following improvements:
 
-- Simplify program description, eliminating wrapped return types for most use cases.
-- Help inference and compile times due to reducing the usage of complex types
+- Simplifies program description, eliminating wrapped return types for most use cases.
+- Helps inference and compile times due to reducing the usage of complex types.
 - Cooperates with the language control structures and produces smaller and faster programs that desugar suspension points efficiently in the stack.
 - Eases the learning curve to program async / effects-based applications and libraries in Scala.
 - Reduces indirection through higher-order functions used extensively in `map`, `flatMap`, and others.
