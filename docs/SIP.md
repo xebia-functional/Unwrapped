@@ -53,7 +53,7 @@ val address = addressOrNotFound.bind
 val country = address.country.bind
 country.code.bind
 
-// or if bind is defined as apply() over Either and Option
+Or if bind is defined as apply() over Either and Option:
 
 def getCountryCodeCont2(maybePerson: Option[Person])(using Structured, Control[NotFound.type | None.type]): String =
   maybePerson().address.join().country().code()
