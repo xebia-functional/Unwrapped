@@ -8,7 +8,7 @@ This allows the programmer to treat side-effects as if they were any other value
 This style requires knowledge of and strict adherence to complex algebraic laws. These laws take time and effort to absorb and understand. In scala, where the execution of side-effects is not yet tracked at the language-level, it takes great discipline to maintain reasonable guarantees of safety, composition, correctness in the construction of data types in concordance with these laws. The data structures required to maintain adherence to these laws in side-effecting programs do not generally compose. Complex attempts to unify the simplicity of function composition and monadic extensible effect/transformer systems increases the distance between programmer intent and program expression. Concepts such as simple tail recursion, loops, try/catch and others must be sacrificed to maintain safety, program throughput and reasonableness guarantees when adhering to a monadic style. 
 
 
-We would like to be able to write scala programs that work with the scala control flow offered by the language with the same syntax
+We would like to write scala programs in a direct style while maintaining the safety of the indirect monadic style. We would like to write these programs with a unified syntax,  
 regardless of these programs being async or synced in nature. We have experienced this style of programming in Kotlin for the last few years
 and when creating equivalent programs in `Future`, `IO` in Scala vs `suspend` in Kotlin we have found that continuation based programs in direct style are easier to write, teach and perform better than those written in indirect style.
 
