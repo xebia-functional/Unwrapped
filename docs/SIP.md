@@ -71,7 +71,7 @@ Other communities and languages concerned about ergonomics and performance, like
 These features allow for sync and async programming without boxed return types and indirect monadic style.
 
 These languages implement such techniques in different ways. In the case of Kotlin, the compiler performs CPS transformations for `suspend` functions, eliminating the need for callbacks and simplifying function return types.
-Other ecosystem libraries such as Spring, Compose, and every library and project in the Kotlin ecosystem integrate with suspending functions natively.
+This simple native compiler supported keyword allows other ecosystem libraries such as [Spring](insert link), [Compose](insert link), and a great many other libraries and projects in the Kotlin ecosystem integrate with suspending functions natively.
 
 In the case of Java and the internals of project LOOM, virtual threads and an impl for non-blocking IO is part of both the new incubator packages in JDK 19 and the internals in the
 JVM hotspot where continuations are managed and related to virtual threads.
