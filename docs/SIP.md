@@ -77,7 +77,7 @@ JDK 19,the Java 19 hotspot runtime, and the internals of Project Loom include na
 
 ## Proposal
 
-We want to propose a native system for continuation in Scala.
+We want to propose a native system for continuations in Scala.
 
 The examples below demonstrate how this could work either with a
 - function modifier: `suspend def helloWorldAsync: String`
