@@ -62,7 +62,7 @@ def getCountryCodeCont2(maybePerson: Option[Person])(using Structured, Control[N
 
 ## Status Quo
 
-Interleaving monadic datatypes in direct style, including `Future` or lazy IO's, which perform async and sync operations, is impossible in Scala
+Interleaving monadic datatypes that are not also `Comonads` in a direct style (including `Future` and lazy `IO`) is impossible in Scala.
 despite context functions and the upcoming capture checking system. Scala lacks an underlying system such as Kotlin continuations or Java LOOM, where functions can suspend and resume computations.
 
 ## Other communities and languages
