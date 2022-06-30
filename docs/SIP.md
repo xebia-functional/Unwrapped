@@ -14,7 +14,7 @@ and when creating equivalent programs in `Future`, `IO` in Scala vs `suspend` in
 
 We think most of the features we need are already on Scala 3, but we lack a way to perform async/sync IO such as the ones offered by continuation-based systems.
 
-For the given model where we explicitly mix a set of unrelated monadic datatypes such as `Option`, `Either`, and `Future`, we would like to access the country code given an `Option[Person]`
+Given a model mixing a set of unrelated monadic datatypes such as `Option`, `Either`, and `Future`, we would like to access the country code given an `Option[Person]`
 
 ```scala
 
