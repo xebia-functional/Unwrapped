@@ -83,8 +83,7 @@ The examples below demonstrate how this could work either with a
 - function modifier: `suspend def helloWorldAsync: String`
 - given evidence: `def helloWorldAsync: Suspend ?=> String`
 
-Our original thought is that this could be part of [add links to capture checking] and related
-to the [add a link to can throw capability] where the compiler performs special desugar in the function body.
+Our intution is that this could be part of the experimental [Capture Checking](https://www-dev.scala-lang.org/scala3/reference/experimental/cc.html) and related to the experimental [CanThrow](https://docs.scala-lang.org/scala3/reference/experimental/canthrow.html) capabilities, where the compiler performs special desugaring in the function body.
 
 ```scala
 val helloWorldAsync: Suspended ?=> String =
