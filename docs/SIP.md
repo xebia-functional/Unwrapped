@@ -4,7 +4,7 @@
 
 Most effect-based programs in use today in the scala community largely depend on data types such as `Future`, or lazy `IO`.
 These data types express control flow based on `map`, `flatMap`, and other functions that allow them to compose and transform their future or lazy results.
-This style takes over user code and makes the user disregard the language's native control flow structure, such as loops, try/catch, and others that do not interoperate with the language control flow without potentially blocking.
+This style requires knowledge of and strict adherence to complex algebraic laws. These laws take time and effort to absorb and understand. In scala, where the execution of side-effects is not yet tracked at the language-level, it takes great discipline to maintain reasonable guarantees of safety, composition, correctness in the construction of data types in concordance with these laws. The data structures required to maintain adherence to these laws in side-effecting programs do not generally compose. Complex attempts to unify the simplicity of function composition and monadic extensible effect/transformer systems increases the distance between programmer intent and program expression. Concepts such as simple tail recursion, loops, try/catch and others must be sacrificed to maintain safety, program throughput and reasonableness guarantees when adhering to a monadic style. 
 
 Our observation in the industry and among our peers is that most programming in Scala today that involves async or effect-based programs targets a monadic indirect style.
 
