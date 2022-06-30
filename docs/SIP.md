@@ -201,7 +201,7 @@ We believe that introducing continuations in Scala 3 coupled or not to the captu
 - Eases the learning curve to program async / effects-based applications and libraries in Scala.
 - Reduces indirection through higher-order functions used extensively in `map`, `flatMap`, and others.
 - Interoperates and adheres to different fiber scheduling and cancellation strategies community libraries offer via ExecutionContext.
-    - An analog example of this is KotlinX Coroutines which is not part of the std lib. The std lib exposes continuation intrinsics like `suspendCoroutine`.
+    - An analogous example of this is KotlinX Coroutines which is not part of the std lib. The std lib exposes continuation intrinsics like `suspendCoroutine`.
 
 
 Looking for thoughts and feedback, and thank you for reading this far!
