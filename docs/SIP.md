@@ -14,6 +14,8 @@ and when creating equivalent programs in `Future`, `IO` in Scala vs `suspend` in
 
 We think most of the features we need are already on Scala 3, but we lack a way to perform async/sync IO such as the ones offered by continuation-based systems.
 
+## Example
+
 Given a model mixing a set of unrelated monadic datatypes such as `Option`, `Either`, and `Future`, we would like to access the country code given an `Option[Person]`
 
 ```scala
@@ -45,19 +47,19 @@ def getCountryCode(maybePerson: Option[Person]): Future[Option[String]] =
 we would like to be able to express the same program in a direct style
 
 ```scala
-
 def getCountryCodeCont(maybePerson: Option[Person])(using Structured, Control[NotFound.type | None.type]): String =
-val person = maybePerson.bind
-val addressOrNotFound = person.address.join
-val address = addressOrNotFound.bind
-val country = address.country.bind
-country.code.bind
+  val person = maybePerson.bind
+  val addressOrNotFound = person.address.join
+  val address = addressOrNotFound.bind
+  val country = address.country.bind
+  country.code.bind
+```
 
 Or if bind is defined as apply() over Either and Option:
 
+```scala
 def getCountryCodeCont2(maybePerson: Option[Person])(using Structured, Control[NotFound.type | None.type]): String =
   maybePerson().address.join().country().code()
-
 ```
 
 ## Status Quo
@@ -65,7 +67,7 @@ def getCountryCodeCont2(maybePerson: Option[Person])(using Structured, Control[N
 Interleaving monadic datatypes that are not also `Comonads` in a direct style (including `Future` and lazy `IO`) is impossible in Scala.
 despite context functions and the upcoming capture checking system. Scala lacks an underlying system such as Kotlin continuations or Java LOOM, where functions can suspend and resume computations.
 
-## Other communities and languages
+### Other communities and languages
 
 Other communities and languages concerned about ergonomics and performance, like Kotlin and Java, are bringing the notion of native support for scoped continuations and structured concurrency.
 These features allow for sync and async programming without boxed return types and indirect monadic style.
@@ -83,7 +85,7 @@ The examples below demonstrate how this could work either with a
 - function modifier: `suspend def helloWorldAsync: String`
 - given evidence: `def helloWorldAsync: Suspend ?=> String`
 
-Our intution is that this could be part of the experimental [Capture Checking](https://www-dev.scala-lang.org/scala3/reference/experimental/cc.html) and related to the experimental [CanThrow](https://docs.scala-lang.org/scala3/reference/experimental/canthrow.html) capabilities, where the compiler performs special desugaring in the function body.
+Our intuition is that this could be part of the experimental [Capture Checking](https://www-dev.scala-lang.org/scala3/reference/experimental/cc.html) and related to the experimental [CanThrow](https://docs.scala-lang.org/scala3/reference/experimental/canthrow.html) capabilities, where the compiler performs special desugaring in the function body.
 
 ```scala
 val helloWorldAsync: Suspended ?=> String =
