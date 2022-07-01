@@ -6,6 +6,10 @@ package fx
 opaque type HttpConnectionTimeout = Long
 
 object HttpConnectionTimeout:
+
+  given Manifest[HttpConnectionTimeout] =
+    Manifest.classType(HttpConnectionTimeout(1).getClass)
+
   /**
    * @constructor
    */

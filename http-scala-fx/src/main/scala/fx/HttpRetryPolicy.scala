@@ -5,24 +5,24 @@ import java.net.http.HttpResponse
 /**
  * Models a retry policy as a function from HttpResponse to Boolean.
  */
-type HttpRetryPolicy =
-  HttpResponse[?] => Boolean
+type HttpRetryPolicy[A] =
+  (HttpResponse[A], Int) => Boolean
 
-extension (a: HttpResponse[?])
+/**
+ * By default, retry if the request is not a bad request.
+ */
+given defaultRetryPolicy[A]: HttpRetryPolicy[A] =
+  (r, i) => i <= 3 && (400 to 499).contains(r.statusCode)
+
+extension [A](a: HttpResponse[A])
   /**
    * Returns true if the policy determines the requust should be retried.
    */
-  def shouldRetry: HttpRetryPolicy ?=> Boolean = summon[HttpRetryPolicy](a)
+  def shouldRetry(retryCount: Int): HttpRetryPolicy[A] ?=> Boolean = summon[HttpRetryPolicy[A]](a, retryCount)
 
 object HttpRetryPolicy:
   /**
    * @constructor
    */
-  def apply(f: HttpResponse[?] => Boolean): HttpRetryPolicy =
+  def apply[A](f: (HttpResponse[A], Int) => Boolean): HttpRetryPolicy[A] =
     f
-
-  /**
-   * By default, retry if the request is a bad request.
-   */
-  lazy val defaultRetryPolicy: HttpRetryPolicy =
-    r => (400 to 499).contains(r.statusCode)

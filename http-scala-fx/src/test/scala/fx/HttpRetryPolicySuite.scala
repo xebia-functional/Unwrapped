@@ -15,9 +15,8 @@ class HttpRetryPolicySuite extends ScalaCheckSuite:
       Gen.oneOf(StatusCode.statusCodes).map(StatusCode.unsafeOf).map(FakeHttpResponse[Any](_))
     }
     forAll { (httpResponse: HttpResponse[Any]) =>
-      given HttpRetryPolicy = HttpRetryPolicy.defaultRetryPolicy
       val f: (HttpResponse[Any]) => Boolean =
-        response => response.shouldRetry
+        response => response.shouldRetry(1)
       (httpResponse.statusCode >= 400 && httpResponse.statusCode < 500) ==> {
         f(httpResponse)
       }

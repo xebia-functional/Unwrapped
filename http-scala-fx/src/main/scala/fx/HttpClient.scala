@@ -11,7 +11,8 @@ extension(h: HttpClient)
   def value: jnh.HttpClient = h
 
 object HttpClient:
-  def apply[A](using HttpClientConfig): HttpClient =
+  def apply(a: jnh.HttpClient): HttpClient = a
+  def apply(using HttpClientConfig): HttpClient =
     val config = summon[HttpClientConfig]
     // need to setup proxy and ssl contexts
     jnh
