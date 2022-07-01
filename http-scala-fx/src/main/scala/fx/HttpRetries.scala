@@ -7,6 +7,9 @@ opaque type HttpRetries = Int
 
 object HttpRetries:
 
+  given Manifest[HttpRetries] =
+    Manifest.classType[HttpRetries](HttpRetries(1).getClass)
+
   /**
    * @constructor
    */
