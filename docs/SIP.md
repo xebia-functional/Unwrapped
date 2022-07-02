@@ -132,7 +132,7 @@ We use `continuation` to create a continuation that suspends the current program
 Continuations can be resumed with the expected value or an exception.
 
 More complex abstractions and operators can be derived from this continuation model.
-All is needed for direct syntax that removes callbacks and boxing is a continuation system with some form of compiler
+All that is needed for direct syntax that removes callbacks and boxing is a continuation system with some form of compiler
 CPS. We don't expect functions like `bind` or `join` to be available in the language, but we do expect `continuation` or similar to be available.
 
 In the following `Example Library` we will see how we can use continuations to also implement monad bind over `Either` and `Option`.
