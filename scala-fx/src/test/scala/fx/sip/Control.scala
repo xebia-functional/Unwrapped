@@ -17,7 +17,6 @@ trait Control[-R]:
    */
   extension (r: R) def shift[A]: A
 
-
 /**
  * Terminal operators for programs that require control
  */
