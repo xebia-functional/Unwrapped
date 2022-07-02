@@ -139,8 +139,8 @@ In the following `Example Library` we will see how we can use continuations to a
 
 ## Example library
 
-The following examples demonstrate the basics of a small functional library on top of the proposed continuation system, and it's inspired in primitives found
-on [Arrow FX](https://arrow-kt.io/docs/fx/). `Arrow` provides complementary functional abstractions for Kotlin and KotlinX coroutines.
+The following examples demonstrate the basics of a small functional library on top of the proposed continuation system, and it's inspired by primitives found
+in [Arrow FX](https://arrow-kt.io/docs/fx/). `Arrow` provides complementary functional abstractions for Kotlin and KotlinX coroutines.
 
 We don't propose this api as part of the proposal. The example is here to demonstrate what can be built on top of the continuation system.
 
