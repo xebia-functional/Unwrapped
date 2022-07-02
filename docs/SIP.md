@@ -64,7 +64,7 @@ def countryCode(maybePerson: Option[Person])(using Control[NotFound.type | None.
   country.code.bind
 ```
 
-Or to show the code above can be further reduced if `bind` is defined as `apply()` over Either and Option:
+Or to show the code above can be further reduced if `bind` is defined as `Either.apply` and `Option.apply`:
 
 ```scala
 def countryCode(maybePerson: Option[Person])(using Control[NotFound.type | None.type]): String =
