@@ -11,4 +11,4 @@ import concurrent.ExecutionContext.Implicits.global
   val joeEffect: Control[NotFound.type | None.type] ?=> String =
     getCountryCodeDirect(joe)
   val result: NotFound.type | None.type | String = run(s"$janeEffect, $joeEffect")
-  println(result) //NotFound
+  println(result) // NotFound
