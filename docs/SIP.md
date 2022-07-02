@@ -118,16 +118,13 @@ The continuation can perform this background work without blocking the caller.
 This CPS desugaring allows for user code to never have to deal with callbacks and allows for integrations with boxed types like `Future`.
 
     ```scala
-     extension [A](f: Future[A]) 
+     extension [A](f: Future[A])(using ExecutionContext) 
        suspend def join(): A = 
-         continuation<A> { cont: Continuation[A] ->
-            whenComplete { result, exception ->
-                if (exception == null) // the future has been completed normally
-                    cont.resume(result)
-                else // the future has completed with an exception
-                    cont.resumeWithException(exception)
+         continuation[A] { cont: Continuation[A] =>
+            f.onComplete { 
+              _.fold(ex => cont.resumeWithException(ex), cont.resume)
             }
-         }
+          }
     ```
 
 We use `continuation` to create a continuation that suspends the current program and resumes it when the future is completed.
