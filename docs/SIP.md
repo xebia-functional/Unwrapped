@@ -145,7 +145,7 @@ in [Arrow FX](https://arrow-kt.io/docs/fx/). `Arrow` provides complementary func
 We don't propose this api as part of the proposal. The example is here to demonstrate what can be built on top of the continuation system.
 
 A continuation is a program producing `A` that may be interrupted at any point with a value of `R`.
-`Control` provides `shift` the operation that allows interruption and acts as a functional `throw`:
+ `Control` provides `shift` the operation that allows interruption analagous to the imperative `throw`:
 
 ```scala
 trait Control[-R]: //can also be implemented in terms of `canThrow`
