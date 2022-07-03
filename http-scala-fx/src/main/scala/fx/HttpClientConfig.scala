@@ -6,14 +6,11 @@ import scala.quoted.*
  * Defines the client configuration options for an http client. Not open for extension.
  */
 final class HttpClientConfig(
-    val connectionTimeout: |?[HttpConnectionTimeout],
-    val followRedirects: |?[HttpFollowRedirects],
-    val maximumRetries: |?[HttpRetries]
+    val connectionTimeout: Nullable[HttpConnectionTimeout],
+    val followRedirects: Nullable[HttpFollowRedirects],
+    val maximumRetries: Nullable[HttpRetries]
 )
 
 object HttpClientConfig:
   given HttpClientConfig =
-    HttpClientConfig(
-      |?.none,
-      |?.none,
-      |?.none)
+    HttpClientConfig(Nullable.none, Nullable.none, Nullable.none)
