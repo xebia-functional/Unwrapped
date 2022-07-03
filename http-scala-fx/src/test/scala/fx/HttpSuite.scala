@@ -1,66 +1,65 @@
 package fx
 
-import java.net.{http => jnh}
+import com.sun.net.httpserver.*
 import munit.fx.ScalaFXSuite
-import java.util.Optional
-import java.net.CookieHandler
-import java.time.Duration
-import java.net.http.HttpClient.Redirect
-import java.net.ProxySelector
-import javax.net.ssl.SSLContext
-import javax.net.ssl.SSLParameters
-import java.net.Authenticator
-import java.util.concurrent.Executor
-import java.net.http.HttpResponse
-import com.sun.net.httpserver.HttpServer
-import com.sun.net.httpserver.HttpContext
-import com.sun.net.httpserver.HttpHandler
-import com.sun.net.httpserver.HttpHandlers
+
 import java.net.InetSocketAddress
-import com.sun.net.httpserver.Headers
-import com.sun.net.httpserver.Request
-import java.util.concurrent.Executors
-import java.util.concurrent.ExecutorService
 import java.net.URI
+import java.util.concurrent.Executors
+import scala.jdk.CollectionConverters.*
 
 class HttpSuite extends ScalaFXSuite {
 
-  serverExpectedResponseHeadersExecutorAndGetHandler.testFX(
-    "a string get request to /ping should return pong") {
-    case ((serverResource, expectedResponseHeaders, executor), getHandler) =>
+  httpServer(getHttpHandler(Nullable.none))
+    .testFX("requests should be returned in non-blocking fibers") { serverResource =>
       serverResource.use { server =>
-        val executorSet: Unit = server.setExecutor(executor)
-        val contextCreated: HttpContext =
-          server.createContext("/ping", getHandler)
-        val serverURI: InetSocketAddress = server.getAddress()
-        val serverStart: Unit = server.start
-        val pongResponse = structured(
+        val baseServerAddress = s"http:/${server.getAddress()}/root"
+        val pongResponse: Structured ?=> (
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String,
+            String) =
           parallel(
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/1")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/2")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/3")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/4")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/5")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/6")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/7")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/8")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/9")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/0")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/11")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/12")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/13")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/14")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/15")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/16")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/17")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/18")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/19")).join.body,
-            () => Http.GET[String](URI.create(s"http:/$serverURI/ping/20")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/1")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/2")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/3")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/4")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/5")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/6")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/7")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/8")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/9")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/0")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/11")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/12")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/13")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/14")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/15")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/16")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/17")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/18")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/19")).join.body,
+            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/20")).join.body
           )
-        )
 
         assertEqualsFX(
-          pongResponse,
+          structured(pongResponse),
           (
             "pong",
             "pong",
@@ -82,10 +81,11 @@ class HttpSuite extends ScalaFXSuite {
             "pong",
             "pong",
             "pong"
-          ))
+          )
+        )
       }
 
-  }
+    }
 
   lazy val notFoundHeaders = Headers.of(
     "Content-Type",
@@ -109,27 +109,42 @@ class HttpSuite extends ScalaFXSuite {
   )
   lazy val fallbackHttpHandler = HttpHandlers.of(404, notFoundHeaders, "Not Found")
 
-  lazy val httpServer = FunFixture(
+  def httpServer(handler: HttpHandler) = FunFixture(
     setup = _ => {
-      Resource(HttpServer.create(InetSocketAddress(0), 0), (server, _) => server.stop(0))
+      for {
+        server <- Resource(
+          HttpServer.create(InetSocketAddress(0), 0),
+          (server, _) => server.stop(0))
+        serverExecutor <- Resource(
+          Executors.newVirtualThreadPerTaskExecutor,
+          (executor, _) => executor.shutdown())
+        _ = server.setExecutor(serverExecutor)
+        httpContext = server.createContext("/root", handler)
+        _ = server.start
+      } yield server
     },
     teardown = server => {
       ()
-    })
+    }
+  )
 
-  lazy val expectedGetHeaders = FunFixture(setup = _ => getSuccessHeaders, teardown = _ => ())
-
-  lazy val getHttpHandler = FunFixture[HttpHandler](
-    setup = _ =>
-      HttpHandlers.handleOrElse(
-        (request: Request) => {
-          request
-            .getRequestMethod() == "GET" && request.getRequestURI().getPath().contains("ping")
-        },
-        HttpHandlers.of(200, getSuccessHeaders, "pong"),
-        fallbackHttpHandler
-      ),
-    teardown = _ => ()
+  def getHttpHandler(maybeExpectedHeaders: Nullable[Headers]) = HttpHandlers.handleOrElse(
+    (request: Request) => {
+      maybeExpectedHeaders
+        .map {
+          _.entrySet.asScala.forall { entrySet =>
+            val headerName = entrySet.getKey
+            request.getRequestHeaders.containsKey(headerName) && request
+              .getRequestHeaders
+              .get(headerName)
+              .containsAll(entrySet.getValue)
+          }
+        }
+        .getOrElse(true) && request
+        .getRequestMethod() == "GET" && request.getRequestURI().getPath().contains("ping")
+    },
+    HttpHandlers.of(200, getSuccessHeaders, "pong"),
+    fallbackHttpHandler
   )
 
   lazy val virtualThreadExecutor = FunFixture(
@@ -138,9 +153,4 @@ class HttpSuite extends ScalaFXSuite {
       println("tearing down executor")
       executor.shutdown
     })
-
-  lazy val serverExpectedResponseHeadersExecutorAndGetHandler = FunFixture.map2(
-    FunFixture.map3(httpServer, expectedGetHeaders, virtualThreadExecutor),
-    getHttpHandler)
-
 }
