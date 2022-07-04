@@ -193,7 +193,7 @@ object Http:
   }
 
   def TRACE[A](uri: URI, headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[A] =
-    TRACE[A](uri, 0, headers:_*)
+    TRACE[A](uri, 0, headers: _*)
 
   @tailrec
   private def TRACE[A](
@@ -218,8 +218,14 @@ object Http:
     }
   }
 
-  @tailrec
   def PATCH[A, B](
+      uri: URI,
+      body: B,
+      headers: HttpHeader*): (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[A] =
+    PATCH(uri, body, 0, headers: _*)
+
+  @tailrec
+  private def PATCH[A, B](
       uri: URI,
       body: B,
       retryCount: Int = 0,

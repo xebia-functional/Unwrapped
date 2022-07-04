@@ -195,6 +195,16 @@ class HttpSuite extends ScalaFXSuite {
       }
   }
 
+  httpServer(patchHttpSuccessHandler).testFX("PATCH should send a patch request") {
+    serverAddressResource =>
+      serverAddressResource.use { baseServerAddress =>
+        assertEqualsFX(
+          structured(
+            Http.PATCH[String, String](URI.create(s"$baseServerAddress/ping"), "pabble").join.statusCode),
+          200)
+      }
+  }
+
   lazy val notFoundHeaders = Headers.of(
     "Content-Type",
     "text/plain; charset=UTF-8",
@@ -222,6 +232,14 @@ class HttpSuite extends ScalaFXSuite {
     "close",
     "Date",
     "Fri, 01 Jul 2022 04:22:42 GMT"
+  )
+
+  lazy val patchHttpSuccessHandler = HttpHandlers.handleOrElse(
+    request =>
+      request
+        .getRequestMethod() == "PATCH" && request.getRequestURI().getPath().contains("ping"),
+    HttpHandlers.of(200, getSuccessHeaders, ""),
+    fallbackHttpHandler
   )
 
   lazy val traceHttpSuccessHandler = HttpHandlers.handleOrElse(
