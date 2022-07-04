@@ -53,7 +53,6 @@ object Http:
             .build(),
           mapper.bodyHandler)
     }).join
-
     if (response.shouldRetry(retryCount)) {
       GET(uri, retryCount + 1, headers: _*)
     } else {
