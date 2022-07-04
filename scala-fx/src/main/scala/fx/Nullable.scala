@@ -43,7 +43,7 @@ extension [A: Manifest](a: Nullable[A])
   def getOrElse(default: A): A =
     default match
       case x: A => x
-      case _ => default
+      case null => default
 
   /**
    * @param default

@@ -7,13 +7,13 @@ import java.net.InetSocketAddress
 import java.net.URI
 import java.util.concurrent.Executors
 import scala.jdk.CollectionConverters.*
+import java.net.http.HttpHeaders
 
 class HttpSuite extends ScalaFXSuite {
 
-  httpServer(getHttpHandler(Nullable.none))
+  httpServer(getHttpHandler(Option.empty))
     .testFX("requests should be returned in non-blocking fibers") { serverResource =>
-      serverResource.use { server =>
-        val baseServerAddress = s"http:/${server.getAddress()}/root"
+      serverResource.use { baseServerAddress =>
         val pongResponse: Structured ?=> (
             String,
             String,
@@ -84,7 +84,23 @@ class HttpSuite extends ScalaFXSuite {
           )
         )
       }
+    }
 
+  httpServer(getHttpHandler(Option(Headers.of("X-Extended-Test-Header", "HttpSuite"))))
+    .testFX("Expected headers are sent with requests, 404 means headers not sent") {
+      (serverAddressResource: Resource[String]) =>
+        serverAddressResource.use { baseServerAddress =>
+          assertEqualsFX(
+            structured(
+              Http
+                .GET[String](
+                  URI.create(s"$baseServerAddress/ping/1"),
+                  HttpHeader("X-Extended-Test-Header", "HttpSuite"))
+                .join
+                .body),
+            "pong"
+          )
+        }
     }
 
   lazy val notFoundHeaders = Headers.of(
@@ -121,26 +137,25 @@ class HttpSuite extends ScalaFXSuite {
         _ = server.setExecutor(serverExecutor)
         httpContext = server.createContext("/root", handler)
         _ = server.start
-      } yield server
+      } yield s"http:/${server.getAddress()}/root"
     },
     teardown = server => {
       ()
     }
   )
 
-  def getHttpHandler(maybeExpectedHeaders: Nullable[Headers]) = HttpHandlers.handleOrElse(
+  def getHttpHandler(maybeExpectedHeaders: Option[Headers]) = HttpHandlers.handleOrElse(
     (request: Request) => {
-      maybeExpectedHeaders
-        .map {
-          _.entrySet.asScala.forall { entrySet =>
-            val headerName = entrySet.getKey
-            request.getRequestHeaders.containsKey(headerName) && request
-              .getRequestHeaders
-              .get(headerName)
-              .containsAll(entrySet.getValue)
-          }
+      val hasAllExpectedHeaders = maybeExpectedHeaders.map {
+        _.entrySet.asScala.forall { entrySet =>
+          val headerName = entrySet.getKey
+          request.getRequestHeaders.containsKey(headerName) && request
+            .getRequestHeaders
+            .get(headerName)
+            .containsAll(entrySet.getValue)
         }
-        .getOrElse(true) && request
+      }
+      hasAllExpectedHeaders.getOrElse(true) && request
         .getRequestMethod() == "GET" && request.getRequestURI().getPath().contains("ping")
     },
     HttpHandlers.of(200, getSuccessHeaders, "pong"),

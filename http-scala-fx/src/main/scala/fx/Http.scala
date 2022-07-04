@@ -33,10 +33,13 @@ object Http:
     }
   }
 
+  def GET[A](uri: URI, headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[A] =
+    GET(uri, 0, headers: _*)
+
   @tailrec
-  def GET[A](
+  private def GET[A](
       uri: URI,
-      retryCount: Int = 0,
+      retryCount: Int,
       headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[A] = {
     val mapper = summon[HttpResponseMapper[A]]
     val config = summon[HttpClientConfig]
