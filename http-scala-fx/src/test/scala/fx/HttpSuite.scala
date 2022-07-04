@@ -8,6 +8,7 @@ import java.net.URI
 import java.util.concurrent.Executors
 import scala.jdk.CollectionConverters.*
 import java.net.http.HttpHeaders
+import java.util.concurrent.atomic.AtomicInteger
 
 class HttpSuite extends ScalaFXSuite {
 
@@ -103,6 +104,11 @@ class HttpSuite extends ScalaFXSuite {
         }
     }
 
+  httpServer(getHttpFailureHandler(Option.empty)).testFX("By default, failed requests should retry 3 times"){ serverResource =>
+
+    
+  }
+
   lazy val notFoundHeaders = Headers.of(
     "Content-Type",
     "text/plain; charset=UTF-8",
@@ -123,7 +129,14 @@ class HttpSuite extends ScalaFXSuite {
     "Date",
     "Fri, 01 Jul 2022 04:22:42 GMT"
   )
-  lazy val fallbackHttpHandler = HttpHandlers.of(404, notFoundHeaders, "Not Found")
+  lazy val serverProblemHeaders = Headers.of(
+    "Content-Type",
+    "text/plain; charset=UTF-8",
+    "Connection",
+    "close",
+    "Date",
+    "Fri, 01 Jul 2022 04:22:42 GMT"
+  )
 
   def httpServer(handler: HttpHandler) = FunFixture(
     setup = _ => {
@@ -143,6 +156,8 @@ class HttpSuite extends ScalaFXSuite {
       ()
     }
   )
+
+  def getHttpFailureHandler: HttpHandler = HttpHandlers.of(500, serverProblemHeaders, "Server Error")
 
   def getHttpHandler(maybeExpectedHeaders: Option[Headers]) = HttpHandlers.handleOrElse(
     (request: Request) => {
