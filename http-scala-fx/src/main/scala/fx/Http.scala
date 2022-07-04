@@ -62,8 +62,20 @@ object Http:
     }
   }
 
-  @tailrec
+  def POST[A](
+      uri: URI,
+      body: String,
+      headers: HttpHeader*): (HttpResponseMapper[String], HttpBodyMapper[A]) ?=> Http[String] =
+    POST[String, String](uri, body, headers: _*)
+
   def POST[A, B](
+      uri: URI,
+      body: B,
+      headers: HttpHeader*): (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[A] =
+    POST(uri, body, 0, headers: _*)
+
+  @tailrec
+  private def POST[A, B](
       uri: URI,
       body: B,
       retryCount: Int = 0,
