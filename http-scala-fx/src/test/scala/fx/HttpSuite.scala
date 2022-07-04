@@ -142,6 +142,16 @@ class HttpSuite extends ScalaFXSuite {
     }
   }
 
+  httpServer(headHttpSuccessHandler).testFX("Head should send a HEAD request") {
+    serverAddressResource =>
+      serverAddressResource.use { baseServerAddress =>
+        assertEqualsFX(
+          structured(Http.HEAD(URI.create(s"$baseServerAddress/ping"))).join.statusCode,
+          200
+        )
+      }
+  }
+
   lazy val notFoundHeaders = Headers.of(
     "Content-Type",
     "text/plain; charset=UTF-8",
@@ -169,6 +179,14 @@ class HttpSuite extends ScalaFXSuite {
     "close",
     "Date",
     "Fri, 01 Jul 2022 04:22:42 GMT"
+  )
+
+  lazy val headHttpSuccessHandler = HttpHandlers.handleOrElse(
+    request =>
+      request
+        .getRequestMethod() == "HEAD" && request.getRequestURI().getPath().contains("ping"),
+    HttpHandlers.of(200, getSuccessHeaders, "OK"),
+    fallbackHttpHandler
   )
 
   lazy val postHttpSuccessHandler =

@@ -99,8 +99,10 @@ object Http:
     }
   }
 
+  def HEAD(uri: URI, headers: HttpHeader*): Http[Void] = HEAD(uri, 0, headers: _*)
+
   @tailrec
-  def HEAD(uri: URI, retryCount: Int = 0, headers: HttpHeader*): Http[Void] = {
+  private def HEAD(uri: URI, retryCount: Int = 0, headers: HttpHeader*): Http[Void] = {
     val config = summon[HttpClientConfig]
     val retries = config.maximumRetries.getOrElse(summon[HttpRetries])
     val response = fork(() =>
