@@ -175,6 +175,17 @@ class HttpSuite extends ScalaFXSuite {
       }
   }
 
+  httpServer(optionsHttpSuccessHandler).testFX("OPTIONS should send an Options request") {
+    serverAddressResource =>
+      serverAddressResource.use { baseServerAddress =>
+        assertEqualsFX(
+          structured(
+            Http.OPTIONS[String](URI.create(s"$baseServerAddress/ping")).join.statusCode),
+          200)
+      }
+
+  }
+
   lazy val notFoundHeaders = Headers.of(
     "Content-Type",
     "text/plain; charset=UTF-8",
@@ -202,6 +213,14 @@ class HttpSuite extends ScalaFXSuite {
     "close",
     "Date",
     "Fri, 01 Jul 2022 04:22:42 GMT"
+  )
+
+  lazy val optionsHttpSuccessHandler = HttpHandlers.handleOrElse(
+    request =>
+      request
+        .getRequestMethod() == "OPTIONS" && request.getRequestURI().getPath().contains("ping"),
+    HttpHandlers.of(200, getSuccessHeaders, ""),
+    fallbackHttpHandler
   )
 
   lazy val deleteHttpSuccessHandler = HttpHandlers.handleOrElse(
