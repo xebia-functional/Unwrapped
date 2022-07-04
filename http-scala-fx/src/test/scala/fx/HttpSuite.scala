@@ -152,6 +152,18 @@ class HttpSuite extends ScalaFXSuite {
       }
   }
 
+  httpServer(putHttpSuccessHandler).testFX("PUT should send a PUT request") {
+    serverAddressResource =>
+      serverAddressResource.use { baseServerAddress =>
+        assertEqualsFX(
+          structured(Http.PUT[String, String](URI.create(s"$baseServerAddress/ping"), "paddle"))
+            .join
+            .statusCode,
+          204
+        )
+      }
+  }
+
   lazy val notFoundHeaders = Headers.of(
     "Content-Type",
     "text/plain; charset=UTF-8",
@@ -179,6 +191,13 @@ class HttpSuite extends ScalaFXSuite {
     "close",
     "Date",
     "Fri, 01 Jul 2022 04:22:42 GMT"
+  )
+
+  lazy val putHttpSuccessHandler = HttpHandlers.handleOrElse(
+    request =>
+      request.getRequestMethod() == "PUT" && request.getRequestURI().getPath().contains("ping"),
+    HttpHandlers.of(204, getSuccessHeaders, ""),
+    fallbackHttpHandler
   )
 
   lazy val headHttpSuccessHandler = HttpHandlers.handleOrElse(
