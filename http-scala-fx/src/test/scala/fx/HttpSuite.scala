@@ -131,6 +131,17 @@ class HttpSuite extends ScalaFXSuite {
         }
     }
 
+  httpServer(postHttpSuccessHandler).testFX(
+    "requests with string post bodies are successuful") { serverAddressResource =>
+    serverAddressResource.use { baseServeraddress =>
+      assertEqualsFX(
+        structured(Http.POST[String](URI.create(s"$baseServeraddress/ping"), "paddle"))
+          .join
+          .statusCode,
+        201)
+    }
+  }
+
   lazy val notFoundHeaders = Headers.of(
     "Content-Type",
     "text/plain; charset=UTF-8",
@@ -159,6 +170,16 @@ class HttpSuite extends ScalaFXSuite {
     "Date",
     "Fri, 01 Jul 2022 04:22:42 GMT"
   )
+
+  lazy val postHttpSuccessHandler =
+    HttpHandlers.handleOrElse(
+      (request: Request) => {
+        request
+          .getRequestMethod() == "POST" && request.getRequestURI().getPath().contains("ping")
+      },
+      HttpHandlers.of(201, getSuccessHeaders, "Created"),
+      fallbackHttpHandler
+    )
 
   def httpServer(handler: HttpHandler) = FunFixture(
     setup = _ => {
@@ -194,23 +215,24 @@ class HttpSuite extends ScalaFXSuite {
 
   lazy val fallbackHttpHandler = HttpHandlers.of(404, notFoundHeaders, "Not Found")
 
-  def getHttpHandler(maybeExpectedHeaders: Option[Headers]) = HttpHandlers.handleOrElse(
-    (request: Request) => {
-      val hasAllExpectedHeaders = maybeExpectedHeaders.map {
-        _.entrySet.asScala.forall { entrySet =>
-          val headerName = entrySet.getKey
-          request.getRequestHeaders.containsKey(headerName) && request
-            .getRequestHeaders
-            .get(headerName)
-            .containsAll(entrySet.getValue)
+  def getHttpHandler(maybeExpectedHeaders: Option[Headers]) =
+    HttpHandlers.handleOrElse(
+      (request: Request) => {
+        val hasAllExpectedHeaders = maybeExpectedHeaders.map {
+          _.entrySet.asScala.forall { entrySet =>
+            val headerName = entrySet.getKey
+            request.getRequestHeaders.containsKey(headerName) && request
+              .getRequestHeaders
+              .get(headerName)
+              .containsAll(entrySet.getValue)
+          }
         }
-      }
-      hasAllExpectedHeaders.getOrElse(true) && request
-        .getRequestMethod() == "GET" && request.getRequestURI().getPath().contains("ping")
-    },
-    HttpHandlers.of(200, getSuccessHeaders, "pong"),
-    fallbackHttpHandler
-  )
+        hasAllExpectedHeaders.getOrElse(true) && request
+          .getRequestMethod() == "GET" && request.getRequestURI().getPath().contains("ping")
+      },
+      HttpHandlers.of(200, getSuccessHeaders, "pong"),
+      fallbackHttpHandler
+    )
 
   lazy val virtualThreadExecutor = FunFixture(
     setup = _ => Executors.newVirtualThreadPerTaskExecutor,
