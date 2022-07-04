@@ -18,7 +18,7 @@ type Http[A] = (
     HttpRetryPolicy[A],
     Control[HttpExecutionException],
     HttpClient
-) ?=> Fiber[HttpResponse[A]] // need to change the signature to be HttpResponse[A]
+) ?=> Fiber[HttpResponse[A]]
 
 object Http:
 
