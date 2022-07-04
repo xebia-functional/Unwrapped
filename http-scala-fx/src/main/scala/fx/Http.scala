@@ -120,6 +120,13 @@ object Http:
   def PUT[A, B](
       uri: URI,
       body: B,
+      headers: HttpHeader*): (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[A] =
+    PUT[A, B](uri, body, 0, headers: _*)
+
+  @tailrec
+  private def PUT[A, B](
+      uri: URI,
+      body: B,
       retryCount: Int = 0,
       headers: HttpHeader*): (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[A] = {
     val mapper = summon[HttpResponseMapper[A]]

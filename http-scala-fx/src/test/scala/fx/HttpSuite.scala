@@ -164,6 +164,17 @@ class HttpSuite extends ScalaFXSuite {
       }
   }
 
+  httpServer(deleteHttpSuccessHandler).testFX("DELETE should send a DELETE request") {
+    serverAddressResource =>
+      serverAddressResource.use { baseServerAddress =>
+        assertEqualsFX(
+          structured(Http.DELETE[String](URI.create(s"$baseServerAddress/ping")))
+            .join
+            .statusCode,
+          204)
+      }
+  }
+
   lazy val notFoundHeaders = Headers.of(
     "Content-Type",
     "text/plain; charset=UTF-8",
@@ -191,6 +202,14 @@ class HttpSuite extends ScalaFXSuite {
     "close",
     "Date",
     "Fri, 01 Jul 2022 04:22:42 GMT"
+  )
+
+  lazy val deleteHttpSuccessHandler = HttpHandlers.handleOrElse(
+    request =>
+      request
+        .getRequestMethod() == "DELETE" && request.getRequestURI().getPath().contains("ping"),
+    HttpHandlers.of(204, getSuccessHeaders, ""),
+    fallbackHttpHandler
   )
 
   lazy val putHttpSuccessHandler = HttpHandlers.handleOrElse(
