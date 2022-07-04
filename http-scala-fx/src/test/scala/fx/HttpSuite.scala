@@ -9,6 +9,8 @@ import java.util.concurrent.Executors
 import scala.jdk.CollectionConverters.*
 import java.net.http.HttpHeaders
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
+import scala.jdk.FunctionConverters.*
 
 class HttpSuite extends ScalaFXSuite {
 
@@ -104,10 +106,30 @@ class HttpSuite extends ScalaFXSuite {
         }
     }
 
-  httpServer(getHttpFailureHandler(Option.empty)).testFX("By default, failed requests should retry 3 times"){ serverResource =>
+  httpServer(getHttpFailureHandler(Option.empty, AtomicInteger(3)))
+    .testFX("By default, failed requests should retry 3 times") { serverAddressResource =>
+      serverAddressResource.use { baseServerAddress =>
+        {
+          assertEqualsFX(
+            structured(
+              Http.GET[String](URI.create(s"$baseServerAddress/ping/fail")).join.statusCode),
+            200)
+        }
+      }
+    }
 
-    
-  }
+  httpServer(getHttpFailureHandler(Option.empty, AtomicInteger(4)))
+    .testFX("More than three request failures should return the server error by default") {
+      serverAddressResource =>
+        serverAddressResource.use { baseServerAddress =>
+          {
+            assertEqualsFX(
+              structured(
+                Http.GET[String](URI.create(s"$baseServerAddress/ping/fail")).join.statusCode),
+              500)
+          }
+        }
+    }
 
   lazy val notFoundHeaders = Headers.of(
     "Content-Type",
@@ -157,7 +179,20 @@ class HttpSuite extends ScalaFXSuite {
     }
   )
 
-  def getHttpFailureHandler: HttpHandler = HttpHandlers.of(500, serverProblemHeaders, "Server Error")
+  def getHttpFailureHandler(
+      maybeExpectedHeaders: Option[Headers],
+      numRequiredFailures: AtomicInteger): HttpHandler =
+    val serverFail = HttpHandlers.of(500, serverProblemHeaders, "Server Error")
+    val successHandler = getHttpHandler(maybeExpectedHeaders)
+    HttpHandlers.handleOrElse(
+      _ => {
+        numRequiredFailures.getAndDecrement > 0
+      },
+      serverFail,
+      successHandler
+    )
+
+  lazy val fallbackHttpHandler = HttpHandlers.of(404, notFoundHeaders, "Not Found")
 
   def getHttpHandler(maybeExpectedHeaders: Option[Headers]) = HttpHandlers.handleOrElse(
     (request: Request) => {

@@ -12,13 +12,16 @@ type HttpRetryPolicy[A] =
  * By default, retry if the request is not a bad request.
  */
 given defaultRetryPolicy[A]: HttpRetryPolicy[A] =
-  (r, i) => i <= 3 && (400 to 499).contains(r.statusCode)
+  (r, i) => {
+    i < 3 && (500 to 599).contains(r.statusCode) && !(200 to 299).contains(r.statusCode)
+  }
 
 extension [A](a: HttpResponse[A])
   /**
    * Returns true if the policy determines the requust should be retried.
    */
-  def shouldRetry(retryCount: Int): HttpRetryPolicy[A] ?=> Boolean = summon[HttpRetryPolicy[A]](a, retryCount)
+  def shouldRetry(retryCount: Int): HttpRetryPolicy[A] ?=> Boolean =
+    summon[HttpRetryPolicy[A]](a, retryCount)
 
 object HttpRetryPolicy:
   /**
