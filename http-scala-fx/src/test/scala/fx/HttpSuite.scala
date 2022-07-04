@@ -183,7 +183,16 @@ class HttpSuite extends ScalaFXSuite {
             Http.OPTIONS[String](URI.create(s"$baseServerAddress/ping")).join.statusCode),
           200)
       }
+  }
 
+  httpServer(traceHttpSuccessHandler).testFX("TRACE should send a trace request") {
+    serverAddressResource =>
+      serverAddressResource.use { baseServerAddress =>
+        assertEqualsFX(
+          structured(
+            Http.TRACE[String](URI.create(s"$baseServerAddress/ping")).join.statusCode),
+          200)
+      }
   }
 
   lazy val notFoundHeaders = Headers.of(
@@ -213,6 +222,14 @@ class HttpSuite extends ScalaFXSuite {
     "close",
     "Date",
     "Fri, 01 Jul 2022 04:22:42 GMT"
+  )
+
+  lazy val traceHttpSuccessHandler = HttpHandlers.handleOrElse(
+    request =>
+      request
+        .getRequestMethod() == "TRACE" && request.getRequestURI().getPath().contains("ping"),
+    HttpHandlers.of(200, getSuccessHeaders, ""),
+    fallbackHttpHandler
   )
 
   lazy val optionsHttpSuccessHandler = HttpHandlers.handleOrElse(
