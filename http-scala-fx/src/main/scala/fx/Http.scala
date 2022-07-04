@@ -192,8 +192,11 @@ object Http:
     }
   }
 
+  def TRACE[A](uri: URI, headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[A] =
+    TRACE[A](uri, 0, headers:_*)
+
   @tailrec
-  def TRACE[A](
+  private def TRACE[A](
       uri: URI,
       retryCount: Int = 0,
       headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[A] = {
