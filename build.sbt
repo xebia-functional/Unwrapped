@@ -11,7 +11,7 @@ addCommandAlias("ci-publish", "github; ci-release")
 publish / skip := true
 
 lazy val root =
-  (project in file("./")).aggregate(`scala-fx`, benchmarks, `munit-scala-fx`, documentation)
+  (project in file("./")).aggregate(`scala-fx`, benchmarks, `munit-scala-fx`, documentation, `scalike-jdbc-scala-fx`)
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
@@ -32,7 +32,7 @@ lazy val `munit-scala-fx` = (project in file("./munit-scalafx"))
   .dependsOn(`scala-fx`)
 
 lazy val `scalike-jdbc-scala-fx` = project
-  .dependsOn(`scala-fx`)
+  .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
   .settings(publish / skip := true)
   .settings(scalalikeSettings)
 
@@ -66,7 +66,8 @@ lazy val scalalikeSettings: Seq[Def.Setting[_]] =
     libraryDependencies ++= Seq(
       scalikejdbc,
       h2Database,
-      logback
+      logback,
+      scalacheck % Test
     )
   )
 
