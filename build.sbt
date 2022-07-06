@@ -23,7 +23,10 @@ lazy val root =
     continuationsPluginExample,
     benchmarks,
     `munit-scala-fx`,
-    documentation)
+    documentation,
+    `scalike-jdbc-scala-fx`,
+    `cats-scala-fx`
+  )
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
@@ -61,7 +64,7 @@ lazy val `cats-scala-fx` = (project in file("./cats-scalafx"))
   .dependsOn(`scala-fx`)
 
 lazy val `scalike-jdbc-scala-fx` = project
-  .dependsOn(`scala-fx`)
+  .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
   .settings(publish / skip := true)
   .settings(scalalikeSettings)
 
@@ -122,7 +125,8 @@ lazy val scalalikeSettings: Seq[Def.Setting[_]] =
     libraryDependencies ++= Seq(
       scalikejdbc,
       h2Database,
-      logback
+      logback,
+      scalacheck % Test
     )
   )
 
