@@ -8,4 +8,4 @@ case class Country(code: Option[String])
 
 case class Address(country: Option[Country])
 
-case class Person(name: String, address: Future[Either[NotFound.type, Address]])
+case class Person(name: String, address: Either[NotFound.type, Address])

@@ -1,15 +1,16 @@
 package fx.sip
 
-def getCountryCodeDirect(maybePerson: Option[Person])(
+import scala.concurrent.Future
+
+def getCountryCodeDirect(futurePerson: Future[Person])(
     using Control[NotFound.type | None.type]): String =
-  val person = maybePerson.bind
-  val addressOrNotFound = person.address.join()
-  val address = addressOrNotFound.bind
+  val person = futurePerson.join()
+  val address = person.address.bind
   val country = address.country.bind
   country.code.bind
 
 // or if bind is defined as apply()...
 
-def getCountryDirect2(maybePerson: Option[Person])(
+def getCountryDirect2(futurePerson: Future[Person])(
     using Control[NotFound.type | None.type]): String =
-  maybePerson().address.join()().country().code()
+  futurePerson.join().address().country().code()

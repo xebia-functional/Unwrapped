@@ -13,21 +13,27 @@ Most programs involve some form of async effects and in that case they largely d
 These data types express dependent, parallel, asynchronous or potentially erroneous computations as lazily evaluated values or thread-shifted eager computations.
 They do so to maintain efficient parallelization or concurrent execution; error-handling properties, non-determinism, and/or simplified structured concurrency.
 This allows the programmer to treat side-effects as if they were any other value. 
+
 Library-level combinators such as `map`, `flatMap`, and `raiseError` allow the composition of single monads to compose relatively freely and easily. 
 However, combining multiple side-effects often involves increasingly confusing methods and datatypes to separate program expression from execution and treat the program as a value.
-This style requires knowledge of and strict adherence to complex algebraic laws. These laws take time and effort to absorb and understand. In scala, where the execution of side-effects is not yet tracked at the language-level, it takes great discipline to maintain reasonable guarantees of safety, composition, correctness in the construction of data types in concordance with these laws. The data structures required to maintain adherence to these laws in side-effecting programs do not generally compose. Complex attempts to unify the simplicity of function composition and monadic extensible effect/transformer systems increases the distance between programmer intent and program expression. Concepts such as simple tail recursion, loops, try/catch and others must be sacrificed to maintain safety, program throughput and reasonableness guarantees when adhering to a monadic style. 
+This style requires knowledge of and strict adherence to complex algebraic laws. These laws take time and effort to absorb and understand. 
+
+In scala, where the execution of side-effects is not yet tracked at the language-level, it takes great discipline to maintain reasonable guarantees of safety, composition, correctness in the construction of data types in concordance with these laws. The data structures required to maintain adherence to these laws in side-effecting programs do not generally compose. Complex attempts to unify the simplicity of function composition and monadic extensible effect/transformer systems increases the distance between programmer intent and program expression. 
+
+Concepts such as simple tail recursion, loops, try/catch and others must be sacrificed to maintain safety, program throughput and reasonableness guarantees when adhering to a monadic style. 
 
 We would like to write scala programs in a direct style while maintaining the safety of the indirect monadic style. We would like to write these programs with a unified syntax,  
 regardless of these programs being async or synced in nature. We have experienced this style of programming in Kotlin for the last few years
 with [`suspend`](https://kotlinlang.org/docs/composing-suspending-functions.html) functions. We have found that these programs are easier to write, teach and generally perform better than those written in indirect style.
 
-We think most of the features we need are already on Scala 3, but we lack a way to perform async/sync IO such as the ones offered by continuation-based systems.
+We think most of the features we need are already on Scala 3, but we lack a way to perform non-blocking async/sync IO in direct style.
 
 ## Example
 
 Given a model mixing a set of unrelated monadic datatypes such as `Option`, `Either`, and `Future`, we would like to access the country code given an `Option[Person]`
 
 ```scala
+import scala.concurrent.Future
 
 object NotFound
 
@@ -35,31 +41,30 @@ case class Country(code: Option[String])
 
 case class Address(country: Option[Country])
 
-case class Person(name: String, address: Future[Either[NotFound.type, Address]])
+case class Person(name: String, address: Either[NotFound.type, Address])
 ```
 
-Instead of the encodings, we see today based on `map` and `flatMap` or equivalent for comprehensions like the one below.
+Instead of the encodings, we see today based on `map` and `flatMap` (or equivalent for comprehensions) like the one below.
 
 ```scala
-def getCountryCode(maybePerson: Option[Person]): Future[Option[String]] =
-  maybePerson match
-    case Some(person) =>
-      person.address.map {
-        case Right(address) =>
-          address.country.flatMap(_.code)
-        case Left(_) =>
-          None
-      }
-    case None => Future.successful(None)
+def getCountryCodeIndirect(futurePerson: Future[Person]): Future[Option[String]] =
+  futurePerson.map { person =>
+    person.address match
+    case Right(address) =>
+    address.country.flatMap(_.code)
+    case Left(_) =>
+    None
+  }
 ```
 
 we would like to be able to express the same program in a direct style
 
 ```scala
-def countryCode(maybePerson: Option[Person])(using Control[NotFound.type | None.type]): String =
-  val person = maybePerson.bind
-  val addressOrNotFound = person.address.join
-  val address = addressOrNotFound.bind
+import scala.concurrent.Future
+
+def getCountryCodeDirect(futurePerson: Future[Person])(using Control[NotFound.type | None.type]): String =
+  val person = futurePerson.join()
+  val address = person.address.bind
   val country = address.country.bind
   country.code.bind
 ```
@@ -67,14 +72,14 @@ def countryCode(maybePerson: Option[Person])(using Control[NotFound.type | None.
 Or to show the code above can be further reduced if `bind` is defined as `Either.apply` and `Option.apply`:
 
 ```scala
-def countryCode(maybePerson: Option[Person])(using Control[NotFound.type | None.type]): String =
-  maybePerson().address.join().country().code()
+def getCountryDirect2(futurePerson: Future[Person])(using Control[NotFound.type | None.type]): String =
+  futurePerson.join().address().country().code()
 ```
 
 ## Status Quo
 
 Interleaving monadic data types that are not also `Comonads` in a direct style (including `Future` and lazy `IO`) is impossible in Scala.
-despite context functions and the upcoming capture checking system. Scala lacks an underlying system such as Kotlin continuations or Java LOOM, where functions can suspend and resume computations.
+Despite context functions and the upcoming capture checking system. Scala lacks an underlying system such as Kotlin continuations or Java LOOM, where functions can suspend and resume computations.
 
 ### Other communities and languages
 
@@ -82,7 +87,7 @@ Other communities and languages concerned about ergonomics and performance, like
 These features allow for sync and async programming without boxed return types and indirect monadic style.
 
 These languages implement such techniques in different ways. In the case of Kotlin, the compiler performs CPS transformations for `suspend` functions, eliminating the need for callbacks and simplifying function return types.
-This simple native compiler supported keyword allows other ecosystem libraries such as [Spring](insert link), [Compose](insert link), and a great many other libraries and projects in the Kotlin ecosystem integrate with suspending functions natively.
+This simple native compiler supported keyword allows other ecosystem libraries such as [Spring](https://spring.io/blog/2019/04/12/going-reactive-with-spring-coroutines-and-kotlin-flow#webflux-with-coroutines-api-in-kotlin), [Android](https://developer.android.com/kotlin/coroutines/coroutines-adv), and many other libraries and projects in the Kotlin ecosystem integrate with suspending functions natively.
 
 JDK 19, the Java 19 hotspot runtime, and [Project Loom](https://openjdk.org/projects/loom/) include native and library support of virtual threads, structured concurrency, and [continuations](https://github.com/openjdk/loom/blob/132bc6aacdf5dfa4897e44772bc7b2052fc2f2d2/src/hotspot/share/runtime/continuation.cpp) related to virtual threads. 
 
@@ -97,7 +102,7 @@ Two possible implementations are included in this Pre-SIP Post:
     suspend def countryCode: String
     ```
 
-2. The use of compiler-desugared `Suspend` context functions or given evidence.
+2. The use of compiler-desugared `Suspend` context functions or given/using evidence.
     ```scala
     def countryCode: Suspend ?=> String
     ```
@@ -108,24 +113,25 @@ Our intuition is that this could be part of the experimental [Capture Checking](
 
 If the compiler followed a model similar to Kotlin, suspended function and lambdas get to codegen with an additional parameter.
 
-`suspend def countryCode: String` is desugared to a function that looks like `def countryCode(continuation: Continuation[?]): Any | Null`.
+`suspend def countryCode: String` is desugared to a function that looks like in bytecode like `def countryCode(continuation: Continuation[?]): ?`.
 
-The body of the suspended function desugars to a [state machine](https://github.com/Kotlin/KEEP/blob/master/proposals/coroutines.md#state-machines) where each state is associated with suspension points.
+The body of the suspended function desugars to a [state machine](https://github.com/Kotlin/KEEP/blob/master/proposals/coroutines.md#state-machines) where each state is labelled and associated with suspension points.
 In the function `countryCode`, calls to `join` and `bind` are calls to suspended functions, and they are considered suspension points.
 When a program reaches a suspension point the underlying continuation may have suspended, performed some work, and resumed back to the original control flow when ready.
 The continuation can perform this background work without blocking the caller.
 
 This CPS desugaring allows for user code to never have to deal with callbacks and allows for integrations with boxed types like `Future`.
 
-    ```scala
-     extension [A](f: Future[A])(using ExecutionContext) 
-       suspend def join(): A = 
-         continuation[A] { cont: Continuation[A] =>
-            f.onComplete { 
-              _.fold(ex => cont.resumeWithException(ex), cont.resume)
-            }
-          }
-    ```
+```scala
+extension [A](f: Future[A])(using ExecutionContext)
+    suspend def join(): A =
+      continuation[A] { cont: Continuation[A] =>
+        f.onComplete {
+          //naive impl does not look into cancellation wiring.
+          _.fold(ex => cont.resumeWithException(ex), cont.resume)
+        }
+      }
+```
 
 We use `continuation` to create a continuation that suspends the current program and resumes it when the future is completed.
 `continuation` is only available when the user is inside the scope of a `suspend` function.
@@ -188,17 +194,16 @@ extension [A](fa: Option[A])
 ```
 
 We can safely combine our types with `bind` in the same scope.
-`shift` allows us to escape the continuation in case we encounter a `Left` or  `None`.
+`shift` allows us to escape the continuation in case we encounter a `Left` or `None`.
 Monadic values compose in the same scope delegating their computation to the underlying continuation which may shift in case of failure or return the value.
 There is no need for wrapped return types, monad transformers or stacked types modeling a sequential computation in this model.
 
 Now that we have the implementations for `join` and `bind` we can express `countryCode` in direct non-blocking style.
 
 ```scala
-def countryCode(maybePerson: Option[Person])(using Control[NotFound.type | None.type]): String =
-  val person = maybePerson.bind //shifts on None
-  val addressOrNotFound = person.address.join //throws if fails to complete (we don't want to control this)
-  val address = addressOrNotFound.bind //shifts on NotFound
+def getCountryCodeDirect(futurePerson: Future[Person])(using Control[NotFound.type | None.type]): String =
+  val person = futurePerson.join() //throws if fails to complete (we don't want to control this)
+  val address = person.address.bind //shifts on Left
   val country = address.country.bind //shifts on None
   country.code.bind //shifts on None
 ```
@@ -217,7 +222,7 @@ extension [R, A](c: Control[R] ?=> A)
     def toOption: Option[A] =
       fold(c)(_ => None, Some(_))
 
-    def run: (R | A) = Continuation.fold(c)(identity, identity)
+    def run: (R | A) = fold(c)(identity, identity)
 ```
 
 ## Alternative community initiatives

@@ -4,8 +4,8 @@ import scala.concurrent.Future
 import concurrent.ExecutionContext.Implicits.global
 
 @main def program =
-  val jane = Some(Person("Jane", Future(Right(Address(Some(Country(Some("ES"))))))))
-  val joe = Some(Person("Joe", Future(Left(NotFound))))
+  val jane = Future(Person("Jane", Right(Address(Some(Country(Some("ES")))))))
+  val joe = Future(Person("Joe", Left(NotFound)))
   val janeEffect: Control[NotFound.type | None.type] ?=> String =
     getCountryCodeDirect(jane)
   val joeEffect: Control[NotFound.type | None.type] ?=> String =
