@@ -26,24 +26,3 @@ extension [R, A](fa: Either[R, A])(using Control[R])
 extension [A](fa: Option[A])(using Control[None.type])
   def bind: A = fa.fold(None.shift)(identity)
   def apply(): A = bind
-
-trait Continuation[A]:
-  def resume(a: A): Unit
-  def resumeWithException(e: Throwable): Unit
-
-// compiler generated implementation of Continuation
-
-suspend def continuation[A](c: Continuation[A] => Unit): A =
-  ???
-
-private val executor = Executors.newSingleThreadScheduledExecutor((runnable: Runnable) => {
-  val thread = Thread(runnable, "scheduler")
-  thread.setDaemon(true)
-  thread
-})
-
-suspend def delay(time: Long): Unit = continuation { c =>
-  val task = new Runnable:
-    override def run(): Unit = c.resume(())
-  executor.schedule(task, time, TimeUnit.MILLISECONDS)
-}
