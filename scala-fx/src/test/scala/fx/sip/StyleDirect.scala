@@ -4,7 +4,7 @@ import scala.concurrent.Future
 
 def getCountryCodeDirect(futurePerson: Future[Person])(
     using Control[NotFound.type | None.type]): String =
-  val person = futurePerson.join()
+  val person = futurePerson.bind
   val address = person.address.bind
   val country = address.country.bind
   country.code.bind
@@ -13,4 +13,4 @@ def getCountryCodeDirect(futurePerson: Future[Person])(
 
 def getCountryDirect2(futurePerson: Future[Person])(
     using Control[NotFound.type | None.type]): String =
-  futurePerson.join().address().country().code()
+  futurePerson.bind.address().country().code()
