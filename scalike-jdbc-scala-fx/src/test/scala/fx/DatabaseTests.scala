@@ -3,7 +3,7 @@ package fx
 import org.scalacheck.Properties
 import org.scalacheck.Prop.forAll
 import java.sql.SQLException
-import scalikejdbc._
+import scalikejdbc.*
 
 object DatabaseTests extends Properties("Database props"):
 
@@ -14,6 +14,9 @@ object DatabaseTests extends Properties("Database props"):
     val names = DB.readOnlyWithControl  { implicit session =>
       sql"select name from emp".map { rs => rs.string("name") }.list.apply()
     }
-    structured(names.join.toEither.isRight)
+    run(structured(names.join.toEither.isRight)) match {
+      case b: Boolean => b
+      case _ => false
+    }
   }
 end DatabaseTests
