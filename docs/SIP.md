@@ -17,7 +17,7 @@ Library-level combinators such as `map`, `flatMap`, and `raiseError` allow the c
 However, combining multiple side-effects often involves increasingly confusing methods and datatypes to separate program expression from execution and treat the program as a value.
 This style requires knowledge of and strict adherence to complex algebraic laws. These laws take time and effort to absorb and understand.
 
-In scala, where the execution of side-effects is not yet tracked at the language level, it takes great discipline to maintain reasonable guarantees of safety, composition, and correctness in constructing data types concordance with these laws. The data structures required to maintain adherence to these laws in side-effecting programs do not generally compose. Complex attempts to unify the simplicity of function composition with monadic extensible effect/transformer systems increase the distance between programmer intent and program expression.
+In scala, where the execution of side-effects is not yet tracked at the language level, it takes great discipline to maintain reasonable guarantees of safety, composition, and correctness in constructing data types in concordance with these laws. The data structures required to maintain adherence to these laws in side-effecting programs do not generally compose. Complex attempts to unify the simplicity of function composition with monadic extensible effect/transformer systems increase the distance between programmer intent and program expression.
 
 Concepts such as simple tail recursion, loops, and try/catch must be sacrificed to maintain safety, program throughput and reasonableness guarantees when adhering to a monadic style.
 
