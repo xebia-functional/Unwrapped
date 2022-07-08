@@ -126,6 +126,7 @@ lazy val scalalikeSettings: Seq[Def.Setting[_]] =
       scalikejdbc,
       h2Database,
       logback,
+      postgres,
       scalacheck % Test
     )
   )
