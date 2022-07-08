@@ -133,6 +133,66 @@ In the function `countryCode`, calls to `bind` are calls to suspended functions 
 When a program reaches a suspension point, the underlying continuation may have suspended, performed some work, and resumed back to the original control flow when ready.
 The continuation can perform this background work without blocking the caller.
 
+#### Compiler requirements.
+
+In order to implement continuations in Scala, the compiler would include the following:
+
+- A new keyword, `suspend` or a new contextual type `Suspend`. This can appear in functions and lambda declarations.
+- CPS transformation for `suspend` function bodies that desugars continuation state into a state machine.
+- A new intrinsic trait `Continuation[?]` for which the compiler synthesizes instances for each one of the compilation target platforms.
+
+#### Std lib requirements.
+
+The standard library would include a set of functions related to continuations such as `continuation` that are the minimal building blocks from which other abstractions can be built.
+If we do this in a similar way [as done in Kotlin](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/), these functions would look like:
+
+##### createContinuationUnintercepted
+
+```scala
+suspend def createContinuationUnintercepted[T](
+  block: suspend () => T,
+  completion: Continuation[T]
+): Unit
+```
+
+This function creates a new, fresh instance of suspendable computation every time it is invoked.
+
+##### startContinuationUninterceptedOrReturn
+
+```scala
+object ContinuationSuspended
+
+suspend def startContinuationUninterceptedOrReturn[T](
+  block: suspend () => T,
+  completion: Continuation[T]
+): T | ContinuationSuspended
+```
+
+Starts a continuation and executes it until its first suspension point. Returns the result of the computation or ContinuationSuspended if this continuation should remain in suspended state. 
+When the implementer returns `ContinuationSuspended` it invokes `completion` as the continuation computation completes.
+
+##### suspendContinuationUninterceptedOrReturn
+
+```scala
+object ContinuationSuspended
+
+suspend def suspendContinuationUninterceptedOrReturn[T](
+  block: Continuation[T] => T | ContinuationSuspended.type
+): T
+```
+
+Given a suspend function it gets its current continuation. Allows for suspension with `ContinuationSuspended` or returns an immediate result without suspension.
+
+##### continuation
+
+```scala
+suspend def continuation[T](
+  block: Continuation[T] => Unit
+): T
+```
+
+Get the current continuation and suspend execution.
+
 ### Use cases
 
 #### Removing callbacks
@@ -422,6 +482,9 @@ We believe that introducing continuations in Scala 3 coupled or not to the captu
 - Reduces indirection and allocations that arise through higher-order functions used extensively in `map`, `flatMap`, and others.
 - Can interop with other libraries and frameworks that offer custom fiber scheduling and cancellation strategies.
 
-Looking forward to your thoughts and feedback, thank you for reading this far! :pray:
+In addition to this proposal and in the hope that more people get to try this, the team at 47 Degrees has started working on the needed compiler changes, a compiler plugin and library to bring this implementation to Scala 3.
+We plan to release it in the near future based on feedback from the Scala community.
+
+Looking forward to your thoughts, and thank you for reading this far! :pray:
 
 
