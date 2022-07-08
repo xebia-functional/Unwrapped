@@ -4,9 +4,9 @@ import java.util.concurrent.{Callable, Executors, TimeUnit}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-extension [A](f: Future[A])
-  def bind: A = // since we don't have continuations yet we have to block in async ops
-    Await.result(f, scala.concurrent.duration.Duration.Inf)
+extension [A](f: Fiber[A])(using Structured)
+  def bind: A =
+    f.join // or Await.result(f, scala.concurrent.duration.Duration.Inf)
 // otherwise we could have written something like
 //    continuation[A] { cont: Continuation[A] => {
 //        f.whenComplete { (result, exception) =>
