@@ -2,7 +2,7 @@
 
 This Pre-SIP post proposes continuations as a new language feature in Scala 3.
 
-It has been prepared by the Scala 3 team at 47 Degrees.
+It has been prepared by [Jack Viers](https://github.com/jackcviers), [Raul Raja](https://github.com/raulraja) and reviewed by the Scala 3 team at 47 Degrees.
 This doc is intended to be used as a way to gather community feedback and foster discussion.
 
 ## Motivation
