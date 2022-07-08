@@ -23,6 +23,7 @@ object Dependencies {
     val scalikeJdbc = "4.0.0"
     val h2Database = "2.1.212"
     val logback = "1.2.11"
+    val postgres = "42.4.0"
   }
 
   object Compile {
@@ -39,6 +40,7 @@ object Dependencies {
 
   object Test {
     val scalacheck = "org.scalacheck" %% "scalacheck" % Versions.scalacheck
+    val postgres = "org.postgresql" % "postgresql" % Versions.postgres
   }
 
   object Plugins {
