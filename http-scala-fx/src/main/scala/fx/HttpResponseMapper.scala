@@ -20,6 +20,8 @@ import scala.jdk.CollectionConverters.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import java.nio.ByteBuffer
+import java.io.StringWriter
+import java.io.PrintWriter
 
 trait HttpResponseMapper[A]:
   def bodyHandler: HttpResponse.BodyHandler[A]
@@ -40,28 +42,41 @@ object HttpResponseMapper:
 
   given HttpResponseReceiveMapper(using s: Structured): HttpResponseMapper[fx.Receive[Byte]] =
     new HttpResponseMapper[fx.Receive[Byte]] {
-
       def bodyHandler: BodyHandler[fx.Receive[Byte]] = new BodyHandler[fx.Receive[Byte]] {
           def apply(responseInfo: HttpResponse.ResponseInfo)
               : HttpResponse.BodySubscriber[fx.Receive[Byte]] =
             new HttpResponse.BodySubscriber[fx.Receive[Byte]] {
+              val debug = true
+              def printDebugMessage(message: String): Unit =
+                if(debug)
+                  println(message)
+                else
+                  ()
               val queue = new ConcurrentLinkedQueue[Byte] {}
               val err: AtomicReference[Throwable] = new AtomicReference()
               val executor = Executors.newVirtualThreadPerTaskExecutor
+              val shutdownExecutor = Executors.newScheduledThreadPool(1)
               val isDone = AtomicBoolean(false)
               def getBody(): CompletionStage[fx.Receive[Byte]] =
                 CompletableFuture.supplyAsync(
                   () =>
                     streamed {
                       def loop(b: Boolean): Unit = {
+                        printDebugMessage(s"getBody:loop: $b")
                         if (b)
                           val ex = err.get
                           if (ex != null)
-                            isDone.set(true)
+                            printDebugMessage(s"getBody:loop:${ex.getMessage()}")
+                            shutdown(true)
                             throw ex
                           else
-                            Nullable(queue.poll).map(send).getOrElse(())
+                            Nullable(queue.poll).nullableMap{byte =>
+                              printDebugMessage(s"getBody:loop:byte:${byte.toInt}")
+                              send(byte)
+                            }.getOrElse(())
+                            printDebugMessage(s"getBody:loop:yielding on ${Thread.currentThread.getName}")
                             Thread.`yield`
+                            printDebugMessage("getBody:loop:resuming loop")
                             loop(!isDone.get())
                         else ()
                       }
@@ -70,22 +85,45 @@ object HttpResponseMapper:
                   executor
                 )
 
-              private def shutdown =
-                isDone.set(true)
-                try
-                  if (!executor.isShutdown())
-                    executor.awaitTermination(10, TimeUnit.SECONDS)
-                    executor.shutdown
-                  else ()
-                catch case _ => ()
+              private def shutdown(now: Boolean):Unit =
+                if(queue.size > 0 && !now){
+                  printDebugMessage(s"shutdown: items remain in queue to be sent, waiting...")
+                  shutdownExecutor.schedule(new Runnable{
+                    override def run() = shutdown(false)
+                  }, 10, TimeUnit.MILLISECONDS)
+                } else{
+                  printDebugMessage("shutdown:shutting down")
+                  isDone.set(true)
+                  try
+                    if (!executor.isShutdown())
+                      executor.awaitTermination(10, TimeUnit.SECONDS)
+                      executor.shutdown
+                      shutdownExecutor.shutdown
+                    else ()
+                  catch case _ => ()
+                }
 
-              def onComplete(): Unit = shutdown
-              def onError(ex: Throwable): Unit = err.updateAndGet(t => ex)
-              def onNext(byteBuffers: java.util.List[java.nio.ByteBuffer]): Unit = for {
-                bb: ByteBuffer <- byteBuffers.asScala
-                b <- bb.array
-              } queue.add(b)
-              def onSubscribe(x$0: Flow.Subscription): Unit =
+              def onComplete(): Unit =
+                printDebugMessage("onComplete:complete")
+                shutdown(false)
+              def onError(ex: Throwable): Unit =
+                val sw:StringWriter = new StringWriter()
+                val pw:PrintWriter = new PrintWriter(sw)
+                ex.printStackTrace(pw)
+                printDebugMessage(s"onError: ${ex}, ${ex.getMessage()}, ${sw.toString()}")
+                err.updateAndGet(t => ex)
+              def onNext(byteBuffers: java.util.List[java.nio.ByteBuffer]): Unit =
+                printDebugMessage(s"onNext: ${byteBuffers.size}")
+                for {
+                  bb: ByteBuffer <- byteBuffers.asScala.toList
+                } while(bb.hasRemaining()){
+                  val b = bb.get()
+                  printDebugMessage(s"onNext: enqueueing current byte: ${b.toInt.toHexString}")
+                  queue.add(b)
+                }
+              def onSubscribe(subscription: Flow.Subscription): Unit =
+                printDebugMessage(s"onSubscribe:subscribed: ${subscription}")
+                subscription.request(Long.MaxValue) // unbounded subscription
                 isDone.set(false)
                 err.updateAndGet(_ => null)
             }
