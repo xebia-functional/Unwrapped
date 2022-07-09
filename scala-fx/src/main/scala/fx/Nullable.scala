@@ -58,7 +58,7 @@ extension [A: Manifest](a: Nullable[A])
    * @return
    *   f applied to the value if it exists
    */
-  def map[B](f: A => B): Nullable[B] =
+  def nullableMap[B](f: A => B): Nullable[B] =
     a match
       case x: A => f(x)
       case _ => Nullable.none
@@ -67,7 +67,7 @@ extension [A: Manifest](a: Nullable[A])
    * @return
    *   f applied to the value if it exists
    */
-  def bind[B](f: A => Nullable[B]): Nullable[B] =
+  def nullableBind[B](f: A => Nullable[B]): Nullable[B] =
     a match
       case x: A => f(x)
       case _ => null
