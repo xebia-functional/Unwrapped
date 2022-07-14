@@ -24,6 +24,8 @@ object Dependencies {
     val h2Database = "2.1.212"
     val logback = "1.2.11"
     val postgres = "42.4.0"
+    val testContainers = "0.40.8"
+    val flyway = "8.5.12"
   }
 
   object Compile {
@@ -41,6 +43,12 @@ object Dependencies {
   object Test {
     val scalacheck = "org.scalacheck" %% "scalacheck" % Versions.scalacheck
     val postgres = "org.postgresql" % "postgresql" % Versions.postgres
+    val testContainers = "com.dimafeng" %% "testcontainers-scala" % Versions.testContainers
+    val testContainersMunit =
+      "com.dimafeng" %% "testcontainers-scala-munit" % Versions.testContainers
+    val testContainersPostgres =
+      "com.dimafeng" %% "testcontainers-scala-postgresql" % Versions.testContainers
+    val flyway = "org.flywaydb"   % "flyway-core" % Versions.flyway
   }
 
   object Plugins {

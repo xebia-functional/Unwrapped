@@ -68,7 +68,11 @@ lazy val scalalikeSettings: Seq[Def.Setting[_]] =
       h2Database,
       logback,
       postgres,
-      scalacheck % Test
+      scalacheck % Test,
+      testContainers % Test,
+      testContainersMunit % Test,
+      testContainersPostgres % Test,
+      flyway % Test
     )
   )
 
