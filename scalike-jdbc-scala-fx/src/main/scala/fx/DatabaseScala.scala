@@ -1,7 +1,7 @@
 package fx
 
 import scalikejdbc.*
-import scalikejdbc.DB.{CPContext, NoCPContext, readOnly}
+import scalikejdbc.DB.{readOnly, CPContext, NoCPContext}
 
 import java.sql.SQLException
 import fx.ensure

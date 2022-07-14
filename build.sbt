@@ -11,7 +11,12 @@ addCommandAlias("ci-publish", "github; ci-release")
 publish / skip := true
 
 lazy val root =
-  (project in file("./")).aggregate(`scala-fx`, benchmarks, `munit-scala-fx`, documentation, `scalike-jdbc-scala-fx`)
+  (project in file("./")).aggregate(
+    `scala-fx`,
+    benchmarks,
+    `munit-scala-fx`,
+    documentation,
+    `scalike-jdbc-scala-fx`)
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 

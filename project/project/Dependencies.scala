@@ -48,7 +48,7 @@ object Dependencies {
       "com.dimafeng" %% "testcontainers-scala-munit" % Versions.testContainers
     val testContainersPostgres =
       "com.dimafeng" %% "testcontainers-scala-postgresql" % Versions.testContainers
-    val flyway = "org.flywaydb"   % "flyway-core" % Versions.flyway
+    val flyway = "org.flywaydb" % "flyway-core" % Versions.flyway
   }
 
   object Plugins {
