@@ -34,26 +34,26 @@ class HttpSuite extends ScalaFXSuite, HttpServerFixtures:
             String,
             String) =
           parallel(
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/1")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/2")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/3")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/4")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/5")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/6")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/7")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/8")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/9")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/0")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/11")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/12")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/13")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/14")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/15")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/16")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/17")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/18")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/19")).join.body,
-            () => Http.GET[String](URI.create(s"$baseServerAddress/ping/20")).join.body
+            () => URI.create(s"$baseServerAddress/ping/1").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/2").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/3").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/4").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/5").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/6").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/7").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/8").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/9").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/0").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/11").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/12").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/13").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/14").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/15").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/16").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/17").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/18").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/19").GET[String]().body,
+            () => URI.create(s"$baseServerAddress/ping/20").GET[String]().body
           )
 
         assertEqualsFX(
@@ -90,11 +90,9 @@ class HttpSuite extends ScalaFXSuite, HttpServerFixtures:
         serverAddressResource.use { baseServerAddress =>
           assertEqualsFX(
             structured(
-              Http
-                .GET[String](
-                  URI.create(s"$baseServerAddress/ping/1"),
-                  HttpHeader("X-Extended-Test-Header", "HttpSuite"))
-                .join
+              URI
+                .create(s"$baseServerAddress/ping/1")
+                .GET[String](HttpHeader("X-Extended-Test-Header", "HttpSuite"))
                 .body),
             "pong"
           )
@@ -104,12 +102,9 @@ class HttpSuite extends ScalaFXSuite, HttpServerFixtures:
   httpServer(getHttpFailureHandler(Option.empty, AtomicInteger(3)))
     .testFX("By default, failed requests should retry 3 times") { serverAddressResource =>
       serverAddressResource.use { baseServerAddress =>
-        {
-          assertEqualsFX(
-            structured(
-              Http.GET[String](URI.create(s"$baseServerAddress/ping/fail")).join.statusCode),
-            200)
-        }
+        assertEqualsFX(
+          structured(URI.create(s"$baseServerAddress/ping/fail").GET[String]().statusCode),
+          200)
       }
     }
 
@@ -117,12 +112,9 @@ class HttpSuite extends ScalaFXSuite, HttpServerFixtures:
     .testFX("More than three request failures should return the server error by default") {
       serverAddressResource =>
         serverAddressResource.use { baseServerAddress =>
-          {
-            assertEqualsFX(
-              structured(
-                Http.GET[String](URI.create(s"$baseServerAddress/ping/fail")).join.statusCode),
-              500)
-          }
+          assertEqualsFX(
+            structured(URI.create(s"$baseServerAddress/ping/fail").GET[String]().statusCode),
+            500)
         }
     }
 
@@ -130,9 +122,8 @@ class HttpSuite extends ScalaFXSuite, HttpServerFixtures:
     "requests with string post bodies are successuful") { serverAddressResource =>
     serverAddressResource.use { baseServeraddress =>
       assertEqualsFX(
-        structured(Http.POST[String](URI.create(s"$baseServeraddress/ping"), "paddle"))
-          .join
-          .statusCode,
+        structured(
+          URI.create(s"$baseServeraddress/ping").POST[String, String]("paddle")).statusCode,
         201)
     }
   }
@@ -141,7 +132,7 @@ class HttpSuite extends ScalaFXSuite, HttpServerFixtures:
     serverAddressResource =>
       serverAddressResource.use { baseServerAddress =>
         assertEqualsFX(
-          structured(Http.HEAD(URI.create(s"$baseServerAddress/ping"))).join.statusCode,
+          structured(URI.create(s"$baseServerAddress/ping").HEAD()).statusCode,
           200
         )
       }
@@ -151,9 +142,8 @@ class HttpSuite extends ScalaFXSuite, HttpServerFixtures:
     serverAddressResource =>
       serverAddressResource.use { baseServerAddress =>
         assertEqualsFX(
-          structured(Http.PUT[String, String](URI.create(s"$baseServerAddress/ping"), "paddle"))
-            .join
-            .statusCode,
+          structured(
+            URI.create(s"$baseServerAddress/ping").PUT[String, String]("paddle")).statusCode,
           204
         )
       }
@@ -163,9 +153,7 @@ class HttpSuite extends ScalaFXSuite, HttpServerFixtures:
     serverAddressResource =>
       serverAddressResource.use { baseServerAddress =>
         assertEqualsFX(
-          structured(Http.DELETE[String](URI.create(s"$baseServerAddress/ping")))
-            .join
-            .statusCode,
+          structured(URI.create(s"$baseServerAddress/ping").DELETE[String]()).statusCode,
           204)
       }
   }
@@ -174,8 +162,7 @@ class HttpSuite extends ScalaFXSuite, HttpServerFixtures:
     serverAddressResource =>
       serverAddressResource.use { baseServerAddress =>
         assertEqualsFX(
-          structured(
-            Http.OPTIONS[String](URI.create(s"$baseServerAddress/ping")).join.statusCode),
+          structured(URI.create(s"$baseServerAddress/ping").OPTIONS[String]().statusCode),
           200)
       }
   }
@@ -184,8 +171,7 @@ class HttpSuite extends ScalaFXSuite, HttpServerFixtures:
     serverAddressResource =>
       serverAddressResource.use { baseServerAddress =>
         assertEqualsFX(
-          structured(
-            Http.TRACE[String](URI.create(s"$baseServerAddress/ping")).join.statusCode),
+          structured(URI.create(s"$baseServerAddress/ping").TRACE[String]().statusCode),
           200)
       }
   }
@@ -195,9 +181,7 @@ class HttpSuite extends ScalaFXSuite, HttpServerFixtures:
       serverAddressResource.use { baseServerAddress =>
         assertEqualsFX(
           structured(
-            Http
-              .PATCH[String, String](URI.create(s"$baseServerAddress/ping"), "paddle")
-              .join
+            URI.create(s"$baseServerAddress/ping").PATCH[String, String]("paddle")
               .statusCode),
           200)
       }

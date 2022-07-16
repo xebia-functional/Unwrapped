@@ -17,7 +17,8 @@ lazy val root =
     `munit-scala-fx`,
     `scalike-jdbc-scala-fx`,
     `http-scala-fx`,
-    documentation)
+    documentation,
+  `sttp-scala-fx`)
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
@@ -46,6 +47,16 @@ lazy val `http-scala-fx` = (project in file("./http-scala-fx"))
   .settings(httpScalaFXSettings)
   .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
 
+lazy val `sttp-scala-fx` = (project in file("./sttp-scala-fx"))
+  .settings(sttpScalaFXSettings)
+  .dependsOn(`scala-fx`, `http-scala-fx`, `munit-scala-fx` % "test -> compile")
+
+lazy val commonSettings = Seq(
+  javaOptions ++= javaOptionsSettings,
+  autoAPIMappings := true,
+  Test / fork := true
+)
+
 lazy val scalafxSettings: Seq[Def.Setting[_]] =
   Seq(
     classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
@@ -57,16 +68,13 @@ lazy val scalafxSettings: Seq[Def.Setting[_]] =
   )
 
 lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
-  Test / fork := true,
-  javaOptions ++= javaOptionsSettings,
-  autoAPIMappings := true,
   libraryDependencies ++= Seq(
     munitScalacheck,
     junit,
     munit,
     junitInterface
   )
-)
+) ++ commonSettings
 
 lazy val scalalikeSettings: Seq[Def.Setting[_]] =
   Seq(
@@ -86,12 +94,11 @@ lazy val scalalikeSettings: Seq[Def.Setting[_]] =
     )
   )
 
-lazy val httpScalaFXSettings = Seq(
-  Test / fork := true,
-  javaOptions ++= javaOptionsSettings,
-  autoAPIMappings := true
-)
+lazy val httpScalaFXSettings = commonSettings
 
+lazy val sttpScalaFXSettings = commonSettings ++ Seq(
+  libraryDependencies += sttp
+)
 
 lazy val javaOptionsSettings = Seq(
   "-XX:+IgnoreUnrecognizedVMOptions",

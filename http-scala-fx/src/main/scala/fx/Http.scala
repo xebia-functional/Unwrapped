@@ -14,228 +14,208 @@ import scala.annotation.tailrec
  * Models the http scheme
  */
 type Http[A] = (
-    Structured,
     HttpRetryPolicy[A],
     Control[HttpExecutionException],
     HttpClient
-) ?=> Fiber[HttpResponse[A]]
+) ?=> A
 
-object Http:
+extension [A](
+    http: Http[A])(using HttpRetryPolicy[A], Control[HttpExecutionException], HttpClient)
+  def value: A = http
+  def fmap[B](f: A => B): Http[B] =
+    f(http)
+  def bindMap[B](f: A => Http[B]): Http[B] =
+    f(http)
 
+
+extension(uri: URI)
   private def addHeadersToRequestBuilder(
       builder: HttpRequest.Builder,
-      headers: HttpHeader*): HttpRequest.Builder = {
+      headers: HttpHeader*): HttpRequest.Builder =
     headers.foldLeft(builder) { (builder: HttpRequest.Builder, header: HttpHeader) =>
       header.values.foldLeft[HttpRequest.Builder](builder) {
         (builder: HttpRequest.Builder, headerValue: String) =>
           builder.header(header.name, headerValue)
       }
     }
-  }
 
-  def GET[A](uri: URI, headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[A] =
-    GET(uri, 0, headers: _*)
+  def GET[A](): HttpResponseMapper[A] ?=> Http[HttpResponse[A]] =
+    GET(0, List.empty: _*)
+
+  def GET[A](headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[HttpResponse[A]] =
+    GET(0, headers: _*)
 
   @tailrec
   private def GET[A](
-      uri: URI,
       retryCount: Int,
-      headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[A] = {
+      headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[HttpResponse[A]] =
     val mapper = summon[HttpResponseMapper[A]]
     val config = summon[HttpClientConfig]
     val retries = config.maximumRetries.getOrElse(summon[HttpRetries])
 
-    val response: HttpResponse[A] = fork(() => {
+    val response: HttpResponse[A] =
       summon[HttpClient]
-        .value
+        .client
         .send(
           addHeadersToRequestBuilder(HttpRequest.newBuilder().GET().uri(uri), headers: _*)
             .build(),
           mapper.bodyHandler)
-    }).join
+
     if (response.shouldRetry(retryCount)) {
-      GET(uri, retryCount + 1, headers: _*)
+      GET(retryCount + 1, headers: _*)
     } else {
-      fork(() => {
-        response
-      })
+      response
     }
-  }
 
-  def POST[A](
-      uri: URI,
-      body: String,
-      headers: HttpHeader*): (HttpResponseMapper[String], HttpBodyMapper[A]) ?=> Http[String] =
-    POST[String, String](uri, body, headers: _*)
-
-  def POST[A, B](
-      uri: URI,
-      body: B,
-      headers: HttpHeader*): (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[A] =
-    POST(uri, body, 0, headers: _*)
+  def POST[A, B](body: B, headers: HttpHeader*)
+      : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
+    POST(body, 0, headers: _*)
 
   @tailrec
-  private def POST[A, B](
-      uri: URI,
-      body: B,
-      retryCount: Int = 0,
-      headers: HttpHeader*): (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[A] = {
+  private def POST[A, B](body: B, retryCount: Int = 0, headers: HttpHeader*)
+      : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
     val mapper = summon[HttpResponseMapper[A]]
     val bodyMapper = summon[HttpBodyMapper[B]]
     val config = summon[HttpClientConfig]
     val retries = config.maximumRetries.getOrElse(summon[HttpRetries])
-    val response = fork(() =>
+    val response =
       summon[HttpClient]
-        .value
+        .client
         .send(
           addHeadersToRequestBuilder(
             HttpRequest.newBuilder().POST(bodyMapper.bodyPublisher(body)).uri(uri),
             headers: _*).build(),
-          mapper.bodyHandler)).join
+          mapper.bodyHandler)
     if (response.shouldRetry(retryCount)) {
-      POST(uri, body, retryCount + 1, headers: _*)
+      POST(body, retryCount + 1, headers: _*)
     } else {
-      fork(() => response)
+      response
     }
-  }
 
-  def HEAD(uri: URI, headers: HttpHeader*): Http[Void] = HEAD(uri, 0, headers: _*)
+  def HEAD(headers: HttpHeader*): Http[HttpResponse[Void]] = HEAD(0, headers: _*)
 
   @tailrec
-  private def HEAD(uri: URI, retryCount: Int = 0, headers: HttpHeader*): Http[Void] = {
+  private def HEAD(
+      retryCount: Int = 0,
+      headers: HttpHeader*): Http[HttpResponse[Void]] =
     val config = summon[HttpClientConfig]
     val retries = config.maximumRetries.getOrElse(summon[HttpRetries])
-    val response = fork(() =>
+    val response =
       summon[HttpClient]
-        .value
+        .client
         .send(
           addHeadersToRequestBuilder(HttpRequest.newBuilder().HEAD().uri(uri), headers: _*)
             .build(),
-          BodyHandlers.discarding)).join
+          BodyHandlers.discarding)
     if (response.shouldRetry(retryCount)) {
-      HEAD(uri, retryCount + 1, headers: _*)
-    } else fork(() => response)
-  }
+      HEAD(retryCount + 1, headers: _*)
+    } else response
 
-  def PUT[A, B](
-      uri: URI,
-      body: B,
-      headers: HttpHeader*): (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[A] =
-    PUT[A, B](uri, body, 0, headers: _*)
+  def PUT[A, B](body: B, headers: HttpHeader*)
+      : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
+    PUT[A, B](body, 0, headers: _*)
 
   @tailrec
-  private def PUT[A, B](
-      uri: URI,
-      body: B,
-      retryCount: Int = 0,
-      headers: HttpHeader*): (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[A] = {
+  private def PUT[A, B](body: B, retryCount: Int = 0, headers: HttpHeader*)
+      : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
     val mapper = summon[HttpResponseMapper[A]]
     val bodyMapper = summon[HttpBodyMapper[B]]
     val config = summon[HttpClientConfig]
     val retries = config.maximumRetries.getOrElse(summon[HttpRetries])
-    val response = fork(() =>
+    val response =
       summon[HttpClient]
-        .value
+        .client
         .send(
           addHeadersToRequestBuilder(
             HttpRequest.newBuilder().PUT(bodyMapper.bodyPublisher(body)).uri(uri),
             headers: _*).build(),
-          mapper.bodyHandler)).join
+          mapper.bodyHandler)
     if (response.shouldRetry(retryCount)) {
-      PUT(uri, body, retryCount + 1, headers: _*)
-    } else {
-      fork(() => response)
-    }
-  }
+      PUT(body, retryCount + 1, headers: _*)
+    } else response
+
+  def DELETE[A](
+      headers: HttpHeader*): (HttpResponseMapper[A]) ?=> Http[HttpResponse[A]] =
+    DELETE[A](0, headers: _*)
 
   @tailrec
-  def DELETE[A](
-      uri: URI,
+  private def DELETE[A](
       retryCount: Int = 0,
-      headers: HttpHeader*): (HttpResponseMapper[A]) ?=> Http[A] = {
+      headers: HttpHeader*): (HttpResponseMapper[A]) ?=> Http[HttpResponse[A]] =
     val mapper = summon[HttpResponseMapper[A]]
     val config = summon[HttpClientConfig]
     val retries = config.maximumRetries.getOrElse(summon[HttpRetries])
-    val response = fork(() =>
+    val response =
       summon[HttpClient]
-        .value
+        .client
         .send(
           addHeadersToRequestBuilder(HttpRequest.newBuilder().DELETE().uri(uri), headers: _*)
             .build(),
-          mapper.bodyHandler)).join
+          mapper.bodyHandler)
     if (response.shouldRetry(retryCount)) {
-      DELETE(uri, retryCount + 1, headers: _*)
+      DELETE(retryCount + 1, headers: _*)
     } else {
-      fork(() => response)
+      response
     }
-  }
+
+  def OPTIONS[A](
+      headers: HttpHeader*): (HttpResponseMapper[A]) ?=> Http[HttpResponse[A]] =
+    OPTIONS(0, headers: _*)
 
   @tailrec
-  def OPTIONS[A](
-      uri: URI,
+  private def OPTIONS[A](
       retryCount: Int = 0,
-      headers: HttpHeader*): (HttpResponseMapper[A]) ?=> Http[A] = {
+      headers: HttpHeader*): (HttpResponseMapper[A]) ?=> Http[HttpResponse[A]] =
     val mapper = summon[HttpResponseMapper[A]]
     val config = summon[HttpClientConfig]
     val retries = config.maximumRetries.getOrElse(summon[HttpRetries])
-    val response = fork(() =>
+    val response =
       summon[HttpClient]
-        .value
+        .client
         .send(
           addHeadersToRequestBuilder(
             HttpRequest.newBuilder().method("OPTIONS", BodyPublishers.noBody).uri(uri)).build(),
-          mapper.bodyHandler)).join
+          mapper.bodyHandler)
     if (response.shouldRetry(retryCount)) {
-      OPTIONS(uri, retryCount + 1, headers: _*)
-    } else {
-      fork(() => response)
-    }
-  }
+      OPTIONS(retryCount + 1, headers: _*)
+    } else response
 
-  def TRACE[A](uri: URI, headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[A] =
-    TRACE[A](uri, 0, headers: _*)
+  def TRACE[A](
+      headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[HttpResponse[A]] =
+    TRACE[A](0, headers: _*)
 
   @tailrec
   private def TRACE[A](
-      uri: URI,
       retryCount: Int = 0,
-      headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[A] = {
+      headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[HttpResponse[A]] =
     val mapper = summon[HttpResponseMapper[A]]
     val config = summon[HttpClientConfig]
     val retries = config.maximumRetries.getOrElse(summon[HttpRetries])
-    val response = fork(() =>
+    val response =
       summon[HttpClient]
-        .value
+        .client
         .send(
           addHeadersToRequestBuilder(
             HttpRequest.newBuilder().method("TRACE", BodyPublishers.noBody).uri(uri),
             headers: _*).build(),
-          mapper.bodyHandler)).join
+          mapper.bodyHandler)
     if (response.shouldRetry(retryCount)) {
-      TRACE(uri, retryCount + 1, headers: _*)
-    } else {
-      fork(() => response)
-    }
-  }
+      TRACE(retryCount + 1, headers: _*)
+    } else response
 
-  def PATCH[A, B](
-      uri: URI,
-      body: B,
-      headers: HttpHeader*): (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[A] =
-    PATCH(uri, body, 0, headers: _*)
+  def PATCH[A, B](body: B, headers: HttpHeader*)
+      : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
+    PATCH(body, 0, headers: _*)
 
   @tailrec
-  private def PATCH[A, B](
-      uri: URI,
-      body: B,
-      retryCount: Int = 0,
-      headers: HttpHeader*): (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[A] = {
+  private def PATCH[A, B](body: B, retryCount: Int = 0, headers: HttpHeader*)
+      : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
     val mapper = summon[HttpResponseMapper[A]]
     val config = summon[HttpClientConfig]
     val retries = config.maximumRetries.getOrElse(summon[HttpRetries])
-    val response = fork(() =>
+    val response =
       summon[HttpClient]
-        .value
+        .client
         .send(
           addHeadersToRequestBuilder(
             HttpRequest
@@ -244,10 +224,14 @@ object Http:
               .uri(uri),
             headers: _*).build(),
           mapper.bodyHandler
-        )).join
+        )
     if (response.shouldRetry(retryCount)) {
-      PATCH(uri, body, retryCount + 1, headers: _*)
-    } else {
-      fork(() => response)
-    }
-  }
+      PATCH(body, retryCount + 1, headers: _*)
+    } else response
+
+object Http:
+
+  def apply[A](a: A): Http[A] =
+    a
+
+  

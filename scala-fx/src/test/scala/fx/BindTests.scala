@@ -16,12 +16,8 @@ object BindTests extends Properties("Bind Tests"):
 
   property("Short-circuiting with Either.Left") = forAll { (n: Int, s: String) =>
     val effect: Control[String | None.type] ?=> Int =
-    {
-      println("Running!")
-Right[String, Int](5).bind + Option(n).bind
-    }
-    println("Before Running!")
-    run(effect) == 5 + n
+      Left[String, Int](s).bind + Option(n).bind
+    run(effect) == s
   }
 
   property("Short-circuiting with Option.None") = forAll { (n: Int) =>

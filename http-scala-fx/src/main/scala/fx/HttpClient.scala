@@ -8,7 +8,7 @@ import java.net.http.HttpRequest
 opaque type HttpClient = jnh.HttpClient
 
 extension(h: HttpClient)
-  def value: jnh.HttpClient = h
+  def client: jnh.HttpClient = h
 
 object HttpClient:
   def apply(a: jnh.HttpClient): HttpClient = a

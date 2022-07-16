@@ -40,13 +40,13 @@ object HttpResponseMapper:
   given HttpResponseMapper[InputStream] with
     def bodyHandler = BodyHandlers.buffering(BodyHandlers.ofInputStream(), 4096)
 
-  given HttpResponseReceiveMapper(using s: Structured): HttpResponseMapper[fx.Receive[Byte]] =
+  given HttpResponseReceiveMapper: HttpResponseMapper[fx.Receive[Byte]] =
     new HttpResponseMapper[fx.Receive[Byte]] {
-      def bodyHandler: BodyHandler[fx.Receive[Byte]] = new BodyHandler[fx.Receive[Byte]] {
+      def bodyHandler: BodyHandler[fx.Receive[Byte]] = BodyHandlers.buffering( new BodyHandler[fx.Receive[Byte]] {
           def apply(responseInfo: HttpResponse.ResponseInfo)
               : HttpResponse.BodySubscriber[fx.Receive[Byte]] =
             new HttpResponse.BodySubscriber[fx.Receive[Byte]] {
-              val debug = true
+              val debug = false
               def printDebugMessage(message: String): Unit =
                 if(debug)
                   println(message)
@@ -127,7 +127,7 @@ object HttpResponseMapper:
                 isDone.set(false)
                 err.updateAndGet(_ => null)
             }
-        }
+        }, 4096)
     }
 
   given fileDownloadHttpResponseMapper(using Path, Seq[OpenOption]): HttpResponseMapper[Path] =

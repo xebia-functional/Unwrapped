@@ -26,6 +26,7 @@ object Dependencies {
     val postgres = "42.4.0"
     val testContainers = "0.40.8"
     val flyway = "8.5.12"
+    val sttp = "3.6.2"
   }
 
   object Compile {
@@ -38,6 +39,7 @@ object Dependencies {
     val scalikejdbc = "org.scalikejdbc" %% "scalikejdbc" % Versions.scalikeJdbc
     val h2Database = "com.h2database" % "h2" % Versions.h2Database
     val logback = "ch.qos.logback" % "logback-classic" % Versions.logback
+    val sttp = "com.softwaremill.sttp.client3" %% "core" % Versions.sttp
   }
 
   object Test {
