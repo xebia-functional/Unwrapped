@@ -20,8 +20,8 @@ type Http[A] = (
 ) ?=> A
 
 extension [A](
-    http: Http[A])(using HttpRetryPolicy[A], Control[HttpExecutionException], HttpClient)
-  def value: A = http
+    http: Http[A])
+  def value: Control[HttpExecutionException] ?=> A = http
   def fmap[B](f: A => B): Http[B] =
     f(http)
   def bindMap[B](f: A => Http[B]): Http[B] =
