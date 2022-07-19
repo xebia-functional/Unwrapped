@@ -7,6 +7,7 @@ ThisBuild / scalaVersion := "3.1.2"
 ThisBuild / organization := "com.47deg"
 ThisBuild / versionScheme := Some("early-semver")
 
+addCommandAlias("plugin-example", "reload; clean; publishLocal; continuationsPluginExample/compile")
 addCommandAlias("ci-test", "scalafmtCheckAll; scalafmtSbtCheck; github; mdoc; test")
 addCommandAlias("ci-docs", "github; mdoc")
 addCommandAlias("ci-publish", "github; ci-release")
@@ -59,6 +60,7 @@ lazy val scalafxSettings: Seq[Def.Setting[_]] =
 
 lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
   Seq(
+    exportJars := true,
     libraryDependencies ++= List(
       "org.scala-lang" %% "scala3-compiler" % "3.1.2"
     )
@@ -70,7 +72,7 @@ lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
     autoCompilerPlugins := true,
     resolvers += Resolver.mavenLocal,
     // this uses the mac system environment variable, HOME. Mine is included by default as an example
-    Compile / scalacOptions += s"-Xplugin:${Properties.envOrElse("HOME", "/Users/jackcviers")}/.ivy2/local/com.47deg/continuationsplugin_3/0.0.0+43-bede6404-SNAPSHOT/jars/continuationsplugin_3.jar"
+    Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / target).value}/scala-${scalaVersion.value}/continuationsplugin_3-${version.value}.jar"
     // addCompilerPlugin("com.47deg" %% "continuationsplugin" % "+" changing())
   )
 

@@ -27,6 +27,6 @@ class ContinuationsPhase extends PluginPhase:
   override val runsBefore = Set(PickleQuotes.name)
 
   override def transformDefDef(tree: tpd.DefDef)(implicit ctx: Context): Tree =
-    report.error("continuations-plugin: " + tree.sourcePos)
+    report.error("continuations-plugin: " + tree.toString)
     tree
 
