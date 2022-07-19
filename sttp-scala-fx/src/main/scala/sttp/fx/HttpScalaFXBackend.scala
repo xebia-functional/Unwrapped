@@ -13,6 +13,8 @@ import java.net.URI
 import sttp.model.Header
 import sttp.client3.Identity
 import java.net.http.HttpResponse
+import scala.jdk.CollectionConverters.*
+import sttp.model.RequestMetadata
 
 class HttpScalaFXBackend(using client: HttpClient, control: Control[Throwable])
     extends SttpBackend[Http, Streams[Receive[Byte]] with Effect[Http]] {
@@ -30,10 +32,24 @@ class HttpScalaFXBackend(using client: HttpClient, control: Control[Throwable])
       }
       .toList
     val uri = request.uri
-    val httpResponse: HttpResponse[? >: Receive[Byte] & Void <: Receive[Byte] | Void] = method match {
+    if(method == Method.GET){
+
+    } else {
+
+    }
+    val httpResponse = method match {
       case Method.GET => uri.toJavaUri.GET[Receive[Byte]](headers: _*)
-      case Method.HEAD => uri.toJavaUri.HEAD(headers: _*) // head returns void, so we're going to have to do something different to return T
-      case Method.POST => uri.toJavaUri.POST[Receive[Byte], String](body.show, headers:_*)
+      case Method.HEAD => uri.toJavaUri.HEAD(headers: _*).fmap{ (r:HttpResponse[Void]) =>
+        Response(null, sttp.model.StatusCode(r.statusCode()), "", r.headers().map().asScala.flatMap{kv =>
+          kv._2.asScala.map{ headerValue =>
+            Header(kv._1, headerValue)
+          }
+        }.toList, List.empty, RequestMetadata(method, uri, request.headers))
+      }
+      case Method.POST =>
+        uri.toJavaUri.POST[Receive[Byte], String](body.show, headers:_*).fmap{(r: HttpResponse[Receive[Byte]]) =>
+          ???
+        }
       case Method.PUT => uri.toJavaUri.PUT[Receive[Byte], String](body.show, headers: _*)
       case Method.DELETE => uri.toJavaUri.DELETE[Receive[Byte]](headers: _*)
       case Method.OPTIONS => uri.toJavaUri.OPTIONS[Receive[Byte]](headers: _*)
