@@ -6,6 +6,7 @@ import scala.collection.JavaConverters._
 import com.fasterxml.jackson.dataformat.csv.CsvSchema
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.dataformat.csv.CsvParser
+import scala.util.Properties
 
 ThisBuild / scalaVersion := "3.1.2"
 ThisBuild / organization := "com.47deg"
@@ -111,7 +112,9 @@ lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
     publish / skip := true,
     autoCompilerPlugins := true,
     resolvers += Resolver.mavenLocal,
-    addCompilerPlugin("com.47deg" %% "continuationsplugin" % "+" changing())
+    // this uses the mac system environment variable, HOME. Mine is included by default as an example
+    Compile / scalacOptions += s"-Xplugin:${Properties.envOrElse("HOME", "/Users/jackcviers")}/.ivy2/local/com.47deg/continuationsplugin_3/0.0.0+43-bede6404-SNAPSHOT/jars/continuationsplugin_3.jar"
+    // addCompilerPlugin("com.47deg" %% "continuationsplugin" % "+" changing())
   )
 
 
