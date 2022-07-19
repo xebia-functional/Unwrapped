@@ -20,9 +20,8 @@ trait ScalaFxAssertions:
    * @see
    *   [munit.Clue]
    */
-  def assertFX(
-      cond: => Boolean,
-      clue: => Any = "assertion failed"): Location ?=> Errors[AssertionError] ?=> Unit =
+  def assertFX[R](cond: => Errors[R] ?=> Boolean, clue: => Any = "assertion failed")
+      : Location ?=> (Errors[AssertionError], Errors[R]) ?=> Unit =
     liftToFX(assert(cond, clue))
 
   /**
