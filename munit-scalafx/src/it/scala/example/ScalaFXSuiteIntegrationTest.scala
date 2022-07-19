@@ -4,12 +4,33 @@ import fx.*
 import munit.fx.ScalaFXSuite
 
 class ScalaFXSuiteIntegrationSuite extends ScalaFXSuite:
+  def myFunction(
+      value1: Either[String, Int],
+      value2: Option[Int]): Errors[String | None.type] ?=> Int =
+    value1.bind + value2.bind
+
+  testFX("The computation's result satisfies the assertion") {
+    assertFX(myFunction(Right(1), Option(2)) == 3)
+  }
+
+  testFX("The computation's result doesn't satisfy the assertion".fail) {
+    assertFX(myFunction(Right(1), Option(2)) == 0)
+  }
+
+  testFX("The computation is short circuited with a None".fail) {
+    assertFX(myFunction(Right(1), None) == 1)
+  }
+
+  testFX("The computation is short circuited with a Left".fail) {
+    assertFX(myFunction(Left("BOOM!"), Option(2)) == 2)
+  }
+
   testFX("Example 1".fail) {
     assertFX(false)
   }
   testFX("Example 2") {
     val x: Console ?=> Unit = "example 1".writeLine()
-    val y: Console ?=> Unit = "example2".writeLine()
+    val y: Console ?=> Unit = "example 2".writeLine()
     structured(
       parallel(
         () => {
