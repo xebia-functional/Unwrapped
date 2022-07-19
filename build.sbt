@@ -18,18 +18,22 @@ addCommandAlias("ci-publish", "github; ci-release")
 publish / skip := true
 
 lazy val root =
-  (project in file("./")).aggregate(
-    `scala-fx`,
-    benchmarks,
-    `munit-scala-fx`,
-    `scalike-jdbc-scala-fx`,
-    `http-scala-fx`,
-    documentation,
-    `sttp-scala-fx`,
-    `java-net-multipart-body-publisher`
-  )
+  (project in file("./")).aggregate(`scala-fx`, continuationsPlugin, continuationsPluginExample, benchmarks, `munit-scala-fx`, documentation, `scalike-jdbc-scala-fx`, `http-scala-fx`, `sttp-scala-fx`, `java-net-multipart-body-publisher`)
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
+
+
+lazy val continuationsPlugin = project
+  .settings(
+    continuationsPluginSettings: _*
+  )
+
+lazy val continuationsPluginExample = project
+  .dependsOn(continuationsPlugin)
+  .settings(
+    continuationsPluginExampleSettings: _*
+  )
+
 
 lazy val benchmarks =
   project.dependsOn(`scala-fx`).settings(publish / skip := true).enablePlugins(JmhPlugin)
@@ -95,6 +99,22 @@ lazy val scalafxSettings: Seq[Def.Setting[_]] =
     )
   )
 
+lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
+  Seq(
+    libraryDependencies ++= List(
+      "org.scala-lang" %% "scala3-compiler" % "3.1.2"
+    )
+  )
+
+lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
+  Seq(
+    publish / skip := true,
+    autoCompilerPlugins := true,
+    resolvers += Resolver.mavenLocal,
+    addCompilerPlugin("com.47deg" %% "continuationsplugin" % "+" changing())
+  )
+
+
 lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
   libraryDependencies ++= Seq(
     munitScalacheck,
@@ -153,3 +173,4 @@ lazy val javaOptionsSettings = Seq(
   "--add-exports java.base/jdk.internal.vm=ALL-UNNAMED",
   "--enable-preview"
 )
+
