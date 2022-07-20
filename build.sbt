@@ -12,7 +12,9 @@ ThisBuild / scalaVersion := "3.1.2"
 ThisBuild / organization := "com.47deg"
 ThisBuild / versionScheme := Some("early-semver")
 
-addCommandAlias("plugin-example", "reload; clean; publishLocal; continuationsPluginExample/compile")
+addCommandAlias(
+  "plugin-example",
+  "reload; clean; publishLocal; continuationsPluginExample/compile")
 addCommandAlias("ci-test", "scalafmtCheckAll; scalafmtSbtCheck; github; mdoc; test")
 addCommandAlias("ci-docs", "github; mdoc")
 addCommandAlias("ci-publish", "github; ci-release")
@@ -24,18 +26,15 @@ lazy val root =
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
-
-lazy val continuationsPlugin = project
-  .settings(
-    continuationsPluginSettings: _*
-  )
+lazy val continuationsPlugin = project.settings(
+  continuationsPluginSettings: _*
+)
 
 lazy val continuationsPluginExample = project
   .dependsOn(continuationsPlugin)
   .settings(
     continuationsPluginExampleSettings: _*
   )
-
 
 lazy val benchmarks =
   project.dependsOn(`scala-fx`).settings(publish / skip := true).enablePlugins(JmhPlugin)
@@ -115,10 +114,9 @@ lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
     autoCompilerPlugins := true,
     resolvers += Resolver.mavenLocal,
     // this uses the mac system environment variable, HOME. Mine is included by default as an example
-    Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / target).value}/scala-${scalaVersion.value}/continuationsplugin_3-${version.value}.jar"
-    // addCompilerPlugin("com.47deg" %% "continuationsplugin" % "+" changing())
+    Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
+    Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}"
   )
-
 
 lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
   libraryDependencies ++= Seq(
@@ -178,4 +176,3 @@ lazy val javaOptionsSettings = Seq(
   "--add-exports java.base/jdk.internal.vm=ALL-UNNAMED",
   "--enable-preview"
 )
-
