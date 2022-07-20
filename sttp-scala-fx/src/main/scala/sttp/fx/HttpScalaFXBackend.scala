@@ -15,6 +15,7 @@ import sttp.client3.Identity
 import java.net.http.HttpResponse
 import scala.jdk.CollectionConverters.*
 import sttp.model.RequestMetadata
+import java.util.zip.Deflater
 
 class HttpScalaFXBackend(using client: HttpClient, control: Control[Throwable])
     extends SttpBackend[Http, Streams[Receive[Byte]] with Effect[Http]] {
@@ -47,8 +48,14 @@ class HttpScalaFXBackend(using client: HttpClient, control: Control[Throwable])
         }.toList, List.empty, RequestMetadata(method, uri, request.headers))
       }
       case Method.POST =>
-        uri.toJavaUri.POST[Receive[Byte], String](body.show, headers:_*).fmap{(r: HttpResponse[Receive[Byte]]) =>
-          ???
+        val response = uri.toJavaUri.POST[Receive[Byte], String](body.show, headers:_*)
+        if(response == OK.value){
+          val byteStream = response.body().transform{byte =>
+            
+          }
+        }
+          
+          
         }
       case Method.PUT => uri.toJavaUri.PUT[Receive[Byte], String](body.show, headers: _*)
       case Method.DELETE => uri.toJavaUri.DELETE[Receive[Byte]](headers: _*)
