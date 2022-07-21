@@ -13,16 +13,10 @@ extension (db: DB.type)
   def readOnlyWithControl[A](execution: DBSession => A)(
       using context: CPContext = NoCPContext,
       settings: SettingsProvider = SettingsProvider.default): Database[A] =
-    fork { () =>
-      try DB.readOnly(execution)
-      catch case e: SQLException => e.shift
-    }
+    fork { () => handle(DB.readOnly(execution))((e: SQLException) => e.shift) }
 
   def localTransaction[A](execution: DBSession => A)(
-      implicit context: CPContext = NoCPContext,
+      using context: CPContext = NoCPContext,
       boundary: TxBoundary[A] = TxBoundary.Exception.exceptionTxBoundary[A],
       settings: SettingsProvider = SettingsProvider.default): Transaction[A] =
-    fork { () =>
-      try DB.localTx(execution)
-      catch case e: Exception => e.shift
-    }
+    fork { () => handle(DB.localTx(execution))((e: Exception) => e.shift) }
