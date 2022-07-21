@@ -5,6 +5,7 @@ import _root_.fx._
 import org.junit.AssumptionViolatedException
 
 import scala.annotation.targetName
+import scala.reflect.Typeable
 
 /**
  * Provides functionality for testing within a scala-fx context.
@@ -32,12 +33,14 @@ abstract class ScalaFXSuite extends FunSuite, ScalaFxAssertions:
      * @return
      *   The result of the test when a location can be pulled from given scope.
      */
-    def testFX[R <: Throwable, B](name: String)(body: Errors[R] ?=> A => B): Location ?=> Unit =
+    def testFX[R, F <: AssertionError: Typeable](name: String)(
+        body: Errors[R | F] ?=> A => Unit): Location ?=> Unit =
       a.test(TestOptions(name)) { fixture =>
-        val x: R | B = run(structured(body(fixture)))
+        val x: R | F | Unit = run(structured(body(fixture)))
         x match
-          case ex: Throwable => throw ex
-          case x => ()
+          case _: Unit => ()
+          case ex: F => throw ex
+          case x => throw AssertionError(x)
       }
 
     /**
@@ -53,13 +56,14 @@ abstract class ScalaFXSuite extends FunSuite, ScalaFxAssertions:
      * @return
      *   The result of the test when a location can be pulled from given scope.
      */
-    def testFX[R <: Throwable, B](options: TestOptions)(
-        body: Errors[R] ?=> A => B): Location ?=> Unit =
+    def testFX[R, F <: AssertionError: Typeable](options: TestOptions)(
+        body: Errors[R | F] ?=> A => Unit): Location ?=> Unit =
       a.test(options) { fixture =>
-        val x: R | B = run(structured(body(fixture)))
+        val x: R | F | Unit = run(structured(body(fixture)))
         x match
-          case ex: Throwable => throw ex
-          case x => ()
+          case _: Unit => ()
+          case ex: F => throw ex
+          case x => throw AssertionError(x)
       }
   }
 
@@ -79,12 +83,14 @@ abstract class ScalaFXSuite extends FunSuite, ScalaFxAssertions:
    * @return
    *   Unit
    */
-  def testFX[R <: Throwable, A](name: String)(body: Errors[R] ?=> A): Location ?=> Unit =
+  def testFX[R, F <: AssertionError: Typeable](name: String)(
+      body: Errors[R | F] ?=> Unit): Location ?=> Unit =
     test(name) {
-      val x: R | A = run(structured(body))
+      val x: R | F | Unit = run(structured(body))
       x match {
-        case ex: Throwable => throw ex
-        case x => ()
+        case _: Unit => ()
+        case ex: F => throw ex
+        case x => throw AssertionError(x)
       }
     }
 
@@ -104,12 +110,13 @@ abstract class ScalaFXSuite extends FunSuite, ScalaFxAssertions:
    * @return
    *   Unit
    */
-  def testFX[R <: Throwable, A](options: TestOptions)(
-      body: => Errors[R] ?=> A): Location ?=> Unit =
+  def testFX[R, F <: AssertionError: Typeable](options: TestOptions)(
+      body: => Errors[R | F] ?=> Unit): Location ?=> Unit =
     test(options) {
-      val x: R | A = run(structured(body))
+      val x: R | F | Unit = run(structured(body))
       x match {
-        case ex: Throwable => throw ex
-        case x => ()
+        case _: Unit => ()
+        case ex: F => throw ex
+        case x => throw AssertionError(x)
       }
     }
