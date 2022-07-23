@@ -33,35 +33,274 @@ class HttpScalaFXBackend(using client: HttpClient, control: Control[Throwable])
       }
       .toList
     val uri = request.uri
-    if(method == Method.GET){
-
-    } else {
-
-    }
+    if (method == Method.GET) {} else {}
     val httpResponse = method match {
-      case Method.GET => uri.toJavaUri.GET[Receive[Byte]](headers: _*)
-      case Method.HEAD => uri.toJavaUri.HEAD(headers: _*).fmap{ (r:HttpResponse[Void]) =>
-        Response(null, sttp.model.StatusCode(r.statusCode()), "", r.headers().map().asScala.flatMap{kv =>
-          kv._2.asScala.map{ headerValue =>
-            Header(kv._1, headerValue)
-          }
-        }.toList, List.empty, RequestMetadata(method, uri, request.headers))
+      case Method.GET => {
+        val response = uri.toJavaUri.GET[Receive[Byte]](headers: _*)
+        if (response.status == OK.value) {
+          val byteStream = response.body()
+          val inflater = new Inflater(false)
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            byteStream
+              .grouped(4096)
+              .transform { bytes =>
+                val output = Array.empty[Byte]
+                inflater.setInput(bytes)
+                inflater.inflate(output)
+                send(output)
+                inflater.reset()
+              }
+              .toList
+              .mkString,
+            r.headers()
+              .map()
+              .asScala
+              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
+              .toList,
+            List.empty,
+            RequestMetadata(method, uri, request.headers)
+          )
+        } else {
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            "",
+            List.empty,
+            RequestMetadata(method, uri, request.headers))
+        }
       }
+      case Method.HEAD =>
+        uri.toJavaUri.HEAD(headers: _*).fmap { (r: HttpResponse[Void]) =>
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            "",
+            r.headers()
+              .map()
+              .asScala
+              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
+              .toList,
+            List.empty,
+            RequestMetadata(method, uri, request.headers)
+          )
+        }
       case Method.POST =>
-        val response = uri.toJavaUri.POST[Receive[Byte], String](body.show, headers:_*)
-        if(response == OK.value){
-          val byteStream = response.body().transform{byte =>
-            
-          }
+        val response = uri.toJavaUri.POST[Receive[Byte], String](body.show, headers: _*)
+        if (response.status == OK.value) {
+          val byteStream = response.body()
+          val inflater = new Inflater(false)
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            byteStream
+              .grouped(4096)
+              .transform { bytes =>
+                val output = Array.empty[Byte]
+                inflater.setInput(bytes)
+                inflater.inflate(output)
+                send(output)
+                inflater.reset()
+              }
+              .toList
+              .mkString,
+            r.headers()
+              .map()
+              .asScala
+              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
+              .toList,
+            List.empty,
+            RequestMetadata(method, uri, request.headers)
+          )
+        } else {
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            "",
+            List.empty,
+            RequestMetadata(method, uri, request.headers))
         }
-          
-          
+      case Method.PUT => {
+        val response = uri.toJavaUri.PUT[Receive[Byte], String](body.show, headers: _*)
+        if (response.status == OK.value) {
+          val byteStream = response.body()
+          val inflater = new Inflater(false)
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            byteStream
+              .grouped(4096)
+              .transform { bytes =>
+                val output = Array.empty[Byte]
+                inflater.setInput(bytes)
+                inflater.inflate(output)
+                send(output)
+                inflater.reset()
+              }
+              .toList
+              .mkString,
+            r.headers()
+              .map()
+              .asScala
+              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
+              .toList,
+            List.empty,
+            RequestMetadata(method, uri, request.headers)
+          )
+        } else {
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            "",
+            List.empty,
+            RequestMetadata(method, uri, request.headers))
         }
-      case Method.PUT => uri.toJavaUri.PUT[Receive[Byte], String](body.show, headers: _*)
-      case Method.DELETE => uri.toJavaUri.DELETE[Receive[Byte]](headers: _*)
-      case Method.OPTIONS => uri.toJavaUri.OPTIONS[Receive[Byte]](headers: _*)
-      case Method.PATCH => uri.toJavaUri.PATCH[Receive[Byte], String](body.show, headers: _*)
-      case Method.TRACE => uri.toJavaUri.TRACE[Receive[Byte]](headers: _*)
+      }
+      case Method.DELETE => {
+        val response = uri.toJavaUri.DELETE[Receive[Byte]](headers: _*)
+        if (response.status == OK.value) {
+          val byteStream = response.body()
+          val inflater = new Inflater(false)
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            byteStream
+              .grouped(4096)
+              .transform { bytes =>
+                val output = Array.empty[Byte]
+                inflater.setInput(bytes)
+                inflater.inflate(output)
+                send(output)
+                inflater.reset()
+              }
+              .toList
+              .mkString,
+            r.headers()
+              .map()
+              .asScala
+              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
+              .toList,
+            List.empty,
+            RequestMetadata(method, uri, request.headers)
+          )
+        } else {
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            "",
+            List.empty,
+            RequestMetadata(method, uri, request.headers))
+        }
+      }
+      case Method.OPTIONS => {
+        val response = uri.toJavaUri.OPTIONS[Receive[Byte]](headers: _*)
+        if (response.status == OK.value) {
+          val byteStream = response.body()
+          val inflater = new Inflater(false)
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            byteStream
+              .grouped(4096)
+              .transform { bytes =>
+                val output = Array.empty[Byte]
+                inflater.setInput(bytes)
+                inflater.inflate(output)
+                send(output)
+                inflater.reset()
+              }
+              .toList
+              .mkString,
+            r.headers()
+              .map()
+              .asScala
+              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
+              .toList,
+            List.empty,
+            RequestMetadata(method, uri, request.headers)
+          )
+        } else {
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            "",
+            List.empty,
+            RequestMetadata(method, uri, request.headers))
+        }
+      }
+      case Method.PATCH => {
+        val response = uri.toJavaUri.PATCH[Receive[Byte], String](body.show, headers: _*)
+        if (response.status == OK.value) {
+          val byteStream = response.body()
+          val inflater = new Inflater(false)
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            byteStream
+              .grouped(4096)
+              .transform { bytes =>
+                val output = Array.empty[Byte]
+                inflater.setInput(bytes)
+                inflater.inflate(output)
+                send(output)
+                inflater.reset()
+              }
+              .toList
+              .mkString,
+            r.headers()
+              .map()
+              .asScala
+              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
+              .toList,
+            List.empty,
+            RequestMetadata(method, uri, request.headers)
+          )
+        } else {
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            "",
+            List.empty,
+            RequestMetadata(method, uri, request.headers))
+        }
+      }
+      case Method.TRACE => {
+        val response = uri.toJavaUri.TRACE[Receive[Byte]](headers: _*)
+        if (response.status == OK.value) {
+          val byteStream = response.body()
+          val inflater = new Inflater(false)
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            byteStream
+              .grouped(4096)
+              .transform { bytes =>
+                val output = Array.empty[Byte]
+                inflater.setInput(bytes)
+                inflater.inflate(output)
+                send(output)
+                inflater.reset()
+              }
+              .toList
+              .mkString,
+            r.headers()
+              .map()
+              .asScala
+              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
+              .toList,
+            List.empty,
+            RequestMetadata(method, uri, request.headers)
+          )
+        } else {
+          Response(
+            null,
+            sttp.model.StatusCode(r.statusCode()),
+            "",
+            List.empty,
+            RequestMetadata(method, uri, request.headers))
+        }
+      }
       case Method.CONNECT => ???
     }
     ???
