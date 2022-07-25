@@ -9,6 +9,7 @@ import dotty.tools.dotc.core.Decorators.*
 import dotty.tools.dotc.core.StdNames.*
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.plugins.{PluginPhase, StandardPlugin}
+import dotty.tools.dotc.semanticdb.TypeMessage.SealedValue.TypeRef
 import dotty.tools.dotc.transform.{PickleQuotes, Staging}
 
 class ContinuationsPlugin extends StandardPlugin:
@@ -27,6 +28,9 @@ class ContinuationsPhase extends PluginPhase:
   override val runsBefore = Set(PickleQuotes.name)
 
   override def transformDefDef(tree: tpd.DefDef)(implicit ctx: Context): Tree =
-    report.error("continuations-plugin: " + tree.toString)
-    tree
-
+    tree.symbol
+    tree match
+      case DefDef(name, params, AppliedTypeTree(tyCon, args), preRhs) =>
+        report.error(s"${tyCon.tpe}, $args")
+        tree
+      case _ => tree
