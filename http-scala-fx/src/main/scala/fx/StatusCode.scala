@@ -5,7 +5,10 @@ package fx
  */
 opaque type StatusCode = Int
 
+
 object StatusCode:
+  def value(s: StatusCode): Int = s
+
   def statusCodes =
     (100 to 103).toSet ++ (200 to 208).toSet + 226 ++ (300 to 308).toSet ++ (400 to 418).toSet ++ (421 to 426).toSet ++ Set(
       428,
@@ -40,4 +43,5 @@ object StatusCode:
   def unsafeOf(i: Int): StatusCode =
     assert(statusCodes.contains(i))
     i
-  extension (s: StatusCode) def value: Int = s
+  extension(s: StatusCode)
+    def statusCodeValue: Int = s
