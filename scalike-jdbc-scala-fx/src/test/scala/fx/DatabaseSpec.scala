@@ -3,15 +3,20 @@ package fx
 import java.sql.SQLException
 import scalikejdbc.*
 import scalikejdbc.DB.*
+import java.util.concurrent.atomic.AtomicInteger
 
 class DatabaseSpec extends DatabaseSuite {
 
+  var counter: AtomicInteger = new AtomicInteger(0)
+  val names: Database[List[String]] = DB.readOnlyWithControl {
+    case given DBSession =>
+      counter.incrementAndGet()
+      sql"select name from emp".map { rs => rs.string("name") }.list.apply()
+  }
   testFX("Read only operation executes properly") {
-    val names: Database[List[String]] = DB.readOnlyWithControl {
-      case given DBSession =>
-        sql"select name from emp".map { rs => rs.string("name") }.list.apply()
-    }
-    assertEqualsFX(names, List("Ana", "Mike"))
+    val result = structured(parallel(() => names, () => names))
+    assertEqualsFX(result, (List("Ana", "Mike"), List("Ana", "Mike")))
+    assertEqualsFX(counter.get(), 2)
   }
 
   testFX("Read only shift when tries to execute a non-read only operation") {
@@ -23,13 +28,17 @@ class DatabaseSpec extends DatabaseSuite {
     }).isLeft)
   }
 
+  var txCounter: AtomicInteger = new AtomicInteger(0)
+  val transactResult: Transaction[Int] = DB.localTransaction {
+    case given DBSession =>
+      txCounter.incrementAndGet()
+      sql"update emp set name = 'Abc' where id = 1".update.apply()
+      sql"update emp set name = 'Emp' where id = 2".update.apply()
+  }
   testFX("Transaction goes well after updating 2 rows.") {
-    val count: Transaction[Int] = DB.localTransaction {
-      case given DBSession =>
-        sql"update emp set name = 'Abc' where id = 1".update.apply()
-        sql"update emp set name = 'Emp' where id = 2".update.apply()
-    }
-    assertEqualsFX(count, 1)
+    val result = structured(parallel(() => transactResult, () => transactResult))
+    assertEqualsFX(result, (1, 1))
+    assertEqualsFX(txCounter.get(), 2)
   }
 
   testFX("Transaction goes wrong and rollback after second update raises an exception") {
