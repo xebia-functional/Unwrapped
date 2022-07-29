@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class DatabaseSpec extends DatabaseSuite {
 
-  var counter: AtomicInteger = new AtomicInteger(0)
+  val counter: AtomicInteger = new AtomicInteger(0)
   val names: Database[List[String]] = DB.readOnlyWithControl {
     case given DBSession =>
       counter.incrementAndGet()
@@ -28,7 +28,7 @@ class DatabaseSpec extends DatabaseSuite {
     }).isLeft)
   }
 
-  var txCounter: AtomicInteger = new AtomicInteger(0)
+  val txCounter: AtomicInteger = new AtomicInteger(0)
   val transactResult: Transaction[Int] = DB.localTransaction {
     case given DBSession =>
       txCounter.incrementAndGet()
