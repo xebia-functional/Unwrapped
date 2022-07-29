@@ -17,9 +17,81 @@ import scala.jdk.CollectionConverters.*
 import sttp.model.RequestMetadata
 import java.util.zip.Deflater
 import java.util.zip.Inflater
+import sttp.client3.internal.BodyFromResponseAs
+import sttp.client3.ws.NotAWebSocketException
+import sttp.model.ResponseMetadata
+import sttp.client3.internal.SttpFile
+import sttp.client3.ws.GotAWebSocketException
+import sttp.client3.WebSocketResponseAs
+import java.nio.file.Files
+import org.apache.http.entity.ContentType
+import java.net.http.HttpHeaders
+import java.nio.charset.Charset
 
 class HttpScalaFXBackend(using client: HttpClient, control: Control[Throwable])
     extends SttpBackend[Http, Streams[Receive[Byte]] with Effect[Http]] {
+
+  class HttpBodyFromResponseAs(using MonadError[Http])
+      extends BodyFromResponseAs[Http, HttpResponse[Receive[Byte]], Nothing, Receive[Byte]] {
+
+    override protected def withReplayableBody(
+        response: HttpResponse[Receive[Byte]],
+        replayableBody: Either[Array[Byte], SttpFile]): Http[HttpResponse[Receive[Byte]]] = ???
+
+    override protected def cleanupWhenGotWebSocket(
+        response: Nothing,
+        e: GotAWebSocketException): Http[Unit] = e.shift
+
+    override protected def regularAsStream(
+        response: HttpResponse[Receive[Byte]]): Http[(Receive[Byte], () => Http[Unit])] =
+      Http((response.body(), () => Http(())))
+
+    private def getContentType(headers: HttpHeaders): Option[String] =
+      (headers.allValues("Content-Type").asScala ++ headers
+        .allValues("content-type")
+        .asScala ++ headers.allValues("Content-type").asScala ++ headers
+        .allValues("content-type")
+        .asScala).filter(_.contains("charset")).headOption
+
+    override protected def regularAsFile(
+        response: HttpResponse[Receive[Byte]],
+        file: SttpFile): Http[SttpFile] = Http {
+      // all this has to be wrapped by handle since we have
+      // structured, it may make sense to use plain old
+      // FileImageOutputStream instead, and avoid all the content-type
+      // shenanigans
+      val charset: Charset = ContentType
+        .parse(
+          getContentType(response.headers())
+            .getOrElse("application/octet-stream; charset=utf-8")
+        )
+        .getCharset()
+      val writer = Files.newBufferedWriter(file.toPath, charset)
+      response
+        .body()
+        .grouped(4096)
+        .receive(bytes => writer.append(new String(bytes.toArray, charset)))
+      writer.flush()
+      writer.close()
+      file
+    }
+
+    override protected def regularAsByteArray(
+        response: HttpResponse[Receive[Byte]]): Http[Array[Byte]] = ???
+
+    override protected def handleWS[T](
+        responseAs: WebSocketResponseAs[T, ?],
+        meta: ResponseMetadata,
+        ws: Nothing): Http[T] = ???
+
+    override protected def cleanupWhenNotAWebSocket(
+        response: HttpResponse[Receive[Byte]],
+        e: NotAWebSocketException): Http[Unit] = ???
+
+    override protected def regularIgnore(response: HttpResponse[Receive[Byte]]): Http[Unit] =
+      ???
+
+  }
 
   def send[T, R >: Streams[Receive[Byte]] with Effect[Http]](
       request: Request[T, R]): Http[Response[T]] = {

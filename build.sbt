@@ -97,7 +97,8 @@ lazy val scalalikeSettings: Seq[Def.Setting[_]] =
 lazy val httpScalaFXSettings = commonSettings
 
 lazy val sttpScalaFXSettings = commonSettings ++ Seq(
-  libraryDependencies += sttp
+  libraryDependencies += sttp,
+  libraryDependencies += httpCore
 )
 
 lazy val javaOptionsSettings = Seq(
