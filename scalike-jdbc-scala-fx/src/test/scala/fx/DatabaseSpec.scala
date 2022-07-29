@@ -41,6 +41,20 @@ class DatabaseSpec extends DatabaseSuite {
     assertEqualsFX(txCounter.get(), 2)
   }
 
+  val readAndWriteCounter: AtomicInteger = new AtomicInteger(0)
+  val readAndWriteResult: Transaction[List[String]] = DB.localTransaction {
+    case given DBSession =>
+      readAndWriteCounter.incrementAndGet()
+      sql"update emp set name = 'Claire' where id = 1".update.apply()
+      sql"update emp set name = 'John' where id = 2".update.apply()
+      sql"select name from emp".map { rs => rs.string("name") }.list.apply()
+  }
+  testFX("Transaction goes well after updating 2 rows and read the result.") {
+    val result = structured(parallel(() => readAndWriteResult, () => readAndWriteResult))
+    assertEqualsFX(result, (List("Claire", "John"), List("Claire", "John")))
+    assertEqualsFX(txCounter.get(), 2)
+  }
+
   testFX("Transaction goes wrong and rollback after second update raises an exception") {
     assertFX(toEither(DB.localTransaction {
       case given DBSession =>
