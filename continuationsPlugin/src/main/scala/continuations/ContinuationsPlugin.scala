@@ -8,6 +8,7 @@ import dotty.tools.dotc.core.Contexts.Context
 import dotty.tools.dotc.core.Decorators.*
 import dotty.tools.dotc.core.StdNames.*
 import dotty.tools.dotc.core.Symbols.*
+import dotty.tools.dotc.core.Types.{AppliedType, Type}
 import dotty.tools.dotc.plugins.{PluginPhase, StandardPlugin}
 import dotty.tools.dotc.semanticdb.TypeMessage.SealedValue.TypeRef
 import dotty.tools.dotc.transform.{PickleQuotes, Staging}
@@ -27,10 +28,22 @@ class ContinuationsPhase extends PluginPhase:
   override val runsAfter = Set(Staging.name)
   override val runsBefore = Set(PickleQuotes.name)
 
-  override def transformDefDef(tree: tpd.DefDef)(implicit ctx: Context): Tree =
-    tree.symbol
+  override def transformBlock(tree: Block)(using ctx: Context): Tree =
+    val calls: List[Apply] = suspensionPoints(tree)
+    calls.foreach { call => report.error(s"Found suspension point: ${call.show}") }
+    tree
+
+  def suspensionPoints(tree: Block)(using ctx: Context): List[Apply] =
+    if (returnsContextFunctionWithSuspendType(tree)) List.empty[Apply]
+    else tree.filterSubTrees { case t: Tree => isCallToSuspend(t) }.asInstanceOf
+
+  def isSuspendType(tpe: Type)(using ctx: Context): Boolean =
+    tpe.classSymbol.showFullName == "continuations.Suspend"
+
+  def returnsContextFunctionWithSuspendType(tree: Tree)(using ctx: Context): Boolean =
+    ctx.definitions.isContextFunctionType(tree.tpe) && tree.tpe.argTypes.exists(isSuspendType)
+
+  def isCallToSuspend(tree: Tree)(using ctx: Context): Boolean =
     tree match
-      case DefDef(name, params, AppliedTypeTree(tyCon, args), preRhs) =>
-        report.error(s"${tyCon.tpe}, $args")
-        tree
-      case _ => tree
+      case Apply(_, _) => returnsContextFunctionWithSuspendType(tree)
+      case _ => false
