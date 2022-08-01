@@ -1,32 +1,38 @@
 package sttp
 package fx
 
-import sttp.client3.SttpBackend
-import sttp.capabilities.Streams
-import _root_.fx.{given, *}
+import _root_.fx.{_, given}
+import org.apache.http.entity.ContentType
 import sttp.capabilities.Effect
-import sttp.client3.{Request, Response}
-import sttp.monad.MonadError
-import sttp.model.Methods
-import sttp.model.Method
-import java.net.URI
-import sttp.model.Header
+import sttp.capabilities.Streams
 import sttp.client3.Identity
-import java.net.http.HttpResponse
-import scala.jdk.CollectionConverters.*
-import sttp.model.RequestMetadata
-import java.util.zip.Deflater
-import java.util.zip.Inflater
+import sttp.client3.Request
+import sttp.client3.Response
+import sttp.client3.SttpBackend
+import sttp.client3.WebSocketResponseAs
 import sttp.client3.internal.BodyFromResponseAs
-import sttp.client3.ws.NotAWebSocketException
-import sttp.model.ResponseMetadata
 import sttp.client3.internal.SttpFile
 import sttp.client3.ws.GotAWebSocketException
-import sttp.client3.WebSocketResponseAs
-import java.nio.file.Files
-import org.apache.http.entity.ContentType
-import java.net.http.HttpHeaders
+import sttp.client3.ws.NotAWebSocketException
+import sttp.model.Header
+import sttp.model.Method
+import sttp.model.Methods
+import sttp.model.RequestMetadata
+import sttp.model.ResponseMetadata
+import sttp.monad.MonadError
+import sttp.{model => sm}
+
+import java.net.URI
+import java.net.{http => jnh}
+import jnh.HttpHeaders
+import jnh.HttpRequest
+import jnh.HttpResponse
 import java.nio.charset.Charset
+import java.nio.file.Files
+import java.util.Optional
+import java.util.zip.Deflater
+import java.util.zip.Inflater
+import scala.jdk.CollectionConverters.*
 
 class HttpScalaFXBackend(using client: HttpClient, control: Control[Throwable])
     extends SttpBackend[Http, Streams[Receive[Byte]] with Effect[Http]] {
@@ -34,9 +40,29 @@ class HttpScalaFXBackend(using client: HttpClient, control: Control[Throwable])
   class HttpBodyFromResponseAs(using MonadError[Http])
       extends BodyFromResponseAs[Http, HttpResponse[Receive[Byte]], Nothing, Receive[Byte]] {
 
+    private def responseWithReplayableBody(
+        response: HttpResponse[Receive[Byte]],
+        newBody: Receive[Byte]) =
+      new HttpResponse[Receive[Byte]] {
+        def statusCode(): Int = response.statusCode();
+        def request(): HttpRequest = response.request();
+        def previousResponse() = Optional.of(response);
+        def headers(): HttpHeaders = response.headers();
+        def body(): Receive[Byte] = newBody
+        def sslSession() = response.sslSession();
+        def uri(): URI = response.uri()
+        def version(): jnh.HttpClient.Version = response.version();
+      }
+
     override protected def withReplayableBody(
         response: HttpResponse[Receive[Byte]],
-        replayableBody: Either[Array[Byte], SttpFile]): Http[HttpResponse[Receive[Byte]]] = ???
+        replayableBody: Either[Array[Byte], SttpFile]): Http[HttpResponse[Receive[Byte]]] =
+      Http(
+        replayableBody.fold(
+          bytes => responseWithReplayableBody(response, streamOf(bytes: _*)),
+          file =>
+            responseWithReplayableBody(response, streamed(Files.readAllBytes(file.toPath)))
+        ))
 
     override protected def cleanupWhenGotWebSocket(
         response: Nothing,
@@ -56,8 +82,8 @@ class HttpScalaFXBackend(using client: HttpClient, control: Control[Throwable])
     override protected def regularAsFile(
         response: HttpResponse[Receive[Byte]],
         file: SttpFile): Http[SttpFile] = Http {
-      // all this has to be wrapped by handle since we have
-      // structured, it may make sense to use plain old
+      // all this has to be wrapped by resource handling since we have
+      // it, it may make sense to use plain old
       // FileImageOutputStream instead, and avoid all the content-type
       // shenanigans
       val charset: Charset = ContentType
@@ -77,19 +103,20 @@ class HttpScalaFXBackend(using client: HttpClient, control: Control[Throwable])
     }
 
     override protected def regularAsByteArray(
-        response: HttpResponse[Receive[Byte]]): Http[Array[Byte]] = ???
+        response: HttpResponse[Receive[Byte]]): Http[Array[Byte]] =
+      Http(response.body().toList.toArray)
 
     override protected def handleWS[T](
         responseAs: WebSocketResponseAs[T, ?],
         meta: ResponseMetadata,
-        ws: Nothing): Http[T] = ???
+        ws: Nothing): Http[T] = new NotAWebSocketException(sm.StatusCode.Ok).shift
 
     override protected def cleanupWhenNotAWebSocket(
         response: HttpResponse[Receive[Byte]],
-        e: NotAWebSocketException): Http[Unit] = ???
+        e: NotAWebSocketException): Http[Unit] = e.shift
 
     override protected def regularIgnore(response: HttpResponse[Receive[Byte]]): Http[Unit] =
-      ???
+      Http(response.body()).fmap(_ => ())
 
   }
 

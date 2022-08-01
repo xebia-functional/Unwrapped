@@ -145,7 +145,7 @@ trait ScalaFxAssertions:
 
   def assertsShiftsToFX[R, T, A](
       obtained: Errors[R] ?=> A,
-      expected: T): (Location, Errors[R], Errors[AssertionError]) ?=> Unit =
+      expected: T): (Location, Errors[R | AssertionError]) ?=> Unit =
     obtained
       .toEither
       .fold(

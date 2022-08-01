@@ -18,7 +18,7 @@ lazy val root =
     `scalike-jdbc-scala-fx`,
     `http-scala-fx`,
     documentation,
-  `sttp-scala-fx`)
+    `sttp-scala-fx`)
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 

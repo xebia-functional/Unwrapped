@@ -13,4 +13,4 @@ class FakeHttpResponse[A](
   def uri(): java.net.URI = ???
   def version(): java.net.http.HttpClient.Version = ???
 
-  override def statusCode(): Int = status.value
+  override def statusCode(): Int = status.statusCodeValue
