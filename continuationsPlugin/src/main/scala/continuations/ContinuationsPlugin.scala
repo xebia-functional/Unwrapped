@@ -13,6 +13,8 @@ import dotty.tools.dotc.plugins.{PluginPhase, StandardPlugin}
 import dotty.tools.dotc.semanticdb.TypeMessage.SealedValue.TypeRef
 import dotty.tools.dotc.transform.{PickleQuotes, Staging}
 
+import scala.annotation.tailrec
+
 class ContinuationsPlugin extends StandardPlugin:
   val name: String = "continuations"
   override val description: String = "CPS transformations"
@@ -29,19 +31,39 @@ class ContinuationsPhase extends PluginPhase:
   override val runsBefore = Set(PickleQuotes.name)
 
   override def transformBlock(tree: Block)(using ctx: Context): Tree =
-    val calls: List[Apply] = suspensionPoints(tree)
-    calls.foreach { call => report.error(s"Found suspension point: ${call.show}") }
-    tree
+//    //val state = suspensionState(tree)
+//    report.error("DEEP FOLD")
+//    tree.deepFold(())((acc, tree) => {
+//      report.error(tree.show)
+//      acc
+//    })
+//    report.error("SHALLOW FOLD")
+//    tree.shallowFold(())((acc, tree) => {
+//      report.error(tree.show)
+//      acc
+//    })
+    //tree
+    report.error(tree.show)
+    EmptyTree
 
-  def suspensionPoints(tree: Block)(using ctx: Context): List[Apply] =
-    if (returnsContextFunctionWithSuspendType(tree)) List.empty[Apply]
-    else tree.filterSubTrees { case t: Tree => isCallToSuspend(t) }.asInstanceOf
+  @tailrec final def transformStatements(block: Block, statements: List[Tree], previous: List[Tree])(using ctx: Context): Block =
+    statements match
+      case Nil => block
+      case current :: remaining =>
+        if (hasInnerSuspensionPoint(current))
+          val newBlock = Block(???, ???)
+          transformStatements(newBlock, remaining, Nil)
+          // TODO nest previous under suspension point. Look at trees dif with example function
+        else transformStatements(block, remaining, previous :+ current) //this may be wrong
 
   def isSuspendType(tpe: Type)(using ctx: Context): Boolean =
     tpe.classSymbol.showFullName == "continuations.Suspend"
 
   def returnsContextFunctionWithSuspendType(tree: Tree)(using ctx: Context): Boolean =
     ctx.definitions.isContextFunctionType(tree.tpe) && tree.tpe.argTypes.exists(isSuspendType)
+
+  def hasInnerSuspensionPoint(statement: Tree)(using ctx: Context): Boolean =
+    statement.find(isCallToSuspend).isDefined
 
   def isCallToSuspend(tree: Tree)(using ctx: Context): Boolean =
     tree match
