@@ -9,22 +9,33 @@ import java.util.concurrent.SubmissionPublisher
 
 trait HttpBodyMapper[B]:
   def bodyPublisher(b: B): BodyPublisher
+  def mediaType: MediaType
 
 object HttpBodyMapper extends HttpBodyMapperLowPriority:
 
   given HttpBodyMapper[String] with
+    def mediaType: MediaType = MediaType(MediaTypes.text.`plain`.value ++ "; charset=utf-8")
     def bodyPublisher(s: String): BodyPublisher =
       BodyPublishers.ofString(s)
 
   given HttpBodyMapper[Array[Byte]] with
+
+    override def mediaType:MediaType = MediaTypes.application.`octet-stream`
+
     def bodyPublisher(b: Array[Byte]): BodyPublisher =
       BodyPublishers.ofByteArray(b)
 
   given HttpBodyMapper[Path] with
+
+    override def mediaType:MediaType = MediaTypes.application.`octet-stream`
+
     def bodyPublisher(p: Path): BodyPublisher =
       BodyPublishers.ofFile(p)
 
   given HttpBodyMapper[InputStream] with
+
+    override def mediaType:MediaType = MediaTypes.application.`octet-stream`
+
     def bodyPublisher(i: InputStream): BodyPublisher =
       BodyPublishers.ofInputStream(() => i)
 
@@ -34,6 +45,9 @@ object HttpBodyMapper extends HttpBodyMapperLowPriority:
     *
     */
   given HttpBodyMapper[Receive[Byte]] with
+
+    override def mediaType:MediaType = MediaTypes.application.`octet-stream`
+
     def bodyPublisher(b: Receive[Byte]): BodyPublisher =
       new BodyPublisher:
         def contentLength(): Long =
@@ -57,5 +71,8 @@ object HttpBodyMapper extends HttpBodyMapperLowPriority:
 
 trait HttpBodyMapperLowPriority:
   given HttpBodyMapper[Any] with
+
+    override def mediaType:MediaType = MediaTypes.application.`octet-stream`
+
     def bodyPublisher(a: Any): BodyPublisher =
       BodyPublishers.noBody()

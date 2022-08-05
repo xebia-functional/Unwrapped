@@ -1,5 +1,12 @@
 import Dependencies.Compile._
 import Dependencies.Test._
+
+import scala.collection.JavaConverters._
+
+import com.fasterxml.jackson.dataformat.csv.CsvSchema
+import com.fasterxml.jackson.dataformat.csv.CsvMapper
+import com.fasterxml.jackson.dataformat.csv.CsvParser
+
 ThisBuild / scalaVersion := "3.1.2"
 ThisBuild / organization := "com.47deg"
 ThisBuild / versionScheme := Some("early-semver")
@@ -18,7 +25,9 @@ lazy val root =
     `scalike-jdbc-scala-fx`,
     `http-scala-fx`,
     documentation,
-    `sttp-scala-fx`)
+    `sttp-scala-fx`,
+    `java-net-multipart-body-publisher`
+  )
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
@@ -43,13 +52,17 @@ lazy val `scalike-jdbc-scala-fx` = project
   .settings(publish / skip := true)
   .settings(scalalikeSettings)
 
+lazy val `java-net-multipart-body-publisher` = (project in file("./java-net-mulitpart-body-publisher"))
+  .settings(commonSettings)
+
 lazy val `http-scala-fx` = (project in file("./http-scala-fx"))
   .settings(httpScalaFXSettings)
-  .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
+  .settings(generateMediaTypeSettings)
+  .dependsOn(`java-net-multipart-body-publisher`, `scala-fx`, `munit-scala-fx` % "test -> compile").enablePlugins(HttpScalaFxPlugin)
 
 lazy val `sttp-scala-fx` = (project in file("./sttp-scala-fx"))
   .settings(sttpScalaFXSettings)
-  .dependsOn(`scala-fx`, `http-scala-fx`, `munit-scala-fx` % "test -> compile")
+  .dependsOn(`java-net-multipart-body-publisher`, `scala-fx`, `http-scala-fx`, `munit-scala-fx` % "test -> compile")
 
 lazy val commonSettings = Seq(
   javaOptions ++= javaOptionsSettings,

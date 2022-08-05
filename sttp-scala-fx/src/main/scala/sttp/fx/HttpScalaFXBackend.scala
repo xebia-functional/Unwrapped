@@ -1,7 +1,7 @@
 package sttp
 package fx
 
-import _root_.fx.{_, given}
+import _root_.fx.{given, _}
 import org.apache.http.entity.ContentType
 import sttp.capabilities.Effect
 import sttp.capabilities.Streams
@@ -33,91 +33,139 @@ import java.util.Optional
 import java.util.zip.Deflater
 import java.util.zip.Inflater
 import scala.jdk.CollectionConverters.*
+import sttp.client3.RequestBody
+import sttp.client3.BasicRequestBody
+import sttp.client3.StringBody
 
 class HttpScalaFXBackend(using client: HttpClient, control: Control[Throwable])
     extends SttpBackend[Http, Streams[Receive[Byte]] with Effect[Http]] {
+  type ??? = Any
 
-  class HttpBodyFromResponseAs(using MonadError[Http])
-      extends BodyFromResponseAs[Http, HttpResponse[Receive[Byte]], Nothing, Receive[Byte]] {
+  given MonadError[Http] = responseMonad
 
-    private def responseWithReplayableBody(
-        response: HttpResponse[Receive[Byte]],
-        newBody: Receive[Byte]) =
-      new HttpResponse[Receive[Byte]] {
-        def statusCode(): Int = response.statusCode();
-        def request(): HttpRequest = response.request();
-        def previousResponse() = Optional.of(response);
-        def headers(): HttpHeaders = response.headers();
-        def body(): Receive[Byte] = newBody
-        def sslSession() = response.sslSession();
-        def uri(): URI = response.uri()
-        def version(): jnh.HttpClient.Version = response.version();
-      }
+  private def headersToHeaders(headers: HttpHeaders): List[Header] = headers
+    .map()
+    .asScala
+    .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
+    .toList
 
-    override protected def withReplayableBody(
-        response: HttpResponse[Receive[Byte]],
-        replayableBody: Either[Array[Byte], SttpFile]): Http[HttpResponse[Receive[Byte]]] =
-      Http(
-        replayableBody.fold(
-          bytes => responseWithReplayableBody(response, streamOf(bytes: _*)),
-          file =>
-            responseWithReplayableBody(response, streamed(Files.readAllBytes(file.toPath)))
-        ))
+  val inflater = new Inflater(false)
 
-    override protected def cleanupWhenGotWebSocket(
-        response: Nothing,
-        e: GotAWebSocketException): Http[Unit] = e.shift
+  val emptyResponse: Receive[Byte] = streamOf(Array.emptyByteArray: _*)
 
-    override protected def regularAsStream(
-        response: HttpResponse[Receive[Byte]]): Http[(Receive[Byte], () => Http[Unit])] =
-      Http((response.body(), () => Http(())))
-
-    private def getContentType(headers: HttpHeaders): Option[String] =
-      (headers.allValues("Content-Type").asScala ++ headers
-        .allValues("content-type")
-        .asScala ++ headers.allValues("Content-type").asScala ++ headers
-        .allValues("content-type")
-        .asScala).filter(_.contains("charset")).headOption
-
-    override protected def regularAsFile(
-        response: HttpResponse[Receive[Byte]],
-        file: SttpFile): Http[SttpFile] = Http {
-      // all this has to be wrapped by resource handling since we have
-      // it, it may make sense to use plain old
-      // FileImageOutputStream instead, and avoid all the content-type
-      // shenanigans
-      val charset: Charset = ContentType
-        .parse(
-          getContentType(response.headers())
-            .getOrElse("application/octet-stream; charset=utf-8")
-        )
-        .getCharset()
-      val writer = Files.newBufferedWriter(file.toPath, charset)
-      response
-        .body()
-        .grouped(4096)
-        .receive(bytes => writer.append(new String(bytes.toArray, charset)))
-      writer.flush()
-      writer.close()
-      file
+  private def replaceBodyWithEmptyBody(
+      r: jnh.HttpResponse[_]): jnh.HttpResponse[Receive[Byte]] =
+    new jnh.HttpResponse[Receive[Byte]] {
+      def statusCode(): Int = r.statusCode()
+      def request(): HttpRequest = r.request()
+      def previousResponse() = Optional.empty()
+      def headers(): HttpHeaders = r.headers()
+      def body(): Receive[Byte] = emptyResponse
+      def sslSession() = r.sslSession()
+      def uri(): URI = r.uri()
+      def version(): jnh.HttpClient.Version = r.version()
     }
 
-    override protected def regularAsByteArray(
-        response: HttpResponse[Receive[Byte]]): Http[Array[Byte]] =
-      Http(response.body().toList.toArray)
+  private def asT[T](request: Request[T, _], r: jnh.HttpResponse[Receive[Byte]]): Http[T] =
+    r.fmap { r =>
+      val metadata = ResponseMetadata(
+        sttp.model.StatusCode.unsafeApply(r.statusCode()),
+        "",
+        headersToHeaders(r.headers()))
+      new BodyFromResponseAs[Http, HttpResponse[Receive[Byte]], Nothing, Receive[Byte]] {
 
-    override protected def handleWS[T](
-        responseAs: WebSocketResponseAs[T, ?],
-        meta: ResponseMetadata,
-        ws: Nothing): Http[T] = new NotAWebSocketException(sm.StatusCode.Ok).shift
+        private def responseWithReplayableBody(
+            response: HttpResponse[Receive[Byte]],
+            newBody: Receive[Byte]) =
+          new HttpResponse[Receive[Byte]] {
+            def statusCode(): Int = response.statusCode();
+            def request(): HttpRequest = response.request();
+            def previousResponse() = Optional.of(response);
+            def headers(): HttpHeaders = response.headers();
+            def body(): Receive[Byte] = newBody
+            def sslSession() = response.sslSession();
+            def uri(): URI = response.uri()
+            def version(): jnh.HttpClient.Version = response.version();
+          }
 
-    override protected def cleanupWhenNotAWebSocket(
-        response: HttpResponse[Receive[Byte]],
-        e: NotAWebSocketException): Http[Unit] = e.shift
+        override protected def withReplayableBody(
+            response: HttpResponse[Receive[Byte]],
+            replayableBody: Either[Array[Byte], SttpFile]): Http[HttpResponse[Receive[Byte]]] =
+          Http(
+            replayableBody.fold(
+              bytes => responseWithReplayableBody(response, streamOf(bytes: _*)),
+              file =>
+                responseWithReplayableBody(response, streamed(Files.readAllBytes(file.toPath)))
+            ))
 
-    override protected def regularIgnore(response: HttpResponse[Receive[Byte]]): Http[Unit] =
-      Http(response.body()).fmap(_ => ())
+        override protected def cleanupWhenGotWebSocket(
+            response: Nothing,
+            e: GotAWebSocketException): Http[Unit] = e.shift
 
+        override protected def regularAsStream(
+            response: HttpResponse[Receive[Byte]]): Http[(Receive[Byte], () => Http[Unit])] =
+          Http((response.body(), () => Http(())))
+
+        private def getContentType(headers: HttpHeaders): Option[String] =
+          (headers.allValues("Content-Type").asScala ++ headers
+            .allValues("content-type")
+            .asScala ++ headers.allValues("Content-type").asScala ++ headers
+            .allValues("content-type")
+            .asScala).filter(_.contains("charset")).headOption
+
+        override protected def regularAsFile(
+            response: HttpResponse[Receive[Byte]],
+            file: SttpFile): Http[SttpFile] = Http {
+          // all this has to be wrapped by resource handling since we have
+          // it, it may make sense to use plain old
+          // FileImageOutputStream instead, and avoid all the content-type
+          // shenanigans
+          val charset: Charset = ContentType
+            .parse(
+              getContentType(response.headers()).getOrElse(
+                "application/octet-stream; charset=utf-8")
+            )
+            .getCharset()
+          val writer = Files.newBufferedWriter(file.toPath, charset)
+          response
+            .body()
+            .grouped(4096)
+            .receive(bytes => writer.append(new String(bytes.toArray, charset)))
+          writer.flush()
+          writer.close()
+          file
+        }
+
+        override protected def regularAsByteArray(
+            response: HttpResponse[Receive[Byte]]): Http[Array[Byte]] =
+          Http(response.body().toList.toArray)
+
+        override protected def handleWS[T](
+            responseAs: WebSocketResponseAs[T, ?],
+            meta: ResponseMetadata,
+            ws: Nothing): Http[T] = new NotAWebSocketException(sm.StatusCode.Ok).shift
+
+        override protected def cleanupWhenNotAWebSocket(
+            response: HttpResponse[Receive[Byte]],
+            e: NotAWebSocketException): Http[Unit] = e.shift
+
+        override protected def regularIgnore(
+            response: HttpResponse[Receive[Byte]]): Http[Unit] =
+          Http(response.body()).fmap(_ => ())
+
+      }.apply(request.response, metadata, Left(r))
+    }
+  private def requestMetadata(r: Request[_, _]): RequestMetadata =
+    RequestMetadata(r.method, r.uri, r.headers)
+
+  private def basicRequestBody(body: BasicRequestBody) =
+    body match
+    case StringBody(b: String, encoding: String, _) =>
+
+  private def requestBody[R :> Streams[Receive[Byte]] with Effect[Http]](r: Request[_, R], body: RequestBody[R]) =
+  body match {
+    case NoBody => emptyResponse
+    case BasicRequestBody
   }
 
   def send[T, R >: Streams[Receive[Byte]] with Effect[Http]](
@@ -133,329 +181,58 @@ class HttpScalaFXBackend(using client: HttpClient, control: Control[Throwable])
       }
       .toList
     val uri = request.uri
-    if (method == Method.GET) {} else {}
-    val httpResponse = method match {
-      case Method.GET => {
-        val r = uri.toJavaUri.GET[Receive[Byte]](headers: _*)
-        if (r.statusCode() == OK.statusCodeValue) {
-          val byteStream = r.body()
-          val inflater = new Inflater(false)
-          Response(
-            null,
-            sttp.model.StatusCode(r.statusCode()),
-            byteStream
-              .grouped(4096)
-              .transform { bytes =>
-                val output: Array[Byte] = Array.empty[Byte]
-                inflater.setInput(bytes.toArray)
-                inflater.inflate(output)
-                _root_.fx.send(output)
-                inflater.reset()
-              }
-              .toList
-              .mkString,
-            r.headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        } else {
-          Response(
-            null,
-            sttp.model.StatusCode(r.statusCode()),
-            "",
-            r.headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        }
-      }
+
+    val metadata = requestMetadata(request)
+    val asRequestResponse  = asT(request, _)
+    method match {
+      case Method.GET =>
+
+        asRequestResponse(uri.toJavaUri.GET[Receive[Byte]](headers: _*)).fmap{ ???} // need
+                                                                                   // to
+                                                                                   // map
+                                                                                   // to
+                                                                                   // sttp
+                                                                                   // Response
+
       case Method.HEAD =>
-        uri.toJavaUri.HEAD(headers: _*).fmap { (r: HttpResponse[Void]) =>
-          Response(
-            null,
-            sttp.model.StatusCode(r.statusCode()),
-            "",
-            r.headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        }
+        asRequestResponse(uri.toJavaUri.HEAD(headers: _*).fmap(replaceBodyWithEmptyBody)
+      case Method.CONNECT => ??? // need to implement this as well... yuck
+      case Method.DELETE =>
+        asRequestResponse(
+          uri.toJavaUri.DELETE[Receive[Byte]](headers: _*).fmap(replaceBodyWithEmptyBody))
+      case Method.OPTIONS =>
+        asRequestResponse(uri.toJavaUri.OPTIONS[Receive[Byte]](headers: _*))
+      case Method.PATCH =>
+        asRequestResponse(uri.toJavaUri.PATCH[Receive[Byte], ???](???, headers: _*)) // need
+      // body
+      // encoders,
+      // and
+      // need
+      // to
+      // figure
+      // out
+      // what
+      // the
+      // B
+      // type
+      // should
+      // be. I
+      // may
+      // actually
+      // need
+      // a
+      // stupid
+      // aux
+      // pattern
+      // to
+      // get
+      // that... yuck.
       case Method.POST =>
-        val r = uri.toJavaUri.POST[Receive[Byte], String](body.show, headers: _*)
-        if (r.statusCode() == OK.statusCodeValue) {
-          val byteStream = r.body()
-          val inflater = new Inflater(false)
-          Response(
-            null,
-            sttp.model.StatusCode(r.statusCode()),
-            byteStream
-              .grouped(4096)
-              .transform { bytes =>
-                val output = Array.empty[Byte]
-                inflater.setInput(bytes.toArray)
-                inflater.inflate(output)
-                _root_.fx.send(output)
-                inflater.reset()
-              }
-              .toList
-              .mkString,
-            r.headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        } else {
-          Response(
-            null,
-            sttp.model.StatusCode(r.statusCode()),
-            "",
-            r.headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        }
-      case Method.PUT => {
-        val response = uri.toJavaUri.PUT[Receive[Byte], String](body.show, headers: _*)
-        if (response.statusCode() == OK.statusCodeValue) {
-          val byteStream = response.body()
-          val inflater = new Inflater(false)
-          Response(
-            null,
-            sttp.model.StatusCode(response.statusCode()),
-            byteStream
-              .grouped(4096)
-              .transform { bytes =>
-                val output = Array.empty[Byte]
-                inflater.setInput(bytes.toArray)
-                inflater.inflate(output)
-                _root_.fx.send(output)
-                inflater.reset()
-              }
-              .toList
-              .mkString,
-            response
-              .headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        } else {
-          Response(
-            null,
-            sttp.model.StatusCode(response.statusCode()),
-            "",
-            response
-              .headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        }
-      }
-      case Method.DELETE => {
-        val response = uri.toJavaUri.DELETE[Receive[Byte]](headers: _*)
-        if (response.statusCode() == OK.statusCodeValue) {
-          val byteStream = response.body()
-          val inflater = new Inflater(false)
-          Response(
-            null,
-            sttp.model.StatusCode(response.statusCode()),
-            byteStream
-              .grouped(4096)
-              .transform { bytes =>
-                val output = Array.empty[Byte]
-                inflater.setInput(bytes.toArray)
-                inflater.inflate(output)
-                _root_.fx.send(output)
-                inflater.reset()
-              }
-              .toList
-              .mkString,
-            response
-              .headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        } else {
-          Response(
-            null,
-            sttp.model.StatusCode(response.statusCode()),
-            "",
-            response
-              .headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        }
-      }
-      case Method.OPTIONS => {
-        val response = uri.toJavaUri.OPTIONS[Receive[Byte]](headers: _*)
-        if (response.statusCode() == OK.statusCodeValue) {
-          val byteStream = response.body()
-          val inflater = new Inflater(false)
-          Response(
-            null,
-            sttp.model.StatusCode(response.statusCode()),
-            byteStream
-              .grouped(4096)
-              .transform { bytes =>
-                val output = Array.empty[Byte]
-                inflater.setInput(bytes.toArray)
-                inflater.inflate(output)
-                _root_.fx.send(output)
-                inflater.reset()
-              }
-              .toList
-              .mkString,
-            response
-              .headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        } else {
-          Response(
-            null,
-            sttp.model.StatusCode(response.statusCode()),
-            "",
-            response
-              .headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        }
-      }
-      case Method.PATCH => {
-        val response = uri.toJavaUri.PATCH[Receive[Byte], String](body.show, headers: _*)
-        if (response.statusCode() == OK.statusCodeValue) {
-          val byteStream = response.body()
-          val inflater = new Inflater(false)
-          Response(
-            null,
-            sttp.model.StatusCode(response.statusCode()),
-            byteStream
-              .grouped(4096)
-              .transform { bytes =>
-                val output = Array.empty[Byte]
-                inflater.setInput(bytes.toArray)
-                inflater.inflate(output)
-                _root_.fx.send(output)
-                inflater.reset()
-              }
-              .toList
-              .mkString,
-            response
-              .headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        } else {
-          Response(
-            null,
-            sttp.model.StatusCode(response.statusCode()),
-            "",
-            response
-              .headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        }
-      }
-      case Method.TRACE => {
-        val response = uri.toJavaUri.TRACE[Receive[Byte]](headers: _*)
-        if (response.statusCode() == OK.statusCodeValue) {
-          val byteStream = response.body()
-          val inflater = new Inflater(false)
-          Response(
-            null,
-            sttp.model.StatusCode(response.statusCode()),
-            byteStream
-              .grouped(4096)
-              .transform { bytes =>
-                val output = Array.empty[Byte]
-                inflater.setInput(bytes.toArray)
-                inflater.inflate(output)
-                _root_.fx.send(output)
-                inflater.reset()
-              }
-              .toList
-              .mkString,
-            response
-              .headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        } else {
-          Response(
-            null,
-            sttp.model.StatusCode(response.statusCode()),
-            "",
-            response
-              .headers()
-              .map()
-              .asScala
-              .flatMap { kv => kv._2.asScala.map { headerValue => Header(kv._1, headerValue) } }
-              .toList,
-            List.empty,
-            RequestMetadata(method, uri, request.headers)
-          )
-        }
-      }
-      case Method.CONNECT => ???
+        asRequestResponse(uri.toJavaUri.POST[Receive[Byte], ???](???, headers: _*))
+      case Method.PUT =>
+        asRequestResponse(uri.toJavaUri.PUT[Receive[Byte], ???](???, headers: _*))
+      case Method.TRACE => asRequestResponse(uri.toJavaUri.TRACE[Receive[Byte]](headers: _*))
     }
-    ???
   }
 
   def close(): Http[Unit] = ???
