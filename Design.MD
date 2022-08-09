@@ -66,7 +66,7 @@ Low-level builders (TBD).
 - startCoroutineUninterceptedOrReturn `(this as Function<Continuation<Any?>, Any?>).invoke(completion)`
 - createCoroutineUnintercepted (do we really need this?)
 
-For efficiency, we want to have `suspendCoroutineUninterceptedOrReturn` so you can return immediate values from `val x: Suspend %=> Int = 1`.
+For efficiency, we want to have `suspendCoroutineUninterceptedOrReturn` so you can return immediate values from `val x: Suspend ?=> Int = 1`.
 This way the CPS compiler can also optimise these functions, and make them perform as immediate/regular functions inside the `Suspend` machinery.
 
 ### Context functions
