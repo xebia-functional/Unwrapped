@@ -21,7 +21,7 @@ Some notes studying the Kotlin implementation below.
 Continuation has two methods, `resume` and `resumeWithException`.
 The first one is to return a _suspended value_,
 and the latter is to _bridge_ an async exception to caller thread.
-Kotlin uses `Result<A>` to merge both methods into 1, but it causes additional overhead and complexity.
+Kotlin uses `Result<A>` to merge both methods into 1, but it causes additional overhead and complexity because of the `inline` nature and special treatment the `Result` type gets in Kotlin.
 
 ```scala
 trait Continuation[A]
