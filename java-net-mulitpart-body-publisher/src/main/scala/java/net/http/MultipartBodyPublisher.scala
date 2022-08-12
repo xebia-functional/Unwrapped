@@ -86,6 +86,24 @@ class MultiPartBodyPublisher private (
     boundary)
 
   /**
+   * Adds a generic input stream to the multi-part body
+   */
+  def addPart(
+      name: String,
+      value: () => InputStream,
+      contentType: String): MultiPartBodyPublisher = new MultiPartBodyPublisher(
+    parts.appended(
+      PartSpecification(
+        PartSpecificationName(name),
+        PartSpecificationInputStream(value),
+        PartSpecificationContentType(contentType),
+        boundary
+      )
+    ),
+    boundary
+  )
+
+  /**
    * Builds a body publisher from the bytes of all the added parts. Throws when there are no
    * body parts to send. Throws when parts is empty or cannot be encoded.
    */
