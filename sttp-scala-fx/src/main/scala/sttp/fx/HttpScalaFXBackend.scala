@@ -12,6 +12,10 @@ import sttp.model.Header
 import sttp.model.Method
 import java.net.URI
 import java.net.{http => jnh}
+import sttp.{model => sm}
+import sm.ResponseMetadata
+
+import scala.sdk.CollectionConverters.*
 
 class HttpScalaFXBackend(
     using client: HttpClient,
@@ -21,35 +25,53 @@ class HttpScalaFXBackend(
   given MonadError[Http] = responseMonad
 
   def requestAsBody[R, A <: RequestBody[R]](r: A)(
-    using ToHttpBodyMapper[A]): Http[HttpBodyMapper[A]] =
-    
-    responseMonad.handleError(r.toHttpBodyMapper()) { case e: Throwable => e.shift }
+      using ToHttpBodyMapper[A]): Http[HttpBodyMapper[A]] =
+    handle(r.toHttpBodyMapper()) { e => HttpExecutionException(e).shift }
 
-  def getHeaders[T, R >: ReceiveStreams with Effect[Http]](request: Request[T, R])(
+  def getRequestHeaders[T, R >: ReceiveStreams with Effect[Http]](request: Request[T, R])(
       using bodyMapper: HttpBodyMapper[RequestBody[R]]): Http[::[HttpHeader]] = {
     val `Content-Type`: HttpHeader = HttpHeader(
       ("Content-Type" -> ::[String](bodyMapper.mediaType.value, List.empty[String])))
-    ::(`Content-Type`, request.headers.groupBy(_.name).map { (p: (String, Seq[Header])) =>
-      val values = p._2.map(_.value).toList
-      HttpHeader(p._1, values.headOption.getOrElse(""), values.tail: _*)
-    }.toList)
+    ::(
+      `Content-Type`,
+      request
+        .headers
+        .groupBy(_.name)
+        .map { (p: (String, Seq[Header])) =>
+          val values = p._2.map(_.value).toList
+          HttpHeader(p._1, values.headOption.getOrElse(""), values.tail: _*)
+        }
+        .toList
+    )
   }
 
-  def toResponse[T, R >: ReceiveStreams with Effect[Http], A](response: jnh.HttpResponse[A]): Http[Response[T]] = {
+  def getResponseHeaders[T](response: jnh.HttpResponse[T]): Http[Seq[sm.Header]] = {
+    response
+    .headers.map().asScala.toList.foldLeft(List.empty[HttpHeader]){ (acc, jnhHeader) =>
+      acc +: HttpHeader(jnhHeader._1, jnhHeader._2.asScala.toList: _*)
+    }
+  }
+
+  def toResponse[T, R >: ReceiveStreams with Effect[Http], A](
+      response: jnh.HttpResponse[A])(using StatusCodeToStatusCode[sm.StatusCode, StatusCode], StatusCodeToStatusCode[Int, sm.StatusCode]): Http[Response[T]] = {
+    val status = response.statusCode().toStatusCode
+    val statusText = status.toStatusCode.statusText
+    val responseMetadata = ResponseMetadata(status, statusText, getResponseHeaders(response))
+    
     ???
   }
 
   def getUri[T, R >: ReceiveStreams with Effect[Http]](request: Request[T, R]): Http[URI] = {
-    handle(request.uri.toJavaUri){ e => HttpExecutionException(e).shift}
+    handle(request.uri.toJavaUri) { e => HttpExecutionException(e).shift }
   }
 
-
-  def makeRequest[T, R >: ReceiveStreams with Effect[Http]](
-      request: Request[T, R])(using HttpBodyMapper[RequestBody[R]], HttpResponseMapper[T]): Http[Response[T]] = {
-    val headers: ::[HttpHeader] = getHeaders(request)
+  def makeRequest[T, R >: ReceiveStreams with Effect[Http]](request: Request[T, R])(
+      using HttpBodyMapper[RequestBody[R]],
+      HttpResponseMapper[T]): Http[Response[T]] = {
+    val headers: ::[HttpHeader] = getRequestHeaders(request)
     val uri: URI = getUri(request).httpValue
     request.method match {
-      case Method.CONNECT => handle(???){e => HttpExecutionException(e).shift}
+      case Method.CONNECT => handle(???) { e => HttpExecutionException(e).shift }
       case Method.DELETE => toResponse(uri.DELETE[T](headers: _*))
       case Method.GET => toResponse(uri.GET[T](headers: _*))
       case Method.HEAD => toResponse(uri.HEAD(headers: _*))
@@ -61,8 +83,8 @@ class HttpScalaFXBackend(
     }
   }
 
-  def send[T, R >: ReceiveStreams with Effect[Http]](
-      request: Request[T, R])(using HttpResponseMapper[T]): Http[Response[T]] =
+  def send[T, R >: ReceiveStreams with Effect[Http]](request: Request[T, R])(
+      using HttpResponseMapper[T]): Http[Response[T]] =
     given bodyMapper: HttpBodyMapper[RequestBody[R]] = requestAsBody(request.body).httpValue
     makeRequest(request)
 
