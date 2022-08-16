@@ -205,7 +205,7 @@ extension(uri: URI)
 
   def PATCH[A, B](body: B, headers: HttpHeader*)
       : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
-    PATCH(body, 0, headers: _*)
+        PATCH(body, 0, headers: _*)
 
   @tailrec
   private def PATCH[A, B](body: B, retryCount: Int = 0, headers: HttpHeader*)

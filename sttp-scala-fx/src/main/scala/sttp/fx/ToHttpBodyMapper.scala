@@ -27,7 +27,7 @@ import scala.util.Random
 import scala.util.Try
 import sttp.capabilities.Effect
 
-trait ToHttpBodyMapper[A]:
+trait ToHttpBodyMapper[-A]:
   /**
    * Maps an sttp request body to its appropriate HttpBodyMapper. Note the bodyPublishers in the returned HttpBodyMapper
    * this operation often requires the use of side effecting code and
@@ -42,6 +42,13 @@ object ToHttpBodyMapper:
    */
   def apply[A](): ToHttpBodyMapper[A] ?=> ToHttpBodyMapper[A] =
     summon
+
+  /** So we have to inline all the body mappers below so that we can get it widened to R
+    *
+    */
+  def apply[R >: ReceiveStreams with Effect[Http]](body: RequestBody[R]): ToHttpBodyMapper[RequestBody[R]] =
+    ???
+
 
   /**
    * Tries to encode the body using its stated charset. If the charset is unsupported, encodes
@@ -90,7 +97,7 @@ object ToHttpBodyMapper:
             override def mediaType: MediaType =
               MediaType(a.defaultContentType.toString)
 
-  given fileBodyToHttpBodyMapper(using HttpBodyMapper[Path]): ToHttpBodyMapper[R,FileBody] =
+  given fileBodyToHttpBodyMapper(using HttpBodyMapper[Path]): ToHttpBodyMapper[FileBody] =
     new ToHttpBodyMapper[FileBody]:
       extension (a: FileBody)
         def toHttpBodyMapper() =

@@ -7,7 +7,7 @@ import sttp.{model => sm}
 trait StatusCodeToStatusCode[A, B]:
   extension (a: A) def toStatusCode: Http[B]
 
-object StatusCodeToStatusCode:
+object StatusCodeToStatusCode{
   def apply[A, B](using StatusCodeToStatusCode[A, B]): StatusCodeToStatusCode[A, B] =
     summon
 
@@ -88,73 +88,74 @@ object StatusCodeToStatusCode:
               .safeApply(unused.value)
               .fold(err => HttpExecutionException(new RuntimeException(err)).shift, identity)
 
-    given StatusCodeToStatusCode[sm.StatusCode, StatusCode] with
-      extension (a: sm.StatusCode)
-        def toStatusCode: Http[StatusCode] =
-          a match
-            case sm.StatusCode.Continue => Continue
-            case sm.StatusCode.SwitchingProtocols => `Switching Protocols`
-            case sm.StatusCode.Processing => Processing
-            case sm.StatusCode.EarlyHints => `Early Hints`
-            case sm.StatusCode.Ok => OK
-            case sm.StatusCode.Created => Created
-            case sm.StatusCode.Accepted => Accepted
-            case sm.StatusCode.NonAuthoritativeInformation => `Non-Authoritative Information`
-            case sm.StatusCode.NoContent => `No-Content`
-            case sm.StatusCode.ResetContent => `Reset Content`
-            case sm.StatusCode.PartialContent => `Partial Content`
-            case sm.StatusCode.MultiStatus => `Multi-Status`
-            case sm.StatusCode.AlreadyReported => `Already Reported`
-            case sm.StatusCode.ImUsed => `IM Used`
-            case sm.StatusCode.MultipleChoices => `Multiple Choices`
-            case sm.StatusCode.MovedPermanently => `Moved Permanently`
-            case sm.StatusCode.Found => `Found`
-            case sm.StatusCode.SeeOther => `See Other`
-            case sm.StatusCode.NotModified => `Not Modified`
-            case sm.StatusCode.UseProxy => `Use Proxy`
-            case sm.StatusCode.TemporaryRedirect => `Temporary Redirect`
-            case sm.StatusCode.PermanentRedirect => `Permenant Redirect`
-            case sm.StatusCode.BadRequest => `Bad Request`
-            case sm.StatusCode.Unauthorized => Unauthorized
-            case sm.StatusCode.PaymentRequired => `Payment Required`
-            case sm.StatusCode.Forbidden => Forbidden
-            case sm.StatusCode.NotFound => `Not Found`
-            case sm.StatusCode.MethodNotAllowed => `Method Not Allowed`
-            case sm.StatusCode.NotAcceptable => `NotAcceptable`
-            case sm.StatusCode.ProxyAuthenticationRequired => `Proxy Authentication Required`
-            case sm.StatusCode.RequestTimeout => `Request Timeout`
-            case sm.StatusCode.Conflict => `Conflict`
-            case sm.StatusCode.Gone => `Gone`
-            case sm.StatusCode.LengthRequired => `Length Required`
-            case sm.StatusCode.PreconditionFailed => `Precondition Failed`
-            case sm.StatusCode.PayloadTooLarge => `Payload Too Large`
-            case sm.StatusCode.UriTooLong => `URI Too Long`
-            case sm.StatusCode.UnsupportedMediaType => `Unsupported Media Type`
-            case sm.StatusCode.RangeNotSatisfiable => `Range Not Satisfiable`
-            case sm.StatusCode.ExpectationFailed => `Expectation Failed`
-            case sm.StatusCode.MisdirectedRequest => `Misdirected Request`
-            case sm.StatusCode.UnprocessableEntity => `Unprocessable Entity`
-            case sm.StatusCode.Locked => `Locked`
-            case sm.StatusCode.FailedDependency => `Failed Dependency`
-            case sm.StatusCode.UpgradeRequired => `Upgrade Required`
-            case sm.StatusCode.PreconditionRequired => `Precondition Required`
-            case sm.StatusCode.TooManyRequests => `Too Many Requests`
-            case sm.StatusCode.RequestHeaderFieldsTooLarge => `Request Header Fields Too Large`
-            case sm.StatusCode.UnavailableForLegalReasons => `Unavailable For Legal Reasons`
-            case sm.StatusCode.InternalServerError => `Internal Server Error`
-            case sm.StatusCode.NotImplemented => `Not Implemented`
-            case sm.StatusCode.BadGateway => `Bad Gateway`
-            case sm.StatusCode.ServiceUnavailable => `Service Unavailable`
-            case sm.StatusCode.GatewayTimeout => `Gateway Timeout`
-            case sm.StatusCode.HttpVersionNotSupported => `Http Version Not Supported`
-            case sm.StatusCode.VariantAlsoNegotiates => `Variant Also Negotiates`
-            case sm.StatusCode.InsufficientStorage => `Insufficient Storage`
-            case sm.StatusCode.LoopDetected => `Loop Detected`
-            case sm.StatusCode.NotExtended => `Not Extended`
-            case sm.StatusCode.NetworkAuthenticationRequired =>
-              `Network Authentication Required`
-            case x: sm.StatusCode if x.code == 306 => unused
-            case x: sm.StatusCode if x.code == 418 => `I'm a teapot`
-            case x: sm.StatusCode if x.code == 425 => `Too Early`
-            case _ =>
-              HttpExecutionException(new RuntimeException("Unrecognized Status Code")).shift
+  given smStatusCode:StatusCodeToStatusCode[sm.StatusCode, StatusCode] with
+    extension (a: sm.StatusCode)
+      def toStatusCode: Http[StatusCode] =
+        a match
+          case sm.StatusCode.Continue => Continue
+          case sm.StatusCode.SwitchingProtocols => `Switching Protocols`
+          case sm.StatusCode.Processing => Processing
+          case sm.StatusCode.EarlyHints => `Early Hints`
+          case sm.StatusCode.Ok => OK
+          case sm.StatusCode.Created => Created
+          case sm.StatusCode.Accepted => Accepted
+          case sm.StatusCode.NonAuthoritativeInformation => `Non-Authoritative Information`
+          case sm.StatusCode.NoContent => `No-Content`
+          case sm.StatusCode.ResetContent => `Reset Content`
+          case sm.StatusCode.PartialContent => `Partial Content`
+          case sm.StatusCode.MultiStatus => `Multi-Status`
+          case sm.StatusCode.AlreadyReported => `Already Reported`
+          case sm.StatusCode.ImUsed => `IM Used`
+          case sm.StatusCode.MultipleChoices => `Multiple Choices`
+          case sm.StatusCode.MovedPermanently => `Moved Permanently`
+          case sm.StatusCode.Found => `Found`
+          case sm.StatusCode.SeeOther => `See Other`
+          case sm.StatusCode.NotModified => `Not Modified`
+          case sm.StatusCode.UseProxy => `Use Proxy`
+          case sm.StatusCode.TemporaryRedirect => `Temporary Redirect`
+          case sm.StatusCode.PermanentRedirect => `Permenant Redirect`
+          case sm.StatusCode.BadRequest => `Bad Request`
+          case sm.StatusCode.Unauthorized => Unauthorized
+          case sm.StatusCode.PaymentRequired => `Payment Required`
+          case sm.StatusCode.Forbidden => Forbidden
+          case sm.StatusCode.NotFound => `Not Found`
+          case sm.StatusCode.MethodNotAllowed => `Method Not Allowed`
+          case sm.StatusCode.NotAcceptable => `NotAcceptable`
+          case sm.StatusCode.ProxyAuthenticationRequired => `Proxy Authentication Required`
+          case sm.StatusCode.RequestTimeout => `Request Timeout`
+          case sm.StatusCode.Conflict => `Conflict`
+          case sm.StatusCode.Gone => `Gone`
+          case sm.StatusCode.LengthRequired => `Length Required`
+          case sm.StatusCode.PreconditionFailed => `Precondition Failed`
+          case sm.StatusCode.PayloadTooLarge => `Payload Too Large`
+          case sm.StatusCode.UriTooLong => `URI Too Long`
+          case sm.StatusCode.UnsupportedMediaType => `Unsupported Media Type`
+          case sm.StatusCode.RangeNotSatisfiable => `Range Not Satisfiable`
+          case sm.StatusCode.ExpectationFailed => `Expectation Failed`
+          case sm.StatusCode.MisdirectedRequest => `Misdirected Request`
+          case sm.StatusCode.UnprocessableEntity => `Unprocessable Entity`
+          case sm.StatusCode.Locked => `Locked`
+          case sm.StatusCode.FailedDependency => `Failed Dependency`
+          case sm.StatusCode.UpgradeRequired => `Upgrade Required`
+          case sm.StatusCode.PreconditionRequired => `Precondition Required`
+          case sm.StatusCode.TooManyRequests => `Too Many Requests`
+          case sm.StatusCode.RequestHeaderFieldsTooLarge => `Request Header Fields Too Large`
+          case sm.StatusCode.UnavailableForLegalReasons => `Unavailable For Legal Reasons`
+          case sm.StatusCode.InternalServerError => `Internal Server Error`
+          case sm.StatusCode.NotImplemented => `Not Implemented`
+          case sm.StatusCode.BadGateway => `Bad Gateway`
+          case sm.StatusCode.ServiceUnavailable => `Service Unavailable`
+          case sm.StatusCode.GatewayTimeout => `Gateway Timeout`
+          case sm.StatusCode.HttpVersionNotSupported => `Http Version Not Supported`
+          case sm.StatusCode.VariantAlsoNegotiates => `Variant Also Negotiates`
+          case sm.StatusCode.InsufficientStorage => `Insufficient Storage`
+          case sm.StatusCode.LoopDetected => `Loop Detected`
+          case sm.StatusCode.NotExtended => `Not Extended`
+          case sm.StatusCode.NetworkAuthenticationRequired =>
+            `Network Authentication Required`
+          case x: sm.StatusCode if x.code == 306 => unused
+          case x: sm.StatusCode if x.code == 418 => `I'm a teapot`
+          case x: sm.StatusCode if x.code == 425 => `Too Early`
+          case _ =>
+            HttpExecutionException(new RuntimeException("Unrecognized Status Code")).shift
+}
