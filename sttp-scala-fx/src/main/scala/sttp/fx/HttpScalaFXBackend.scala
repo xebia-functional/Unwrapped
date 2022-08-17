@@ -28,6 +28,12 @@ import javax.net.ssl.SSLSession
 import java.nio.file.Files
 import java.io.File
 import java.nio.file.Path
+import sttp.client3.NoBody
+import sttp.client3.ByteBufferBody
+import sttp.client3.InputStreamBody
+import sttp.client3.FileBody
+import sttp.client3.StreamBody
+import sttp.client3.MultipartBody
 
 class HttpScalaFXBackend(
     using client: HttpClient,
@@ -40,8 +46,9 @@ class HttpScalaFXBackend(
       using ToHttpBodyMapper[A]): Http[HttpBodyMapper[A]] =
     handle(r.toHttpBodyMapper()) { e => HttpExecutionException(e).shift }
 
-  def getRequestHeaders[T, R >: ReceiveStreams with Effect[Http]](request: Request[T, R])(
-      using bodyMapper: HttpBodyMapper[RequestBody[R]]): Http[::[HttpHeader]] = {
+  def getRequestHeaders[T, R >: ReceiveStreams with Effect[Http], A](
+      request: Request[T, R],
+      body: A)(using bodyMapper: HttpBodyMapper[A]): Http[::[HttpHeader]] = {
     val `Content-Type`: HttpHeader = HttpHeader(
       ("Content-Type" -> ::[String](bodyMapper.mediaType.value, List.empty[String])))
     ::(
@@ -63,18 +70,12 @@ class HttpScalaFXBackend(
     }
   }
 
-  private def bodyAsResponseAs[T](
-      using HttpBodyMapper[Receive[Byte]],
-      MonadError[Http])= {
-    new BodyFromResponseAs[
-      Http,
-      jnh.HttpResponse[Receive[Byte]],
-      Nothing,
-      Receive[Byte]] {
+  private def bodyAsResponseAs[T](using HttpBodyMapper[Receive[Byte]], MonadError[Http]) = {
+    new BodyFromResponseAs[Http, jnh.HttpResponse[Receive[Byte]], Nothing, Receive[Byte]] {
       override protected def withReplayableBody(
-      response: jnh.HttpResponse[Receive[Byte]],
-      replayableBody: Either[Array[Byte], SttpFile]
-  ): Http[jnh.HttpResponse[Receive[Byte]]] = {
+          response: jnh.HttpResponse[Receive[Byte]],
+          replayableBody: Either[Array[Byte], SttpFile]
+      ): Http[jnh.HttpResponse[Receive[Byte]]] = {
         new jnh.HttpResponse[Receive[Byte]] {
           def statusCode(): Int = response.statusCode()
           def request(): jnh.HttpRequest = response.request()
@@ -90,7 +91,8 @@ class HttpScalaFXBackend(
           def version(): jnh.HttpClient.Version = response.version()
         }
       }
-      override protected def regularIgnore(response: jnh.HttpResponse[Receive[Byte]]): Http[Unit] = {
+      override protected def regularIgnore(
+          response: jnh.HttpResponse[Receive[Byte]]): Http[Unit] = {
         val x: Http[Receive[Byte]] = handle[Exception, Receive[Byte]](response.body()) { e =>
           HttpExecutionException(e).shift[Receive[Byte]]
         }.httpValue
@@ -157,10 +159,11 @@ class HttpScalaFXBackend(
     handle(request.uri.toJavaUri) { e => HttpExecutionException(e).shift }
   }
 
-  def makeRequest[T, R >: ReceiveStreams with Effect[Http]](request: Request[T, R])(
-      using HttpBodyMapper[RequestBody[R]],
-      HttpResponseMapper[T]): Http[Response[T]] = {
-    val headers: ::[HttpHeader] = getRequestHeaders(request)
+  def makeRequest[T, R >: ReceiveStreams with Effect[Http], A](request: Request[T, R], body: A)(
+      using ToHttpBodyMapper[A],
+      HttpResponseMapper[Receive[Byte]]): Http[Response[T]] = {
+    given bm: HttpBodyMapper[A] = body.toHttpBodyMapper()
+    val headers: ::[HttpHeader] = getRequestHeaders(request, body)
     val uri: URI = getUri(request).httpValue
     request.method match {
       case Method.DELETE => toResponse(request, uri.DELETE[Receive[Byte]](headers: _*))
@@ -172,7 +175,8 @@ class HttpScalaFXBackend(
             new jnh.HttpResponse[Receive[Byte]] {
               def statusCode(): Int = response.statusCode()
               def request(): jnh.HttpRequest = response.request()
-              def previousResponse(): Optional[jnh.HttpResponse[Receive[Byte]]] = Optional.ofNullable(null)
+              def previousResponse(): Optional[jnh.HttpResponse[Receive[Byte]]] =
+                Optional.ofNullable(null)
               def headers(): jnh.HttpHeaders = response.headers()
               def body(): Receive[Byte] = streamOf(Array.emptyByteArray.toList: _*)
               def sslSession(): Optional[SSLSession] = response.sslSession()
@@ -183,23 +187,40 @@ class HttpScalaFXBackend(
         )
       case Method.OPTIONS => toResponse(request, uri.OPTIONS[Receive[Byte]](headers: _*))
       case Method.PATCH =>
-        toResponse(request, uri.patch[Receive[Byte]](request.body, headers: _*))
+        toResponse(request, uri.patch[Receive[Byte]](body, headers: _*))
       case Method.POST =>
-        toResponse(request, uri.post[Receive[Byte]](request.body, headers: _*))
-      case Method.PUT => toResponse(request, uri.put[Receive[Byte]](request.body, headers: _*))
+        toResponse(request, uri.post[Receive[Byte]](body, headers: _*))
+      case Method.PUT => toResponse(request, uri.put[Receive[Byte]](body, headers: _*))
       case Method.TRACE => toResponse(request, uri.TRACE(headers: _*))
       case m @ _ =>
         HttpExecutionException(new RuntimeException(s"Method: $m is unsupported."))
           .shift[Response[T]]
     }
   }
-  
 
-  def send[T, R >: ReceiveStreams with Effect[Http]](request: Request[T, R]): Http[Response[T]] =
-    given ToHttpBodyMapper[RequestBody[R]] = ToHttpBodyMapper(request.body)
-    val bm: HttpBodyMapper[RequestBody[R]] = requestAsBody(request.body).httpValue
-    given HttpBodyMapper[RequestBody[R]] = bm
-    makeRequest(request)
+  def send[T, R >: ReceiveStreams with Effect[Http]](
+      request: Request[T, R]): Http[Response[T]] =
+    request.body match {
+      case x: NoBody.type => makeRequest(request, x)
+      case x: ByteBufferBody => makeRequest(request, x)
+      case x: InputStreamBody => makeRequest(request, x)
+      case x: FileBody => makeRequest(request, x)
+      case x @ StreamBody(_) => {
+        val body = handle[Exception, StreamBody[Receive[Byte], ReceiveStreams]](
+          x.asInstanceOf[StreamBody[Receive[Byte], ReceiveStreams]]) { e =>
+          HttpExecutionException(e).shift[StreamBody[Receive[Byte], ReceiveStreams]]
+        }.httpValue
+        makeRequest(request, body)
+      }
+      case x @ MultipartBody(_) =>
+        val body = handle[Exception, MultipartBody[R]](x.asInstanceOf[MultipartBody[R]]) { e =>
+          HttpExecutionException(e).shift[MultipartBody[R]]
+        }.httpValue
+        makeRequest(request, body)
+      case b =>
+        HttpExecutionException(new RuntimeException(s"unsupported body type: ${b.toString()}"))
+          .shift[Response[T]]
+    }
 
   def close(): Http[Unit] = ???
 
