@@ -13,9 +13,11 @@ import java.net.http.HttpResponse
  * Parameters](https://tpolecat.github.io/2015/07/30/infer.html), accessed
  * 2022/08/11T23:01:00.000-5:00.
  */
-private [fx] class PutPartiallyApplied[A](private val uri: URI){
+private [fx] class PutPartiallyApplied[A](private val uri: URI) extends Equals {
   def apply[B](body: B, headers: HttpHeader*)
     : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
       uri.PUT[A, B](body, headers: _*)
+    override def canEqual(that: Any): Boolean = that.isInstanceOf[PutPartiallyApplied[?]]
+    override def equals(that: Any): Boolean = that.asInstanceOf[PutPartiallyApplied[A]].uri == uri
 }
 
