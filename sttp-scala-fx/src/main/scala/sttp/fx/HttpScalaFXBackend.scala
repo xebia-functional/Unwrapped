@@ -34,6 +34,7 @@ import sttp.client3.InputStreamBody
 import sttp.client3.FileBody
 import sttp.client3.StreamBody
 import sttp.client3.MultipartBody
+import sttp.client3.ByteArrayBody
 
 class HttpScalaFXBackend(
     using client: HttpClient,
@@ -202,6 +203,7 @@ class HttpScalaFXBackend(
       request: Request[T, R]): Http[Response[T]] =
     request.body match {
       case x: NoBody.type => makeRequest(request, x)
+      case x: ByteArrayBody => makeRequest(request, x)
       case x: ByteBufferBody => makeRequest(request, x)
       case x: InputStreamBody => makeRequest(request, x)
       case x: FileBody => makeRequest(request, x)
