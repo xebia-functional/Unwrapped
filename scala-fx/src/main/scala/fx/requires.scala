@@ -2,6 +2,7 @@ package fx
 
 import scala.compiletime.error
 import scala.quoted.*
+
 /**
  * Super-simple compile time requirements.
  *
@@ -20,12 +21,13 @@ import scala.quoted.*
  * }}}
  */
 inline def requires[A](assertion: Boolean, errorMessage: String, value: A): A = {
-  ${requiresImpl('assertion,'errorMessage, 'value)}
+  ${ requiresImpl('assertion, 'errorMessage, 'value) }
 }
 
 private[fx] def requiresImpl[A](
     assertionExpression: Expr[Boolean],
-    errorMessageExpression: Expr[String], value: Expr[A])(using Quotes)(using Type[A]): Expr[A] =
+    errorMessageExpression: Expr[String],
+    value: Expr[A])(using Quotes)(using Type[A]): Expr[A] =
   '{
     if $assertionExpression == false then error($errorMessageExpression) else $value
   }

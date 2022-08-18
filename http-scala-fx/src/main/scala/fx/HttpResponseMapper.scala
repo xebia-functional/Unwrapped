@@ -39,7 +39,7 @@ object HttpResponseMapper:
           try { // getting the value can actually fail
             val x = Serde[T]().deserialize(accumulator.get())
             x match {
-              case errors@h::t =>
+              case errors @ h :: t =>
                 onError(
                   HttpExecutionException(
                     new RuntimeException(

@@ -63,5 +63,3 @@ val `Insufficient Storage` = StatusCode(507)
 val `Loop Detected` = StatusCode(508)
 val `Not Extended` = StatusCode(510)
 val `Network Authentication Required` = StatusCode(511)
-
-

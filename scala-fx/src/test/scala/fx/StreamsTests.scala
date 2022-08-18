@@ -21,7 +21,8 @@ object StreamsTests extends Properties("Streams tests"):
       }
     }
 
-  property("streamOf(list).grouped.toList should result in lists of size size, except for the final item, which contains all remaining items") =
+  property(
+    "streamOf(list).grouped.toList should result in lists of size size, except for the final item, which contains all remaining items") =
     forAll { (v: List[Long]) =>
       (v.size > 10) ==> {
         val list = streamOf(v*).grouped(10).toList.map(_.size == 10)

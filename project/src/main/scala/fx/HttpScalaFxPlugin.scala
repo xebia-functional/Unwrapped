@@ -71,7 +71,8 @@ object HttpScalaFxPlugin extends AutoPlugin {
           }
           .toList
 
-        sb.append(s"$newline${indent}val mediaTypes: Set[MediaType] = $newline$indent${indent}Set(")
+        sb.append(
+          s"$newline${indent}val mediaTypes: Set[MediaType] = $newline$indent${indent}Set(")
 
         for {
           reference <- lb

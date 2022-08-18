@@ -1,7 +1,7 @@
 package sttp
 package fx
 
-import _root_.fx.{*, given}
+import _root_.fx.{given, *}
 import munit.fx.ScalaFXSuite
 import sttp.client3.StringBody
 

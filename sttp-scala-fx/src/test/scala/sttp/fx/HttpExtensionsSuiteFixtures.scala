@@ -82,7 +82,7 @@ trait HttpExtensionsSuiteFixtures { self: ScalaFXSuite =>
 
   lazy val putHandler = HttpHandlers.handleOrElse(
     request =>
-    request.getRequestMethod() == "PUT" && request.getRequestURI().getPath().contains("ping"),
+      request.getRequestMethod() == "PUT" && request.getRequestURI().getPath().contains("ping"),
     HttpHandlers.of(Accepted.value, getSuccessHeaders, Accepted.statusText),
     fallbackHttpHandler
   )

@@ -14,7 +14,7 @@ class HttpExtensionsSuite extends ScalaFXSuite, HttpExtensionsSuiteFixtures {
     assertEqualsFX(uri.post[String], PostPartiallyApplied[String](uri))
   }
 
-  uri.testFX("uri.put should return a PutPartiallyApplied"){ uri =>
+  uri.testFX("uri.put should return a PutPartiallyApplied") { uri =>
     assertEqualsFX(uri.put[String], PutPartiallyApplied(uri))
   }
 

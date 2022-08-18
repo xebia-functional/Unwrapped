@@ -22,8 +22,9 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
       }
     }
   }
-    
-  property("given an exception, assertsShiftsToFX should expect control to shift to that exception") {
+
+  property(
+    "given an exception, assertsShiftsToFX should expect control to shift to that exception") {
     given Arbitrary[java.lang.Exception] = Arbitrary {
       Gen.alphaNumStr.map(java.lang.Exception(_))
     }

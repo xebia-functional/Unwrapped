@@ -105,8 +105,12 @@ object PartSpecification:
       def toPartSpec: Array[Byte] =
         val path: Path = p.value
         s"""|--${p.boundary.value}
-            |Content-Disposition: form-data; name=${p.name.value}; filename=${path.toFile().getName()}
-            |Content-Type: ${Try { Option(Files.probeContentType(path)).get }.fold(_ => "application/octet-stream",identity)}""".stripMargin.getBytes() ++ Files.newInputStream(path).readAllBytes()
+            |Content-Disposition: form-data; name=${p
+          .name
+          .value}; filename=${path.toFile().getName()}
+            |Content-Type: ${Try { Option(Files.probeContentType(path)).get }.fold(
+          _ => "application/octet-stream",
+          identity)}""".stripMargin.getBytes() ++ Files.newInputStream(path).readAllBytes()
 
   private given ToPartSpec[StreamPartSpec] with
     extension (p: StreamPartSpec)

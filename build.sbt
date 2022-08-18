@@ -52,17 +52,25 @@ lazy val `scalike-jdbc-scala-fx` = project
   .settings(publish / skip := true)
   .settings(scalalikeSettings)
 
-lazy val `java-net-multipart-body-publisher` = (project in file("./java-net-mulitpart-body-publisher"))
-  .settings(commonSettings)
+lazy val `java-net-multipart-body-publisher` =
+  (project in file("./java-net-mulitpart-body-publisher")).settings(commonSettings)
 
 lazy val `http-scala-fx` = (project in file("./http-scala-fx"))
   .settings(httpScalaFXSettings)
   .settings(generateMediaTypeSettings)
-  .dependsOn(`java-net-multipart-body-publisher`, `scala-fx`, `munit-scala-fx` % "test -> compile").enablePlugins(HttpScalaFxPlugin)
+  .dependsOn(
+    `java-net-multipart-body-publisher`,
+    `scala-fx`,
+    `munit-scala-fx` % "test -> compile")
+  .enablePlugins(HttpScalaFxPlugin)
 
 lazy val `sttp-scala-fx` = (project in file("./sttp-scala-fx"))
   .settings(sttpScalaFXSettings)
-  .dependsOn(`java-net-multipart-body-publisher`, `scala-fx`, `http-scala-fx`, `munit-scala-fx` % "test -> compile")
+  .dependsOn(
+    `java-net-multipart-body-publisher`,
+    `scala-fx`,
+    `http-scala-fx`,
+    `munit-scala-fx` % "test -> compile")
 
 lazy val commonSettings = Seq(
   javaOptions ++= javaOptionsSettings,

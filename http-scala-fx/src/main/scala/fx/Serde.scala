@@ -27,4 +27,3 @@ trait Serde[A]:
 
 object Serde:
   def apply[A: Serde](): Serde[A] = summon[Serde[A]]
-

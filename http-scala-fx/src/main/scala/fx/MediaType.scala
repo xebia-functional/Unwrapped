@@ -9,4 +9,3 @@ extension (m: MediaType)
 object MediaType:
   def apply(s: String): MediaType =
     s
-

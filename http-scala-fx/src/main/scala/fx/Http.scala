@@ -19,16 +19,14 @@ type Http[A] = (
     HttpClient
 ) ?=> A
 
-extension [A](
-    http: Http[A])
+extension [A](http: Http[A])
   def httpValue: Control[HttpExecutionException] ?=> A = http
   def fmap[B](f: A => B): Http[B] =
     f(http)
   def bindMap[B](f: A => Http[B]): Http[B] =
     f(http)
 
-
-extension(uri: URI)
+extension (uri: URI)
   private def addHeadersToRequestBuilder(
       builder: HttpRequest.Builder,
       headers: HttpHeader*): HttpRequest.Builder =
@@ -95,9 +93,7 @@ extension(uri: URI)
   def HEAD(headers: HttpHeader*): Http[HttpResponse[Void]] = HEAD(0, headers: _*)
 
   @tailrec
-  private def HEAD(
-      retryCount: Int = 0,
-      headers: HttpHeader*): Http[HttpResponse[Void]] =
+  private def HEAD(retryCount: Int = 0, headers: HttpHeader*): Http[HttpResponse[Void]] =
     val config = summon[HttpClientConfig]
     val retries = config.maximumRetries.getOrElse(summon[HttpRetries])
     val response =
@@ -134,8 +130,7 @@ extension(uri: URI)
       PUT(body, retryCount + 1, headers: _*)
     } else response
 
-  def DELETE[A](
-      headers: HttpHeader*): (HttpResponseMapper[A]) ?=> Http[HttpResponse[A]] =
+  def DELETE[A](headers: HttpHeader*): (HttpResponseMapper[A]) ?=> Http[HttpResponse[A]] =
     DELETE[A](0, headers: _*)
 
   @tailrec
@@ -158,8 +153,7 @@ extension(uri: URI)
       response
     }
 
-  def OPTIONS[A](
-      headers: HttpHeader*): (HttpResponseMapper[A]) ?=> Http[HttpResponse[A]] =
+  def OPTIONS[A](headers: HttpHeader*): (HttpResponseMapper[A]) ?=> Http[HttpResponse[A]] =
     OPTIONS(0, headers: _*)
 
   @tailrec
@@ -180,8 +174,7 @@ extension(uri: URI)
       OPTIONS(retryCount + 1, headers: _*)
     } else response
 
-  def TRACE[A](
-      headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[HttpResponse[A]] =
+  def TRACE[A](headers: HttpHeader*): HttpResponseMapper[A] ?=> Http[HttpResponse[A]] =
     TRACE[A](0, headers: _*)
 
   @tailrec
@@ -205,7 +198,7 @@ extension(uri: URI)
 
   def PATCH[A, B](body: B, headers: HttpHeader*)
       : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
-        PATCH(body, 0, headers: _*)
+    PATCH(body, 0, headers: _*)
 
   @tailrec
   private def PATCH[A, B](body: B, retryCount: Int = 0, headers: HttpHeader*)
@@ -233,5 +226,3 @@ object Http:
 
   def apply[A](a: A): Http[A] =
     a
-
-  

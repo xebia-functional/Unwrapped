@@ -55,19 +55,20 @@ extension [A](r: Receive[A])
     }
 
   def grouped(n: Int): Receive[Vector[A]] = { // this could be written
-                                            // as a tail rec function,
-                                            // but it is unlikely the
-                                            // streamed body will be
-                                            // extracted and thus from
-                                            // the outside is RT.
+    // as a tail rec function,
+    // but it is unlikely the
+    // streamed body will be
+    // extracted and thus from
+    // the outside is RT.
     streamed {
       var acc: Vector[A] = Vector.empty[A]
-      r.receive((value: A) => if(acc.size < n){
-        acc = acc :+ value
-      } else{
-        send(acc)
-        acc = Vector(value)
-      })
+      r.receive((value: A) =>
+        if (acc.size < n) {
+          acc = acc :+ value
+        } else {
+          send(acc)
+          acc = Vector(value)
+        })
       send(acc)
     }
   }

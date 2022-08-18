@@ -181,8 +181,7 @@ class HttpSuite extends ScalaFXSuite, HttpServerFixtures:
       serverAddressResource.use { baseServerAddress =>
         assertEqualsFX(
           structured(
-            URI.create(s"$baseServerAddress/ping").PATCH[String, String]("paddle")
-              .statusCode),
+            URI.create(s"$baseServerAddress/ping").PATCH[String, String]("paddle").statusCode),
           200)
       }
   }

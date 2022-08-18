@@ -1,7 +1,7 @@
 package sttp
 package fx
 
-import _root_.fx.{*, given}
+import _root_.fx.{given, *}
 import munit.fx.ScalaFXSuite
 
 import java.nio.ByteBuffer
@@ -65,9 +65,7 @@ class ToHttpBodyMapperSuite extends ScalaFXSuite, ToHttpBodyMapperFixtures {
                   subscription.request(Long.MaxValue)
 
                 override def onNext(x: ByteBuffer): Unit = {
-                  x.array.foreach { byte =>
-                    send(byte)
-                  }
+                  x.array.foreach { byte => send(byte) }
                 }
               })
           }.toList.toArray,
@@ -102,9 +100,7 @@ class ToHttpBodyMapperSuite extends ScalaFXSuite, ToHttpBodyMapperFixtures {
                   subscription.request(Long.MaxValue)
 
                 override def onNext(x: ByteBuffer): Unit = {
-                  x.array.foreach { byte =>
-                    send(byte)
-                  }
+                  x.array.foreach { byte => send(byte) }
                 }
               })
           }.toList.toArray,

@@ -7,10 +7,9 @@ import sttp.{model => sm}
 trait StatusCodeToStatusCode[A, B]:
   extension (a: A) def toStatusCode: Http[B]
 
-object StatusCodeToStatusCode{
+object StatusCodeToStatusCode {
   def apply[A, B](using StatusCodeToStatusCode[A, B]): StatusCodeToStatusCode[A, B] =
     summon
-
 
   given StatusCodeToStatusCode[Int, sm.StatusCode] with
     extension (a: Int)
@@ -88,7 +87,7 @@ object StatusCodeToStatusCode{
               .safeApply(unused.value)
               .fold(err => HttpExecutionException(new RuntimeException(err)).shift, identity)
 
-  given smStatusCode:StatusCodeToStatusCode[sm.StatusCode, StatusCode] with
+  given smStatusCode: StatusCodeToStatusCode[sm.StatusCode, StatusCode] with
     extension (a: sm.StatusCode)
       def toStatusCode: Http[StatusCode] =
         a match
