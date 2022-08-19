@@ -1,6 +1,4 @@
-package java
-package net
-package http
+package fx
 
 import java.nio.charset.Charset
 import java.nio.file.Files
@@ -88,7 +86,8 @@ object PartSpecification:
             |
             |${p
           .value
-          .value}""".stripMargin.replace("/n", "/r/n").getBytes(Charset.forName("UTF-8"))
+          .value}
+            |""".stripMargin.replace("/n", "/r/n").getBytes(Charset.forName("UTF-8"))
 
   private given ToPartSpec[FilePartSpec] with
     extension (p: FilePartSpec)
@@ -98,7 +97,8 @@ object PartSpecification:
             |Content-Disposition: form-data; name=${p.name.value}; filename=${p.filename.value}
             |Content-Type: ${Try { Option(Files.probeContentType(path)).get }.fold(
           _ => "application/octet-stream",
-          identity)}""".stripMargin.getBytes() ++ Files.newInputStream(path).readAllBytes()
+          identity)}
+            |""".stripMargin.getBytes() ++ Files.newInputStream(path).readAllBytes() ++ "\r\n".getBytes
 
   private given ToPartSpec[PathPartSpec] with
     extension (p: PathPartSpec)
@@ -110,7 +110,7 @@ object PartSpecification:
           .value}; filename=${path.toFile().getName()}
             |Content-Type: ${Try { Option(Files.probeContentType(path)).get }.fold(
           _ => "application/octet-stream",
-          identity)}""".stripMargin.getBytes() ++ Files.newInputStream(path).readAllBytes()
+          identity)}""".stripMargin.getBytes() ++ Files.newInputStream(path).readAllBytes() ++ "\r\n".getBytes
 
   private given ToPartSpec[StreamPartSpec] with
     extension (p: StreamPartSpec)
@@ -122,7 +122,7 @@ object PartSpecification:
             |""".stripMargin.replace("\n", "\r\n").getBytes(Charset.forName("UTF-8")) ++ p
           .value
           .value()
-          .readAllBytes()
+          .readAllBytes() ++ "\r\n".getBytes
 
   private given ToPartSpec[FinalBoundaryPartSpec] with
     extension (p: FinalBoundaryPartSpec)

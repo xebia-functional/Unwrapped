@@ -16,10 +16,10 @@ import sttp.model.Part
 
 import java.io.ByteArrayInputStream
 import java.io.InputStream
-import java.net.http.Boundary
+import fx.Boundary
 import java.net.http.HttpRequest.BodyPublisher
 import java.net.http.HttpRequest.BodyPublishers
-import java.net.http.MultiPartBodyPublisher
+import fx.MultiPartBodyPublisher
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path

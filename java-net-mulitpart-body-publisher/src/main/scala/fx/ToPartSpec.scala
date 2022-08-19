@@ -1,6 +1,4 @@
-package java
-package net
-package http
+package fx
 
 /**
  * Provides a conversion from a PartSpecification to an array of bytes for http request

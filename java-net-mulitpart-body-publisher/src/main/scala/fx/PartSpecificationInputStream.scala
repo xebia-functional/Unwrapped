@@ -1,6 +1,4 @@
-package java
-package net
-package http
+package fx
 
 import java.io.InputStream
 

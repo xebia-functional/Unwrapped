@@ -1,6 +1,4 @@
-package java
-package net
-package http
+package fx
 
 /**
  * Models the filename part of a multipart part.

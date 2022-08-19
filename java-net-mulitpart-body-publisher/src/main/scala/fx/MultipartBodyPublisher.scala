@@ -8,9 +8,7 @@
  * https://stackoverflow.com/users/1746118/naman Converted to scala by
  * https://stackoverflow.com/users/708929/jack-viers
  */
-package java
-package net
-package http
+package fx
 
 import java.io.IOException
 import java.io.InputStream

@@ -6,6 +6,9 @@ import java.net.http.HttpRequest.BodyPublishers
 import java.nio.ByteBuffer
 import java.nio.file.Path
 import java.util.concurrent.SubmissionPublisher
+import java.nio.charset.StandardCharsets
+import java.util.concurrent.Executors
+import java.util.concurrent.Flow.Publisher
 
 /**
  * Require Http effect to work with body publisher and mediaType. This keeps everything within
@@ -58,21 +61,11 @@ object HttpBodyMapper extends HttpBodyMapperLowPriority:
 
         def subscribe(
             subscriber: java.util.concurrent.Flow.Subscriber[? >: java.nio.ByteBuffer]): Unit =
-          val publisher = new SubmissionPublisher[java.nio.ByteBuffer] {}
-          publisher.subscribe(subscriber)
-          val x: Send[Byte] ?=> (Byte) => Unit = byte =>
-            while (publisher.offer( // this could be rewritten as a tail
-                // recursive function... but as the
-                // compiler will reduce to this
-                // while loop, what is the point?
-                ByteBuffer.wrap(
-                  new Array[Byte](byte)
-                ),
-                (subscriber, droppedByteBuffer) => true
-              ) < 0) {
-              ()
-            } // always resend dropped bytes
-          b.transform(x)
+          b.grouped(1024)
+            .transform { bytes =>
+              subscriber.onNext(ByteBuffer.wrap(bytes.toArray))
+            }
+            .toList
 
 trait HttpBodyMapperLowPriority:
   given HttpBodyMapper[Any] with
