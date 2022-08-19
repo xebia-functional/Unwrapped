@@ -119,7 +119,7 @@ lazy val httpScalaFXSettings = commonSettings
 
 lazy val sttpScalaFXSettings = commonSettings ++ Seq(
   libraryDependencies += sttp,
-  libraryDependencies += httpCore
+  libraryDependencies += httpCore5
 )
 
 lazy val javaOptionsSettings = Seq(

@@ -27,7 +27,7 @@ object Dependencies {
     val testContainers = "0.40.8"
     val flyway = "8.5.12"
     val sttp = "3.6.2"
-    val httpCore = "4.4.15"
+    val httpCore5 = "5.1.4"
   }
 
   object Compile {
@@ -41,7 +41,7 @@ object Dependencies {
     val h2Database = "com.h2database" % "h2" % Versions.h2Database
     val logback = "ch.qos.logback" % "logback-classic" % Versions.logback
     val sttp = "com.softwaremill.sttp.client3" %% "core" % Versions.sttp
-    val httpCore = "org.apache.httpComponents" % "httpcore" % Versions.httpCore
+    val httpCore5 = "org.apache.httpcomponents.core5" % "httpcore5" % Versions.httpCore5
   }
 
   object Test {
