@@ -1,32 +1,86 @@
 package sttp
 package fx
 
-import _root_.fx.{given, *}
-import munit.fx.ScalaFXSuite
+import _root_.fx.{given, _}
 import com.sun.net.httpserver.*
+import munit.fx.ScalaFXSuite
+import sttp.client3.*
+import sttp.model.headers.Accepts
+
 import java.net.InetSocketAddress
-import java.util.concurrent.Executors
-import scala.jdk.CollectionConverters.*
+import java.nio.file.Files
 import java.time.*
+import java.util.concurrent.Executors
 import scala.io.Source
+import scala.jdk.CollectionConverters.*
+import java.nio.charset.StandardCharsets
 
 private[fx] trait FullBackendFixtures { self: ScalaFXSuite =>
 
-  def httpServer(handlers: HttpHandler*) = FunFixture(
+  def getRequest(baseServerAddress: String) = basicRequest
+    .get(uri"$baseServerAddress/47DegLogo.svg")
+    .header("Accepts", MediaTypes.image.`svg+xml`.value, true)
+
+  val imageFileResource = FunFixture(
+    setup = _ =>
+      Resource(
+        Files.createTempFile("47DegLogo", "svg").toFile(),
+        (file, _) => file.deleteOnExit()
+      ),
+    teardown = _ => ())
+
+  val resultFileResource = FunFixture(
+    setup = _ =>
+      Resource(
+        Files.createTempFile("result", ".txt").toFile(),
+        (file, _) => file.deleteOnExit()
+      ),
+    teardown = _ => ())
+
+  val resultPutFileResource = FunFixture(
+    setup = _ =>
+      Resource(
+        Files.createTempFile("resultPut", ".txt").toFile(),
+        (file, _) => file.deleteOnExit()
+      ),
+    teardown = _ => ())
+
+  val resultPatchFileResource = FunFixture(
+    setup = _ =>
+      Resource(
+        Files.createTempFile("resultPatch", ".txt").toFile(),
+        (file, _) => file.deleteOnExit()
+      ),
+    teardown = _ => ())
+
+  val basicServer = httpServer(echoHandler)
+
+  val testBody = FunFixture(setup = _ => "test", teardown = _ => ())
+
+  val basicServerAndTestBody = FunFixture.map2(basicServer, testBody)
+
+  val basicServerAndTestBodyAndFile = FunFixture.map3(basicServer, testBody, resultFileResource)
+
+  val basicServerAndTestBodyAndPutFile =
+    FunFixture.map3(basicServer, testBody, resultPutFileResource)
+
+  val basicServerAndTestBodyAndPatchFile =
+    FunFixture.map3(basicServer, testBody, resultPatchFileResource)
+
+  val basicServerAndFile = FunFixture.map2(basicServer, imageFileResource)
+
+  val executor = Executors.newVirtualThreadPerTaskExecutor
+  sys.addShutdownHook(executor.shutdown())
+
+  def httpServer(handler: HttpHandler) = FunFixture(
     setup = _ => {
       for {
         server <- Resource(
           HttpServer.create(InetSocketAddress(0), 0),
           (server, _) => server.stop(0)
         )
-        serverExecutor <- Resource(
-          Executors.newVirtualThreadPerTaskExecutor,
-          (executor, _) => executor.shutdown()
-        )
-        _ = server.setExecutor(serverExecutor)
-        _ = for {
-          handler <- handlers
-        } server.createContext("/", handler)
+        _ = server.setExecutor(executor)
+        _ = server.createContext("/", handler)
         _ = server.start
       } yield s"http:/${server.getAddress()}/"
     },
@@ -42,7 +96,7 @@ private[fx] trait FullBackendFixtures { self: ScalaFXSuite =>
       val method = request.getRequestMethod()
       val path = request.getRequestURI().getPath()
       method match {
-        case "POST" | "PATCH" | "PUT" => path.contains("/echo")
+        case "POST" | "PATCH" | "PUT" => path.contains("echo")
         case _ => false
       }
     },
@@ -56,17 +110,14 @@ private[fx] trait FullBackendFixtures { self: ScalaFXSuite =>
         for {
           key <- requestHeaderKeys
         } mutableResponseHeaders.put(key, requestHeaders.get(key))
-        exchange.sendResponseHeaders(200, 0L)
+
+        exchange.sendResponseHeaders(200, requestInputStream.available.toLong)
         requestInputStream.transferTo(outputStream)
-        outputStream.flush()
-        outputStream.close()
       } catch {
         case _ => ()
-      } finally {
-        exchange.close()
       }
     },
-    fallbackHttpHandler
+    deleteHandler
   )
 
   lazy val getImageHandler = HttpHandlers.handleOrElse(
@@ -83,9 +134,9 @@ private[fx] trait FullBackendFixtures { self: ScalaFXSuite =>
         val outputStream = exchange.getResponseBody()
         val mutableResponseHeaders = exchange.getResponseHeaders()
         mutableResponseHeaders.add("Content-Type", MediaTypes.image.`svg+xml`.value)
-        mutableResponseHeaders.add("Content-Length", "988")
-        exchange.sendResponseHeaders(200, 988L)
-        getClass.getResourceAsStream("brand.svg").transferTo(outputStream)
+        // mutableResponseHeaders.add("Content-Length", "988")
+        exchange.sendResponseHeaders(200, 0)
+        getClass.getResourceAsStream("/brand.svg").transferTo(outputStream)
         outputStream.flush()
         outputStream.close()
       } catch {
@@ -107,7 +158,7 @@ private[fx] trait FullBackendFixtures { self: ScalaFXSuite =>
       }
     },
     HttpHandlers.of(OK.value, getSuccessHeaders, OK.statusText),
-    fallbackHttpHandler
+    getImageHandler
   )
 
   lazy val fallbackHttpHandler =

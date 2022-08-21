@@ -35,8 +35,9 @@ import sttp.client3.FileBody
 import sttp.client3.StreamBody
 import sttp.client3.MultipartBody
 import sttp.client3.ByteArrayBody
+import sttp.client3.StringBody
 
-class HttpScalaFXBackend(
+class HttpScalaFXBackend()(
     using client: HttpClient,
     control: Control[Throwable | HttpExecutionException])
     extends SttpBackend[Http, ReceiveStreams] {
@@ -47,6 +48,7 @@ class HttpScalaFXBackend(
       request: Request[T, R]): Http[Response[T]] =
     request.body match {
       case x: NoBody.type => makeRequest(request, x)
+      case x: StringBody => makeRequest(request, x)
       case x: ByteArrayBody => makeRequest(request, x)
       case x: ByteBufferBody => makeRequest(request, x)
       case x: InputStreamBody => makeRequest(request, x)
@@ -63,9 +65,6 @@ class HttpScalaFXBackend(
           HttpExecutionException(e).shift[MultipartBody[R]]
         }.httpValue
         makeRequest(request, body)
-      case b =>
-        HttpExecutionException(new RuntimeException(s"unsupported body type: ${b.toString()}"))
-          .shift[Response[T]]
     }
 
   def close(): Http[Unit] = ???
@@ -116,6 +115,7 @@ class HttpScalaFXBackend(
       `Content-Type`,
       request
         .headers
+        .filterNot(_.name != "Content-Length")
         .groupBy(_.name)
         .map { (p: (String, Seq[Header])) =>
           val values = p._2.map(_.value).toList
@@ -131,7 +131,7 @@ class HttpScalaFXBackend(
     }
   }
 
-  private def bodyAsResponseAs[T](using HttpBodyMapper[Receive[Byte]], MonadError[Http]) = {
+  private def bodyAsResponseAs[T](using MonadError[Http]) = {
     new BodyFromResponseAs[Http, jnh.HttpResponse[Receive[Byte]], Nothing, Receive[Byte]] {
       override protected def withReplayableBody(
           response: jnh.HttpResponse[Receive[Byte]],

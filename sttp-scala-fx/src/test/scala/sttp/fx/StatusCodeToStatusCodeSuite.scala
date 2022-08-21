@@ -11,7 +11,8 @@ import sttp.fx.StatusCodeToStatusCode.given_StatusCodeToStatusCode_StatusCode_St
 import hedgehog.Gen
 
 class StatusCodeToStatusCodeSuite extends ScalaFXSuite, HedgehogAssertions:
-  lazy val statusCodeInts = StatusCode.statusCodes.toList.filterNot(c => c == 509 || c == 425)
+  lazy val statusCodeInts =
+    StatusCode.statusCodes.toList.filterNot(c => c == 509 || c == 425 || c == 418)
   lazy val statusCodeGen = Gen.element(statusCodeInts.head, statusCodeInts.tail)
 
   propertyFX(

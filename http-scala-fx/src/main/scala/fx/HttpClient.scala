@@ -10,6 +10,7 @@ opaque type HttpClient = jnh.HttpClient
 extension (h: HttpClient) def client: jnh.HttpClient = h
 
 object HttpClient:
+  System.setProperty("jdk.httpclient.allowRestrictedHeaders", "Content-Length")
   def apply(a: jnh.HttpClient): HttpClient = a
   def apply(using HttpClientConfig): HttpClient =
     val config = summon[HttpClientConfig]
