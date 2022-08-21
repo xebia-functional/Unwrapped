@@ -62,9 +62,7 @@ object HttpBodyMapper extends HttpBodyMapperLowPriority:
         def subscribe(
             subscriber: java.util.concurrent.Flow.Subscriber[? >: java.nio.ByteBuffer]): Unit =
           b.grouped(1024)
-            .transform { bytes =>
-              subscriber.onNext(ByteBuffer.wrap(bytes.toArray))
-            }
+            .transform { bytes => subscriber.onNext(ByteBuffer.wrap(bytes.toArray)) }
             .toList
 
 trait HttpBodyMapperLowPriority:

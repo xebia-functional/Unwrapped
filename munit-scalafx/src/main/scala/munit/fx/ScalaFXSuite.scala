@@ -3,14 +3,38 @@ package fx
 
 import _root_.fx._
 import org.junit.AssumptionViolatedException
+import hedgehog.core.Seed
+import hedgehog.{runner => hr}
 
 import scala.annotation.targetName
 import scala.reflect.Typeable
+import hedgehog.core.PropertyConfig
+import hedgehog.Property
+import hedgehog.munit.HedgehogAssertions
+import hedgehog.core.Status
 
 /**
  * Provides functionality for testing within a scala-fx context.
  */
-abstract class ScalaFXSuite extends FunSuite, ScalaFxAssertions:
+abstract class ScalaFXSuite extends FunSuite, ScalaFxAssertions, HedgehogAssertions:
+
+  private val seedSource = hr.SeedSource.fromEnvOrTime()
+  private val seed = Seed.fromLong(seedSource.seed)
+
+  private def check(test: hr.Test, config: PropertyConfig)(implicit loc: Location): Any = {
+    val report = Property.check(test.withConfig(config), test.result, seed)
+    if (report.status != Status.ok) {
+      val reason = hr
+        .Test
+        .renderReport(
+          this.getClass.getName,
+          test,
+          report,
+          ansiCodesSupported = true
+        )
+      withMunitAssertions(assertions => assertions.fail(s"$reason\n${seedSource.renderLog}"))
+    }
+  }
 
   /**
    * Provides fixtures to effectful tests.
@@ -65,7 +89,53 @@ abstract class ScalaFXSuite extends FunSuite, ScalaFxAssertions:
           case ex: F => throw ex
           case x => throw AssertionError(x)
       }
+
+    /**
+     * Provides testFX for [munit.FunFixtures.FunFixture]
+     *
+     * @tparam R
+     *   The error type declared by the test body effect.
+     * @tparam F
+     *   AssertionError thrown by any assertions
+     * @param name
+     *   The name of the test
+     * @param withConfig
+     *   A hedgehog PropertyConfig transformer
+     * @return
+     *   The result of the test when a location can be pulled from given scope.
+     */
+    def propertyWithFixtureFX[R, F <: AssertionError: Typeable](
+        name: String,
+        withConfig: PropertyConfig => PropertyConfig = identity)(
+        prop: Errors[R | F] ?=> A => Property): Location ?=> Unit =
+      a.testFX(name) { fixture =>
+        val t = hedgehog.runner.property(name, prop(fixture)).config(withConfig)
+        check(t, t.withConfig(PropertyConfig.default))
+      }
   }
+
+  /**
+   * Provides testFX for [munit.FunFixtures.FunFixture]
+   *
+   * @tparam R
+   *   The error type declared by the test body effect.
+   * @tparam F
+   *   AssertionError thrown by any assertions
+   * @param name
+   *   The name of the test
+   * @param withConfig
+   *   A hedgehog PropertyConfig transformer
+   * @return
+   *   The result of the test when a location can be pulled from given scope.
+   */
+  def propertyFX[R, F <: AssertionError: Typeable](
+      name: String,
+      withConfig: PropertyConfig => PropertyConfig = identity)(
+      prop: Errors[R | F] ?=> Property): Location ?=> Unit =
+    testFX(name) {
+      val t = hedgehog.runner.property(name, prop).config(withConfig)
+      check(t, t.withConfig(PropertyConfig.default))
+    }
 
   /**
    * Runs a test inside an effect. The execution of the effect is delayed until the test is run.

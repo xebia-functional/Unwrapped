@@ -91,6 +91,7 @@ lazy val scalafxSettings: Seq[Def.Setting[_]] =
 lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
   libraryDependencies ++= Seq(
     munitScalacheck,
+    hedgehog,
     junit,
     munit,
     junitInterface
@@ -119,7 +120,8 @@ lazy val httpScalaFXSettings = commonSettings
 
 lazy val sttpScalaFXSettings = commonSettings ++ Seq(
   libraryDependencies += sttp,
-  libraryDependencies += httpCore5
+  libraryDependencies += httpCore5,
+  libraryDependencies += hedgehog % Test
 )
 
 lazy val javaOptionsSettings = Seq(

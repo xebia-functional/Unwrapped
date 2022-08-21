@@ -28,6 +28,7 @@ object Dependencies {
     val flyway = "8.5.12"
     val sttp = "3.6.2"
     val httpCore5 = "5.1.4"
+    val hedgehog = "0.9.0"
   }
 
   object Compile {
@@ -42,6 +43,7 @@ object Dependencies {
     val logback = "ch.qos.logback" % "logback-classic" % Versions.logback
     val sttp = "com.softwaremill.sttp.client3" %% "core" % Versions.sttp
     val httpCore5 = "org.apache.httpcomponents.core5" % "httpcore5" % Versions.httpCore5
+
   }
 
   object Test {
@@ -53,6 +55,7 @@ object Dependencies {
     val testContainersPostgres =
       "com.dimafeng" %% "testcontainers-scala-postgresql" % Versions.testContainers
     val flyway = "org.flywaydb" % "flyway-core" % Versions.flyway
+    val hedgehog = "qa.hedgehog" %% "hedgehog-munit" % Versions.hedgehog
   }
 
   object Plugins {
