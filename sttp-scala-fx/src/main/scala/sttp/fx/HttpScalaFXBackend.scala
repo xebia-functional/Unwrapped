@@ -41,13 +41,73 @@ class HttpScalaFXBackend(
     control: Control[Throwable | HttpExecutionException])
     extends SttpBackend[Http, ReceiveStreams] {
 
-  given MonadError[Http] = responseMonad
+  private given MonadError[Http] = responseMonad
 
-  def requestAsBody[R, A <: RequestBody[R]](r: A)(
+  def send[T, R >: ReceiveStreams with Effect[Http]](
+      request: Request[T, R]): Http[Response[T]] =
+    request.body match {
+      case x: NoBody.type => makeRequest(request, x)
+      case x: ByteArrayBody => makeRequest(request, x)
+      case x: ByteBufferBody => makeRequest(request, x)
+      case x: InputStreamBody => makeRequest(request, x)
+      case x: FileBody => makeRequest(request, x)
+      case x @ StreamBody(_) => {
+        val body = handle[Exception, StreamBody[Receive[Byte], ReceiveStreams]](
+          x.asInstanceOf[StreamBody[Receive[Byte], ReceiveStreams]]) { e =>
+          HttpExecutionException(e).shift[StreamBody[Receive[Byte], ReceiveStreams]]
+        }.httpValue
+        makeRequest(request, body)
+      }
+      case x @ MultipartBody(_) =>
+        val body = handle[Exception, MultipartBody[R]](x.asInstanceOf[MultipartBody[R]]) { e =>
+          HttpExecutionException(e).shift[MultipartBody[R]]
+        }.httpValue
+        makeRequest(request, body)
+      case b =>
+        HttpExecutionException(new RuntimeException(s"unsupported body type: ${b.toString()}"))
+          .shift[Response[T]]
+    }
+
+  def close(): Http[Unit] = ???
+
+  def responseMonad: MonadError[Http] = new MonadError[Http] {
+    def ensure[T](f: Http[T], e: => Http[Unit]): Http[T] = {
+      val x: Throwable | T = run(f)
+      x match {
+        case ex: Throwable =>
+          val ignored = run(e)
+          f
+        case a => unit(a.asInstanceOf[T]) // the only other possible
+        // value is T. Since we
+        // cannot change the
+        // signature, we cast
+      }
+    }
+    def error[T](t: Throwable): Http[T] = t.shift
+    def flatMap[T, T2](fa: Http[T])(f: T => Http[T2]): Http[T2] = fa.bindMap(f)
+    protected def handleWrappedError[T](rt: Http[T])(
+        h: PartialFunction[Throwable, Http[T]]): Http[T] = {
+      val x: Throwable | T = run(rt)
+      x match {
+        case ex: Throwable if h.isDefinedAt(ex) => h(ex)
+        case ex: Throwable => ex.shift[T]
+        case a => unit(a.asInstanceOf[T]) // because the only other
+        // possible value is T, and
+        // we cannot change the
+        // signature to include a
+        // manifest, we cast here
+
+      }
+    }
+    def map[T, T2](fa: Http[T])(f: T => T2): Http[T2] = fa.fmap(f)
+    def unit[T](t: T): Http[T] = Http(t)
+  }
+
+  private def requestAsBody[R, A <: RequestBody[R]](r: A)(
       using ToHttpBodyMapper[A]): Http[HttpBodyMapper[A]] =
     handle(r.toHttpBodyMapper()) { e => HttpExecutionException(e).shift }
 
-  def getRequestHeaders[T, R >: ReceiveStreams with Effect[Http], A](
+  private def getRequestHeaders[T, R >: ReceiveStreams with Effect[Http], A](
       request: Request[T, R],
       body: A)(using bodyMapper: HttpBodyMapper[A]): Http[::[HttpHeader]] = {
     val `Content-Type`: HttpHeader = HttpHeader(
@@ -65,7 +125,7 @@ class HttpScalaFXBackend(
     )
   }
 
-  def getResponseHeaders[T](response: jnh.HttpResponse[T]): Http[Seq[sm.Header]] = {
+  private def getResponseHeaders[T](response: jnh.HttpResponse[T]): Http[Seq[sm.Header]] = {
     response.headers.map().asScala.toList.foldLeft(Seq.empty[sm.Header]) { (acc, jnhHeader) =>
       acc ++ jnhHeader._2.asScala.map(sm.Header(jnhHeader._1, _))
     }
@@ -147,20 +207,24 @@ class HttpScalaFXBackend(
       StatusCodeToStatusCode[Int, sm.StatusCode]): Http[Response[T]] = {
     val status = response.statusCode().toStatusCode
     val statusText = status.toStatusCode.statusText
-    val responseMetadata = ResponseMetadata(status, statusText, getResponseHeaders(response))
+    val headers = getResponseHeaders(response)
+    val responseMetadata = ResponseMetadata(status, statusText, headers)
     val body = bodyAsResponseAs[T].apply(
       request.response,
       responseMetadata,
       Left(response)
     )
-    ???
+    Response(body, status, statusText, headers)
   }
 
-  def getUri[T, R >: ReceiveStreams with Effect[Http]](request: Request[T, R]): Http[URI] = {
+  private def getUri[T, R >: ReceiveStreams with Effect[Http]](
+      request: Request[T, R]): Http[URI] = {
     handle(request.uri.toJavaUri) { e => HttpExecutionException(e).shift }
   }
 
-  def makeRequest[T, R >: ReceiveStreams with Effect[Http], A](request: Request[T, R], body: A)(
+  private def makeRequest[T, R >: ReceiveStreams with Effect[Http], A](
+      request: Request[T, R],
+      body: A)(
       using ToHttpBodyMapper[A],
       HttpResponseMapper[Receive[Byte]]): Http[Response[T]] = {
     given bm: HttpBodyMapper[A] = body.toHttpBodyMapper()
@@ -199,63 +263,4 @@ class HttpScalaFXBackend(
     }
   }
 
-  def send[T, R >: ReceiveStreams with Effect[Http]](
-      request: Request[T, R]): Http[Response[T]] =
-    request.body match {
-      case x: NoBody.type => makeRequest(request, x)
-      case x: ByteArrayBody => makeRequest(request, x)
-      case x: ByteBufferBody => makeRequest(request, x)
-      case x: InputStreamBody => makeRequest(request, x)
-      case x: FileBody => makeRequest(request, x)
-      case x @ StreamBody(_) => {
-        val body = handle[Exception, StreamBody[Receive[Byte], ReceiveStreams]](
-          x.asInstanceOf[StreamBody[Receive[Byte], ReceiveStreams]]) { e =>
-          HttpExecutionException(e).shift[StreamBody[Receive[Byte], ReceiveStreams]]
-        }.httpValue
-        makeRequest(request, body)
-      }
-      case x @ MultipartBody(_) =>
-        val body = handle[Exception, MultipartBody[R]](x.asInstanceOf[MultipartBody[R]]) { e =>
-          HttpExecutionException(e).shift[MultipartBody[R]]
-        }.httpValue
-        makeRequest(request, body)
-      case b =>
-        HttpExecutionException(new RuntimeException(s"unsupported body type: ${b.toString()}"))
-          .shift[Response[T]]
-    }
-
-  def close(): Http[Unit] = ???
-
-  def responseMonad: MonadError[Http] = new MonadError[Http] {
-    def ensure[T](f: Http[T], e: => Http[Unit]): Http[T] = {
-      val x: Throwable | T = run(f)
-      x match {
-        case ex: Throwable =>
-          val ignored = run(e)
-          f
-        case a => unit(a.asInstanceOf[T]) // the only other possible
-        // value is T. Since we
-        // cannot change the
-        // signature, we cast
-      }
-    }
-    def error[T](t: Throwable): Http[T] = t.shift
-    def flatMap[T, T2](fa: Http[T])(f: T => Http[T2]): Http[T2] = fa.bindMap(f)
-    protected def handleWrappedError[T](rt: Http[T])(
-        h: PartialFunction[Throwable, Http[T]]): Http[T] = {
-      val x: Throwable | T = run(rt)
-      x match {
-        case ex: Throwable if h.isDefinedAt(ex) => h(ex)
-        case ex: Throwable => ex.shift[T]
-        case a => unit(a.asInstanceOf[T]) // because the only other
-        // possible value is T, and
-        // we cannot change the
-        // signature to include a
-        // manifest, we cast here
-
-      }
-    }
-    def map[T, T2](fa: Http[T])(f: T => T2): Http[T2] = fa.fmap(f)
-    def unit[T](t: T): Http[T] = Http(t)
-  }
 }
