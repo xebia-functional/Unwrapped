@@ -3,6 +3,7 @@ package sttp.fx
 import _root_.fx.{given, *}
 import java.net.URI
 import java.net.http.HttpResponse
+import scala.concurrent.duration.Duration
 
 /**
  * Sttp's BodyFromResponseAs can only really work with responses bound to a statically known
@@ -13,9 +14,9 @@ import java.net.http.HttpResponse
  * 2022/08/11T23:01:00.000-5:00.
  */
 private[fx] class PostPartiallyApplied[A](private val uri: URI) extends Equals {
-  def apply[B](body: B, headers: HttpHeader*)
+  def apply[B](body: B, timeout: Duration, headers: HttpHeader*)
       : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
-    uri.POST[A, B](body, headers: _*)
+    uri.POST[A, B](body, timeout, headers: _*)
 
   override def canEqual(that: Any): Boolean = that.isInstanceOf[PostPartiallyApplied[?]]
   override def equals(that: Any): Boolean =

@@ -39,8 +39,9 @@ import sttp.client3.StringBody
 
 class HttpScalaFXBackend()(
     using client: HttpClient,
-    control: Control[Throwable | HttpExecutionException])
-    extends SttpBackend[Http, ReceiveStreams] {
+    control: Control[Throwable | HttpExecutionException],
+    config: HttpClientConfig
+) extends SttpBackend[Http, ReceiveStreams] {
 
   private given MonadError[Http] = responseMonad
 
@@ -230,13 +231,14 @@ class HttpScalaFXBackend()(
     given bm: HttpBodyMapper[A] = body.toHttpBodyMapper()
     val headers: ::[HttpHeader] = getRequestHeaders(request, body)
     val uri: URI = getUri(request).httpValue
+    val timeout = request.options.readTimeout
     request.method match {
-      case Method.DELETE => toResponse(request, uri.DELETE[Receive[Byte]](headers: _*))
-      case Method.GET => toResponse(request, uri.GET[Receive[Byte]](headers: _*))
+      case Method.DELETE => toResponse(request, uri.DELETE[Receive[Byte]](timeout, headers: _*))
+      case Method.GET => toResponse(request, uri.GET[Receive[Byte]](timeout, headers: _*))
       case Method.HEAD =>
         toResponse(
           request,
-          uri.HEAD(headers: _*).fmap { response =>
+          uri.HEAD(timeout, headers: _*).fmap { response =>
             new jnh.HttpResponse[Receive[Byte]] {
               def statusCode(): Int = response.statusCode()
               def request(): jnh.HttpRequest = response.request()
@@ -250,13 +252,14 @@ class HttpScalaFXBackend()(
             }
           }
         )
-      case Method.OPTIONS => toResponse(request, uri.OPTIONS[Receive[Byte]](headers: _*))
+      case Method.OPTIONS =>
+        toResponse(request, uri.OPTIONS[Receive[Byte]](timeout, headers: _*))
       case Method.PATCH =>
-        toResponse(request, uri.patch[Receive[Byte]](body, headers: _*))
+        toResponse(request, uri.patch[Receive[Byte]](body, timeout, headers: _*))
       case Method.POST =>
-        toResponse(request, uri.post[Receive[Byte]](body, headers: _*))
-      case Method.PUT => toResponse(request, uri.put[Receive[Byte]](body, headers: _*))
-      case Method.TRACE => toResponse(request, uri.TRACE(headers: _*))
+        toResponse(request, uri.post[Receive[Byte]](body, timeout, headers: _*))
+      case Method.PUT => toResponse(request, uri.put[Receive[Byte]](body, timeout, headers: _*))
+      case Method.TRACE => toResponse(request, uri.TRACE(timeout, headers: _*))
       case m @ _ =>
         HttpExecutionException(new RuntimeException(s"Method: $m is unsupported."))
           .shift[Response[T]]

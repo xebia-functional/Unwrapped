@@ -7,6 +7,8 @@ import sttp.client3.StringBody
 
 import java.net.URI
 import java.net.http.HttpResponse
+import scala.concurrent.duration.*
+import scala.language.postfixOps
 
 class PatchPartiallyAppliedSuite extends ScalaFXSuite, HttpExtensionsSuiteFixtures:
 
@@ -17,7 +19,7 @@ class PatchPartiallyAppliedSuite extends ScalaFXSuite, HttpExtensionsSuiteFixtur
         serverAddressResource.use { serverAddressBase =>
           given HttpBodyMapper[StringBody] = body.toHttpBodyMapper()
           val response: Http[HttpResponse[Receive[Byte]]] =
-            URI(s"$serverAddressBase/ping").patch[Receive[Byte]](body)
+            URI(s"$serverAddressBase/ping").patch[Receive[Byte]](body, 5 seconds)
           val result: Http[String] = response.fmap { response =>
             new String(response.body().toList.toArray)
           }

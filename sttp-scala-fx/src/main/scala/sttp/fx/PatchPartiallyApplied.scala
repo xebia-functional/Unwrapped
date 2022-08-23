@@ -4,6 +4,7 @@ import _root_.fx.{given, *}
 import java.net.URI
 import java.net.http.HttpResponse
 import scala.reflect.TypeTest
+import scala.concurrent.duration.Duration
 
 /**
  * Sttp's BodyFromResponseAs can only really work with responses bound to a statically known
@@ -29,9 +30,9 @@ private[fx] class PatchPartiallyApplied[A](private val uri: URI) extends Equals:
    * @return
    *   The http response in an Http effect.
    */
-  def apply[B](body: B, headers: HttpHeader*)
+  def apply[B](body: B, timeout: Duration, headers: HttpHeader*)
       : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
-    uri.PATCH[A, B](body, headers: _*)
+    uri.PATCH[A, B](body, timeout, headers: _*)
 
   override def canEqual(that: Any): Boolean = that.isInstanceOf[PatchPartiallyApplied[A]]
   override def equals(x: Any): Boolean =

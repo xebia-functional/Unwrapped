@@ -4,8 +4,10 @@ package fx
 import _root_.fx.{given, *}
 import munit.fx.ScalaFXSuite
 import sttp.client3.StringBody
+import scala.concurrent.duration.*
 
 import java.net.URI
+import scala.language.postfixOps
 
 class PostPartiallyAppliedSuite extends ScalaFXSuite, HttpExtensionsSuiteFixtures:
 
@@ -17,7 +19,7 @@ class PostPartiallyAppliedSuite extends ScalaFXSuite, HttpExtensionsSuiteFixture
           given HttpBodyMapper[StringBody] = stringBody.toHttpBodyMapper()
           assertEqualsFX(
             URI(s"$serverBaseAddress/ping")
-              .post[Receive[Byte]](stringBody)
+              .post[Receive[Byte]](stringBody, 5 seconds)
               .fmap { response => new String(response.body().toList.toArray) }
               .httpValue,
             Created.statusText
