@@ -43,7 +43,7 @@ object StatusCodeToStatusCode {
           case `Not Modified` => sm.StatusCode.NotModified
           case `Use Proxy` => sm.StatusCode.UseProxy
           case `Temporary Redirect` => sm.StatusCode.TemporaryRedirect
-          case `Permenant Redirect` => sm.StatusCode.PermanentRedirect
+          case `Permanent Redirect` => sm.StatusCode.PermanentRedirect
           case `Bad Request` => sm.StatusCode.BadRequest
           case Unauthorized => sm.StatusCode.Unauthorized
           case `Payment Required` => sm.StatusCode.PaymentRequired
