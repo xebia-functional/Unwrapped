@@ -18,5 +18,5 @@ object RetryPolicyHttpException:
 
   def unhandledException[A](ex: Throwable): RetryPolicyHttpException[A] =
     UnhandledRetryPolicyException(ex.getMessage, ex)
-  def retriesExhauseted[A](r: HttpResponse[A])(
+  def retriesExhausted[A](r: HttpResponse[A])(
       using Show[HttpResponse[A]]): RetryPolicyHttpException[A] = RetriesExhaustedException(r)
