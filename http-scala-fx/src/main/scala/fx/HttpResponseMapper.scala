@@ -104,7 +104,7 @@ object HttpResponseMapper:
                             throw ex
                           else
                             Nullable(queue.poll)
-                              .nullableMap { byte =>
+                              .map { byte =>
                                 printDebugMessage(s"getBody:loop:byte:${byte.toInt}")
                                 send(byte)
                               }

@@ -34,6 +34,8 @@ private[fx] class PatchPartiallyApplied[A](private val uri: URI) extends Equals:
       : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
     uri.PATCH[A, B](body, timeout, headers: _*)
 
-  override def canEqual(that: Any): Boolean = that.isInstanceOf[PatchPartiallyApplied[A]]
+  override def canEqual(that: Any): Boolean =
+    that.isInstanceOf[PatchPartiallyApplied[A]] // cannot disable unchecked warning
+
   override def equals(x: Any): Boolean =
     canEqual(x) && x.asInstanceOf[PatchPartiallyApplied[A]].uri == uri
