@@ -13,7 +13,7 @@ type HttpRetryPolicy[A] =
  */
 given defaultRetryPolicy[A]: HttpRetryPolicy[A] =
   (r, i) => {
-    i < 3 && (500 to 599).contains(r.statusCode) && !(200 to 299).contains(r.statusCode)
+    i < 3 && (500 to 599).contains(r.statusCode)
   }
 
 extension [A](a: HttpResponse[A])
