@@ -30,7 +30,7 @@ object StatusCode {
       case `Not Modified` => "Not Modified"
       case `Use Proxy` => "Use Proxy"
       case `Temporary Redirect` => "Temporary Redirect"
-      case `Permenant Redirect` => "Permenant Redirect"
+      case `Permanent Redirect` => "Permanent Redirect"
       case `Bad Request` => "Bad Request"
       case Unauthorized => "Unauthorized"
       case `Payment Required` => "Payment Required"
