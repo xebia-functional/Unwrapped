@@ -41,7 +41,7 @@ extension [A: Manifest](a: Nullable[A])
    *   the value as a nullable if the nullable is not null, or a default nullable if it is null.
    */
   def getOrElse(default: A): A =
-    default match
+    a match
       case x: A => x
       case null => default
 
