@@ -18,7 +18,7 @@ given defaultRetryPolicy[A]: HttpRetryPolicy[A] =
 
 extension [A](a: HttpResponse[A])
   /**
-   * Returns true if the policy determines the requust should be retried.
+   * Returns true if the policy determines the request should be retried.
    */
   def shouldRetry(retryCount: Int): HttpRetryPolicy[A] ?=> Boolean =
     summon[HttpRetryPolicy[A]](a, retryCount)
