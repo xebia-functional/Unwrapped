@@ -12,10 +12,9 @@ object RetryPolicyHttpException:
       cause: Throwable | Null)
       extends RuntimeException(message, cause)
   private[fx] final case class RetriesExhaustedException[A](r: HttpResponse[A])(
-      using Show[HttpResponse[A]])
+      using S: Show[HttpResponse[A]])
       extends RuntimeException:
-    override def getMessage: String =
-      s"${summon[Show[HttpResponse[A]]].show(r)} retries exhausted."
+    override def getMessage: String = s"${S.show(r)} retries exhausted."
 
   def unhandledException[A](ex: Throwable): RetryPolicyHttpException[A] =
     UnhandledRetryPolicyException(ex.getMessage, ex)
