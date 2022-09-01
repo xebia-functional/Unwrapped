@@ -112,7 +112,7 @@ object StatusCodeToStatusCode {
           case sm.StatusCode.NotModified => `Not Modified`
           case sm.StatusCode.UseProxy => `Use Proxy`
           case sm.StatusCode.TemporaryRedirect => `Temporary Redirect`
-          case sm.StatusCode.PermanentRedirect => `Permenant Redirect`
+          case sm.StatusCode.PermanentRedirect => `Permanent Redirect`
           case sm.StatusCode.BadRequest => `Bad Request`
           case sm.StatusCode.Unauthorized => Unauthorized
           case sm.StatusCode.PaymentRequired => `Payment Required`
