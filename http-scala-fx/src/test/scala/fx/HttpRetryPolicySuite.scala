@@ -16,7 +16,7 @@ class HttpRetryPolicySuite extends ScalaCheckSuite:
     }
     forAll { (httpResponse: HttpResponse[Any]) =>
       val f: (HttpResponse[Any]) => Boolean =
-        response => response.shouldRetry(1)
+        response => response.shouldRetry(HttpRetries(1))
       (httpResponse.statusCode >= 500 && httpResponse.statusCode < 600) ==> {
         f(httpResponse)
       }

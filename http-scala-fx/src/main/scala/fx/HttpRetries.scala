@@ -14,16 +14,16 @@ object HttpRetries:
    * @constructor
    */
   inline def apply(i: Int): HttpRetries =
-    requires(i > 0, "HttpRetries must be a positive number", i)
+    requires(i >= 0, "HttpRetries must be greater than 0", i)
 
   /**
    * Safe constructor for runtime instantiation
    */
-  def of(i: Int): Errors[String] ?=> HttpRetries =
-    if (i > 0)
+  def of(i: Int): Errors[HttpExecutionException] ?=> HttpRetries =
+    if (i >= 0)
       i
     else
-      "HttpRetries must be a positive Number".shift
+      HttpExecutionException(RuntimeException("HttpRetries must be greater than 0")).shift
 
   extension (h: HttpRetries)
     /**
@@ -31,6 +31,14 @@ object HttpRetries:
      *   The int value of the HttpRetries object
      */
     def value: Int = h
+
+    /**
+     * @param z
+     *   The HttpRetries to add to this Http retries
+     * @return
+     *   The HttpRetries added to this Http retries
+     */
+    def +(z: HttpRetries): HttpRetries = value + z.value
 
   given HttpRetries =
     HttpRetries(3)
