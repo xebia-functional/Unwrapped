@@ -16,7 +16,7 @@ object HttpConnectionTimeout:
   inline def apply(durationInSeconds: Long): HttpConnectionTimeout =
     requires(durationInSeconds > 0, "Durations must be positive", durationInSeconds)
 
-  def of(durationInSeconds: Long): Errors[String] ?=> HttpConnectionTimeout =
+  def of(durationInSeconds: Long)(using Errors[String]): HttpConnectionTimeout =
     if (durationInSeconds > 0)
       durationInSeconds
     else

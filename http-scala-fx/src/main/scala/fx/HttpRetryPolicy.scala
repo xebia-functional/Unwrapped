@@ -21,8 +21,9 @@ extension [A](a: HttpResponse[A])
    * Returns true if the policy determines the request should be retried.
    */
   def shouldRetry(retryCount: HttpRetries)(
-      using config: HttpClientConfig): HttpRetryPolicy[A] ?=> Boolean =
-    summon[HttpRetryPolicy[A]](a, retryCount, config.maximumRetries.getOrElse(HttpRetries(3)))
+      using policy: HttpRetryPolicy[A],
+      config: HttpClientConfig): Boolean =
+    policy(a, retryCount, config.maximumRetries.getOrElse(HttpRetries(3)))
 
 object HttpRetryPolicy:
   /**

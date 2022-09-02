@@ -101,7 +101,7 @@ object StatusCode {
       "status code must be a valid status code",
       i
     )
-  def of(i: Int): Errors[String] ?=> StatusCode =
+  def of(i: Int)(using Errors[String]): StatusCode =
     if (statusCodes.contains(i))
       i
     else

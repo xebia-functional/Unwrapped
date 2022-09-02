@@ -14,8 +14,9 @@ import scala.concurrent.duration.Duration
  * 2022/08/11T23:01:00.000-5:00.
  */
 private[fx] class PostPartiallyApplied[A](private val uri: URI) extends Equals {
-  def apply[B](body: B, timeout: Duration, headers: HttpHeader*)
-      : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
+  def apply[B](body: B, timeout: Duration, headers: HttpHeader*)(
+      using HttpResponseMapper[A],
+      HttpBodyMapper[B]): Http[HttpResponse[A]] =
     uri.POST[A, B](body, timeout, headers: _*)
 
   override def canEqual(that: Any): Boolean = that.isInstanceOf[PostPartiallyApplied[?]]

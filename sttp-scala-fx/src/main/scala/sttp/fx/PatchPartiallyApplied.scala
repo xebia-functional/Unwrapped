@@ -30,8 +30,9 @@ private[fx] class PatchPartiallyApplied[A](private val uri: URI) extends Equals:
    * @return
    *   The http response in an Http effect.
    */
-  def apply[B](body: B, timeout: Duration, headers: HttpHeader*)
-      : (HttpResponseMapper[A], HttpBodyMapper[B]) ?=> Http[HttpResponse[A]] =
+  def apply[B](body: B, timeout: Duration, headers: HttpHeader*)(
+      using HttpResponseMapper[A],
+      HttpBodyMapper[B]): Http[HttpResponse[A]] =
     uri.PATCH[A, B](body, timeout, headers: _*)
 
   override def canEqual(that: Any): Boolean =

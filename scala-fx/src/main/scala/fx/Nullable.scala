@@ -11,7 +11,7 @@ object Nullable:
     /**
      * Alias of value
      */
-    def v: Errors[NullPointerException] ?=> A = value
+    def v(using Errors[NullPointerException]): A = value
 
     /**
      * True if the nullable is non-null
@@ -32,7 +32,7 @@ object Nullable:
      * @return
      *   the value of a in a NullPointerException context
      */
-    def value: Errors[NullPointerException] ?=> A =
+    def value(using Errors[NullPointerException]): A =
       getOrElse(NullPointerException().shift)
 
     /**

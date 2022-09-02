@@ -19,7 +19,7 @@ object HttpRetries:
   /**
    * Safe constructor for runtime instantiation
    */
-  def of(i: Int): Errors[HttpExecutionException] ?=> HttpRetries =
+  def of(i: Int)(using Errors[HttpExecutionException]): HttpRetries =
     if (i >= 0)
       i
     else
