@@ -207,5 +207,5 @@ object ToHttpBodyMapper:
   /**
    * Summons the approprite mapper by request body type from implicit scope
    */
-  def apply[A]()(using ToHttpBodyMapper[A]): ToHttpBodyMapper[A] =
-    summon
+  def apply[A]()(using mapper: ToHttpBodyMapper[A]): ToHttpBodyMapper[A] =
+    mapper

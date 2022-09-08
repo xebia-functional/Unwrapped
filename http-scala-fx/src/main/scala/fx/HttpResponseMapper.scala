@@ -171,7 +171,9 @@ object HttpResponseMapper:
       )
     }
 
-  given fileDownloadHttpResponseMapper(using Path, Seq[OpenOption]): HttpResponseMapper[Path] =
+  given fileDownloadHttpResponseMapper(
+      using path: Path,
+      options: Seq[OpenOption]): HttpResponseMapper[Path] =
     new HttpResponseMapper[Path] {
-      def bodyHandler = BodyHandlers.ofFile(summon[Path], summon[Seq[OpenOption]]: _*)
+      def bodyHandler = BodyHandlers.ofFile(path, options: _*)
     }

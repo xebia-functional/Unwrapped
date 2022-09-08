@@ -8,8 +8,10 @@ trait StatusCodeToStatusCode[A, B]:
   extension (a: A) def toStatusCode: Http[B]
 
 object StatusCodeToStatusCode {
-  def apply[A, B](using StatusCodeToStatusCode[A, B]): StatusCodeToStatusCode[A, B] =
-    summon
+  def apply[A, B](
+      using
+      statusCodeToStatusCode: StatusCodeToStatusCode[A, B]): StatusCodeToStatusCode[A, B] =
+    statusCodeToStatusCode
 
   given StatusCodeToStatusCode[Int, sm.StatusCode] with
     extension (a: Int)

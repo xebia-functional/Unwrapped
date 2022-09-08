@@ -1,7 +1,7 @@
 package fx
 
 import scala.deriving.Mirror
-import scala.compiletime.{erasedValue, summonInline}
+import scala.compiletime.erasedValue
 
 import java.nio.ByteBuffer
 

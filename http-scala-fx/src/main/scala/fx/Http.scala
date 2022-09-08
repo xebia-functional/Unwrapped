@@ -52,8 +52,7 @@ extension (uri: URI)
   private def GET[A](
       retryCount: HttpRetries,
       maybeTimeout: Option[ScalaDuration],
-      headers: HttpHeader*)(using HttpResponseMapper[A]): Http[HttpResponse[A]] =
-    val mapper = summon[HttpResponseMapper[A]]
+      headers: HttpHeader*)(using mapper: HttpResponseMapper[A]): Http[HttpResponse[A]] =
     val requestBuilder =
       addHeadersToRequestBuilder(HttpRequest.newBuilder().GET().uri(uri), headers: _*)
 
@@ -91,10 +90,8 @@ extension (uri: URI)
       maybeTimeout: Option[ScalaDuration],
       retryCount: HttpRetries,
       headers: HttpHeader*)(
-      using HttpResponseMapper[A],
-      HttpBodyMapper[B]): Http[HttpResponse[A]] =
-    val mapper = summon[HttpResponseMapper[A]]
-    val bodyMapper = summon[HttpBodyMapper[B]]
+      using mapper: HttpResponseMapper[A],
+      bodyMapper: HttpBodyMapper[B]): Http[HttpResponse[A]] =
     val requestBuilder = addHeadersToRequestBuilder(
       HttpRequest.newBuilder().POST(bodyMapper.bodyPublisher(body)).uri(uri),
       headers: _*)
@@ -159,10 +156,8 @@ extension (uri: URI)
       maybeTimeout: Option[ScalaDuration],
       retryCount: HttpRetries,
       headers: HttpHeader*)(
-      using HttpResponseMapper[A],
-      HttpBodyMapper[B]): Http[HttpResponse[A]] =
-    val mapper = summon[HttpResponseMapper[A]]
-    val bodyMapper = summon[HttpBodyMapper[B]]
+      using mapper: HttpResponseMapper[A],
+      bodyMapper: HttpBodyMapper[B]): Http[HttpResponse[A]] =
     val requestBuilder = addHeadersToRequestBuilder(
       HttpRequest.newBuilder().PUT(bodyMapper.bodyPublisher(body)).uri(uri),
       headers: _*)
@@ -191,8 +186,7 @@ extension (uri: URI)
   private def DELETE[A](
       maybeTimeout: Option[ScalaDuration],
       retryCount: HttpRetries,
-      headers: HttpHeader*)(using HttpResponseMapper[A]): Http[HttpResponse[A]] =
-    val mapper = summon[HttpResponseMapper[A]]
+      headers: HttpHeader*)(using mapper: HttpResponseMapper[A]): Http[HttpResponse[A]] =
     val requestBuilder =
       addHeadersToRequestBuilder(HttpRequest.newBuilder().DELETE().uri(uri), headers: _*)
     val response =
@@ -223,8 +217,7 @@ extension (uri: URI)
   private def OPTIONS[A](
       maybeTimeout: Option[ScalaDuration],
       retryCount: HttpRetries,
-      headers: HttpHeader*)(using HttpResponseMapper[A]): Http[HttpResponse[A]] =
-    val mapper = summon[HttpResponseMapper[A]]
+      headers: HttpHeader*)(using mapper: HttpResponseMapper[A]): Http[HttpResponse[A]] =
     val requestBuilder = addHeadersToRequestBuilder(
       HttpRequest.newBuilder().method("OPTIONS", BodyPublishers.noBody).uri(uri))
     val response =
@@ -253,8 +246,7 @@ extension (uri: URI)
   private def TRACE[A](
       maybeTimeout: Option[ScalaDuration],
       retryCount: HttpRetries,
-      headers: HttpHeader*)(using HttpResponseMapper[A]): Http[HttpResponse[A]] =
-    val mapper = summon[HttpResponseMapper[A]]
+      headers: HttpHeader*)(using mapper: HttpResponseMapper[A]): Http[HttpResponse[A]] =
     val requestBuilder = addHeadersToRequestBuilder(
       HttpRequest.newBuilder().method("TRACE", BodyPublishers.noBody).uri(uri),
       headers: _*)
@@ -288,14 +280,10 @@ extension (uri: URI)
       maybeTimeout: Option[ScalaDuration],
       retryCount: HttpRetries,
       headers: HttpHeader*)(
-      using HttpResponseMapper[A],
-      HttpBodyMapper[B]): Http[HttpResponse[A]] =
-    val mapper = summon[HttpResponseMapper[A]]
+      using mapper: HttpResponseMapper[A],
+      bodyMapper: HttpBodyMapper[B]): Http[HttpResponse[A]] =
     val requestBuilder = addHeadersToRequestBuilder(
-      HttpRequest
-        .newBuilder()
-        .method("PATCH", summon[HttpBodyMapper[B]].bodyPublisher(body))
-        .uri(uri),
+      HttpRequest.newBuilder().method("PATCH", bodyMapper.bodyPublisher(body)).uri(uri),
       headers: _*)
     val response =
       handle(
