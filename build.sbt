@@ -12,7 +12,12 @@ addCommandAlias("ci-publish", "github; ci-release")
 publish / skip := true
 
 lazy val root =
-  (project in file("./")).aggregate(`scala-fx`, benchmarks, `munit-scala-fx`, documentation)
+  (project in file("./")).aggregate(
+    `scala-fx`,
+    benchmarks,
+    `munit-scala-fx`,
+    documentation,
+    `scalike-jdbc-scala-fx`)
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
@@ -38,6 +43,11 @@ lazy val `cats-scala-fx` = (project in file("./cats-scalafx"))
     catsScalaFXSettings
   )
   .dependsOn(`scala-fx`)
+
+lazy val `scalike-jdbc-scala-fx` = project
+  .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
+  .settings(publish / skip := true)
+  .settings(scalalikeSettings)
 
 lazy val scalafxSettings: Seq[Def.Setting[_]] =
   Seq(
@@ -70,6 +80,24 @@ lazy val catsScalaFXSettings = Seq(
     scalacheck % Test
   )
 )
+
+lazy val scalalikeSettings: Seq[Def.Setting[_]] =
+  Seq(
+    classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
+    javaOptions ++= javaOptionsSettings,
+    autoAPIMappings := true,
+    libraryDependencies ++= Seq(
+      scalikejdbc,
+      h2Database,
+      logback,
+      postgres,
+      scalacheck % Test,
+      testContainers % Test,
+      testContainersMunit % Test,
+      testContainersPostgres % Test,
+      flyway % Test
+    )
+  )
 
 lazy val javaOptionsSettings = Seq(
   "-XX:+IgnoreUnrecognizedVMOptions",

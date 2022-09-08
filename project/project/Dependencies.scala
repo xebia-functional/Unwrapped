@@ -21,6 +21,12 @@ object Dependencies {
     val jmhGeneratorReflection = "1.35"
     val sbtExplicitDependencies = "0.2.16"
     val catsEffect = "3.3.12"
+    val scalikeJdbc = "4.0.0"
+    val h2Database = "2.1.212"
+    val logback = "1.2.11"
+    val postgres = "42.4.0"
+    val testContainers = "0.40.8"
+    val flyway = "8.5.12"
   }
 
   object Compile {
@@ -31,10 +37,20 @@ object Dependencies {
     val junit = "junit" % "junit" % Versions.junit
     val munit = "org.scalameta" %% "munit" % Versions.munit
     val junitInterface = "org.scalameta" % "junit-interface" % Versions.junitInterface
+    val scalikejdbc = "org.scalikejdbc" %% "scalikejdbc" % Versions.scalikeJdbc
+    val h2Database = "com.h2database" % "h2" % Versions.h2Database
+    val logback = "ch.qos.logback" % "logback-classic" % Versions.logback
   }
 
   object Test {
     val scalacheck = "org.scalacheck" %% "scalacheck" % Versions.scalacheck
+    val postgres = "org.postgresql" % "postgresql" % Versions.postgres
+    val testContainers = "com.dimafeng" %% "testcontainers-scala" % Versions.testContainers
+    val testContainersMunit =
+      "com.dimafeng" %% "testcontainers-scala-munit" % Versions.testContainers
+    val testContainersPostgres =
+      "com.dimafeng" %% "testcontainers-scala-postgresql" % Versions.testContainers
+    val flyway = "org.flywaydb" % "flyway-core" % Versions.flyway
   }
 
   object Plugins {
