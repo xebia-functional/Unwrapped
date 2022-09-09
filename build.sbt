@@ -1,5 +1,6 @@
 import Dependencies.Compile._
 import Dependencies.Test._
+
 ThisBuild / scalaVersion := "3.1.2"
 ThisBuild / organization := "com.47deg"
 ThisBuild / versionScheme := Some("early-semver")
@@ -36,6 +37,13 @@ lazy val `munit-scala-fx` = (project in file("./munit-scalafx"))
   )
   .dependsOn(`scala-fx`)
 
+lazy val `cats-scala-fx` = (project in file("./cats-scalafx"))
+  .configs(IntegrationTest)
+  .settings(
+    catsScalaFXSettings
+  )
+  .dependsOn(`scala-fx`)
+
 lazy val `scalike-jdbc-scala-fx` = project
   .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
   .settings(publish / skip := true)
@@ -60,6 +68,16 @@ lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
     junit,
     munit,
     junitInterface
+  )
+)
+
+lazy val catsScalaFXSettings = Seq(
+  classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
+  javaOptions ++= javaOptionsSettings,
+  autoAPIMappings := true,
+  libraryDependencies ++= Seq(
+    catsEffect,
+    scalacheck % Test
   )
 )
 

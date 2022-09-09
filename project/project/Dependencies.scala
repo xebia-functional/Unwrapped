@@ -20,6 +20,7 @@ object Dependencies {
     val sbtDependencyUpdates = "1.2.1"
     val jmhGeneratorReflection = "1.35"
     val sbtExplicitDependencies = "0.2.16"
+    val catsEffect = "3.3.12"
     val scalikeJdbc = "4.0.0"
     val h2Database = "2.1.212"
     val logback = "1.2.11"
@@ -29,6 +30,7 @@ object Dependencies {
   }
 
   object Compile {
+    val catsEffect = "org.typelevel" %% "cats-effect" % Versions.catsEffect
     // in compile because munit-scala-fx depends on munit directly
     val munitScalacheck = "org.scalameta" %% "munit-scalacheck" % Versions.munitScalacheck
     // munit transitive dependency conflict
