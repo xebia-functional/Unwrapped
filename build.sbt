@@ -1,6 +1,12 @@
 import Dependencies.Compile._
 import Dependencies.Test._
 
+import scala.collection.JavaConverters._
+
+import com.fasterxml.jackson.dataformat.csv.CsvSchema
+import com.fasterxml.jackson.dataformat.csv.CsvMapper
+import com.fasterxml.jackson.dataformat.csv.CsvParser
+
 ThisBuild / scalaVersion := "3.1.2"
 ThisBuild / organization := "com.47deg"
 ThisBuild / versionScheme := Some("early-semver")
@@ -16,8 +22,12 @@ lazy val root =
     `scala-fx`,
     benchmarks,
     `munit-scala-fx`,
+    `scalike-jdbc-scala-fx`,
+    `http-scala-fx`,
     documentation,
-    `scalike-jdbc-scala-fx`)
+    `sttp-scala-fx`,
+    `java-net-multipart-body-publisher`
+  )
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
@@ -49,6 +59,32 @@ lazy val `scalike-jdbc-scala-fx` = project
   .settings(publish / skip := true)
   .settings(scalalikeSettings)
 
+lazy val `java-net-multipart-body-publisher` =
+  (project in file("./java-net-mulitpart-body-publisher")).settings(commonSettings)
+
+lazy val `http-scala-fx` = (project in file("./http-scala-fx"))
+  .settings(httpScalaFXSettings)
+  .settings(generateMediaTypeSettings)
+  .dependsOn(
+    `java-net-multipart-body-publisher`,
+    `scala-fx`,
+    `munit-scala-fx` % "test -> compile")
+  .enablePlugins(HttpScalaFxPlugin)
+
+lazy val `sttp-scala-fx` = (project in file("./sttp-scala-fx"))
+  .settings(sttpScalaFXSettings)
+  .dependsOn(
+    `java-net-multipart-body-publisher`,
+    `scala-fx`,
+    `http-scala-fx`,
+    `munit-scala-fx` % "test -> compile")
+
+lazy val commonSettings = Seq(
+  javaOptions ++= javaOptionsSettings,
+  autoAPIMappings := true,
+  Test / fork := true
+)
+
 lazy val scalafxSettings: Seq[Def.Setting[_]] =
   Seq(
     classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
@@ -60,16 +96,14 @@ lazy val scalafxSettings: Seq[Def.Setting[_]] =
   )
 
 lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
-  Test / fork := true,
-  javaOptions ++= javaOptionsSettings,
-  autoAPIMappings := true,
   libraryDependencies ++= Seq(
     munitScalacheck,
+    hedgehog,
     junit,
     munit,
     junitInterface
   )
-)
+) ++ commonSettings
 
 lazy val catsScalaFXSettings = Seq(
   classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
@@ -98,6 +132,14 @@ lazy val scalalikeSettings: Seq[Def.Setting[_]] =
       flyway % Test
     )
   )
+
+lazy val httpScalaFXSettings = commonSettings
+
+lazy val sttpScalaFXSettings = commonSettings ++ Seq(
+  libraryDependencies += sttp,
+  libraryDependencies += httpCore5,
+  libraryDependencies += hedgehog % Test
+)
 
 lazy val javaOptionsSettings = Seq(
   "-XX:+IgnoreUnrecognizedVMOptions",
