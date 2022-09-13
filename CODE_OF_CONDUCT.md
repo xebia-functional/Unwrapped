@@ -45,9 +45,8 @@ For other projects adopting the ScalaFx Code of Conduct, please contact the main
 
 ##Contact
 For CoC-related questions, concerns, moderation requests or to report possible violations on the channels listed above,
-* contact a [member of the project.](AUTHORS.md#maintainers)
-* send an e-mail to one of the following general moderators if you want to choose who you are talking to
-  * 
+* contact a [member of the project.](CODEOWNERS.md)
+
 
 ##Examples of unacceptable behavior
 Behavior that will lead to exclusion includes the following points, inspired by the definition of “Unacceptable Behavior” in the [Citizen Code of Conduct:](https://web.archive.org/web/20200330154000/http://citizencodeofconduct.org/)
