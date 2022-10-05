@@ -42,19 +42,22 @@ class ContinuationsPhase extends PluginPhase:
 //      report.error(tree.show)
 //      acc
 //    })
-    //tree
+    // tree
     report.error(tree.show)
     EmptyTree
 
-  @tailrec final def transformStatements(block: Block, statements: List[Tree], previous: List[Tree])(using ctx: Context): Block =
+  @tailrec final def transformStatements(
+      block: Block,
+      statements: List[Tree],
+      previous: List[Tree])(using ctx: Context): Block =
     statements match
       case Nil => block
       case current :: remaining =>
         if (hasInnerSuspensionPoint(current))
           val newBlock = Block(???, ???)
           transformStatements(newBlock, remaining, Nil)
-          // TODO nest previous under suspension point. Look at trees dif with example function
-        else transformStatements(block, remaining, previous :+ current) //this may be wrong
+        // TODO nest previous under suspension point. Look at trees dif with example function
+        else transformStatements(block, remaining, previous :+ current) // this may be wrong
 
   def isSuspendType(tpe: Type)(using ctx: Context): Boolean =
     tpe.classSymbol.showFullName == "continuations.Suspend"

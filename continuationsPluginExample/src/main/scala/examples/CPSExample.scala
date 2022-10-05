@@ -1,18 +1,46 @@
-package continuations.examples
+package examples
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 import continuations.*
 import continuations.jvm.internal.ContinuationImpl
+import continuations.intrinsics.*
 
 import concurrent.ExecutionContext.Implicits.global
 import scala.annotation.switch
 
-def await[A](future: Future[A]): Suspend ?=> A =
-  ???
+inline def suspendContinuationOrReturn[A](f: Continuation[A] => Continuation.State) = ???
 
-def await$expanded[A](future: Future[A])(using continuation: Continuation[Any | Null]): A =
-  ???
+def await[A](future: Future[A]): Suspend ?=> A =
+  suspendContinuationOrReturn { (c: Continuation[A]) =>
+    future.onComplete {
+      case Success(value) => c.resume(Right(value))
+      case Failure(exception) => c.resume(Left(exception))
+    }
+    Continuation.State.Suspended
+  }
+
+def await$expanded[A](future: Future[A])(using completion: Continuation[Any | Null]): Any =
+  future.onComplete { it =>
+    val $await = new await$2$1(completion)
+    $await.invoke(it)
+  }
+  val var10000: Any | Null =
+    if (future.isCompleted) Continuation.State.Resumed else Continuation.State.Suspended
+  var10000
+
+final class await$2$1(completion: Continuation[Any | Null])
+    extends ContinuationImpl(completion, completion.context):
+  // $FF: synthetic field
+  val $continuation = completion
+
+  final def invokeSuspend(result: Either[Throwable, Any]): Any = ???
+  final def invoke[A](it: Try[A]) =
+    it match
+      case Failure(exception) =>
+        this.$continuation.resume(Left(exception))
+      case Success(value) =>
+        this.$continuation.resume(Right(value))
 
 def a(): Int = 47
 def b(): Unit = ()
@@ -30,14 +58,14 @@ def program: Suspend ?=> Int =
 
 import continuations.jvm.internal.ContinuationImpl
 
-final class program$continuation$1(val completion: Continuation[Any | Null])
+final class program$continuation$1(override val completion: Continuation[Any | Null])
     extends ContinuationImpl(completion, completion.context):
   var I$0 = 0
   // $FF: synthetic field
   var result: Any = null
   var label = 0
 
-  final def invokeSuspend(result: Any): Any =
+  final def invokeSuspend(result: Either[Throwable, Any]): Any =
     this.result = result
     this.label |= Integer.MIN_VALUE
     program$expanded(using this)
