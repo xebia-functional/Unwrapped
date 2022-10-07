@@ -21,10 +21,11 @@ def await[A](future: Future[A]): Suspend ?=> A =
   }
 
 def await$expanded[A](future: Future[A])(using completion: Continuation[Any | Null]): Any =
-  future.onComplete { it =>
+  val f: Try[A] => Unit = it => {
     val $await = new await$2$1(completion)
     $await.invoke(it)
   }
+  future.onComplete(f)
   val var10000: Any | Null =
     if (future.isCompleted) Continuation.State.Resumed else Continuation.State.Suspended
   var10000
@@ -35,7 +36,7 @@ final class await$2$1(completion: Continuation[Any | Null])
   val $continuation = completion
 
   final def invokeSuspend(result: Either[Throwable, Any]): Any = ???
-  final def invoke[A](it: Try[A]) =
+  final def invoke[A](it: Try[A]): Unit =
     it match
       case Failure(exception) =>
         this.$continuation.resume(Left(exception))

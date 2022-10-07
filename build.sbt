@@ -103,6 +103,5 @@ lazy val javaOptionsSettings = Seq(
   "--add-modules=jdk.incubator.concurrent",
   "--add-opens java.base/jdk.internal.vm=ALL-UNNAMED",
   "--add-exports java.base/jdk.internal.vm=ALL-UNNAMED",
-  "--enable-preview",
-  "--add-modules jdk.incubator.concurrent"
+  "--enable-preview"
 )

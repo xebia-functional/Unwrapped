@@ -30,7 +30,7 @@ class ContinuationsPhase extends PluginPhase:
   override val runsAfter = Set(Staging.name)
   override val runsBefore = Set(PickleQuotes.name)
 
-  override def transformBlock(tree: Block)(using ctx: Context): Tree =
+  // override def transformBlock(tree: Block)(using ctx: Context): Tree =
 //    //val state = suspensionState(tree)
 //    report.error("DEEP FOLD")
 //    tree.deepFold(())((acc, tree) => {
@@ -42,9 +42,9 @@ class ContinuationsPhase extends PluginPhase:
 //      report.error(tree.show)
 //      acc
 //    })
-    // tree
-    report.error(tree.show)
-    EmptyTree
+  // tree
+  // report.error(tree.show)
+  // EmptyTree
 
   @tailrec final def transformStatements(
       block: Block,
