@@ -21,19 +21,18 @@ addCommandAlias("ci-publish", "github; ci-release")
 
 publish / skip := true
 
-lazy val root =
+lazy val root =// I
   (project in file("./")).aggregate(
-    `scala-fx`,
-    continuationsPlugin,
-    continuationsPluginExample,
-    benchmarks,
-    `munit-scala-fx`,
-    `scalike-jdbc-scala-fx`,
-    `http-scala-fx`,
-    documentation,
-    `cats-scala-fx`
-    `sttp-scala-fx`,
-    `java-net-multipart-body-publisher`
+    benchmarks,// A
+    continuationsPlugin,// C
+    continuationsPluginExample,// D
+    documentation,// E
+    `http-scala-fx`,// F
+    `java-net-multipart-body-publisher`,// G
+    `munit-scala-fx`,// H
+    `scala-fx`,// J
+    `scalike-jdbc-scala-fx`,// K
+    `sttp-scala-fx`// L
   )
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
