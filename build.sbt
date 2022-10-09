@@ -115,7 +115,8 @@ lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
   Seq(
     exportJars := true,
     libraryDependencies ++= List(
-      "org.scala-lang" %% "scala3-compiler" % "3.1.2"
+      "org.scala-lang" %% "scala3-compiler" % "3.1.2",
+      munit % Test
     )
   )
 
@@ -124,9 +125,12 @@ lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
     publish / skip := true,
     autoCompilerPlugins := true,
     resolvers += Resolver.mavenLocal,
-    // this uses the mac system environment variable, HOME. Mine is included by default as an example
     Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
-    Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}"
+    Compile / scalacOptions += s"-Ylog:pickleQuotes",
+    Compile / scalacOptions += s"-Ydebug:pickleQuotes",
+    Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}",
+    Test / scalacOptions += s"-Ylog:pickleQuotes",
+    Test / scalacOptions += s"-Ydebug:pickleQuotes",
   )
 
 lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(

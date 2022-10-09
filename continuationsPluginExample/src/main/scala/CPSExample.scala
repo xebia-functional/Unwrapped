@@ -1,5 +1,6 @@
 package continuations.examples
 
+import continuations.Continuation.State
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 import continuations.*
@@ -30,17 +31,19 @@ def program: Suspend ?=> Int =
 
 import continuations.jvm.internal.ContinuationImpl
 
-final class program$continuation$1(val completion: Continuation[Any | Null])
-    extends ContinuationImpl(completion, completion.context):
+final class program$continuation$1(override val completion: Continuation[Any | Null])
+  extends ContinuationImpl(completion, completion.context){
   var I$0 = 0
   // $FF: synthetic field
   var result: Any = null
   var label = 0
 
-  final def invokeSuspend(result: Any): Any =
+
+  final def invokeSuspend(result: Either[Throwable, Any | Null | State.Suspended.type]): Any | Null =
     this.result = result
     this.label |= Integer.MIN_VALUE
     program$expanded(using this)
+}
 
 def program$expanded(
     using var0: Continuation[Any | Null]): Any | Null | Continuation.State.Suspended.type =

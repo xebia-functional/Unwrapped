@@ -43,8 +43,9 @@ class ContinuationsPhase extends PluginPhase:
 //      acc
 //    })
     //tree
-    report.error(tree.show)
-    EmptyTree
+    
+    report.debuglog(s"transformBlock ${tree}")
+    tree
 
   @tailrec final def transformStatements(block: Block, statements: List[Tree], previous: List[Tree])(using ctx: Context): Block =
     statements match
