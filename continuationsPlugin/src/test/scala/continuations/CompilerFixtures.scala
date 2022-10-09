@@ -115,8 +115,11 @@ import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Types.MethodType
 import dotty.tools.dotc.core.Types.Type
 import munit.FunSuite
+import scala.util.Properties
 
 trait CompilerFixtures { self: FunSuite =>
+  println(s"scala-compiler-classpath: ${Properties.propOrEmpty("scala-compiler-classpath")}")
+
 
   protected def compilerWithChecker(phase: String)(assertion: (tpd.Tree, Context) => Unit) =
     new Compiler {
