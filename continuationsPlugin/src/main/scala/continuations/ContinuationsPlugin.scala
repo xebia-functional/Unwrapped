@@ -42,9 +42,11 @@ class ContinuationsPhase extends PluginPhase:
 //      report.error(tree.show)
 //      acc
 //    })
-  // tree
-  // report.error(tree.show)
-  // EmptyTree
+    // tree
+
+    // report.logWith("transformBlock")(tree)
+    // report.logWith("transformBlock")(tree.show)
+    // tree
 
   @tailrec final def transformStatements(
       block: Block,

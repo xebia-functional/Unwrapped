@@ -11,15 +11,18 @@ object main$handler extends (Continuation[Any | Null] => Any):
   override def apply($completion: Continuation[Any | Null]): Any =
     main$expanded(using $completion)
 
-final class main$continuation$1($completion: Continuation[Any | Null])
-    extends ContinuationImpl($completion, $completion.context):
-  var result: Any = null
-  var label: Int = 0
+class main$continuation$1($completion: Continuation[Any | Null])
+    extends ContinuationImpl($completion, $completion.context) {
+  var result: Any = ???
+  var label: Int = ???
 
-  final def invokeSuspend(result: Either[Throwable, Any]): Any =
+  final def invokeSuspend(
+      result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended.type)])
+      : Any | Null =
     this.result = result
     this.label |= Integer.MIN_VALUE
     main$expanded(using this)
+}
 
 def main$expanded(
     using var0: Continuation[Any | Null]): Any | Null | Continuation.State.Suspended.type =
