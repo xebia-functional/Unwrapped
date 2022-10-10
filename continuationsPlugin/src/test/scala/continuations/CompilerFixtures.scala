@@ -118,8 +118,9 @@ import munit.FunSuite
 import scala.util.Properties
 
 trait CompilerFixtures { self: FunSuite =>
-  println(s"scala-compiler-classpath: ${Properties.propOrEmpty("scala-compiler-classpath")}")
 
+  val compileSourceIdentifier =
+    """-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.""".r
 
   protected def compilerWithChecker(phase: String)(assertion: (tpd.Tree, Context) => Unit) =
     new Compiler {
@@ -140,15 +141,41 @@ trait CompilerFixtures { self: FunSuite =>
       }
     }
 
-  /**
-   * TODO: Need to add the continuations plugin to this fixture. Should be possible to do.
-   */
+  val compilerContextWithContinuationsPlugin = FunFixture(
+    setup = _ => {
+      val base = new ContextBase {}
+      val compilerPlugin = Properties.propOrEmpty("scala-compiler-plugin")
+      val compilerClasspath = Properties.propOrEmpty(
+        "scala-compiler-classpath") ++ s":${Properties.propOrEmpty("scala-compiler-plugin")}"
+      val context = base.initialCtx.fresh
+      context.setSetting(context.settings.color, "never")
+      context.setSetting(context.settings.encoding, "UTF8")
+      context.setSetting(context.settings.language, List("experimental.erasedDefinitions"))
+      context.setSetting(context.settings.noindent, true)
+      context.setSetting(context.settings.XprintDiffDel, true)
+      if (compilerPlugin.nonEmpty) {
+        context.setSetting(context.settings.classpath, compilerClasspath)
+      }
+
+      context.setSetting(
+        context.settings.plugin,
+        List(Properties.propOrEmpty("scala-compiler-plugin")))
+      context.setProperty(ContextDoc, new ContextDocstrings)
+      base.initialize()(using context)
+      context
+    },
+    teardown = ctx => {}
+  )
+
   val compilerContext = FunFixture(
     setup = _ => {
       val base = new ContextBase {}
       val context = base.initialCtx.fresh
       context.setSetting(context.settings.encoding, "UTF8")
       context.setSetting(context.settings.language, List("experimental.erasedDefinitions"))
+      context.setSetting(
+        context.settings.classpath,
+        Properties.propOrEmpty("scala-compiler-classpath"))
       context.setProperty(ContextDoc, new ContextDocstrings)
       base.initialize()(using context)
       context
@@ -162,6 +189,11 @@ trait CompilerFixtures { self: FunSuite =>
     val run = c.newRun
     run.compileFromStrings(List(source))
     run.runContext
+  }
+
+  def checkContinuations(source: String)(assertion: (tpd.Tree, Context) => Unit)(
+      using Context): Context = {
+    checkCompile("pickleQuotes", source)(assertion)
   }
 
   def checkTypes(source: String, typeStrings: String*)(

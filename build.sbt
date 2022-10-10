@@ -21,18 +21,18 @@ addCommandAlias("ci-publish", "github; ci-release")
 
 publish / skip := true
 
-lazy val root =// I
+lazy val root = // I
   (project in file("./")).aggregate(
-    benchmarks,// A
-    continuationsPlugin,// C
-    continuationsPluginExample,// D
-    documentation,// E
-    `http-scala-fx`,// F
-    `java-net-multipart-body-publisher`,// G
-    `munit-scala-fx`,// H
-    `scala-fx`,// J
-    `scalike-jdbc-scala-fx`,// K
-    `sttp-scala-fx`// L
+    benchmarks, // A
+    continuationsPlugin, // C
+    continuationsPluginExample, // D
+    documentation, // E
+    `http-scala-fx`, // F
+    `java-net-multipart-body-publisher`, // G
+    `munit-scala-fx`, // H
+    `scala-fx`, // J
+    `scalike-jdbc-scala-fx`, // K
+    `sttp-scala-fx` // L
   )
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
@@ -120,9 +120,25 @@ lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
       munit % Test
     ),
     Test / javaOptions += {
-      val x = (Compile / dependencyClasspath).value.files.map{_.toPath().toAbsolutePath().toString()}.mkString(":")
-      s"-Dscala-compiler-classpath=$x"
-    }
+      val `scala-compiler-classpath` =
+        (Compile / dependencyClasspath)
+          .value
+          .files
+          .map(_.toPath().toAbsolutePath().toString())
+          .mkString(":")
+      s"-Dscala-compiler-classpath=${`scala-compiler-classpath`}"
+    },
+    Test / javaOptions += {
+      s"""-Dcompiler-scalacOptions=\"${scalacOptions.value.mkString(" ")}\""""
+    },
+    Test / javaOptions += Def.taskDyn {
+      Def.task {
+        val _ = (Compile / Keys.`package`).value
+        val `scala-compiler-options` =
+          s"${(continuationsPlugin / Compile / packageBin).value}"
+        s"""-Dscala-compiler-plugin=${`scala-compiler-options`}"""
+      }
+    }.value
   )
 
 lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
@@ -141,8 +157,7 @@ lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
     Test / scalacOptions += s"-Ydebug:pickleQuotes",
     Test / scalacOptions += s"-Yprint-pos",
     Test / scalacOptions += s"-Ydebug",
-    Test / scalacOptions += s"-Yshow-tree-ids",
-    
+    Test / scalacOptions += s"-Yshow-tree-ids"
   )
 
 lazy val mySetting = taskKey[String]("example")
@@ -191,7 +206,6 @@ lazy val sttpScalaFXSettings = commonSettings ++ Seq(
   libraryDependencies += httpCore5,
   libraryDependencies += hedgehog % Test
 )
-
 
 lazy val javaOptionsSettings = Seq(
   "-XX:+IgnoreUnrecognizedVMOptions",

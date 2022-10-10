@@ -1,7 +1,10 @@
 package continuations
 
 import dotty.tools.dotc.core.Contexts.Context
+import dotty.tools.dotc.ast.tpd
+
 import munit.FunSuite
+import dotty.tools.dotc.core.Symbols.ClassSymbol
 
 /**
  * TODO: Add the compiler core libraries and scala standard library to the classpath
@@ -9,6 +12,37 @@ import munit.FunSuite
  *   [[https://stackoverflow.com/questions/4713031/how-to-use-scalatest-to-develop-a-compiler-plugin-in-scala]]
  */
 class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
+
+  compilerContextWithContinuationsPlugin.test(
+    "It should work when there are no continuations") { implicit givenContext =>
+    val source = """|class A""".stripMargin
+    // format: off
+    val expected = """|package <empty> {
+                              |  @SourceFile("compileFromString.scala") 
+                              |    class
+                              |   A() extends Object() {}
+                              |}
+                              |""".stripMargin
+    // format: on
+    checkContinuations(source) {
+      case (tree, ctx) =>
+        assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+    }
+
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "It should work when there are no continuations".fail) { implicit givenContext =>
+    val source = """|class A""".stripMargin
+    val expected = """|package <empty> {
+                      |  @SourceFile("compileFromString.scala") class B() extends Object() {}
+                      |}""".stripMargin
+    checkContinuations(source) {
+      case (tree, ctx) =>
+        assertEquals(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+    }
+
+  }
 
   compilerContext.test("it should run the compiler") { implicit givenContext =>
     val source = """
