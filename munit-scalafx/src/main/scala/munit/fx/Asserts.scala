@@ -4,7 +4,7 @@ package fx
 import scala.annotation.implicitNotFound
 
 /**
- * The Asserts copability Models assertion error-handling capabilities.
+ * The Asserts capability models assertion error-handling capabilities.
  *
  * AssertionError falls outside the hierarchy covered by the Throws capability,
  * @tparam R
@@ -14,8 +14,8 @@ import scala.annotation.implicitNotFound
   "Missing capability:\n" +
     "* Asserts[${R}]\n" +
     "alternatively you may resolve this call with \n" +
-    "```scala\nhandle(f)(recover)\n```\n" +
-    "or\n ignore thrown exceptions with import munit.fx.unsafe.unsafeAssertions`")
+    "```scala\nhandleAssert(f)(recover)\n```\n" +
+    "or\n ignore thrown exceptions with import munit.fx.Asserts.unsafeAsserts")
 opaque type Asserts[-R <: AssertionError] = Unit
 
 object Asserts {
@@ -24,7 +24,7 @@ object Asserts {
    * Importable capability evidence that allows unsafely throwing assertion errors when
    * imported.
    * @tparam R
-   *   The assertion error subtype that is allowod to be thrown.
+   *   The assertion error subtype that is allowed to be thrown.
    */
   given unsafeAsserts[R <: AssertionError]: Asserts[R] = ()
 }
@@ -43,7 +43,7 @@ object Asserts {
  */
 inline def handleAssert[R <: AssertionError, A](
     inline f: Asserts[R] ?=> A
-)(inline recover: (R) => A): A =
+)(inline recover: R => A): A =
   try
     import munit.fx.Asserts.unsafeAsserts
     f

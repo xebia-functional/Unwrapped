@@ -24,6 +24,20 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
+    "given an exception, assertsShiftsToFX should expect control to shift to that exception") {
+    given Arbitrary[java.lang.Exception] = Arbitrary {
+      Gen.alphaNumStr.map(java.lang.Exception(_))
+    }
+    forAll { (exception: java.lang.Exception) =>
+      val obtained = run(assertsShiftsToFX(exception.shift[Int], exception))
+      obtained match
+        case obtainedException: FailException =>
+          unitToProp(fail(s"Expected unit, got $obtainedException"))
+        case _ => passed
+    }
+  }
+
+  property(
     "given a false condition, assertFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to a `FailException` when run.") {
     forAll { (cond: Boolean) =>
       !cond ==> {

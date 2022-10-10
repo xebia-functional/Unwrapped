@@ -1,7 +1,7 @@
 package fx
 
 import org.scalacheck.Properties
-import org.scalacheck.Prop.forAll
+import org.scalacheck.Prop._
 
 object StreamsTests extends Properties("Streams tests"):
 
@@ -12,6 +12,24 @@ object StreamsTests extends Properties("Streams tests"):
   property("zipWithIndex") = forAll { (list: List[Int]) =>
     streamOf(list*).zipWithIndex.toList == list.zipWithIndex
   }
+
+  property("streamOf(list).grouped.toList.flatten should result in the original list") =
+    forAll { (v: List[Int], size: Int) =>
+      (size > 0) ==> {
+        val list = streamOf(v*).grouped(size).toList.flatten
+        list == v
+      }
+    }
+
+  property(
+    "streamOf(list).grouped.toList should result in lists of size size, except for the final item, which contains all remaining items") =
+    forAll { (v: List[Long]) =>
+      (v.size > 10) ==> {
+        val list = streamOf(v*).grouped(10).toList.map(_.size == 10)
+        list.headOption.exists(identity) && list.lastOption.nonEmpty
+      }
+
+    }
 
   property("flatten: identity") = forAll { (n: Int) =>
     streamOf(n).map(i => streamOf(i)).flatten.toList == List(n)
