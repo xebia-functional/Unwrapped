@@ -153,6 +153,7 @@ trait CompilerFixtures { self: FunSuite =>
       context.setSetting(context.settings.language, List("experimental.erasedDefinitions"))
       context.setSetting(context.settings.noindent, true)
       context.setSetting(context.settings.XprintDiffDel, true)
+      context.setSetting(context.settings.pageWidth, 149)
       if (compilerPlugin.nonEmpty) {
         context.setSetting(context.settings.classpath, compilerClasspath)
       }
@@ -164,7 +165,7 @@ trait CompilerFixtures { self: FunSuite =>
       base.initialize()(using context)
       context
     },
-    teardown = ctx => {}
+    teardown = ctx => ()
   )
 
   val compilerContext = FunFixture(

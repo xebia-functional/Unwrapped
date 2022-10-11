@@ -1,10 +1,9 @@
 package continuations
 
-import dotty.tools.dotc.core.Contexts.Context
 import dotty.tools.dotc.ast.tpd
-
-import munit.FunSuite
+import dotty.tools.dotc.core.Contexts.Context
 import dotty.tools.dotc.core.Symbols.ClassSymbol
+import munit.FunSuite
 
 /**
  * TODO: Add the compiler core libraries and scala standard library to the classpath
@@ -18,19 +17,17 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
     val source = """|class A""".stripMargin
     // format: off
     val expected = """|package <empty> {
-                              |  @SourceFile("compileFromString.scala") 
-                              |    class
-                              |   A() extends Object() {}
-                              |}
-                              |""".stripMargin
+       |  @SourceFile("compileFromString.scala") class A() extends Object() {}
+       |}
+       |""".stripMargin
     // format: on
     checkContinuations(source) {
       case (tree, ctx) =>
+        val f: Byte => (String, Char) = b => (b.toInt.toHexString, b.toChar)
         assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
     }
 
   }
-
   compilerContextWithContinuationsPlugin.test(
     "It should work when there are no continuations".fail) { implicit givenContext =>
     val source = """|class A""".stripMargin
