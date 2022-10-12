@@ -21,7 +21,7 @@ import fx.*
 
 def runProgram: Int | String =
     val program: Raise[String] ?=> Int =
-      Right(1).bind + Right(2).bind + "oops".raise[Int]
+      Right(1).bind + Right(2).bind + "oops".raise.asInstanceOf[Int]
 
     run(program)
 
