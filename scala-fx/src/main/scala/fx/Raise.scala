@@ -7,7 +7,7 @@ import scala.annotation.implicitNotFound
  * [[R]]
  */
 @implicitNotFound(
-  "this function may raise control to ${R} and requires capability:\n% Control[${R}]"
+  "this function may raise a ${R} and requires capability:\n% Raise[${R}]"
 )
 trait Raise[-R]:
   /**
