@@ -57,13 +57,13 @@ class HttpScalaFXBackend()(
       case x @ StreamBody(_) => {
         val body = handle[Exception, StreamBody[Receive[Byte], ReceiveStreams]](
           x.asInstanceOf[StreamBody[Receive[Byte], ReceiveStreams]]) { e =>
-          HttpExecutionException(e).raise[StreamBody[Receive[Byte], ReceiveStreams]]
+          HttpExecutionException(e).raise
         }.httpValue
         makeRequest(request, body)
       }
       case x @ MultipartBody(_) =>
         val body = handle[Exception, MultipartBody[R]](x.asInstanceOf[MultipartBody[R]]) { e =>
-          HttpExecutionException(e).raise[MultipartBody[R]]
+          HttpExecutionException(e).raise
         }.httpValue
         makeRequest(request, body)
     }
@@ -90,7 +90,7 @@ class HttpScalaFXBackend()(
       val x: Throwable | T = run(rt)
       x match {
         case ex: Throwable if h.isDefinedAt(ex) => h(ex)
-        case ex: Throwable => ex.raise[T]
+        case ex: Throwable => ex.raise
         case a => unit(a.asInstanceOf[T]) // because the only other
         // possible value is T, and
         // we cannot change the
@@ -156,14 +156,14 @@ class HttpScalaFXBackend()(
       override protected def regularIgnore(
           response: jnh.HttpResponse[Receive[Byte]]): Http[Unit] = {
         val x: Http[Receive[Byte]] = handle[Exception, Receive[Byte]](response.body()) { e =>
-          HttpExecutionException(e).raise[Receive[Byte]]
+          HttpExecutionException(e).raise
         }.httpValue
         Http(())
       }
       override protected def regularAsByteArray(
           response: jnh.HttpResponse[Receive[Byte]]): Http[Array[Byte]] =
         handle[Exception, Array[Byte]](response.body().toList.toArray) { e =>
-          HttpExecutionException(e).raise[Array[Byte]]
+          HttpExecutionException(e).raise
         }
 
       override protected def regularAsFile(
@@ -171,7 +171,7 @@ class HttpScalaFXBackend()(
           file: SttpFile): Http[SttpFile] = {
         val pathWritten =
           handle[Exception, Path](Files.write(file.toPath, response.body.toList.toArray)) { e =>
-            HttpExecutionException(e).raise[Path]
+            HttpExecutionException(e).raise
           }.httpValue
         Http(file)
       }
@@ -179,15 +179,13 @@ class HttpScalaFXBackend()(
       override protected def regularAsStream(
           response: jnh.HttpResponse[Receive[Byte]]): Http[(Receive[Byte], () => Http[Unit])] =
         handle[Exception, (Receive[Byte], () => Http[Unit])](
-          (response.body(), () => Http(()))) { e =>
-          HttpExecutionException(e).raise[(Receive[Byte], () => Http[Unit])]
-        }
+          (response.body(), () => Http(()))) { e => HttpExecutionException(e).raise }
 
       override protected def handleWS[T](
           responseAs: WebSocketResponseAs[T, _],
           meta: ResponseMetadata,
           ws: Nothing): Http[T] =
-        HttpExecutionException(new RuntimeException("Websockets are unsupported")).raise[T]
+        HttpExecutionException(new RuntimeException("Websockets are unsupported")).raise
 
       override protected def cleanupWhenNotAWebSocket(
           response: jnh.HttpResponse[Receive[Byte]],
@@ -197,7 +195,7 @@ class HttpScalaFXBackend()(
       override protected def cleanupWhenGotWebSocket(
           response: Nothing,
           e: GotAWebSocketException): Http[Unit] =
-        HttpExecutionException(new RuntimeException("Websockets are unsupported")).raise[Unit]
+        HttpExecutionException(new RuntimeException("Websockets are unsupported")).raise
     }
   }
 
@@ -261,8 +259,7 @@ class HttpScalaFXBackend()(
       case Method.PUT => toResponse(request, uri.put[Receive[Byte]](body, timeout, headers: _*))
       case Method.TRACE => toResponse(request, uri.TRACE(timeout, headers: _*))
       case m @ _ =>
-        HttpExecutionException(new RuntimeException(s"Method: $m is unsupported."))
-          .raise[Response[T]]
+        HttpExecutionException(new RuntimeException(s"Method: $m is unsupported.")).raise
     }
   }
 

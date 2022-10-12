@@ -47,7 +47,7 @@ object Fold:
    * Serves as both purposes of a scope-reference token, and a default implementation for Raise.
    */
   class DefaultRaise[R] extends Raise[R]:
-    extension (r: R) def raise[A]: A = throw RaiseCancellationException(r, this)
+    extension (r: R) def raise: Nothing = throw RaiseCancellationException(r, this)
 
   private class RaiseCancellationException[R](val _raised: Any | Null, val raise: Raise[R])
       extends CancellationException("Raised Continuation")

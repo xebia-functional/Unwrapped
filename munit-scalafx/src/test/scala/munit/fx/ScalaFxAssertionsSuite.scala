@@ -29,7 +29,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
       Gen.alphaNumStr.map(java.lang.Exception(_))
     }
     forAll { (exception: java.lang.Exception) =>
-      val obtained = run(assertsRaisesToFX(exception.raise[Int], exception))
+      val obtained = run(assertsRaisesToFX(exception.raise, exception))
       obtained match
         case obtainedException: FailException =>
           unitToProp(fail(s"Expected unit, got $obtainedException"))

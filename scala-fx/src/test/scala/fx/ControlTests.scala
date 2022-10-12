@@ -8,7 +8,7 @@ object ControlTests extends Properties("Control Tests"):
   property("short-circuit from nested control") = forAll { (s: String) =>
     def outer: Raise[String] ?=> Int = 1
     def inner: Raise[String] ?=> Int =
-      s.raise[Int] + outer + 1
+      outer + 1 + s.raise.asInstanceOf[Int]
     run(inner) == s
   }
 
