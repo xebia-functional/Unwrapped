@@ -5,13 +5,13 @@ import _root_.fx.*
 import org.junit.AssumptionViolatedException
 
 /**
- * Wraps munit assertions in an Errors effect for integration within scala-fx test bodies.
+ * Wraps munit assertions in an Raise effect for integration within scala-fx test bodies.
  */
 trait ScalaFxAssertions:
   self: Assertions =>
 
   /**
-   * Lifts munit.Assertions#assert into Errors for testing. Will not return until given an
+   * Lifts munit.Assertions#assert into Raise for testing. Will not return until given an
    * Error[AssertionError], typically within run or structured.
    *
    * @param cond
@@ -20,12 +20,12 @@ trait ScalaFxAssertions:
    * @see
    *   [munit.Clue]
    */
-  def assertFX[R](cond: => Errors[R] ?=> Boolean, clue: => Any = "assertion failed")
-      : Location ?=> (Errors[AssertionError], Errors[R]) ?=> Unit =
+  def assertFX[R](cond: => Raise[R] ?=> Boolean, clue: => Any = "assertion failed")
+      : Location ?=> (Raise[AssertionError], Raise[R]) ?=> Unit =
     liftToFX(assert(cond, clue))
 
   /**
-   * Lifts munit.Assertions#assertEquals into Errors for testing. Will not return until given an
+   * Lifts munit.Assertions#assertEquals into Raise for testing. Will not return until given an
    * Error[AssertionError], typically within run or structured.
    *
    * @tparam A
@@ -40,14 +40,14 @@ trait ScalaFxAssertions:
    *   [munit.Clue]
    */
   def assertEqualsFX[R, A, B](
-      obtained: Errors[R] ?=> A,
+      obtained: Raise[R] ?=> A,
       expected: B,
       clue: => Any = "values are not the same"
-  ): Location ?=> B <:< A ?=> (Errors[AssertionError], Errors[R]) ?=> Unit =
+  ): Location ?=> B <:< A ?=> (Raise[AssertionError], Raise[R]) ?=> Unit =
     liftToFX(assertEquals(obtained, expected, clue))
 
   /**
-   * Lifts munit.Assertions#assume into Errors for testing. Will not return until given an
+   * Lifts munit.Assertions#assume into Raise for testing. Will not return until given an
    * Error[AssumptionViolatedException], typically within run or structured.
    *
    * @param cond
@@ -56,13 +56,13 @@ trait ScalaFxAssertions:
    * @see
    *   [munit.Clue]
    */
-  def assumeFX[R](cond: => Errors[R] ?=> Boolean, clue: => Any = "assumption failed")
-      : Location ?=> (Errors[AssumptionViolatedException], Errors[R]) ?=> Unit =
+  def assumeFX[R](cond: => Raise[R] ?=> Boolean, clue: => Any = "assumption failed")
+      : Location ?=> (Raise[AssumptionViolatedException], Raise[R]) ?=> Unit =
     try assume(cond, clue)
     catch case ex: AssumptionViolatedException => ex.raise
 
   /**
-   * Lifts munit.Assertions#assertNoDiff into Errors for testing. Will not return until given an
+   * Lifts munit.Assertions#assertNoDiff into Raise for testing. Will not return until given an
    * Error[AssertionError], typically within run or structured.
    *
    * @param obtained
@@ -73,14 +73,14 @@ trait ScalaFxAssertions:
    *   [munit.Clue]
    */
   def assertNoDiffFX[R](
-      obtained: Errors[R] ?=> String,
+      obtained: Raise[R] ?=> String,
       expected: String,
       clue: => Any = "diff assertion failed")
-      : Location ?=> (Errors[AssertionError], Errors[R]) ?=> Unit =
+      : Location ?=> (Raise[AssertionError], Raise[R]) ?=> Unit =
     liftToFX(assertNoDiff(obtained, expected, clue))
 
   /**
-   * Lifts munit.Assertions#assertNotEquals into Errors for testing. Will not return until given
+   * Lifts munit.Assertions#assertNotEquals into Raise for testing. Will not return until given
    * an Error[AssertionError], typically within run or structured.
    *
    * @tparam A
@@ -95,14 +95,14 @@ trait ScalaFxAssertions:
    *   [munit.Clue]
    */
   def assertNotEqualsFX[R, A, B](
-      obtained: Errors[R] ?=> A,
+      obtained: Raise[R] ?=> A,
       expected: B,
       clue: => Any = "values are the same"
-  ): Location ?=> A =:= B ?=> (Errors[AssertionError], Errors[R]) ?=> Unit =
+  ): Location ?=> A =:= B ?=> (Raise[AssertionError], Raise[R]) ?=> Unit =
     liftToFX(assertNotEquals(obtained, expected, clue))
 
   /**
-   * Lifts munit.Assertions#assertEqualsDoubleFX into Errors for testing. Will not return until
+   * Lifts munit.Assertions#assertEqualsDoubleFX into Raise for testing. Will not return until
    * given an Error[AssertionError], typically within run or structured.
    *
    * @param obtained
@@ -115,15 +115,15 @@ trait ScalaFxAssertions:
    *   [munit.Clue]
    */
   def assertEqualsDoubleFX[R](
-      obtained: Errors[R] ?=> Double,
+      obtained: Raise[R] ?=> Double,
       expected: Double,
       delta: Double,
       clue: => Any = "values are not the same"
-  ): Location ?=> (Errors[AssertionError], Errors[R]) ?=> Unit = liftToFX(
+  ): Location ?=> (Raise[AssertionError], Raise[R]) ?=> Unit = liftToFX(
     assertEqualsDouble(obtained, expected, delta, clue))
 
   /**
-   * Lifts munit.Assertions#assertEquals into Errors for testing. Will not return until given an
+   * Lifts munit.Assertions#assertEquals into Raise for testing. Will not return until given an
    * Error[AssertionError], typically within run or structured.
    *
    * @param obtained
@@ -136,16 +136,16 @@ trait ScalaFxAssertions:
    *   munit.Clue
    */
   def assertEqualsFloatFX[R](
-      obtained: Errors[R] ?=> Float,
+      obtained: Raise[R] ?=> Float,
       expected: Float,
       delta: Float,
       clue: => Any = "values are not the same"
-  ): Location ?=> (Errors[AssertionError], Errors[R]) ?=> Unit = liftToFX(
+  ): Location ?=> (Raise[AssertionError], Raise[R]) ?=> Unit = liftToFX(
     assertEqualsFloat(obtained, expected, delta, clue))
 
-  def assertsShiftsToFX[R, T, A](
-      obtained: Errors[R] ?=> A,
-      expected: T): (Location, Errors[R | AssertionError]) ?=> Unit =
+  def assertsRaisesToFX[R, T, A](
+      obtained: Raise[R] ?=> A,
+      expected: T): (Location, Raise[R | AssertionError]) ?=> Unit =
     obtained
       .toEither
       .fold(
@@ -153,5 +153,5 @@ trait ScalaFxAssertions:
         a => FailException(s"expected $expected got $a", summon[Location]))
 
   private def liftToFX[A](
-      body: Asserts[AssertionError] ?=> A): Errors[AssertionError] ?=> Unit =
+      body: Asserts[AssertionError] ?=> A): Raise[AssertionError] ?=> Unit =
     handleAssert(body)(_.raise)

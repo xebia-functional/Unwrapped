@@ -19,7 +19,7 @@ class DatabaseSpec extends DatabaseSuite {
     assertEqualsFX(counter.get(), 2)
   }
 
-  testFX("Read only shift when tries to execute a non-read only operation") {
+  testFX("Read only raises when tries to execute a non-read only operation") {
     assertFX(toEither(DB.readOnlyWithControl {
       case given DBSession =>
         sql"update emp set name = 'Never changed in a readonly operation' where id = 1"

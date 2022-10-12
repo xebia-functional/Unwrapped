@@ -56,7 +56,7 @@ class FakeConsole(var input: String)(using Throws[EndOfLine]) extends Console:
     def writeLine(): Unit = output += (s + "\n")
 
 @tailrec
-def program(using Errors[String], Console): String =
+def program(using Raise[String], Console): String =
   "what is your name?".writeLine()
   read() match
     case "" =>

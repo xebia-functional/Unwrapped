@@ -58,7 +58,7 @@ abstract class ScalaFXSuite extends FunSuite, ScalaFxAssertions, HedgehogAsserti
      *   The result of the test when a location can be pulled from given scope.
      */
     def testFX[R, F <: AssertionError: Typeable](name: String)(
-        body: Errors[R | F] ?=> A => Unit): Location ?=> Unit =
+        body: Raise[R | F] ?=> A => Unit): Location ?=> Unit =
       a.test(TestOptions(name)) { fixture =>
         val x: R | F | Unit = run(structured(body(fixture)))
         x match
@@ -81,7 +81,7 @@ abstract class ScalaFXSuite extends FunSuite, ScalaFxAssertions, HedgehogAsserti
      *   The result of the test when a location can be pulled from given scope.
      */
     def testFX[R, F <: AssertionError: Typeable](options: TestOptions)(
-        body: Errors[R | F] ?=> A => Unit): Location ?=> Unit =
+        body: Raise[R | F] ?=> A => Unit): Location ?=> Unit =
       a.test(options) { fixture =>
         val x: R | F | Unit = run(structured(body(fixture)))
         x match
@@ -107,7 +107,7 @@ abstract class ScalaFXSuite extends FunSuite, ScalaFxAssertions, HedgehogAsserti
     def propertyWithFixtureFX[R, F <: AssertionError: Typeable](
         name: String,
         withConfig: PropertyConfig => PropertyConfig = identity)(
-        prop: Errors[R | F] ?=> A => Property): Location ?=> Unit =
+        prop: Raise[R | F] ?=> A => Property): Location ?=> Unit =
       a.testFX(name) { fixture =>
         val t = hedgehog.runner.property(name, prop(fixture)).config(withConfig)
         check(t, t.withConfig(PropertyConfig.default))
@@ -131,7 +131,7 @@ abstract class ScalaFXSuite extends FunSuite, ScalaFxAssertions, HedgehogAsserti
   def propertyFX[R, F <: AssertionError: Typeable](
       name: String,
       withConfig: PropertyConfig => PropertyConfig = identity)(
-      prop: Errors[R | F] ?=> Property): Location ?=> Unit =
+      prop: Raise[R | F] ?=> Property): Location ?=> Unit =
     testFX(name) {
       val t = hedgehog.runner.property(name, prop).config(withConfig)
       check(t, t.withConfig(PropertyConfig.default))
@@ -148,13 +148,13 @@ abstract class ScalaFXSuite extends FunSuite, ScalaFxAssertions, HedgehogAsserti
    * @param name
    *   A unique string identifying the test within the suite.
    * @param body
-   *   A test program suspended in an effect that at minumum can shift control to the R error
+   *   A test program suspended in an effect that at minumum can raise control to the R error
    *   type.
    * @return
    *   Unit
    */
   def testFX[R, F <: AssertionError: Typeable](name: String)(
-      body: Errors[R | F] ?=> Unit): Location ?=> Unit =
+      body: Raise[R | F] ?=> Unit): Location ?=> Unit =
     test(name) {
       val x: R | F | Unit = run(structured(body))
       x match {
@@ -175,13 +175,13 @@ abstract class ScalaFXSuite extends FunSuite, ScalaFxAssertions, HedgehogAsserti
    * @param options
    *   The options, including the name, tag, and other munit test configuration options
    * @param body
-   *   A test program suspended in an effect that at minumum can shift control to the R error
+   *   A test program suspended in an effect that at minumum can raise control to the R error
    *   type.
    * @return
    *   Unit
    */
   def testFX[R, F <: AssertionError: Typeable](options: TestOptions)(
-      body: => Errors[R | F] ?=> Unit): Location ?=> Unit =
+      body: => Raise[R | F] ?=> Unit): Location ?=> Unit =
     test(options) {
       val x: R | F | Unit = run(structured(body))
       x match {

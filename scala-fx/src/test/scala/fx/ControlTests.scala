@@ -6,19 +6,19 @@ import org.scalacheck.Prop.forAll
 object ControlTests extends Properties("Control Tests"):
 
   property("short-circuit from nested control") = forAll { (s: String) =>
-    def outer: Control[String] ?=> Int = 1
-    def inner: Control[String] ?=> Int =
-      s.shift[Int] + outer + 1
+    def outer: Raise[String] ?=> Int = 1
+    def inner: Raise[String] ?=> Int =
+      s.raise[Int] + outer + 1
     run(inner) == s
   }
 
   property("happy path") = forAll { (n: Int) =>
-    def effect: Control[Nothing] ?=> Int = n
+    def effect: Raise[Nothing] ?=> Int = n
     run(effect) == n
   }
 
-  property("shift short-circuits") = forAll { (s: String) =>
-    def effect: Control[String] ?=> Int = s.shift
+  property("raise short-circuits") = forAll { (s: String) =>
+    def effect: Raise[String] ?=> Int = s.raise
     run(effect) == s
   }
 

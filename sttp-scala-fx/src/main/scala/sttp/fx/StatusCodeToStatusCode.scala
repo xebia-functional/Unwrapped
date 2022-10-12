@@ -18,7 +18,7 @@ object StatusCodeToStatusCode {
       def toStatusCode: Http[sm.StatusCode] =
         sm.StatusCode
           .safeApply(a)
-          .fold(s => HttpExecutionException(new RuntimeException(s)).shift, identity)
+          .fold(s => HttpExecutionException(new RuntimeException(s)).raise, identity)
 
   given StatusCodeToStatusCode[StatusCode, sm.StatusCode] with
     extension (a: StatusCode)
@@ -87,7 +87,7 @@ object StatusCodeToStatusCode {
           case _ =>
             sm.StatusCode
               .safeApply(unused.value)
-              .fold(err => HttpExecutionException(new RuntimeException(err)).shift, identity)
+              .fold(err => HttpExecutionException(new RuntimeException(err)).raise, identity)
 
   given smStatusCode: StatusCodeToStatusCode[sm.StatusCode, StatusCode] with
     extension (a: sm.StatusCode)
@@ -158,5 +158,5 @@ object StatusCodeToStatusCode {
           case x: sm.StatusCode if x.code == 418 => `I'm a teapot`
           case x: sm.StatusCode if x.code == 425 => `Too Early`
           case _ =>
-            HttpExecutionException(new RuntimeException("Unrecognized Status Code")).shift
+            HttpExecutionException(new RuntimeException("Unrecognized Status Code")).raise
 }

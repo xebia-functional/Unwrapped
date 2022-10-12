@@ -19,11 +19,11 @@ object HttpRetries:
   /**
    * Safe constructor for runtime instantiation
    */
-  def of(i: Int)(using Errors[HttpExecutionException]): HttpRetries =
+  def of(i: Int)(using Raise[HttpExecutionException]): HttpRetries =
     if (i >= 0)
       i
     else
-      HttpExecutionException(RuntimeException("HttpRetries must be greater than 0")).shift
+      HttpExecutionException(RuntimeException("HttpRetries must be greater than 0")).raise
 
   extension (h: HttpRetries)
     /**

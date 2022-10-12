@@ -16,12 +16,12 @@ import scala.concurrent.duration.{Duration => ScalaDuration}
  */
 type Http[A] = (
     HttpRetryPolicy[A],
-    Control[HttpExecutionException],
+    Raise[HttpExecutionException],
     HttpClient
 ) ?=> A
 
 extension [A](http: Http[A])
-  def httpValue(using Control[HttpExecutionException]): A = http
+  def httpValue(using Raise[HttpExecutionException]): A = http
   def fmap[B](f: A => B): Http[B] =
     f(http)
   def bindMap[B](f: A => Http[B]): Http[B] =
@@ -66,7 +66,7 @@ extension (uri: URI)
                 requestBuilder.timeout(Duration.ofMillis(fd.toMillis))
               }
               .build(),
-            mapper.bodyHandler)) { ex => HttpExecutionException(ex).shift }
+            mapper.bodyHandler)) { ex => HttpExecutionException(ex).raise }
 
     if (response.shouldRetry(retryCount)) {
       GET(retryCount + HttpRetries(1), maybeTimeout, headers: _*)
@@ -106,7 +106,7 @@ extension (uri: URI)
                 requestBuilder.timeout(Duration.ofMillis(fd.toMillis))
               }
               .build(),
-            mapper.bodyHandler)) { ex => HttpExecutionException(ex).shift }
+            mapper.bodyHandler)) { ex => HttpExecutionException(ex).raise }
     if (response.shouldRetry(retryCount)) {
       POST(body, maybeTimeout, retryCount + HttpRetries(1), headers: _*)
     } else {
@@ -135,7 +135,7 @@ extension (uri: URI)
                 requestBuilder.timeout(Duration.ofMillis(fd.toMillis))
               }
               .build(),
-            BodyHandlers.discarding)) { ex => HttpExecutionException(ex).shift }
+            BodyHandlers.discarding)) { ex => HttpExecutionException(ex).raise }
     if (response.shouldRetry(retryCount)) {
       HEAD(maybeTimeout, retryCount + HttpRetries(1), headers: _*)
     } else response
@@ -171,7 +171,7 @@ extension (uri: URI)
                 requestBuilder.timeout(Duration.ofMillis(fd.toMillis))
               }
               .build(),
-            mapper.bodyHandler)) { ex => HttpExecutionException(ex).shift }
+            mapper.bodyHandler)) { ex => HttpExecutionException(ex).raise }
     if (response.shouldRetry(retryCount)) {
       PUT(body, maybeTimeout, retryCount + HttpRetries(1), headers: _*)
     } else response
@@ -199,7 +199,7 @@ extension (uri: URI)
                 requestBuilder.timeout(Duration.ofMillis(fd.toMillis))
               }
               .build(),
-            mapper.bodyHandler)) { ex => HttpExecutionException(ex).shift }
+            mapper.bodyHandler)) { ex => HttpExecutionException(ex).raise }
     if (response.shouldRetry(retryCount)) {
       DELETE(maybeTimeout, retryCount + HttpRetries(1), headers: _*)
     } else {
@@ -230,7 +230,7 @@ extension (uri: URI)
                 requestBuilder.timeout(Duration.ofMillis(fd.toMillis))
               }
               .build(),
-            mapper.bodyHandler)) { ex => HttpExecutionException(ex).shift }
+            mapper.bodyHandler)) { ex => HttpExecutionException(ex).raise }
     if (response.shouldRetry(retryCount)) {
       OPTIONS(maybeTimeout, retryCount + HttpRetries(1), headers: _*)
     } else response
@@ -260,7 +260,7 @@ extension (uri: URI)
                 requestBuilder.timeout(Duration.ofMillis(fd.toMillis))
               }
               .build(),
-            mapper.bodyHandler)) { ex => HttpExecutionException(ex).shift }
+            mapper.bodyHandler)) { ex => HttpExecutionException(ex).raise }
     if (response.shouldRetry(retryCount)) {
       TRACE(maybeTimeout, retryCount + HttpRetries(1), headers: _*)
     } else response
@@ -296,7 +296,7 @@ extension (uri: URI)
               }
               .build(),
             mapper.bodyHandler
-          )) { ex => HttpExecutionException(ex).shift }
+          )) { ex => HttpExecutionException(ex).raise }
     if (response.shouldRetry(retryCount)) {
       PATCH(body, maybeTimeout, retryCount + HttpRetries(1), headers: _*)
     } else response

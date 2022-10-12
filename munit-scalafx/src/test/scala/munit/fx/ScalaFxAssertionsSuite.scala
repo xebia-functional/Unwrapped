@@ -11,7 +11,7 @@ import org.scalacheck.Prop._
 class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
 
   property(
-    "given a true condition, assertFX should return an Errors[AssertionError] ?=> Unit that evaluates to `()` run") {
+    "given a true condition, assertFX should return an Raise[AssertionError] ?=> Unit that evaluates to `()` run") {
     forAll { (cond: Boolean) =>
       val obtained: AssertionError | Unit = run(assertFX(cond))
       cond ==> {
@@ -24,12 +24,12 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given an exception, assertsShiftsToFX should expect control to shift to that exception") {
+    "given an exception, assertsRaisesToFX should expect Raise to raise that exception") {
     given Arbitrary[java.lang.Exception] = Arbitrary {
       Gen.alphaNumStr.map(java.lang.Exception(_))
     }
     forAll { (exception: java.lang.Exception) =>
-      val obtained = run(assertsShiftsToFX(exception.shift[Int], exception))
+      val obtained = run(assertsRaisesToFX(exception.raise[Int], exception))
       obtained match
         case obtainedException: FailException =>
           unitToProp(fail(s"Expected unit, got $obtainedException"))
@@ -38,7 +38,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given a false condition, assertFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to a `FailException` when run.") {
+    "given a false condition, assertFX should return an `Raise[AssertionError] ?=> Unit` that evaluates to a `FailException` when run.") {
     forAll { (cond: Boolean) =>
       !cond ==> {
         val obtained = run(assertFX(false))
@@ -51,7 +51,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given two equal items, assertEqualFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to `()` when run") {
+    "given two equal items, assertEqualFX should return an `Raise[AssertionError] ?=> Unit` that evaluates to `()` when run") {
     forAll { (givenInt: Int) =>
       val obtained = run(assertEqualsFX(givenInt, givenInt))
       obtained match
@@ -62,7 +62,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given two inequal items, assertEqualFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to a ComparisonFailure when run") {
+    "given two inequal items, assertEqualFX should return an `Raise[AssertionError] ?=> Unit` that evaluates to a ComparisonFailure when run") {
     forAll { (x: Int, y: Int) =>
       (x != y) ==> {
         val obtained =
@@ -75,7 +75,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given a false condition, assumeFX should return an `Errors[AssumptionViolatedException]` ?=> Unit that evaluates to an AssumptionViolatedException when run") {
+    "given a false condition, assumeFX should return an `Raise[AssumptionViolatedException]` ?=> Unit that evaluates to an AssumptionViolatedException when run") {
     forAll { (cond: Boolean) =>
       (!cond) ==> {
         val obtained = run(assumeFX(cond))
@@ -87,7 +87,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given a true condition, assumeFX should return an `Errors[AssumptionViolatedException] ?=> Unit` that evaluates to () when run") {
+    "given a true condition, assumeFX should return an `Raise[AssumptionViolatedException] ?=> Unit` that evaluates to () when run") {
     forAll { (cond: Boolean) =>
       cond ==> {
         val obtained = run(assumeFX(cond))
@@ -99,7 +99,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "when given two equal strings, assertNoDiffFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to () when run") {
+    "when given two equal strings, assertNoDiffFX should return an `Raise[AssertionError] ?=> Unit` that evaluates to () when run") {
     forAll { (s: String) =>
       val obtained = run(assertNoDiffFX(s, s))
       obtained match
@@ -110,7 +110,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "when given two nonequal strings, assertNoDiffFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to a ComparisonFailureException when run") {
+    "when given two nonequal strings, assertNoDiffFX should return an `Raise[AssertionError] ?=> Unit` that evaluates to a ComparisonFailureException when run") {
     // assertNoDiff can't handle complex strings in munit
     given Arbitrary[String] = Arbitrary { Gen.alphaLowerStr }
     forAll { (s: String, s2: String) =>
@@ -126,7 +126,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given two equal items, assertNotEqualFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to a ComparisonFailure when run") {
+    "given two equal items, assertNotEqualFX should return an `Raise[AssertionError] ?=> Unit` that evaluates to a ComparisonFailure when run") {
     forAll { (givenInt: Int) =>
       val obtained = run(assertNotEqualsFX(12, 12))
       obtained match
@@ -136,7 +136,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given two inequal items, assertEqualFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to `()` when run") {
+    "given two inequal items, assertEqualFX should return an `Raise[AssertionError] ?=> Unit` that evaluates to `()` when run") {
     forAll { (x: Int, y: Int) =>
       (x != y) ==> {
         val obtained =
@@ -149,7 +149,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given two equal items, assertEqualsDoubleFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to `()` when run") {
+    "given two equal items, assertEqualsDoubleFX should return an `Raise[AssertionError] ?=> Unit` that evaluates to `()` when run") {
     forAll { (givenDouble: Double) =>
       val obtained = run(assertEqualsDoubleFX(givenDouble, givenDouble, 0.00))
       obtained match
@@ -160,7 +160,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given two items within a tolerance delta range of each other, assertEqualsDoubleFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to `()` when run") {
+    "given two items within a tolerance delta range of each other, assertEqualsDoubleFX should return an `Raise[AssertionError] ?=> Unit` that evaluates to `()` when run") {
     forAll { (givenDouble: Double, givenDelta: Double) =>
       val givenDoubleWithinDelta = givenDouble + givenDelta - Double.MinPositiveValue
       val obtained = run(assertEqualsDoubleFX(givenDouble, givenDoubleWithinDelta, givenDelta))
@@ -172,7 +172,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given two inequal items, assertEqualsDoubleFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to a ComparisonFailure when run") {
+    "given two inequal items, assertEqualsDoubleFX should return an `Raise[AssertionError] ?=> Unit` that evaluates to a ComparisonFailure when run") {
     forAll { (x: Double, y: Double) =>
       (x != y) ==> {
         val obtained =
@@ -185,7 +185,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given two equal items, assertEqualsFloatFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to `()` when run") {
+    "given two equal items, assertEqualsFloatFX should return an `Raise[AssertionError] ?=> Unit` that evaluates to `()` when run") {
     forAll { (givenFloat: Float) =>
       val obtained = run(assertEqualsFloatFX(givenFloat, givenFloat, 0.00))
       obtained match
@@ -196,7 +196,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given two items within a tolerance delta range of each other, assertEqualsFloatFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to `()` when run") {
+    "given two items within a tolerance delta range of each other, assertEqualsFloatFX should return an `Raise[AssertionError] ?=> Unit` that evaluates to `()` when run") {
     forAll { (givenFloat: Float, givenDelta: Float) =>
       val givenFloatWithinDelta = givenFloat + givenDelta
       val obtained = run(assertEqualsFloatFX(givenFloat, givenFloatWithinDelta, givenDelta))
@@ -208,7 +208,7 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, ScalaFxAssertions:
   }
 
   property(
-    "given two inequal items, assertEqualsFloatFX should return an `Errors[AssertionError] ?=> Unit` that evaluates to a ComparisonFailure when run") {
+    "given two inequal items, assertEqualsFloatFX should return an `Raise[AssertionError] ?=> Unit` that evaluates to a ComparisonFailure when run") {
     forAll { (x: Float, y: Float) =>
       (x != y) ==> {
         val obtained =

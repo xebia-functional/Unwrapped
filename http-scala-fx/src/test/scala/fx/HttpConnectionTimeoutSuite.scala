@@ -12,7 +12,7 @@ class HttpConnectionTimeoutSuite extends ScalaCheckSuite:
       (i > 0) ==> {
         @nowarn // value will not resolve without the fruitless typecheck
         val result = run(HttpConnectionTimeout.of(i)) match
-          case s: String => fail(s"unexpected shift to error: $s")
+          case s: String => fail(s"unexpected raise to error: $s")
           case x: HttpConnectionTimeout => x.value == i
         result
       }

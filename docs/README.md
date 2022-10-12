@@ -20,7 +20,7 @@ Capabilities can be introduced a la carte and will be carried as given contextua
 import fx.*
 
 def runProgram: Int | String =
-    val program: Errors[String] ?=> Int =
+    val program: Raise[String] ?=> Int =
       Right(1).bind + Right(2).bind + "oops".raise[Int]
 
     run(program)
@@ -35,7 +35,7 @@ Users and library authors may define their own Capabilities. Here is how `Bind` 
   * access [[Control]] to short-circuit as necessary
   */
 extension [R, A](fa: Either[R, A])
-  def bind: Errors[R] ?=> A = fa.fold(_.shift, identity)
+  def bind: Raise[R] ?=> A = fa.fold(_.raise, identity)
 ```
 
 Scala Fx supports a structured concurrency model backed by the non-blocking [StructuredExecutorTask](https://openjdk.java.net/jeps/428)

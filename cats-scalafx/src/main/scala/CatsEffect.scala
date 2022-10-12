@@ -15,7 +15,7 @@ import scala.concurrent.{Await, ExecutionContext, ExecutionException}
 import scala.util.{Failure, Success}
 
 def toEffect[F[*]: [g[*]] =>> ApplicativeError[g, R], R: Manifest, A: Manifest](
-    program: Control[R] ?=> A): F[A] =
+    program: Raise[R] ?=> A): F[A] =
   val x = run(program)
   x match {
     case x: A => x.pure

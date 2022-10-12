@@ -11,7 +11,7 @@ object Nullable:
     /**
      * Alias of value
      */
-    def v(using Errors[NullPointerException]): A = value
+    def v(using Raise[NullPointerException]): A = value
 
     /**
      * True if the nullable is non-null
@@ -28,12 +28,12 @@ object Nullable:
     def nonEmpty: Boolean = exists
 
     /**
-     * Unifies the value to A or shifts control to a NullPointerException,
+     * Unifies the value to A or raises to a NullPointerException,
      * @return
      *   the value of a in a NullPointerException context
      */
-    def value(using Errors[NullPointerException]): A =
-      getOrElse(NullPointerException().shift)
+    def value(using Raise[NullPointerException]): A =
+      getOrElse(NullPointerException().raise)
 
     /**
      * @param default

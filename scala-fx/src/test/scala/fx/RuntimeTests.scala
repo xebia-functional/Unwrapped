@@ -20,13 +20,13 @@ object RuntimeTests extends Properties("Runtime Tests"):
   }
 
   property("Short-circuiting with Either.Left toEither") = forAll { (n: Int, s: String) =>
-    val effect: Control[String | None.type] ?=> Int =
+    val effect: Raise[String | None.type] ?=> Int =
       Left[String, Int](s).bind + Some(n).bind
     toEither(effect) == Left[String, Int](s)
   }
 
   property("Short-circuiting with Option.None toOption") = forAll { (n: Int) =>
-    val effect: Control[None.type] ?=> Int =
+    val effect: Raise[None.type] ?=> Int =
       Right(n).bind + Option.empty[Int].bind
     toOption(effect).isEmpty
   }
