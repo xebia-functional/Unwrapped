@@ -152,6 +152,5 @@ trait ScalaFxAssertions:
         r => assertEqualsFX(r, expected),
         a => FailException(s"expected $expected got $a", summon[Location]))
 
-  private def liftToFX[A](
-      body: Asserts[AssertionError] ?=> A): Raise[AssertionError] ?=> Unit =
+  private def liftToFX[A](body: Asserts[AssertionError] ?=> A): Raise[AssertionError] ?=> Unit =
     handleAssert(body)(_.raise)

@@ -38,9 +38,9 @@ import sttp.client3.ByteArrayBody
 import sttp.client3.StringBody
 
 class HttpScalaFXBackend()(
-  using client: HttpClient,
-  control: Raise[Throwable | HttpExecutionException],
-  config: HttpClientConfig
+    using client: HttpClient,
+    control: Raise[Throwable | HttpExecutionException],
+    config: HttpClientConfig
 ) extends SttpBackend[Http, ReceiveStreams] {
 
   private given MonadError[Http] = responseMonad
