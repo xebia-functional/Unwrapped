@@ -60,7 +60,7 @@ object Dependencies {
       "com.dimafeng" %% "testcontainers-scala-postgresql" % Versions.testContainers
     val flyway = "org.flywaydb" % "flyway-core" % Versions.flyway
     val hedgehog = "qa.hedgehog" %% "hedgehog-munit" % Versions.hedgehog
-    val catsEffectLaws = "org.typelevel" %% "cats-effect-laws"   % Versions.catsEffect
+    val catsEffectLaws = "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect
     val munitDiscipline = "org.typelevel" %% "discipline-munit" % Versions.munitDiscpline
     val catsEffectTestKit = "org.typelevel" %% "cats-effect-testkit" % Versions.catsEffect
 //    val scalaCheckShapeless = "com.github.alexarchambault" %% "scalacheck-shapeless_1.16" % Versions.scalaCheckShapeless
