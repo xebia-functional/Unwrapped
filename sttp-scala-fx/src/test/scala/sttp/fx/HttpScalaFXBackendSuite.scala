@@ -18,7 +18,7 @@ import StatusCodeToStatusCode.given
 
 class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
 
-  testBody.testFX("string POST to /echo should echo back as a string") { body =>
+  testBody.testFX("string POST to /echo should echo back as a string".ignore) { body =>
     given config: HttpClientConfig =
       HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
 
@@ -37,7 +37,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testBody.testFX("string POST to /echo should echo back as a stream") { body =>
+  testBody.testFX("string POST to /echo should echo back as a stream".ignore) { body =>
     given config: HttpClientConfig =
       HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
 
@@ -59,7 +59,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  file.testFX("get image should work") { imageFileResource =>
+  file.testFX("get image should work".ignore) { imageFileResource =>
     val serverAddress = getServerAddress()
     val imageAsString = imageFileResource.use { imageFileToWriteTo =>
       val response: File = basicRequest
@@ -79,7 +79,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     assertEqualsFX(imageAsString, expected)
   }
 
-  testBodyAndFile.testFX("string POST to /echo should echo back as a file") {
+  testBodyAndFile.testFX("string POST to /echo should echo back as a file".ignore) {
     case (body, fileResource) =>
       val serverAddress = getServerAddress()
       val fileContents = fileResource.use { file =>
@@ -99,7 +99,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
       assertEqualsFX(fileContents, body)
   }
 
-  testBody.testFX("string POST to /echo should echo back as a byteArray") { body =>
+  testBody.testFX("string POST to /echo should echo back as a byteArray".ignore) { body =>
     given config: HttpClientConfig =
       HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
     val serverAddress = getServerAddress()
@@ -117,7 +117,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testBody.testFX("string POST to /echo should echo back as a both byteArray and string") {
+  testBody.testFX("string POST to /echo should echo back as a both byteArray and string".ignore) {
     body =>
       given config: HttpClientConfig =
         HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
@@ -133,7 +133,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
       assertEqualsFX((new String(byteArray), str), ("test", "test"))
   }
 
-  testBody.testFX("string PUT to /echo should echo back as a string") { body =>
+  testBody.testFX("string PUT to /echo should echo back as a string".ignore) { body =>
     given config: HttpClientConfig =
       HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
     val serverAddress = getServerAddress()
@@ -150,7 +150,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testBody.testFX("string PUT to /echo should echo back as a stream") { body =>
+  testBody.testFX("string PUT to /echo should echo back as a stream".ignore) { body =>
     given config: HttpClientConfig =
       HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
     val serverAddress = getServerAddress()
@@ -171,7 +171,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testBodyAndPutFile.testFX("string PUT to /echo should echo back as a file") {
+  testBodyAndPutFile.testFX("string PUT to /echo should echo back as a file".ignore) {
     case (body, fileResource) =>
       val serverAddress = getServerAddress()
       val fileContents =
@@ -192,7 +192,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
       assertEqualsFX(fileContents, body)
   }
 
-  testBody.testFX("string PUT to /echo should echo back as a byteArray") { body =>
+  testBody.testFX("string PUT to /echo should echo back as a byteArray".ignore) { body =>
     given config: HttpClientConfig =
       HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
     val serverAddress = getServerAddress()
@@ -210,7 +210,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testBody.testFX("string PUT to /echo should echo back as a both byteArray and string") {
+  testBody.testFX("string PUT to /echo should echo back as a both byteArray and string".ignore) {
     body =>
       given config: HttpClientConfig =
         HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
@@ -226,7 +226,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
       assertEqualsFX((new String(byteArray), str), ("test", "test"))
   }
 
-  testBody.testFX("string PATCH to /echo should echo back as a string") { body =>
+  testBody.testFX("string PATCH to /echo should echo back as a string".ignore) { body =>
     given config: HttpClientConfig =
       HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
     val serverAddress = getServerAddress()
@@ -243,7 +243,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testBody.testFX("string PATCH to /echo should echo back as a stream") { body =>
+  testBody.testFX("string PATCH to /echo should echo back as a stream".ignore) { body =>
     given config: HttpClientConfig =
       HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
     val serverAddress = getServerAddress()
@@ -264,7 +264,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testBodyAndPatchFile.testFX("string PATCH to /echo should echo back as a file") {
+  testBodyAndPatchFile.testFX("string PATCH to /echo should echo back as a file".ignore) {
     case (body, fileResource) =>
       val serverAddress = getServerAddress()
       val fileContents =
@@ -285,7 +285,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
       assertEqualsFX(fileContents, body)
   }
 
-  testBody.testFX("string PATCH to /echo should echo back as a byteArray") { body =>
+  testBody.testFX("string PATCH to /echo should echo back as a byteArray".ignore) { body =>
     given config: HttpClientConfig =
       HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
     val serverAddress = getServerAddress()
@@ -303,7 +303,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testBody.testFX("string PATCH to /echo should echo back as a both byteArray and string") {
+  testBody.testFX("string PATCH to /echo should echo back as a both byteArray and string".ignore) {
     body =>
       given config: HttpClientConfig =
         HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
@@ -319,7 +319,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
       assertEqualsFX((new String(byteArray), str), ("test", "test"))
   }
 
-  testFX("delete to /toDelete should return a request with no body") {
+  testFX("delete to /toDelete should return a request with no body".ignore) {
     given config: HttpClientConfig =
       HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
     val serverAddress = getServerAddress()
@@ -335,7 +335,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testFX("HEAD to / should return a request with no body") {
+  testFX("HEAD to / should return a request with no body".ignore) {
     given config: HttpClientConfig =
       HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
     val serverAddress = getServerAddress()
@@ -367,7 +367,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testFX("TRACE to / should return a request with no body") {
+  testFX("TRACE to / should return a request with no body".ignore) {
     given config: HttpClientConfig =
       HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
     val serverAddress = getServerAddress()
@@ -383,7 +383,7 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testFX("get to an endpoint that times out should timeout") {
+  testFX("get to an endpoint that times out should timeout".ignore) {
     given config: HttpClientConfig =
       HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
     val serverAddress = getServerAddress()
