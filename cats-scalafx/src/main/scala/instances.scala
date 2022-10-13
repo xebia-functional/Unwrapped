@@ -5,9 +5,9 @@ import _root_.cats.effect.Async
 import _root_.cats.effect.Outcome
 import _root_.cats.effect.kernel.{Cont, Deferred, Fiber, Poll, Ref, Sync}
 import _root_.cats.instances.*
-import fx.{ExitCase, Structured, fork, join, cancel, Fiber => FxFiber}
+import fx.{ExitCase, Structured, cancel, fork, join, uncancellable as FxUncancellable, Fiber as FxFiber}
 
-import java.util.concurrent.{CancellationException, ExecutionException, CompletableFuture, Executor, Executors, TimeUnit}
+import java.util.concurrent.{CancellationException, CompletableFuture, ExecutionException, Executor, Executors, TimeUnit}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 import scala.util.control.NonFatal
@@ -67,7 +67,13 @@ class FxAsync extends Async[StructuredF]:
     catch case NonFatal(_) => fb
 
   override def uncancelable[A](body: Poll[StructuredF] => StructuredF[A]): StructuredF[A] =
-    ???
+    FxUncancellable(() => {
+      val poll = new Poll[StructuredF] {
+        override def apply[A](f: StructuredF[A]): StructuredF[A] =
+          fork(() => f).join
+      }
+      body(poll)
+    })
 
   override def canceled: StructuredF[Unit] =
     throw CancellationException()
