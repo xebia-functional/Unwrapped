@@ -5,7 +5,7 @@ import _root_.fx.*
 import org.junit.AssumptionViolatedException
 
 /**
- * Wraps munit assertions in an Raise effect for integration within scala-fx test bodies.
+ * Wraps munit assertions in a Raise effect for integration within scala-fx test bodies.
  */
 trait ScalaFxAssertions:
   self: Assertions =>
