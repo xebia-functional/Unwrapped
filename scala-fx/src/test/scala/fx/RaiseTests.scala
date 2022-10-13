@@ -3,7 +3,7 @@ package fx
 import org.scalacheck.Properties
 import org.scalacheck.Prop.forAll
 
-object ControlTests extends Properties("Control Tests"):
+object RaiseTests extends Properties("Raise Tests"):
 
   property("short-circuit from nested control") = forAll { (s: String) =>
     def outer: Raise[String] ?=> Int = 1
@@ -22,4 +22,4 @@ object ControlTests extends Properties("Control Tests"):
     run(effect) == s
   }
 
-end ControlTests
+end RaiseTests
