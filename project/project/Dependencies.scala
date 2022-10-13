@@ -21,6 +21,8 @@ object Dependencies {
     val jmhGeneratorReflection = "1.35"
     val sbtExplicitDependencies = "0.2.16"
     val catsEffect = "3.3.12"
+    val munitDiscpline = "2.0.0-M2"
+    val scalaCheckShapeless = "1.3.1"
     val scalikeJdbc = "4.0.0"
     val h2Database = "2.1.212"
     val logback = "1.2.11"
@@ -58,6 +60,10 @@ object Dependencies {
       "com.dimafeng" %% "testcontainers-scala-postgresql" % Versions.testContainers
     val flyway = "org.flywaydb" % "flyway-core" % Versions.flyway
     val hedgehog = "qa.hedgehog" %% "hedgehog-munit" % Versions.hedgehog
+    val catsEffectLaws = "org.typelevel" %% "cats-effect-laws"   % Versions.catsEffect
+    val munitDiscipline = "org.typelevel" %% "discipline-munit" % Versions.munitDiscpline
+    val catsEffectTestKit = "org.typelevel" %% "cats-effect-testkit" % Versions.catsEffect
+//    val scalaCheckShapeless = "com.github.alexarchambault" %% "scalacheck-shapeless_1.16" % Versions.scalaCheckShapeless
   }
 
   object Plugins {
