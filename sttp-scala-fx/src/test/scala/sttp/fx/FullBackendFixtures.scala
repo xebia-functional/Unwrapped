@@ -35,7 +35,7 @@ private[fx] trait FullBackendFixtures { self: ScalaFXSuite =>
   }
 
   override def afterAll() = {
-    server.get.stop(0)
+    server.get.stop(1_000)
     executor.get.shutdown
   }
 
