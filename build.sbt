@@ -52,7 +52,7 @@ lazy val `cats-scala-fx` = (project in file("./cats-scalafx"))
   .settings(
     catsScalaFXSettings
   )
-  .dependsOn(`scala-fx`)
+  .dependsOn(`scala-fx`, `munit-scala-fx`)
 
 lazy val `scalike-jdbc-scala-fx` = project
   .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
