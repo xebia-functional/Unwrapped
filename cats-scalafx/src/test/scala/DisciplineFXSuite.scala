@@ -11,8 +11,8 @@ import scala.reflect.Typeable
 
 abstract class DisciplineFXSuite extends ScalaFXSuite, DisciplineSuite {
 
-  def checkAllLaws[R, F <: AssertionError: Typeable](
-      name: String)(ruleSet: Laws#RuleSet): Location ?=> Unit =
+  def checkAllLaws[G <: Laws#RuleSet](
+      name: String)(ruleSet: G)(using Location): Unit =
     testFX(name) {
       checkAll(name, ruleSet)
     }
