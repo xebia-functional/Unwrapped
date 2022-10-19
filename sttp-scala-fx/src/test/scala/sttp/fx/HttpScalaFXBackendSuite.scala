@@ -117,20 +117,20 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testBody.testFX("string POST to /echo should echo back as a both byteArray and string".ignore) {
-    body =>
-      given config: HttpClientConfig =
-        HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
-      val serverAddress = getServerAddress()
-      val (Right(byteArray), Right(str)) =
-        basicRequest
-          .post(Uri(new URI(s"${serverAddress}echo")))
-          .body(body)
-          .response(asBoth(asByteArray, asString))
-          .send[Http, ReceiveStreams](HttpScalaFXBackend())
-          .httpValue
-          .body
-      assertEqualsFX((new String(byteArray), str), ("test", "test"))
+  testBody.testFX(
+    "string POST to /echo should echo back as a both byteArray and string".ignore) { body =>
+    given config: HttpClientConfig =
+      HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
+    val serverAddress = getServerAddress()
+    val (Right(byteArray), Right(str)) =
+      basicRequest
+        .post(Uri(new URI(s"${serverAddress}echo")))
+        .body(body)
+        .response(asBoth(asByteArray, asString))
+        .send[Http, ReceiveStreams](HttpScalaFXBackend())
+        .httpValue
+        .body
+    assertEqualsFX((new String(byteArray), str), ("test", "test"))
   }
 
   testBody.testFX("string PUT to /echo should echo back as a string".ignore) { body =>
@@ -210,20 +210,20 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testBody.testFX("string PUT to /echo should echo back as a both byteArray and string".ignore) {
-    body =>
-      given config: HttpClientConfig =
-        HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
-      val serverAddress = getServerAddress()
-      val (Right(byteArray), Right(str)) =
-        basicRequest
-          .put(Uri(new URI(s"${serverAddress}echo")))
-          .body(body)
-          .response(asBoth(asByteArray, asString))
-          .send[Http, ReceiveStreams](HttpScalaFXBackend())
-          .httpValue
-          .body
-      assertEqualsFX((new String(byteArray), str), ("test", "test"))
+  testBody.testFX(
+    "string PUT to /echo should echo back as a both byteArray and string".ignore) { body =>
+    given config: HttpClientConfig =
+      HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
+    val serverAddress = getServerAddress()
+    val (Right(byteArray), Right(str)) =
+      basicRequest
+        .put(Uri(new URI(s"${serverAddress}echo")))
+        .body(body)
+        .response(asBoth(asByteArray, asString))
+        .send[Http, ReceiveStreams](HttpScalaFXBackend())
+        .httpValue
+        .body
+    assertEqualsFX((new String(byteArray), str), ("test", "test"))
   }
 
   testBody.testFX("string PATCH to /echo should echo back as a string".ignore) { body =>
@@ -303,20 +303,20 @@ class HttpScalaFXBackendSuite extends ScalaFXSuite, FullBackendFixtures {
     )
   }
 
-  testBody.testFX("string PATCH to /echo should echo back as a both byteArray and string".ignore) {
-    body =>
-      given config: HttpClientConfig =
-        HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
-      val serverAddress = getServerAddress()
-      val (Right(byteArray), Right(str)) =
-        basicRequest
-          .patch(Uri(new URI(s"${serverAddress}echo")))
-          .body(body)
-          .response(asBoth(asByteArray, asString))
-          .send[Http, ReceiveStreams](HttpScalaFXBackend())
-          .httpValue
-          .body
-      assertEqualsFX((new String(byteArray), str), ("test", "test"))
+  testBody.testFX(
+    "string PATCH to /echo should echo back as a both byteArray and string".ignore) { body =>
+    given config: HttpClientConfig =
+      HttpClientConfig(Nullable(HttpConnectionTimeout.of(5)), Nullable.none, Nullable.none)
+    val serverAddress = getServerAddress()
+    val (Right(byteArray), Right(str)) =
+      basicRequest
+        .patch(Uri(new URI(s"${serverAddress}echo")))
+        .body(body)
+        .response(asBoth(asByteArray, asString))
+        .send[Http, ReceiveStreams](HttpScalaFXBackend())
+        .httpValue
+        .body
+    assertEqualsFX((new String(byteArray), str), ("test", "test"))
   }
 
   testFX("delete to /toDelete should return a request with no body".ignore) {
