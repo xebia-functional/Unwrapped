@@ -2,6 +2,7 @@ package fx
 
 import java.util.concurrent.Future
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CompletionException
 
 opaque type Fiber[A] = Future[A]
 
@@ -20,7 +21,9 @@ def uncancellable[A](fn: () => A): A = {
         case t: Throwable =>
           promise.completeExceptionally(t)
     })
-  promise.join
+  try
+    promise.join
+  catch case e : CompletionException => throw e.getCause
 }
 
 def fork[B](f: () => B)(using structured: Structured): Fiber[B] =
