@@ -77,9 +77,11 @@ inline def bracketCase[A, B](
   val res =
     try use(acquired)
     catch
-      case (e: CancellationException) =>
+      case e: InterruptedException =>
         runReleaseAndRethrow(e, () => release(acquired, ExitCase.Cancelled(e)))
-      case (e: ExecutionException) =>
+      case e: CancellationException =>
+        runReleaseAndRethrow(e, () => release(acquired, ExitCase.Cancelled(e)))
+      case e: ExecutionException =>
         runReleaseAndRethrow(
           e.getCause,
           () => release(acquired, ExitCase.Cancelled(e.getCause))
