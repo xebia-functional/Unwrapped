@@ -30,8 +30,8 @@ object ResourcesTests extends Properties("Resources Tests"):
       try
         r.use(_ + 1)
         "unexpected"
-      catch case e: CompletionException => e.getCause.asInstanceOf[CustomEx].token
-    result == n
+      catch case CustomEx(msg) => msg
+    n == result
   }
 
 end ResourcesTests
