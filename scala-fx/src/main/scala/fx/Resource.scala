@@ -6,24 +6,24 @@ import Tuple.{InverseMap, IsMappedBy, Map}
 import scala.annotation.implicitNotFound
 
 class Resource[A](
-    val acquire: Resources ?=> A,
+    val acquire: Resources ?=> () => A,
     val release: (A, ExitCase) => Unit
 ):
 
-  def this(value: Resources ?=> A) = this(value, (_, _) => ())
+  def this(value: Resources ?=> () => A) = this(value, (_, _) => ())
 
-  def use[B](f: A => B): B = bracketCase(() => acquire, f, release)
+  def use[B](f: A => B): B = bracketCase(acquire, f, release)
 
   def map[B](f: (A) => B): Resource[B] =
-    Resource(f(this.bind))
+    Resource(() => f(this.bind))
 
   def flatMap[B](f: (A) => Resource[B]): Resource[B] =
-    Resource(f(this.bind).bind)
+    Resource(() => f(this.bind).bind)
 
   def bind: A =
     bracketCase(
       () => {
-        val a = acquire
+        val a = acquire()
         val finalizer: (ExitCase) => Unit = (ex: ExitCase) => release(a, ex)
         summon[Resources].finalizers.updateAndGet(finalizer +: _)
         a

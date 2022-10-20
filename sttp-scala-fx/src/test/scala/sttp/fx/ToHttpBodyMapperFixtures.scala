@@ -39,7 +39,7 @@ trait ToHttpBodyMapperFixtures { self: ScalaFXSuite =>
   val fileBody = FunFixture(
     setup = _ => {
       Resource.apply(
-        {
+        () => {
           val file = Files.createTempFile("fileBodyTest", ".txt")
           Files.write(file, "test".getBytes())
           FileBody(SttpFile.fromPath(file))
