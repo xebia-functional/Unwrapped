@@ -17,7 +17,10 @@ object BracketTests extends Properties("Bracket Tests"):
   property("bracketCase exception identity") = forAll { (msg: String) =>
     val res =
       try
-        bracketCase(() => throw CustomEx(msg), _ => throw RuntimeException("Cannot come here"), (_, _) => ())
+        bracketCase(
+          () => throw CustomEx(msg),
+          _ => throw RuntimeException("Cannot come here"),
+          (_, _) => ())
       catch case CustomEx(msg) => msg
 
     res == msg
@@ -26,8 +29,7 @@ object BracketTests extends Properties("Bracket Tests"):
   property("bracketCase must run release task on use error") = forAll { (msg: String) =>
     val promise = new CompletableFuture[ExitCase]
     val res =
-      try
-        bracketCase(() => (), _ => throw CustomEx(msg), (_, ex) => promise.complete(ex))
+      try bracketCase(() => (), _ => throw CustomEx(msg), (_, ex) => promise.complete(ex))
       catch case CustomEx(msg) => msg
 
     res == msg && promise.join() == ExitCase.Failure(CustomEx(msg))
@@ -41,15 +43,17 @@ object BracketTests extends Properties("Bracket Tests"):
   }
 
   property("bracketCase cancellation in use") = forAll { (msg: String) =>
-    // throw RuntimeException("I am hanging.")
-    
     val latch = new CompletableFuture[Unit]
     val promise = new CompletableFuture[ExitCase]
     structured {
-      val fiber = fork(() => bracketCase(() => (), _ => {
-        latch.complete(())
-        Thread.sleep(100_000)
-      }, (_,ex) => promise.complete(ex)))
+      val fiber = fork(() =>
+        bracketCase(
+          () => (),
+          _ => {
+            latch.complete(())
+            Thread.sleep(100_000)
+          },
+          (_, ex) => promise.complete(ex)))
       latch.join()
       fiber.cancel()
       promise.join().isInstanceOf[ExitCase.Cancelled]
@@ -57,4 +61,3 @@ object BracketTests extends Properties("Bracket Tests"):
   }
 
 end BracketTests
-

@@ -8,16 +8,13 @@ import java.util.concurrent.{CompletableFuture, CompletionException}
 
 object UncancellableTests extends Properties("Bracket Tests"):
 
-  property("uncancellable identity") = forAll { (n: Int) =>
-    uncancellable(() => n) == n
-  }
+  property("uncancellable identity") = forAll { (n: Int) => uncancellable(() => n) == n }
 
   case class CustomEx(val token: String) extends RuntimeException
 
   property("uncancellable exception identity") = forAll { (msg: String) =>
     val res =
-      try
-        uncancellable(() => throw CustomEx(msg))
+      try uncancellable(() => throw CustomEx(msg))
       catch case CustomEx(msg) => msg
 
     res == msg
@@ -47,4 +44,3 @@ object UncancellableTests extends Properties("Bracket Tests"):
 //  }
 
 end UncancellableTests
-

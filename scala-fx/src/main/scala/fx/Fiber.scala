@@ -21,9 +21,8 @@ def uncancellable[A](fn: () => A): A = {
         case t: Throwable =>
           promise.completeExceptionally(t)
     })
-  try
-    promise.join
-  catch case e : CompletionException => throw e.getCause
+  try promise.join
+  catch case e: CompletionException => throw e.getCause
 }
 
 def fork[B](f: () => B)(using structured: Structured): Fiber[B] =
