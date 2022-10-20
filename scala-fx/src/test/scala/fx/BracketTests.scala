@@ -41,7 +41,7 @@ object BracketTests extends Properties("Bracket Tests"):
   }
 
   property("bracketCase cancellation in use") = forAll { (msg: String) =>
-    throw RuntimeException("I am hanging.")
+    // throw RuntimeException("I am hanging.")
     
     val latch = new CompletableFuture[Unit]
     val promise = new CompletableFuture[ExitCase]
