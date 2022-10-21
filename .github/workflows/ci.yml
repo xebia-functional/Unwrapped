@@ -9,7 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      JAVA_OPTS: --add-modules jdk.incubator.concurrent
+      JAVA_OPTS: --enable-preview --add-modules jdk.incubator.concurrent
     steps:
       - name: Checkout project (pull-request)
         if: github.event_name == 'pull_request'
@@ -21,9 +21,10 @@ jobs:
         if: github.event_name == 'push'
         uses: actions/checkout@v3
       - name: Setup Scala
-        uses: olafurpg/setup-scala@v13
+        uses: actions/setup-java@v3.6.0
         with:
-          java-version: 'openjdk@19.0.0=tgz+https://download.java.net/java/early_access/loom/6/openjdk-19-loom+6-625_linux-x64_bin.tar.gz'
+          distribution: 'temurin'
+          java-version: 19
       - name: Run checks
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
