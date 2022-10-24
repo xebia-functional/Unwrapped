@@ -12,9 +12,11 @@ import scala.reflect.Typeable
 abstract class DisciplineFXSuite extends ScalaFXSuite, DisciplineSuite {
 
   def checkAllLaws[G <: Laws#RuleSet](
-      name: String)(ruleSet: G)(using Location): Unit =
+      name: String)(ruleSet: Structured ?=> G)(using Location): Unit =
     testFX(name) {
-      checkAll(name, ruleSet)
+        checkAll(name, _root_.fx.structured{
+          ruleSet
+        })
     }
 
 }

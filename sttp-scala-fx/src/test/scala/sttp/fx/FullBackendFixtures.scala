@@ -42,7 +42,7 @@ private[fx] trait FullBackendFixtures { self: ScalaFXSuite =>
   val imageFileResource = FunFixture(
     setup = _ =>
       Resource(
-        Files.createTempFile("47DegLogo", "svg").toFile(),
+        () => Files.createTempFile("47DegLogo", "svg").toFile(),
         (file, _) => ()
       ),
     teardown = _ => ())
@@ -50,7 +50,7 @@ private[fx] trait FullBackendFixtures { self: ScalaFXSuite =>
   val resultFileResource = FunFixture(
     setup = _ =>
       Resource(
-        Files.createTempFile("result", ".txt").toFile(),
+        () => Files.createTempFile("result", ".txt").toFile(),
         (file, _) => ()
       ),
     teardown = _ => ())
@@ -58,7 +58,7 @@ private[fx] trait FullBackendFixtures { self: ScalaFXSuite =>
   val resultPutFileResource = FunFixture(
     setup = _ =>
       Resource(
-        Files.createTempFile("resultPut", ".txt").toFile(),
+        () => Files.createTempFile("resultPut", ".txt").toFile(),
         (file, _) => ()
       ),
     teardown = _ => ())
@@ -66,7 +66,7 @@ private[fx] trait FullBackendFixtures { self: ScalaFXSuite =>
   val resultPatchFileResource = FunFixture(
     setup = _ =>
       Resource(
-        Files.createTempFile("resultPatch", ".txt").toFile(),
+        () => Files.createTempFile("resultPatch", ".txt").toFile(),
         (file, _) => ()
       ),
     teardown = _ => ())
