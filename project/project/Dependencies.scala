@@ -32,6 +32,7 @@ object Dependencies {
     val sttp = "3.6.2"
     val httpCore5 = "5.1.4"
     val hedgehog = "0.9.0"
+    val http4sBlaze = "0.23.12"
   }
 
   object Compile {
@@ -47,7 +48,7 @@ object Dependencies {
     val logback = "ch.qos.logback" % "logback-classic" % Versions.logback
     val sttp = "com.softwaremill.sttp.client3" %% "core" % Versions.sttp
     val httpCore5 = "org.apache.httpcomponents.core5" % "httpcore5" % Versions.httpCore5
-
+    val http4sBlaze = "org.http4s" %% "http4s-blaze-server" % Versions.http4sBlaze
   }
 
   object Test {
