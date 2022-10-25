@@ -17,8 +17,7 @@ final class main$continuation$1($completion: Continuation[Any | Null])
   var label: Int = 0
 
   final def invokeSuspend(
-      result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended.type)])
-      : Any | Null =
+      result: Either[Throwable, Any | Null | Continuation.State.Suspended.type]): Any | Null =
     this.result = result
     this.label |= Integer.MIN_VALUE
     main$expanded(using this)
