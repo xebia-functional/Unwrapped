@@ -2,6 +2,11 @@ import Dependencies.Compile._
 import Dependencies.Test._
 
 import scala.util.Properties
+import scala.collection.JavaConverters._
+
+import com.fasterxml.jackson.dataformat.csv.CsvSchema
+import com.fasterxml.jackson.dataformat.csv.CsvMapper
+import com.fasterxml.jackson.dataformat.csv.CsvParser
 
 ThisBuild / scalaVersion := "3.1.2"
 ThisBuild / organization := "com.47deg"
@@ -16,14 +21,19 @@ addCommandAlias("ci-publish", "github; ci-release")
 
 publish / skip := true
 
-lazy val root =
+lazy val root = // I
   (project in file("./")).aggregate(
-    `scala-fx`,
-    continuationsPlugin,
-    continuationsPluginExample,
-    benchmarks,
-    `munit-scala-fx`,
-    documentation)
+    benchmarks, // A
+    continuationsPlugin, // C
+    continuationsPluginExample, // D
+    documentation, // E
+    `http-scala-fx`, // F
+    `java-net-multipart-body-publisher`, // G
+    `munit-scala-fx`, // H
+    `scala-fx`, // J
+    `scalike-jdbc-scala-fx`, // K
+    `sttp-scala-fx` // L
+  )
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
@@ -53,6 +63,44 @@ lazy val `munit-scala-fx` = (project in file("./munit-scalafx"))
   )
   .dependsOn(`scala-fx`)
 
+lazy val `cats-scala-fx` = (project in file("./cats-scalafx"))
+  .configs(IntegrationTest)
+  .settings(
+    catsScalaFXSettings
+  )
+  .dependsOn(`scala-fx`)
+
+lazy val `scalike-jdbc-scala-fx` = project
+  .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
+  .settings(publish / skip := true)
+  .settings(scalalikeSettings)
+
+lazy val `java-net-multipart-body-publisher` =
+  (project in file("./java-net-mulitpart-body-publisher")).settings(commonSettings)
+
+lazy val `http-scala-fx` = (project in file("./http-scala-fx"))
+  .settings(httpScalaFXSettings)
+  .settings(generateMediaTypeSettings)
+  .dependsOn(
+    `java-net-multipart-body-publisher`,
+    `scala-fx`,
+    `munit-scala-fx` % "test -> compile")
+  .enablePlugins(HttpScalaFxPlugin)
+
+lazy val `sttp-scala-fx` = (project in file("./sttp-scala-fx"))
+  .settings(sttpScalaFXSettings)
+  .dependsOn(
+    `java-net-multipart-body-publisher`,
+    `scala-fx`,
+    `http-scala-fx`,
+    `munit-scala-fx` % "test -> compile")
+
+lazy val commonSettings = Seq(
+  javaOptions ++= javaOptionsSettings,
+  autoAPIMappings := true,
+  Test / fork := true
+)
+
 lazy val scalafxSettings: Seq[Def.Setting[_]] =
   Seq(
     classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
@@ -66,9 +114,31 @@ lazy val scalafxSettings: Seq[Def.Setting[_]] =
 lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
   Seq(
     exportJars := true,
+    Test / fork := true,
     libraryDependencies ++= List(
-      "org.scala-lang" %% "scala3-compiler" % "3.1.2"
-    )
+      "org.scala-lang" %% "scala3-compiler" % "3.1.2",
+      munit % Test
+    ),
+    Test / javaOptions += {
+      val `scala-compiler-classpath` =
+        (Compile / dependencyClasspath)
+          .value
+          .files
+          .map(_.toPath().toAbsolutePath().toString())
+          .mkString(":")
+      s"-Dscala-compiler-classpath=${`scala-compiler-classpath`}"
+    },
+    Test / javaOptions += {
+      s"""-Dcompiler-scalacOptions=\"${scalacOptions.value.mkString(" ")}\""""
+    },
+    Test / javaOptions += Def.taskDyn {
+      Def.task {
+        val _ = (Compile / Keys.`package`).value
+        val `scala-compiler-options` =
+          s"${(continuationsPlugin / Compile / packageBin).value}"
+        s"""-Dscala-compiler-plugin=${`scala-compiler-options`}"""
+      }
+    }.value
   )
 
 lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
@@ -76,21 +146,65 @@ lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
     publish / skip := true,
     autoCompilerPlugins := true,
     resolvers += Resolver.mavenLocal,
-    // this uses the mac system environment variable, HOME. Mine is included by default as an example
     Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
-    Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}"
+    Compile / scalacOptions += s"-Ylog:pickleQuotes",
+    Compile / scalacOptions += s"-Ydebug:pickleQuotes",
+    Compile / scalacOptions += s"-Yprint-pos",
+    Compile / scalacOptions += s"-Ydebug",
+    Compile / scalacOptions += s"-Yshow-tree-ids",
+    Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}",
+    Test / scalacOptions += s"-Ylog:pickleQuotes",
+    Test / scalacOptions += s"-Ydebug:pickleQuotes",
+    Test / scalacOptions += s"-Yprint-pos",
+    Test / scalacOptions += s"-Ydebug",
+    Test / scalacOptions += s"-Yshow-tree-ids"
   )
 
+lazy val mySetting = taskKey[String]("example")
+
 lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
-  Test / fork := true,
-  javaOptions ++= javaOptionsSettings,
-  autoAPIMappings := true,
   libraryDependencies ++= Seq(
     munitScalacheck,
+    hedgehog,
     junit,
     munit,
     junitInterface
   )
+) ++ commonSettings
+
+lazy val catsScalaFXSettings = Seq(
+  classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
+  javaOptions ++= javaOptionsSettings,
+  autoAPIMappings := true,
+  libraryDependencies ++= Seq(
+    catsEffect,
+    scalacheck % Test
+  )
+)
+lazy val scalalikeSettings: Seq[Def.Setting[_]] =
+  Seq(
+    classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
+    javaOptions ++= javaOptionsSettings,
+    autoAPIMappings := true,
+    libraryDependencies ++= Seq(
+      scalikejdbc,
+      h2Database,
+      logback,
+      postgres,
+      scalacheck % Test,
+      testContainers % Test,
+      testContainersMunit % Test,
+      testContainersPostgres % Test,
+      flyway % Test
+    )
+  )
+
+lazy val httpScalaFXSettings = commonSettings
+
+lazy val sttpScalaFXSettings = commonSettings ++ Seq(
+  libraryDependencies += sttp,
+  libraryDependencies += httpCore5,
+  libraryDependencies += hedgehog % Test
 )
 
 lazy val javaOptionsSettings = Seq(
