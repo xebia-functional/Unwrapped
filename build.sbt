@@ -111,7 +111,11 @@ lazy val catsScalaFXSettings = Seq(
   autoAPIMappings := true,
   libraryDependencies ++= Seq(
     catsEffect,
-    scalacheck % Test
+    scalacheck % Test,
+    catsEffectLaws % Test,
+    munitDiscipline % Test,
+    catsEffectTestKit % Test
+//    scalaCheckShapeless % Test
   )
 )
 
