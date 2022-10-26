@@ -1,4 +1,4 @@
-package continuations.examples
+package examples
 
 import continuations.*
 import continuations.jvm.internal.ContinuationImpl
@@ -11,18 +11,16 @@ object main$handler extends (Continuation[Any | Null] => Any):
   override def apply($completion: Continuation[Any | Null]): Any =
     main$expanded(using $completion)
 
-class main$continuation$1($completion: Continuation[Any | Null])
-    extends ContinuationImpl($completion, $completion.context) {
-  var result: Any = ???
-  var label: Int = ???
+final class main$continuation$1($completion: Continuation[Any | Null])
+    extends ContinuationImpl($completion, $completion.context):
+  var result: Any = null
+  var label: Int = 0
 
   final def invokeSuspend(
-      result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended.type)])
-      : Any | Null =
+      result: Either[Throwable, Any | Null | Continuation.State.Suspended.type]): Any | Null =
     this.result = result
     this.label |= Integer.MIN_VALUE
     main$expanded(using this)
-}
 
 def main$expanded(
     using var0: Continuation[Any | Null]): Any | Null | Continuation.State.Suspended.type =
