@@ -26,7 +26,8 @@ lazy val root =
     `http-scala-fx`,
     documentation,
     `sttp-scala-fx`,
-    `java-net-multipart-body-publisher`
+    `java-net-multipart-body-publisher`,
+    `http4s-scala-fx`
   )
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
@@ -77,6 +78,14 @@ lazy val `sttp-scala-fx` = (project in file("./sttp-scala-fx"))
     `java-net-multipart-body-publisher`,
     `scala-fx`,
     `http-scala-fx`,
+    `munit-scala-fx` % "test -> compile")
+
+lazy val `http4s-scala-fx` = (project in file("./http4s-scala-fx"))
+  .settings(http4sScalaFXSettings)
+  .dependsOn(
+    `cats-scala-fx`,
+    `scala-fx`,
+    `http-scala-fx` % "test -> test",
     `munit-scala-fx` % "test -> compile")
 
 lazy val commonSettings = Seq(
@@ -143,6 +152,10 @@ lazy val sttpScalaFXSettings = commonSettings ++ Seq(
   libraryDependencies += sttp,
   libraryDependencies += httpCore5,
   libraryDependencies += hedgehog % Test
+)
+
+lazy val http4sScalaFXSettings = commonSettings ++ Seq(
+  libraryDependencies += http4sBlaze
 )
 
 lazy val javaOptionsSettings = Seq(

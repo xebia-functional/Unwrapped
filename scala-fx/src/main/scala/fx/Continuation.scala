@@ -4,7 +4,7 @@ import scala.annotation.implicitNotFound
 import scala.util.control.ControlThrowable
 import java.util.UUID
 import scala.util.control.NonFatal
-import java.util.concurrent.ExecutionException
+import java.util.concurrent.{CompletionException, ExecutionException}
 import scala.annotation.tailrec
 
 object Continuation:
@@ -30,7 +30,7 @@ object Continuation:
 
   @tailrec def handleControl(control: Control[_], e: Throwable): Any =
     e match
-      case e: ExecutionException =>
+      case e: (ExecutionException | CompletionException) =>
         handleControl(control, e.getCause)
       case e @ ControlToken(token, shifted, recover) =>
         if (control.token == token)
