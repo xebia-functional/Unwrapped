@@ -1,7 +1,7 @@
 package http4s
 package fx
 
-import _root_.fx.{handle, structured, toEither, Control, Resource}
+import _root_.fx.{handle, structured, toEither, Control, Resource, Structured}
 import _root_.fx.instances.FxAsync.asyncInstance
 import _root_.fx.instances.StructuredF
 import _root_.fx.HttpExecutionException
@@ -25,14 +25,9 @@ trait HttpServerFixtures:
         Response[StructuredF]().withBodyStream(r.body)
     }
 
-  def httpServerHttp4s(app: HttpApp[StructuredF]): FunFixture[Resource[String]] =
+  def httpServerHttp4s(app: HttpApp[StructuredF])
+      : FunFixture[(Structured, Control[Throwable]) ?=> Resource[String]] =
     FunFixture(
-      setup = _ => {
-        for {
-          server <- toEither(
-            structured(BlazeServerFXBackend(app))
-          ).fold(e => throw e, identity)
-        } yield s"http:/${server.server().address}"
-      },
+      setup = _ => BlazeServerFXBackend(app).map(server => s"http:/${server.server().address}"),
       teardown = _ => ()
     )
