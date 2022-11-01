@@ -5,7 +5,8 @@ import continuations.jvm.internal.ContinuationImpl
 
 @main def main =
   val result: Int = program
-  println(result)
+  val result2: Int = programSuspendContinuationTask2
+  println(result2)
 
 object main$handler extends (Continuation[Any | Null] => Any):
   override def apply($completion: Continuation[Any | Null]): Any =
