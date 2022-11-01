@@ -58,6 +58,13 @@ def program: Suspend ?=> Int =
   val z = await(bar(x, y)) // suspension point #2
   c(z)
 
+def programSuspendContinuationTask2: Int =
+  // need to cast on the correct expected type?
+  def fooTest()(using s: Suspend): Int =
+    Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+
+  fooTest()
+
 import continuations.jvm.internal.ContinuationImpl
 
 final class program$continuation$1(override val completion: Continuation[Any | Null])
