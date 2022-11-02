@@ -136,24 +136,26 @@ class ContinuationsPhase extends PluginPhase:
     if (hasOnlySuspendParam(tree)) {
       val subTrees: List[Tree] = getAllSubTrees(tree.rhs)
 
-      val callsSuspendContinuation: List[Tree] =
-        subTrees.collect {
-          case Apply(fun, List(arg))
-              if fun.symbol.showFullName == "continuations.Continuation.suspendContinuation" =>
-            arg
-        }
+      val suspendContinuationResumeCall: List[Tree] =
+        subTrees
+          .collect {
+            case Apply(TypeApply(fun, _), List(arg))
+                if fun
+                  .symbol
+                  .showFullName == "continuations.Continuation.suspendContinuation" =>
+              arg
+          }
+          .flatMap(getAllSubTrees)
+          .collect {
+            case Apply(fun, List(arg))
+                if fun.symbol.showFullName == "continuations.Continuation.resume" =>
+              arg
+          }
 
-      val callsResume: List[Tree] =
-        subTrees.collect {
-          case Apply(fun, List(arg))
-              if fun.symbol.showFullName == "continuations.Continuation.resume" =>
-            arg
-        }
-
-      if (callsSuspendContinuation.nonEmpty && callsResume.nonEmpty) {
+      if (suspendContinuationResumeCall.size == 1) {
         val parent: Symbol = tree.symbol
         val returnType: Trees.Tree[Type] = tree.tpt
-        val callsResumeInput = callsResume.head
+        val resumeInput = suspendContinuationResumeCall.head
 
         // Continuation[Int]
         val continuationTyped: AppliedTypeTree =
@@ -212,7 +214,7 @@ class ContinuationsPhase extends PluginPhase:
         // safeContinuation.resume(Right(Int.box(1)))
         // Int.box should happen from the 1st task in the ClickUp ticket
         val suspendContinuationResume =
-          safeContinuation.tpt.select(termName("resume")).appliedTo(callsResumeInput)
+          safeContinuation.tpt.select(termName("resume")).appliedTo(resumeInput)
 
         // safeContinuation.getOrThrow()
         val suspendContinuationGetThrow =
