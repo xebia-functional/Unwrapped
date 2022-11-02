@@ -15,6 +15,7 @@ import dotty.tools.dotc.report
 import dotty.tools.dotc.transform.{PickleQuotes, Staging}
 
 import scala.annotation.tailrec
+import scala.collection.mutable.ListBuffer
 
 class ContinuationsPlugin extends StandardPlugin:
   val name: String = "continuations"
@@ -66,33 +67,93 @@ class ContinuationsPhase extends PluginPhase:
 
     ctx
 
-  override def transformDefDef(tree: DefDef)(using Context): Tree = {
-    val (input, callsSuspendContinuation): (Tree, Boolean) =
-      tree.rhs match
-        case Inlined(
-              Apply(
-                Apply(
-                  fun1,
-                  List(
-                    Block(
-                      Nil,
-                      Block(List(DefDef(_, _, _, Block(Nil, Apply(fun2, List(arg))))), _)))),
-                List(_)),
-              Nil,
-              _) =>
-          (
-            arg,
-            fun1.symbol.showFullName == "continuations.Continuation.suspendContinuation" &&
-              fun2.symbol.showFullName == "continuations.Continuation.resume"
-          )
-        case _ =>
-          (EmptyTree, false)
+  override def transformDefDef(tree: DefDef)(using Context): Tree =
+    transformSuspendNoParametersOneContinuationResume(tree)
 
+  @tailrec final def transformStatements(
+      block: Block,
+      statements: List[Tree],
+      previous: List[Tree])(using ctx: Context): Block =
+    statements match
+      case Nil => block
+      case current :: remaining =>
+        if (hasInnerSuspensionPoint(current))
+          val newBlock = Block(???, ???)
+          transformStatements(newBlock, remaining, Nil)
+        // TODO nest previous under suspension point. Look at trees dif with example function
+        else transformStatements(block, remaining, previous :+ current) // this may be wrong
+
+  def isSuspendType(tpe: Type)(using ctx: Context): Boolean =
+    tpe.classSymbol.showFullName == "continuations.Suspend"
+
+  def returnsContextFunctionWithSuspendType(tree: Tree)(using ctx: Context): Boolean =
+    ctx.definitions.isContextFunctionType(tree.tpe) && tree.tpe.argTypes.exists(isSuspendType)
+
+  def hasInnerSuspensionPoint(statement: Tree)(using ctx: Context): Boolean =
+    statement.find(isCallToSuspend).isDefined
+
+  def isCallToSuspend(tree: Tree)(using ctx: Context): Boolean =
+    tree match
+      case Apply(_, _) => returnsContextFunctionWithSuspendType(tree)
+      case _ => false
+
+  def hasOnlySuspendParam(tree: DefDef)(using Context): Boolean =
     tree.termParamss match
-      case List(Nil, usingSuspend :: Nil)
-          if isSuspendType(usingSuspend.tpe) && callsSuspendContinuation =>
+      case List(Nil, param :: Nil) => isSuspendType(param.tpe)
+      case _ => false
+
+  def getAllSubTrees(tree: Tree)(using Context): List[Tree] = {
+    val deepFolder: DeepFolder[ListBuffer[tpd.Tree]] =
+      new DeepFolder[ListBuffer[Tree]]((subTrees, tree) => subTrees += tree)
+
+    /*
+     * Needed for `case Inlined` because DeepFolder.foldOver for Inlined doesn't use `call` tree so the Inlined
+     * is not being unwrapped (???)
+     */
+    @tailrec
+    def recurse(trees: List[Tree], buf: ListBuffer[Tree]): List[Tree] =
+      trees match
+        case Nil =>
+          buf.toList
+        case Inlined(call, _, _) :: rest =>
+          recurse(call :: rest, buf)
+        case t :: rest =>
+          val (inlined, notInlined) =
+            deepFolder.apply(ListBuffer[Tree](), t).partition {
+              case _: Inlined => true
+              case _ => false
+            }
+          recurse(inlined.toList ++ rest, notInlined ++ buf)
+
+    recurse(tree.toList, ListBuffer[Tree]())
+  }
+
+  /*
+   * For now it works with only one `suspendContinuation` that calls `resume` in the method body
+   * and it replaces the whole body
+   */
+  def transformSuspendNoParametersOneContinuationResume(tree: DefDef)(using Context): Tree = {
+    if (hasOnlySuspendParam(tree)) {
+      val subTrees: List[Tree] = getAllSubTrees(tree.rhs)
+
+      val callsSuspendContinuation: List[Tree] =
+        subTrees.collect {
+          case Apply(fun, List(arg))
+              if fun.symbol.showFullName == "continuations.Continuation.suspendContinuation" =>
+            arg
+        }
+
+      val callsResume: List[Tree] =
+        subTrees.collect {
+          case Apply(fun, List(arg))
+              if fun.symbol.showFullName == "continuations.Continuation.resume" =>
+            arg
+        }
+
+      if (callsSuspendContinuation.nonEmpty && callsResume.nonEmpty) {
         val parent: Symbol = tree.symbol
         val returnType: Trees.Tree[Type] = tree.tpt
+        val callsResumeInput = callsResume.head
 
         // Continuation[Int]
         val continuationTyped: AppliedTypeTree =
@@ -151,7 +212,7 @@ class ContinuationsPhase extends PluginPhase:
         // safeContinuation.resume(Right(Int.box(1)))
         // Int.box should happen from the 1st task in the ClickUp ticket
         val suspendContinuationResume =
-          safeContinuation.tpt.select(termName("resume")).appliedTo(input)
+          safeContinuation.tpt.select(termName("resume")).appliedTo(callsResumeInput)
 
         // safeContinuation.getOrThrow()
         val suspendContinuationGetThrow =
@@ -168,33 +229,6 @@ class ContinuationsPhase extends PluginPhase:
         println(s"PLUGIN ${methodDef.show}")
 
         methodDef
-      case _ =>
-        tree
+      } else tree
+    } else tree
   }
-
-  @tailrec final def transformStatements(
-      block: Block,
-      statements: List[Tree],
-      previous: List[Tree])(using ctx: Context): Block =
-    statements match
-      case Nil => block
-      case current :: remaining =>
-        if (hasInnerSuspensionPoint(current))
-          val newBlock = Block(???, ???)
-          transformStatements(newBlock, remaining, Nil)
-        // TODO nest previous under suspension point. Look at trees dif with example function
-        else transformStatements(block, remaining, previous :+ current) // this may be wrong
-
-  def isSuspendType(tpe: Type)(using ctx: Context): Boolean =
-    tpe.classSymbol.showFullName == "continuations.Suspend"
-
-  def returnsContextFunctionWithSuspendType(tree: Tree)(using ctx: Context): Boolean =
-    ctx.definitions.isContextFunctionType(tree.tpe) && tree.tpe.argTypes.exists(isSuspendType)
-
-  def hasInnerSuspensionPoint(statement: Tree)(using ctx: Context): Boolean =
-    statement.find(isCallToSuspend).isDefined
-
-  def isCallToSuspend(tree: Tree)(using ctx: Context): Boolean =
-    tree match
-      case Apply(_, _) => returnsContextFunctionWithSuspendType(tree)
-      case _ => false
