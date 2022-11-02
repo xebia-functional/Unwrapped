@@ -181,6 +181,5 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       case (tree, _) =>
         assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expectedLeft)
     }
-
   }
 }
