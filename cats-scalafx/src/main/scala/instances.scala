@@ -1,4 +1,5 @@
-package fx.instances
+package fx
+package instances
 
 import _root_.cats.Monad
 import _root_.cats.effect.Async

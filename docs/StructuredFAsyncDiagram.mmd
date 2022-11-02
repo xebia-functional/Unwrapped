@@ -1,0 +1,39 @@
+classDiagram
+   class Future~A~
+   <<interface>> Future~A~
+   class Fiber~A~
+   <<interface>> Fiber~A~
+   Fiber: get() A
+   Fiber: cancel(mayInterrupt Boolean) Boolean
+   Future <|-- Fiber : Opaque
+   class UncancellableFiber~A~
+   UncancellableFiber: -scope Structured
+   UncancellableFiber: -underlying Fiber
+   UncancellableFiber: +fork(Function0 B) UncancellableFiber
+   UncancellableFiber: +join() A
+   class CancellableFiber~A~
+   CancellableFiber: -scope Structured
+   CancellableFiber: -underlying Fiber
+   CancellableFiber: +fork(Function0 B) CancellableFiber
+   CancellableFiber: +cancel(Function0 B) CancellableFiber
+   CancellableFiber: +join() A
+   class Structured
+   Structured: +fork(Function0 B) CancellableFiber
+   Structured: +uncancellable(Function1 => CancellableFiber) UncancellableFiber
+   Structured: -scope StructuredTaskScope  
+   Structured: -token UUID
+   Structured: +name() String
+   Structured: +newThread() VirtualThread
+   Structured: -externalFibers List[Fiber]
+   Structured: +addExternalFiber(fiber Fiber)
+   Structured: -lock ReentrantLock
+   Structured: -joinAll() Unit
+   Structured: +close() Unit
+   Fiber <.. UncancellableFiber
+   Fiber <.. CancellableFiber
+   Structured <.. UncancellableFiber : OwnedBy
+   Structured <.. CancellableFiber : OwnedBy
+   class StructuredF~A~
+   <<interface>> StructuredF~A~
+   StructuredF <|-- UncancellableFiber
+   StructuredF <|-- CancellableFiber
