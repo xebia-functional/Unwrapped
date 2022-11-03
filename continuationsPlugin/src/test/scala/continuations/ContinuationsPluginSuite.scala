@@ -79,6 +79,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
     def foo()(using Suspend): Int =
       Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
 
+    val cont: Continuation[Int] = new Continuation[Int]:
+      type Ctx = Tuple
+      def context = (1, 1)
+      def resume(value: Either[Throwable, Int]): Unit = ()
     /*
      * Is the initial code in the task correct?
      * seems different from the Kotlin one `kotlin.coroutines.Continuation.kt`,
@@ -96,11 +100,13 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
       val continuation1: Continuation[Int] = completion
       val safeContinuation: SafeContinuation[Int] =
-        SafeContinuation[Int](continuation1.intercepted(), Continuation.State.Undecided)
+        new SafeContinuation[Int](continuation1.intercepted(), Continuation.State.Undecided)
       val suspendContinuation = 0
       safeContinuation.resume(Right(Int.box(1)))
       safeContinuation.getOrThrow()
     }
+
+//    println(fooConverted(cont))
 
     val source =
       """|
@@ -130,16 +136,16 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
          |  () extends Object() { this: continuations.compileFromString$package.type =>
          |    private def writeReplace(): AnyRef = 
          |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-         |    def foo(completion: continuations.Continuation[Int]): Any = 
+         |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
          |      {
          |        val continuation1: continuations.Continuation[Int] = completion
          |        val safeContinuation: continuations.SafeContinuation[Int] = 
-         |          continuations.SafeContinuation.apply[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+         |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
          |            continuations.Continuation.State.Undecided
          |          )
          |        val suspendContinuation: Int = 0
-         |        continuations.SafeContinuation[Int]#resume(Right.apply[Nothing, Int](1))
-         |        continuations.SafeContinuation[Int]#getOrThrow()
+         |        safeContinuation.resume(Right.apply[Nothing, Int](1))
+         |        safeContinuation.getOrThrow()
          |      }
          |  }
          |}
@@ -156,16 +162,16 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
          |  () extends Object() { this: continuations.compileFromString$package.type =>
          |    private def writeReplace(): AnyRef = 
          |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-         |    def foo(completion: continuations.Continuation[Int]): Any = 
+         |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
          |      {
          |        val continuation1: continuations.Continuation[Int] = completion
          |        val safeContinuation: continuations.SafeContinuation[Int] = 
-         |          continuations.SafeContinuation.apply[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+         |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
          |            continuations.Continuation.State.Undecided
          |          )
          |        val suspendContinuation: Int = 0
-         |        continuations.SafeContinuation[Int]#resume(Left.apply[Exception, Nothing](new Exception("error")))
-         |        continuations.SafeContinuation[Int]#getOrThrow()
+         |        safeContinuation.resume(Left.apply[Exception, Nothing](new Exception("error")))
+         |        safeContinuation.getOrThrow()
          |      }
          |  }
          |}
