@@ -9,7 +9,7 @@ import dotty.tools.dotc.core.Flags
 import dotty.tools.dotc.core.Names.termName
 import dotty.tools.dotc.core.StdNames.*
 import dotty.tools.dotc.core.Symbols.{Symbol, TermSymbol, *}
-import dotty.tools.dotc.core.Types.{AppliedType, Type}
+import dotty.tools.dotc.core.Types.{AppliedType, OrType, Type}
 import dotty.tools.dotc.plugins.{PluginPhase, StandardPlugin}
 import dotty.tools.dotc.report
 import dotty.tools.dotc.transform.{PickleQuotes, Staging}
@@ -51,16 +51,15 @@ class ContinuationsPhase extends PluginPhase:
     // tree
 
   var continuationTraitSym: ClassSymbol = _
-  var continuationObjectSym: TermSymbol = _
-  var safeContinuationClassApplySym: TermSymbol = _
+  var continuationObjectSym: Symbol = _
+  var safeContinuationClassApplySym: ClassSymbol = _
   var interceptedMethodSym: TermSymbol = _
 
   override def prepareForUnit(tree: Tree)(using Context): Context =
     continuationTraitSym = requiredClass("continuations.Continuation")
-    continuationObjectSym = requiredModule("continuations.Continuation")
+    continuationObjectSym = continuationTraitSym.companionModule
 
-    safeContinuationClassApplySym = requiredModule("continuations.SafeContinuation")
-      .requiredMethod("apply", List(defn.AnyType, defn.AnyType))
+    safeContinuationClassApplySym = requiredClass("continuations.SafeContinuation")
 
     interceptedMethodSym =
       requiredPackage("continuations.intrinsics").requiredMethod("intercepted")
@@ -129,15 +128,14 @@ class ContinuationsPhase extends PluginPhase:
   }
 
   /*
-   * For now it works with only one `suspendContinuation` that calls `resume` in the method body
+   * It works with only one `suspendContinuation` that calls `resume` in the method body
    * and it replaces the whole body
    */
   def transformSuspendNoParametersOneContinuationResume(tree: DefDef)(using Context): Tree = {
     if (hasOnlySuspendParam(tree)) {
-      val subTrees: List[Tree] = getAllSubTrees(tree.rhs)
 
       val suspendContinuationResumeCall: List[Tree] =
-        subTrees
+        getAllSubTrees(tree.rhs)
           .collect {
             case Apply(TypeApply(fun, _), List(arg))
                 if fun
@@ -176,20 +174,20 @@ class ContinuationsPhase extends PluginPhase:
           ref(continuationObjectSym).select(termName("State")).select(termName("Undecided"))
 
         // continuation1.intercepted()
-        def interceptedCall =
+        val interceptedCall =
           ref(interceptedMethodSym)
             .appliedToType(returnType.tpe)
             .appliedTo(ref(continuation1.symbol))
             .appliedToNone
 
-        // SafeContinuation(continuation1.intercepted(), Continuation.State.Undecided)
-        // TODO: how to call it with `new`, is this why it fails?
+        // new SafeContinuation(continuation1.intercepted(), Continuation.State.Undecided)
         val safeContinuationConstructor =
-          ref(safeContinuationClassApplySym)
+          New(ref(safeContinuationClassApplySym))
+            .select(nme.CONSTRUCTOR)
             .appliedToType(returnType.tpe)
             .appliedTo(interceptedCall, undecided)
 
-        // val safeContinuation: SafeContinuation[Int] = SafeContinuation(continuation1.intercepted(), Continuation.State.Undecided)
+        // val safeContinuation: SafeContinuation[Int] = new SafeContinuation(continuation1.intercepted(), Continuation.State.Undecided)
         val safeContinuation: ValDef =
           ValDef(
             newSymbol(
@@ -199,8 +197,10 @@ class ContinuationsPhase extends PluginPhase:
               safeContinuationConstructor.tpe),
             safeContinuationConstructor)
 
+        val safeContinuationRef: Tree =
+          ref(safeContinuation.symbol)
+
         // val suspendContinuation: Int = 0
-        // TODO: try decompile with foo: String, see if it is the same
         val suspendContinuation: ValDef =
           ValDef(
             newSymbol(
@@ -214,19 +214,35 @@ class ContinuationsPhase extends PluginPhase:
         // safeContinuation.resume(Right(Int.box(1)))
         // Int.box should happen from the 1st task in the ClickUp ticket
         val suspendContinuationResume =
-          safeContinuation.tpt.select(termName("resume")).appliedTo(resumeInput)
+          safeContinuationRef.select(termName("resume")).appliedTo(resumeInput)
 
         // safeContinuation.getOrThrow()
         val suspendContinuationGetThrow =
-          safeContinuation.tpt.select(termName("getOrThrow")).appliedToNone
+          safeContinuationRef.select(termName("getOrThrow")).appliedToNone
 
         val body = Block(
           continuation1 :: safeContinuation :: suspendContinuation :: suspendContinuationResume :: Nil,
           suspendContinuationGetThrow
         )
 
+        // Continuation.State.Suspended
+        val suspended: Tree =
+          ref(continuationObjectSym).select(termName("State")).select(termName("Suspended"))
+
+        /* TODO:
+         * Probably we want to remove `Continuation.State.Suspended.type` from this return type
+         * It should be handled in some way in here or in SafeContinuation so the return will be either `throw` or
+         * a result value of the correct/expected parent type (now we get a ClassCastException if it is `Suspended`)
+         */
+        // Any | Null | Continuation.State.Suspended.type
+        val methodReturnType =
+          OrType(
+            OrType(ctx.definitions.AnyType, ctx.definitions.NullType, soft = false),
+            suspended.symbol.namedType,
+            soft = false)
+
         val methodDef =
-          DefDef(parent.asTerm, List(List(completion)), ctx.definitions.AnyType, body)
+          DefDef(parent.asTerm, List(List(completion)), methodReturnType, body)
 
         println(s"PLUGIN ${methodDef.show}")
 

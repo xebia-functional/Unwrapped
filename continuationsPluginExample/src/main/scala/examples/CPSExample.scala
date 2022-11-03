@@ -59,7 +59,6 @@ def program: Suspend ?=> Int =
   c(z)
 
 def programSuspendContinuationTask2: Int =
-  // need to cast on the correct expected type?
   def fooTest()(using s: Suspend): Int =
     Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
 
