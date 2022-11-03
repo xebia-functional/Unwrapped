@@ -52,14 +52,14 @@ class ContinuationsPhase extends PluginPhase:
 
   var continuationTraitSym: ClassSymbol = _
   var continuationObjectSym: Symbol = _
-  var safeContinuationClassApplySym: ClassSymbol = _
+  var safeContinuationClassSym: ClassSymbol = _
   var interceptedMethodSym: TermSymbol = _
 
   override def prepareForUnit(tree: Tree)(using Context): Context =
     continuationTraitSym = requiredClass("continuations.Continuation")
     continuationObjectSym = continuationTraitSym.companionModule
 
-    safeContinuationClassApplySym = requiredClass("continuations.SafeContinuation")
+    safeContinuationClassSym = requiredClass("continuations.SafeContinuation")
 
     interceptedMethodSym =
       requiredPackage("continuations.intrinsics").requiredMethod("intercepted")
@@ -106,8 +106,8 @@ class ContinuationsPhase extends PluginPhase:
       new DeepFolder[ListBuffer[Tree]]((subTrees, tree) => subTrees += tree)
 
     /*
-     * Needed for `case Inlined` because DeepFolder.foldOver for Inlined doesn't use `call` tree so the Inlined
-     * is not being unwrapped (???)
+     * Needed for the `case Inlined(...)` because `DeepFolder.apply(...).foldOver` for the `Inlined` doesn't use
+     * the `call` tree so the `Inlined` is not being unwrapped (???)
      */
     @tailrec
     def recurse(trees: List[Tree], buf: ListBuffer[Tree]): List[Tree] =
@@ -128,8 +128,8 @@ class ContinuationsPhase extends PluginPhase:
   }
 
   /*
-   * It works with only one `suspendContinuation` that calls `resume` in the method body
-   * and it replaces the whole body
+   * It works with only one `suspendContinuation` that just calls `resume`
+   * and it replaces the whole parent method body
    */
   def transformSuspendNoParametersOneContinuationResume(tree: DefDef)(using Context): Tree = {
     if (hasOnlySuspendParam(tree)) {
@@ -152,42 +152,35 @@ class ContinuationsPhase extends PluginPhase:
 
       if (suspendContinuationResumeCall.size == 1) {
         val parent: Symbol = tree.symbol
-        val returnType: Trees.Tree[Type] = tree.tpt
+        val returnType: Type = tree.tpt.tpe
         val resumeInput = suspendContinuationResumeCall.head
 
-        // Continuation[Int]
-        val continuationTyped: AppliedTypeTree =
-          AppliedTypeTree(ref(continuationTraitSym), List(returnType))
+        val continuationTyped: Type =
+          continuationTraitSym.typeRef.appliedTo(returnType)
 
-        // (completion: continuations.Continuation[Int])
         val completion =
-          newSymbol(parent, termName("completion"), Flags.LocalParam, continuationTyped.tpe)
+          newSymbol(parent, termName("completion"), Flags.LocalParam, continuationTyped)
 
-        // val continuation1: continuations.Continuation = completion
         val continuation1: ValDef =
           ValDef(
-            newSymbol(parent, termName("continuation1"), Flags.Local, continuationTyped.tpe),
+            newSymbol(parent, termName("continuation1"), Flags.Local, continuationTyped),
             ref(completion))
 
-        // Continuation.State.Undecided
-        val undecided =
+        val undecidedState =
           ref(continuationObjectSym).select(termName("State")).select(termName("Undecided"))
 
-        // continuation1.intercepted()
         val interceptedCall =
           ref(interceptedMethodSym)
-            .appliedToType(returnType.tpe)
+            .appliedToType(returnType)
             .appliedTo(ref(continuation1.symbol))
             .appliedToNone
 
-        // new SafeContinuation(continuation1.intercepted(), Continuation.State.Undecided)
         val safeContinuationConstructor =
-          New(ref(safeContinuationClassApplySym))
+          New(ref(safeContinuationClassSym))
             .select(nme.CONSTRUCTOR)
-            .appliedToType(returnType.tpe)
-            .appliedTo(interceptedCall, undecided)
+            .appliedToType(returnType)
+            .appliedTo(interceptedCall, undecidedState)
 
-        // val safeContinuation: SafeContinuation[Int] = new SafeContinuation(continuation1.intercepted(), Continuation.State.Undecided)
         val safeContinuation: ValDef =
           ValDef(
             newSymbol(
@@ -197,10 +190,9 @@ class ContinuationsPhase extends PluginPhase:
               safeContinuationConstructor.tpe),
             safeContinuationConstructor)
 
-        val safeContinuationRef: Tree =
+        val safeContinuationRef =
           ref(safeContinuation.symbol)
 
-        // val suspendContinuation: Int = 0
         val suspendContinuation: ValDef =
           ValDef(
             newSymbol(
@@ -211,12 +203,9 @@ class ContinuationsPhase extends PluginPhase:
             Literal(Constant(0))
           )
 
-        // safeContinuation.resume(Right(Int.box(1)))
-        // Int.box should happen from the 1st task in the ClickUp ticket
         val suspendContinuationResume =
           safeContinuationRef.select(termName("resume")).appliedTo(resumeInput)
 
-        // safeContinuation.getOrThrow()
         val suspendContinuationGetThrow =
           safeContinuationRef.select(termName("getOrThrow")).appliedToNone
 
@@ -225,28 +214,22 @@ class ContinuationsPhase extends PluginPhase:
           suspendContinuationGetThrow
         )
 
-        // Continuation.State.Suspended
-        val suspended: Tree =
+        val suspendedState =
           ref(continuationObjectSym).select(termName("State")).select(termName("Suspended"))
 
         /* TODO:
-         * Probably we want to remove `Continuation.State.Suspended.type` from this return type
+         * Probably we want to remove `Continuation.State.Suspended.type` from this return type.
          * It should be handled in some way in here or in SafeContinuation so the return will be either `throw` or
          * a result value of the correct/expected parent type (now we get a ClassCastException if it is `Suspended`)
          */
         // Any | Null | Continuation.State.Suspended.type
-        val methodReturnType =
+        val finalMethodReturnType =
           OrType(
             OrType(ctx.definitions.AnyType, ctx.definitions.NullType, soft = false),
-            suspended.symbol.namedType,
+            suspendedState.symbol.namedType,
             soft = false)
 
-        val methodDef =
-          DefDef(parent.asTerm, List(List(completion)), methodReturnType, body)
-
-        println(s"PLUGIN ${methodDef.show}")
-
-        methodDef
+        DefDef(parent.asTerm, List(List(completion)), finalMethodReturnType, body)
       } else tree
     } else tree
   }

@@ -13,7 +13,7 @@ import munit.FunSuite
 class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   compilerContextWithContinuationsPlugin.test(
-    "It should work when there are no continuations".ignore) { implicit givenContext =>
+    "It should work when there are no continuations") { implicit givenContext =>
     val source = """|class A""".stripMargin
     // format: off
     val expected = """|package <empty> {
@@ -29,7 +29,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   }
   compilerContextWithContinuationsPlugin.test(
-    "It should work when there are no continuations".fail.ignore) { implicit givenContext =>
+    "It should work when there are no continuations".fail) { implicit givenContext =>
     val source = """|class A""".stripMargin
     val expected = """|package <empty> {
                       |  @SourceFile("compileFromString.scala") class B() extends Object() {}
@@ -41,7 +41,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   }
 
-  compilerContext.test("it should run the compiler".ignore) { implicit givenContext =>
+  compilerContext.test("it should run the compiler") { implicit givenContext =>
     val source = """
                    |class A
                    |class B extends A
@@ -73,119 +73,87 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with no parameters") { implicit givenContext =>
+    "it should convert simple suspended def with no parameters using `transformSuspendNoParametersOneContinuationResume`") {
+    implicit givenContext =>
 
-    // FROM
-    def foo()(using Suspend): Int =
-      Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using Suspend): Int =
+           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |""".stripMargin
 
-    val cont: Continuation[Int] = new Continuation[Int]:
-      type Ctx = Tuple
-      def context = (1, 1)
-      def resume(value: Either[Throwable, Int]): Unit = ()
-    /*
-     * Is the initial code in the task correct?
-     * seems different from the Kotlin one `kotlin.coroutines.Continuation.kt`,
-     * https://github.com/JetBrains/kotlin/blob/master/libraries/stdlib/src/kotlin/coroutines/Continuation.kt#L142,
-     * there is `suspendCoroutineUninterceptedOrReturn`.
-     * Also return type cannot be Int
-     *
-     * https://github.com/arrow-kt/arrow/tree/main/arrow-libs/fx/arrow-fx-coroutines#suspendcoroutine
-     * https://github.com/JetBrains/kotlin/blob/master/libraries/stdlib/jvm/src/kotlin/coroutines/SafeContinuationJvm.kt#L20
-     */
-    // TO
-    def fooConverted(
-        completion: Continuation[Int]): Any | Null | Continuation.State.Suspended.type = {
-      import continuations.intrinsics.intercepted
+      val sourceLeft =
+        """|
+           |package continuations
+           |
+           |def foo()(using Suspend): Int =
+           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Left(new Exception("error"))) }
+           |""".stripMargin
 
-      val continuation1: Continuation[Int] = completion
-      val safeContinuation: SafeContinuation[Int] =
-        new SafeContinuation[Int](continuation1.intercepted(), Continuation.State.Undecided)
-      val suspendContinuation = 0
-      safeContinuation.resume(Right(Int.box(1)))
-      safeContinuation.getOrThrow()
-    }
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        val continuation1: continuations.Continuation[Int] = completion
+           |        val safeContinuation: continuations.SafeContinuation[Int] = 
+           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |            continuations.Continuation.State.Undecided
+           |          )
+           |        val suspendContinuation: Int = 0
+           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |        safeContinuation.getOrThrow()
+           |      }
+           |  }
+           |}
+           |""".stripMargin
 
-//    println(fooConverted(cont))
+      val expectedLeft =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        val continuation1: continuations.Continuation[Int] = completion
+           |        val safeContinuation: continuations.SafeContinuation[Int] = 
+           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |            continuations.Continuation.State.Undecided
+           |          )
+           |        val suspendContinuation: Int = 0
+           |        safeContinuation.resume(Left.apply[Exception, Nothing](new Exception("error")))
+           |        safeContinuation.getOrThrow()
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
 
-    val source =
-      """|
-         |package continuations
-         |
-         |def foo()(using Suspend): Int =
-         |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
-         |""".stripMargin
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
 
-    val sourceLeft =
-      """|
-         |package continuations
-         |
-         |def foo()(using Suspend): Int =
-         |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Left(new Exception("error"))) }
-         |""".stripMargin
-
-    // format: off
-    val expected =
-      """|
-         |package continuations {
-         |  final lazy module val compileFromString$package: 
-         |    continuations.compileFromString$package
-         |   = new continuations.compileFromString$package()
-         |  @SourceFile("compileFromString.scala") final module class 
-         |    compileFromString$package
-         |  () extends Object() { this: continuations.compileFromString$package.type =>
-         |    private def writeReplace(): AnyRef = 
-         |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-         |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
-         |      {
-         |        val continuation1: continuations.Continuation[Int] = completion
-         |        val safeContinuation: continuations.SafeContinuation[Int] = 
-         |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-         |            continuations.Continuation.State.Undecided
-         |          )
-         |        val suspendContinuation: Int = 0
-         |        safeContinuation.resume(Right.apply[Nothing, Int](1))
-         |        safeContinuation.getOrThrow()
-         |      }
-         |  }
-         |}
-         |""".stripMargin
-
-    val expectedLeft =
-      """|
-         |package continuations {
-         |  final lazy module val compileFromString$package: 
-         |    continuations.compileFromString$package
-         |   = new continuations.compileFromString$package()
-         |  @SourceFile("compileFromString.scala") final module class 
-         |    compileFromString$package
-         |  () extends Object() { this: continuations.compileFromString$package.type =>
-         |    private def writeReplace(): AnyRef = 
-         |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-         |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
-         |      {
-         |        val continuation1: continuations.Continuation[Int] = completion
-         |        val safeContinuation: continuations.SafeContinuation[Int] = 
-         |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-         |            continuations.Continuation.State.Undecided
-         |          )
-         |        val suspendContinuation: Int = 0
-         |        safeContinuation.resume(Left.apply[Exception, Nothing](new Exception("error")))
-         |        safeContinuation.getOrThrow()
-         |      }
-         |  }
-         |}
-         |""".stripMargin
-    // format: on
-
-    checkContinuations(source) {
-      case (tree, _) =>
-        assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
-    }
-
-    checkContinuations(sourceLeft) {
-      case (tree, _) =>
-        assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expectedLeft)
-    }
+      checkContinuations(sourceLeft) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expectedLeft)
+      }
   }
 }

@@ -58,7 +58,7 @@ def program: Suspend ?=> Int =
   val z = await(bar(x, y)) // suspension point #2
   c(z)
 
-def programSuspendContinuationTask2: Int =
+def programSuspendContinuationNoParamResume: Int =
   def fooTest()(using s: Suspend): Int =
     Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
 
