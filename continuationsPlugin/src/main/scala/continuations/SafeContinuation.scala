@@ -37,7 +37,7 @@ class SafeContinuation[-T](val delegate: Continuation[T], initialResult: Any | N
     else if (result.isInstanceOf[Right[_, _]])
       result.asInstanceOf[Right[_, _]].value
     else
-      result // COROUTINE_SUSPENDED
+      result // Continuation.State.Suspended
 
   override def callerFrame: ContinuationStackFrame | Null =
     if (delegate != null && delegate.isInstanceOf[ContinuationStackFrame]) delegate.asInstanceOf
