@@ -128,25 +128,24 @@ class ContinuationsPhase extends PluginPhase:
   }
 
   /*
-   * It works with only one `suspendContinuation` that just calls `resume`
-   * and it replaces the whole parent method body
+   * It works with only one top level `suspendContinuation` that just calls `resume`
+   * and it replaces the parent method body keeping any rows before the `suspendContinuation` (but not ones after).
    */
   def transformSuspendNoParametersOneContinuationResume(tree: DefDef)(using Context): Tree = {
     if (hasOnlySuspendParam(tree)) {
+      val suspendContinuationName = "continuations.Continuation.suspendContinuation"
+      val resumeName = "continuations.Continuation.resume"
 
       val suspendContinuationResumeCall: List[Tree] =
         getAllSubTrees(tree.rhs)
           .collect {
             case Apply(TypeApply(fun, _), List(arg))
-                if fun
-                  .symbol
-                  .showFullName == "continuations.Continuation.suspendContinuation" =>
+                if fun.symbol.showFullName == suspendContinuationName =>
               arg
           }
           .flatMap(getAllSubTrees)
           .collect {
-            case Apply(fun, List(arg))
-                if fun.symbol.showFullName == "continuations.Continuation.resume" =>
+            case Apply(fun, List(arg)) if fun.symbol.showFullName == resumeName =>
               arg
           }
 
@@ -154,6 +153,17 @@ class ContinuationsPhase extends PluginPhase:
         val parent: Symbol = tree.symbol
         val returnType: Type = tree.tpt.tpe
         val resumeInput = suspendContinuationResumeCall.head
+
+        val rowsBeforeSuspend =
+          tree.rhs match
+            case Block(trees, _) =>
+              trees
+                .map {
+                  case Inlined(c, _, _) => c
+                  case t => t
+                }
+                .takeWhile(_.symbol.showFullName != suspendContinuationName)
+            case _ => List.empty[Tree]
 
         val continuationTyped: Type =
           continuationTraitSym.typeRef.appliedTo(returnType)
@@ -210,7 +220,8 @@ class ContinuationsPhase extends PluginPhase:
           safeContinuationRef.select(termName("getOrThrow")).appliedToNone
 
         val body = Block(
-          continuation1 :: safeContinuation :: suspendContinuation :: suspendContinuationResume :: Nil,
+          rowsBeforeSuspend ++
+            (continuation1 :: safeContinuation :: suspendContinuation :: suspendContinuationResume :: Nil),
           suspendContinuationGetThrow
         )
 
