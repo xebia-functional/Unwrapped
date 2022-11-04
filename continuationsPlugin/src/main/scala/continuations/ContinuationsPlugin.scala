@@ -106,8 +106,8 @@ class ContinuationsPhase extends PluginPhase:
       new DeepFolder[ListBuffer[Tree]]((subTrees, tree) => subTrees += tree)
 
     /*
-     * Needed for the `case Inlined(...)` because `DeepFolder.apply(...).foldOver` for the `Inlined` doesn't use
-     * the `call` tree so the `Inlined` is not being unwrapped (???)
+     * Needed for the `case Inlined(...)` because `DeepFolder.apply(...).foldOver` for the `Inlined` case  doesn't use
+     * the `call` tree and as a result the `Inlined` is not being unwrapped.
      */
     @tailrec
     def recurse(trees: List[Tree], buf: ListBuffer[Tree]): List[Tree] =
@@ -218,9 +218,10 @@ class ContinuationsPhase extends PluginPhase:
           ref(continuationObjectSym).select(termName("State")).select(termName("Suspended"))
 
         /* TODO:
-         * Probably we want to remove `Continuation.State.Suspended.type` from this return type.
-         * It should be handled in some way in here or in SafeContinuation so the return will be either `throw` or
-         * a result value of the correct/expected parent type (now we get a ClassCastException if it is `Suspended`)
+         * Do we need to handle and remove `Continuation.State.Suspended.type` from this return type?
+         *
+         * If `Suspended` is actually being returned without being handled it will result to a `ClassCastException` as
+         * in runtime we have a method which expects a value that is of `returnType`.
          */
         // Any | Null | Continuation.State.Suspended.type
         val finalMethodReturnType =
