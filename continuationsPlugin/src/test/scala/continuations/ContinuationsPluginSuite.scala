@@ -276,7 +276,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  Continuation.suspendContinuation[Int] { _ => Right(1) }
+           |  Continuation.suspendContinuation[Int] { _ => () }
            |""".stripMargin
 
       // format: off
@@ -291,21 +291,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo()(using x$1: continuations.Suspend): Int = 
-           |      continuations.Continuation.suspendContinuation[Int](
-           |        {
-           |          {
-           |            def $anonfun(_$1: continuations.Continuation[Int]): Unit = 
-           |              {
-           |                {
-           |                  Right.apply[Nothing, Int](1)
-           |                  ()
-           |                }
-           |              }
-           |            closure($anonfun)
-           |          }
-           |        }
-           |      )(x$1)
+           |    def foo()(using x$1: continuations.Suspend): Int = ??? :Int
            |  }
            |}
            |""".stripMargin
@@ -345,28 +331,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
            |    def foo()(using x$1: continuations.Suspend): Int = 
            |      {
-           |        continuations.Continuation.suspendContinuation[Int](
-           |          {
-           |            {
-           |              def $anonfun(continuation: continuations.Continuation[Int]): Unit = 
-           |                {
-           |                  continuation.resume(Right.apply[Nothing, Int](1))
-           |                }
-           |              closure($anonfun)
-           |            }
-           |          }
-           |        )(x$1)
-           |        continuations.Continuation.suspendContinuation[Int](
-           |          {
-           |            {
-           |              def $anonfun(continuation: continuations.Continuation[Int]): Unit = 
-           |                {
-           |                  continuation.resume(Right.apply[Nothing, Int](1))
-           |                }
-           |              closure($anonfun)
-           |            }
-           |          }
-           |        )(x$1)
+           |        ??? :Int
+           |        ??? :Int
            |      }
            |  }
            |}

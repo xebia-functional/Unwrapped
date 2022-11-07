@@ -36,11 +36,8 @@ class DefDefTransforms(
     val returnType: Type = tree.tpt.tpe
 
     val rowsBeforeSuspend =
-      tree.rhs match
-        case Block(trees, expr) =>
-          (trees :+ expr).takeWhile(_.symbol.showFullName != suspendContinuationFullName)
-        case _ =>
-          List.empty[Tree]
+      unnestTopLevelSubtrees(tree).takeWhile(
+        _.symbol.showFullName != suspendContinuationFullName)
 
     val continuationTyped: Type =
       continuationTraitSym.typeRef.appliedTo(returnType)
@@ -128,6 +125,19 @@ object DefDefTransforms {
   private val suspendContinuationFullName = "continuations.Continuation.suspendContinuation"
   private val resumeFullName = "continuations.Continuation.resume"
 
+  private def unnestTopLevelSubtrees(tree: tpd.DefDef)(using Context): List[tpd.Tree] =
+    tree
+      .rhs
+      .toList
+      .flatMap {
+        case Block(trees, tree) => trees :+ tree
+        case tree => List(tree)
+      }
+      .map {
+        case Inlined(call, _, _) => call
+        case tree => tree
+      }
+
   object HasSuspendParameter {
     def unapply(tree: tpd.DefDef)(using c: Context): Option[tpd.DefDef] =
       Option(tree).filter {
@@ -142,14 +152,8 @@ object DefDefTransforms {
   object CallsContinuationResumeWith {
     def unapply(tree: tpd.DefDef)(using c: Context): Option[tpd.Tree] =
       val args =
-        tree
-          .rhs
-          .toList
-          .flatMap {
-            case Block(trees, tree) => trees :+ tree
-            case tree => List(tree)
-          }
-          .filter { _.symbol.showFullName == suspendContinuationFullName }
+        unnestTopLevelSubtrees(tree)
+          .filter(_.symbol.showFullName == suspendContinuationFullName)
           .flatMap(_.filterSubTrees(_.symbol.showFullName == resumeFullName))
           .flatMap {
             case Apply(_, List(arg)) => Option(arg)
