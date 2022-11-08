@@ -33,11 +33,28 @@ class DefDefTransforms(
       tree: DefDef,
       resumeArg: Tree): DefDef =
     val parent: Symbol = tree.symbol
-    val returnType: Type = tree.tpt.tpe
+    val returnType: Type =
+      tree
+        .rhs
+        .find {
+          case Inlined(fun, _, _) => fun.symbol.showFullName == suspendContinuationFullName
+          case _ => false
+        }
+        .map(_.tpe)
+        .get
 
     val rowsBeforeSuspend =
-      unnestTopLevelSubtrees(tree).takeWhile(
-        _.symbol.showFullName != suspendContinuationFullName)
+      tree
+        .rhs
+        .toList
+        .flatMap {
+          case Block(trees, tree) => trees :+ tree
+          case tree => List(tree)
+        }
+        .takeWhile {
+          case Inlined(call, _, _) => call.symbol.showFullName != suspendContinuationFullName
+          case _ => true
+        }
 
     val continuationTyped: Type =
       continuationTraitSym.typeRef.appliedTo(returnType)
@@ -125,19 +142,6 @@ object DefDefTransforms {
   private val suspendContinuationFullName = "continuations.Continuation.suspendContinuation"
   private val resumeFullName = "continuations.Continuation.resume"
 
-  private def unnestTopLevelSubtrees(tree: tpd.DefDef)(using Context): List[tpd.Tree] =
-    tree
-      .rhs
-      .toList
-      .flatMap {
-        case Block(trees, tree) => trees :+ tree
-        case tree => List(tree)
-      }
-      .map {
-        case Inlined(call, _, _) => call
-        case tree => tree
-      }
-
   object HasSuspendParameter {
     def unapply(tree: tpd.DefDef)(using c: Context): Option[tpd.DefDef] =
       Option(tree).filter {
@@ -152,12 +156,36 @@ object DefDefTransforms {
   object CallsContinuationResumeWith {
     def unapply(tree: tpd.DefDef)(using c: Context): Option[tpd.Tree] =
       val args =
-        unnestTopLevelSubtrees(tree)
-          .filter(_.symbol.showFullName == suspendContinuationFullName)
-          .flatMap(_.filterSubTrees(_.symbol.showFullName == resumeFullName))
+        tree
+          .rhs
+          .filterSubTrees {
+            case Inlined(fun, _, _) => fun.symbol.showFullName == suspendContinuationFullName
+            case _ => false
+          }
           .flatMap {
-            case Apply(_, List(arg)) => Option(arg)
-            case _ => None
+            case Inlined(
+                  Apply(
+                    Apply(_, List(Block(Nil, Block(List(DefDef(_, _, _, suspendBody)), _)))),
+                    List(_)),
+                  _,
+                  _) =>
+              Option(suspendBody)
+            case Inlined(
+                  Apply(Apply(_, List(Block(List(DefDef(_, _, _, suspendBody)), _))), List(_)),
+                  _,
+                  _) =>
+              Option(suspendBody)
+            case _ =>
+              None
+          }
+          .flatMap {
+            case Block(Nil, Apply(fun, List(arg)))
+                if fun.symbol.showFullName == resumeFullName =>
+              Option(arg.withType(arg.tpe))
+            case Apply(fun, List(arg)) if fun.symbol.showFullName == resumeFullName =>
+              Option(arg.withType(arg.tpe))
+            case _ =>
+              None
           }
 
       Option.when(args.size == 1)(args.head)
