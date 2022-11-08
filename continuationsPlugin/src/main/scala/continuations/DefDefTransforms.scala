@@ -143,7 +143,7 @@ object DefDefTransforms {
   private val resumeFullName = "continuations.Continuation.resume"
 
   object HasSuspendParameter {
-    def unapply(tree: tpd.DefDef)(using c: Context): Option[tpd.DefDef] =
+    def unapply(tree: tpd.DefDef)(using Context): Option[tpd.DefDef] =
       Option(tree).filter {
         _.paramss.exists {
           _.exists { v =>
@@ -154,7 +154,7 @@ object DefDefTransforms {
   }
 
   object CallsContinuationResumeWith {
-    def unapply(tree: tpd.DefDef)(using c: Context): Option[tpd.Tree] =
+    def unapply(tree: tpd.DefDef)(using Context): Option[tpd.Tree] =
       val args =
         tree
           .rhs
