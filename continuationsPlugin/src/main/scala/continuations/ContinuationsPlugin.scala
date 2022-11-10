@@ -1,19 +1,21 @@
 package continuations
 
-import dotty.tools.dotc.report
 import dotty.tools.dotc.ast.Trees.*
 import dotty.tools.dotc.ast.tpd
 import dotty.tools.dotc.core.Constants.Constant
-import dotty.tools.dotc.core.Contexts.Context
+import dotty.tools.dotc.core.Contexts.{ctx, Context}
 import dotty.tools.dotc.core.Decorators.*
+import dotty.tools.dotc.core.Flags
+import dotty.tools.dotc.core.Names.termName
 import dotty.tools.dotc.core.StdNames.*
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Types.{AppliedType, Type}
 import dotty.tools.dotc.plugins.{PluginPhase, StandardPlugin}
-import dotty.tools.dotc.semanticdb.TypeMessage.SealedValue.TypeRef
+import dotty.tools.dotc.report
 import dotty.tools.dotc.transform.{PickleQuotes, Staging}
 
 import scala.annotation.tailrec
+import scala.collection.mutable.ListBuffer
 
 class ContinuationsPlugin extends StandardPlugin:
   val name: String = "continuations"
@@ -47,6 +49,9 @@ class ContinuationsPhase extends PluginPhase:
     report.logWith("transformBlock")(tree)
     report.logWith("transformBlock")(tree.show)
     tree
+
+  override def transformDefDef(tree: DefDef)(using Context): Tree =
+    new DefDefTransforms().transformSuspendContinuation(tree)
 
   @tailrec final def transformStatements(
       block: Block,

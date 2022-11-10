@@ -72,4 +72,414 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
     }
   }
 
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert simple suspended def with no parameters with a Right input") {
+    implicit givenContext =>
+
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using Suspend): Int =
+           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        val continuation1: continuations.Continuation[Int] = completion
+           |        val safeContinuation: continuations.SafeContinuation[Int] = 
+           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |            continuations.Continuation.State.Undecided
+           |          )
+           |        val suspendContinuation: Int = 0
+           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |        safeContinuation.getOrThrow()
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert simple suspended def with no parameters with a Right input using braces") {
+    implicit givenContext =>
+
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using Suspend): Int =
+           |  Continuation.suspendContinuation[Int](continuation => continuation.resume(Right(1)))
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        val continuation1: continuations.Continuation[Int] = completion
+           |        val safeContinuation: continuations.SafeContinuation[Int] = 
+           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |            continuations.Continuation.State.Undecided
+           |          )
+           |        val suspendContinuation: Int = 0
+           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |        safeContinuation.getOrThrow()
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert simple suspended def with no parameters with a Right input but no inner var") {
+    implicit givenContext =>
+
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using Suspend): Int =
+           |  Continuation.suspendContinuation[Int] { _.resume(Right(1)) }
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        val continuation1: continuations.Continuation[Int] = completion
+           |        val safeContinuation: continuations.SafeContinuation[Int] = 
+           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |            continuations.Continuation.State.Undecided
+           |          )
+           |        val suspendContinuation: Int = 0
+           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |        safeContinuation.getOrThrow()
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert simple suspended def with no parameters with a Right input but no inner var using braces") {
+    implicit givenContext =>
+
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using Suspend): Int =
+           |  Continuation.suspendContinuation[Int](_.resume(Right(1)))
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        val continuation1: continuations.Continuation[Int] = completion
+           |        val safeContinuation: continuations.SafeContinuation[Int] = 
+           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |            continuations.Continuation.State.Undecided
+           |          )
+           |        val suspendContinuation: Int = 0
+           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |        safeContinuation.getOrThrow()
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert simple suspended def with no parameters with a Left input") {
+    implicit givenContext =>
+
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using Suspend): Int =
+           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Left(new Exception("error"))) }
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        val continuation1: continuations.Continuation[Int] = completion
+           |        val safeContinuation: continuations.SafeContinuation[Int] = 
+           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |            continuations.Continuation.State.Undecided
+           |          )
+           |        val suspendContinuation: Int = 0
+           |        safeContinuation.resume(Left.apply[Exception, Nothing](new Exception("error")))
+           |        safeContinuation.getOrThrow()
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert simple suspended def with no parameters keeping the rows before the suspend call") {
+    implicit givenContext =>
+
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using Suspend): Int = {
+           |  val x = 5
+           |  println("HI")
+           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |}
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        val x: Int = 5
+           |        println("HI")
+           |        val continuation1: continuations.Continuation[Int] = completion
+           |        val safeContinuation: continuations.SafeContinuation[Int] = 
+           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |            continuations.Continuation.State.Undecided
+           |          )
+           |        val suspendContinuation: Int = 0
+           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |        safeContinuation.getOrThrow()
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert simple suspended def with no parameters ignoring any rows after the suspend call") {
+    implicit givenContext =>
+
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using Suspend): Int = {
+           |  val x = 5
+           |  println("HI")
+           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  10
+           |}
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        val x: Int = 5
+           |        println("HI")
+           |        val continuation1: continuations.Continuation[Int] = completion
+           |        val safeContinuation: continuations.SafeContinuation[Int] = 
+           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |            continuations.Continuation.State.Undecided
+           |          )
+           |        val suspendContinuation: Int = 0
+           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |        safeContinuation.getOrThrow()
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should not convert suspended def with no parameters that doesn't call resume") {
+    implicit givenContext =>
+
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using Suspend): Int =
+           |  Continuation.suspendContinuation[Int] { _ => () }
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo()(using x$1: continuations.Suspend): Int = ??? :Int
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should not convert simple suspended def with no parameters with multiple `suspendContinuation`") {
+    implicit givenContext =>
+
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using Suspend): Int = {
+           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |}
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo()(using x$1: continuations.Suspend): Int = 
+           |      {
+           |        ??? :Int
+           |        ??? :Int
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
 }
