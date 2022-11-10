@@ -9,21 +9,15 @@ import dotty.tools.dotc.core.Contexts.{ctx, Context}
 import dotty.tools.dotc.core.Flags
 import dotty.tools.dotc.core.Names.termName
 import dotty.tools.dotc.core.StdNames.nme
-import dotty.tools.dotc.core.Symbols.{newSymbol, ClassSymbol, Symbol, TermSymbol}
+import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Types.{OrType, Type}
 
 import scala.annotation.tailrec
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
 
-class DefDefTransforms(
-    continuationTraitSym: ClassSymbol,
-    safeContinuationClassSym: ClassSymbol,
-    interceptedMethodSym: TermSymbol
-)(using Context) {
+class DefDefTransforms(using Context) {
   import tpd.*
-
-  private val continuationObjectSym: Symbol = continuationTraitSym.companionModule
 
   /*
    * It works with only one top level `suspendContinuation` that just calls `resume`
@@ -32,6 +26,15 @@ class DefDefTransforms(
   private def transformSuspendNoParametersOneContinuationResume(
       tree: DefDef,
       resumeArg: Tree): DefDef =
+    val continuationTraitSym: ClassSymbol =
+      requiredClass("continuations.Continuation")
+    val continuationObjectSym: Symbol =
+      continuationTraitSym.companionModule
+    val safeContinuationClassSym: ClassSymbol =
+      requiredClass("continuations.SafeContinuation")
+    val interceptedMethodSym: TermSymbol =
+      requiredPackage("continuations.intrinsics").requiredMethod("intercepted")
+
     val parent: Symbol = tree.symbol
     val returnType: Type =
       tree

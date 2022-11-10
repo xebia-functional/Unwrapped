@@ -50,19 +50,8 @@ class ContinuationsPhase extends PluginPhase:
     report.logWith("transformBlock")(tree.show)
     tree
 
-  var defDefTransforms: DefDefTransforms = _
-
-  override def prepareForDefDef(tree: DefDef)(using Context): Context =
-    defDefTransforms = new DefDefTransforms(
-      requiredClass("continuations.Continuation"),
-      requiredClass("continuations.SafeContinuation"),
-      requiredPackage("continuations.intrinsics").requiredMethod("intercepted")
-    )
-
-    ctx
-
   override def transformDefDef(tree: DefDef)(using Context): Tree =
-    defDefTransforms.transformSuspendContinuation(tree)
+    new DefDefTransforms().transformSuspendContinuation(tree)
 
   @tailrec final def transformStatements(
       block: Block,
