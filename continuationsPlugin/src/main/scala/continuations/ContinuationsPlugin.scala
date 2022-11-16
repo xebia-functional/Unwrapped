@@ -2,13 +2,15 @@ package continuations
 
 import dotty.tools.dotc.report
 import dotty.tools.dotc.ast.Trees.*
-import dotty.tools.dotc.ast.{tpd, Trees}
+import dotty.tools.dotc.ast.{Trees, tpd}
 import dotty.tools.dotc.core.Constants.Constant
-import dotty.tools.dotc.core.Contexts.{atPhase, Context}
+import dotty.tools.dotc.core.Contexts.{Context, atPhase}
 import dotty.tools.dotc.core.Decorators.*
+import dotty.tools.dotc.core.Flags.Module
+import dotty.tools.dotc.core.Names.*
 import dotty.tools.dotc.core.StdNames.*
 import dotty.tools.dotc.core.Symbols
-import dotty.tools.dotc.core.Types.{AppliedType, Type}
+import dotty.tools.dotc.core.Types.{AppliedType, TermParamRef, TermRef, Type}
 import dotty.tools.dotc.plugins.{PluginPhase, StandardPlugin}
 import dotty.tools.dotc.semanticdb.TypeMessage.SealedValue.TypeRef
 import dotty.tools.dotc.transform.{PickleQuotes, Staging}
@@ -71,27 +73,32 @@ class ContinuationsPhase extends PluginPhase:
    */
 
   def isSuspendType(tpe: Type)(using ctx: Context): Boolean =
-    tpe.classSymbol.showFullName == "continuations.Suspend"
+    tpe.classSymbol.info.hasClassSymbol(Symbols.requiredClass("continuations.Suspend"))
 
   def returnsContextFunctionWithSuspendType(tree: DefDef)(using ctx: Context): Boolean =
-    if (hasSuspendParam(tree)) tree.rhs.existsSubTree(hasInnerSuspensionPoint)
-    else false
+    hasSuspendParam(tree).fold(false) { suspendParamName =>
+      tree.rhs.existsSubTree(st => hasInnerSuspensionPoint(st, suspendParamName))
+    }
 
-  def hasSuspendParam(tree: tpd.DefDef)(using ctx: Context): Boolean =
+  def hasSuspendParam(tree: tpd.DefDef)(using ctx: Context): Option[ValDef] =
     tree.paramss.reverse match {
       case ValDefs(vparams @ (vparam :: _)) :: _
           if vparam.mods.isOneOf(Flags.GivenOrImplicit) =>
-        vparams.exists(vp => isSuspendType(vp.tpe))
-      case _ => false
+        vparams.find(vp => isSuspendType(vp.tpe))
+      case _ => None
     }
 
-  def hasInnerSuspensionPoint(subTree: Tree)(using ctx: Context): Boolean =
+  def hasInnerSuspensionPoint(subTree: Tree, suspendParamName: ValDef)(using ctx: Context): Boolean =
     subTree match
       case Inlined(Apply(fun, _), _, _) => isCallToSuspend(fun)
-      case Apply(fun, _) => isCallToSuspend(fun)
+      case Apply(_, args) => isCallToSuspend(args, suspendParamName)
       case _ => false
 
   def isCallToSuspend(tree: Tree)(using ctx: Context): Boolean =
-    tree.symbol.name.show == "suspendContinuationOrReturn"
+    val requiredMethod = Symbols.requiredMethod("continuations.Continuation.suspendContinuationOrReturn")
+    tree.symbol.id == requiredMethod.id
+
+  def isCallToSuspend(trees: List[Tree], suspendParamName: ValDef)(using ctx: Context): Boolean =
+    trees.exists(_.symbol == suspendParamName.symbol)
 
 end ContinuationsPhase

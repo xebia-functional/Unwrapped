@@ -10,10 +10,8 @@ import continuations.intrinsics.*
 import concurrent.ExecutionContext.Implicits.global
 import scala.annotation.switch
 
-inline def suspendContinuationOrReturn[A](f: Continuation[A] => Continuation.State) = ???
-
-def await[A](future: Future[A]): Suspend ?=> A =
-  suspendContinuationOrReturn { (c: Continuation[A]) =>
+def await[A](future: Future[A])(using sos: Suspend): A =
+  Continuation.suspendContinuationOrReturn { (c: Continuation[A]) =>
     future.onComplete {
       case Success(value) => c.resume(Right(value))
       case Failure(exception) => c.resume(Left(exception))

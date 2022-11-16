@@ -73,7 +73,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
         |  }
         |}
         |""".stripMargin
-      
+
     checkContinuations(source) {
       case (tree, _) =>
         assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
@@ -88,10 +88,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       """
         |package continuations
         |
-        |inline def suspendContinuationOrReturn[A](f: Continuation[A] => Unit): A = ???
-        |
         |def foo(x: Int): Suspend ?=> Int =
-        |  suspendContinuationOrReturn { (c: Continuation[Int]) =>
+        |  Continuation.suspendContinuationOrReturn { (c: Continuation[Int]) =>
         |    c.resume(Right(x))
         |    Continuation.State.Suspended
         |  }
@@ -108,9 +106,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
           case DefDef(name, _, _, _) if name == funName => true
           case _ => false
         }
-        
+
         val foo = defDefs.head.asInstanceOf[tpd.DefDef]
-        
+
         val sut = new ContinuationsPhase
         assertEquals(sut.returnsContextFunctionWithSuspendType(foo), true)
     }
@@ -123,8 +121,6 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
     val source =
       """
         |package continuations
-        |
-        |inline def suspendContinuationOrReturn[A](f: Continuation[A] => Unit): A = ???
         |
         |def foo(x: Int): Suspend ?=> Int = x + 1
         |
@@ -156,10 +152,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       """
         |package continuations
         |
-        |inline def suspendContinuationOrReturn[A](f: Continuation[A] => Unit): A = ???
-        |
         |def foo(x: Int)(using s: Suspend): Int =
-        |  suspendContinuationOrReturn { (c: Continuation[Int]) =>
+        |  Continuation.suspendContinuationOrReturn { (c: Continuation[Int]) =>
         |    c.resume(Right(x))
         |    Continuation.State.Suspended
         |  }
@@ -192,8 +186,6 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       """
         |package continuations
         |
-        |inline def suspendContinuationOrReturn[A](f: Continuation[A] => Unit): A = ???
-        |
         |def foo(x: Int)(using s: Suspend): Int = x + 1
         |
         |""".stripMargin
@@ -223,8 +215,6 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
     val source =
       """
         |package continuations
-        |
-        |inline def suspendContinuationOrReturn[A](f: Continuation[A] => Unit): A = ???
         |
         |def foo(x: Int)(s: Suspend): Int = x + 1
         |
