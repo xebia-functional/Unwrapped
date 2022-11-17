@@ -58,9 +58,12 @@ class ContinuationsPhase extends PluginPhase:
 //    })
     tree
 
+  /*
   override def transformDefDef(tree: DefDef)(using Context): Tree =
     new DefDefTransforms().transformSuspendContinuation(tree)
+  */
 
+  /*
   @tailrec final def transformStatements(
       block: Block,
       statements: List[Tree],
@@ -73,7 +76,8 @@ class ContinuationsPhase extends PluginPhase:
           transformStatements(newBlock, remaining, Nil)
         // TODO nest previous under suspension point. Look at trees dif with example function
         else transformStatements(block, remaining, previous :+ current) // this may be wrong
-
+  */
+  
   def isSuspendType(tpe: Type)(using ctx: Context): Boolean =
     tpe.classSymbol.info.hasClassSymbol(Symbols.requiredClass("continuations.Suspend"))
 
@@ -97,7 +101,7 @@ class ContinuationsPhase extends PluginPhase:
       case _ => false
 
   def isCallToSuspend(tree: Tree)(using ctx: Context): Boolean =
-    val requiredMethod = Symbols.requiredMethod("continuations.Continuation.suspendContinuationOrReturn")
+    val requiredMethod = Symbols.requiredMethod("continuations.Continuation.suspendContinuation")
     tree.symbol.id == requiredMethod.id
 
   def isCallToSuspend(trees: List[Tree], suspendParamName: ValDef)(using ctx: Context): Boolean =

@@ -89,7 +89,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
         |package continuations
         |
         |def foo(x: Int): Suspend ?=> Int =
-        |  Continuation.suspendContinuationOrReturn { (c: Continuation[Int]) =>
+        |  Continuation.suspendContinuation { (c: Continuation[Int]) =>
         |    c.resume(Right(x))
         |    Continuation.State.Suspended
         |  }
@@ -153,7 +153,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
         |package continuations
         |
         |def foo(x: Int)(using s: Suspend): Int =
-        |  Continuation.suspendContinuationOrReturn { (c: Continuation[Int]) =>
+        |  Continuation.suspendContinuation { (c: Continuation[Int]) =>
         |    c.resume(Right(x))
         |    Continuation.State.Suspended
         |  }

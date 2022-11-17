@@ -11,7 +11,7 @@ import concurrent.ExecutionContext.Implicits.global
 import scala.annotation.switch
 
 def await[A](future: Future[A])(using sos: Suspend): A =
-  Continuation.suspendContinuationOrReturn { (c: Continuation[A]) =>
+  Continuation.suspendContinuation { (c: Continuation[A]) =>
     future.onComplete {
       case Success(value) => c.resume(Right(value))
       case Failure(exception) => c.resume(Left(exception))
