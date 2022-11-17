@@ -102,7 +102,7 @@ class ContinuationsPhase extends PluginPhase:
 
   def isCallToSuspend(tree: Tree)(using ctx: Context): Boolean =
     val requiredMethod = Symbols.requiredMethod("continuations.Continuation.suspendContinuation")
-    tree.symbol.id == requiredMethod.id
+    tree.symbol.denot.matches(requiredMethod.denot)
 
   def isCallToSuspend(trees: List[Tree], suspendParamName: ValDef)(using ctx: Context): Boolean =
     trees.exists(_.symbol == suspendParamName.symbol)
