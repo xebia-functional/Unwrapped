@@ -17,6 +17,7 @@ import dotty.tools.dotc.transform.{PickleQuotes, Staging}
 import dotty.tools.dotc.core.{Flags, NameKinds}
 
 import scala.annotation.tailrec
+import scala.collection.mutable.ListBuffer
 
 class ContinuationsPlugin extends StandardPlugin:
   val name: String = "continuations"
@@ -57,7 +58,9 @@ class ContinuationsPhase extends PluginPhase:
 //    })
     tree
 
-  /*
+  override def transformDefDef(tree: DefDef)(using Context): Tree =
+    new DefDefTransforms().transformSuspendContinuation(tree)
+
   @tailrec final def transformStatements(
       block: Block,
       statements: List[Tree],
@@ -70,7 +73,6 @@ class ContinuationsPhase extends PluginPhase:
           transformStatements(newBlock, remaining, Nil)
         // TODO nest previous under suspension point. Look at trees dif with example function
         else transformStatements(block, remaining, previous :+ current) // this may be wrong
-   */
 
   def isSuspendType(tpe: Type)(using ctx: Context): Boolean =
     tpe.classSymbol.info.hasClassSymbol(Symbols.requiredClass("continuations.Suspend"))
