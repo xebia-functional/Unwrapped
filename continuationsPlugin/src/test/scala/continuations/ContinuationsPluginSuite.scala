@@ -1,6 +1,7 @@
 package continuations
 
 import dotty.tools.dotc.ast.tpd
+import dotty.tools.dotc.config.Printers
 import dotty.tools.dotc.core.Contexts.{Context, ctx}
 import dotty.tools.dotc.core.Symbols
 import dotty.tools.dotc.core.Symbols.{ClassSymbol, newSymbol}
@@ -20,6 +21,36 @@ import munit.FunSuite
 class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   compilerContextWithContinuationsPlugin.test(
+    """|it should transform a 0-arity suspended definition returning a
+       |non-blocking value into a definition accepting a continuation
+       |returning the non-blocking value""".stripMargin) {
+    case given Context =>
+      val source =
+        """| import continuations.*
+           | def foo()(using Suspend): Int = 1""".stripMargin
+      val expectedOutput =
+        """|package <empty> {
+           |  import continuations.*
+           |  final lazy module val compileFromString$package:
+           |    compileFromString$package
+           |   = new compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class
+           |    compileFromString$package
+           |  () extends Object() { this: compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef =
+           |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[Int | Any]): Object = 1
+           |  }
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, ctx) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expectedOutput)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
     "It should work when there are no continuations") { implicit givenContext =>
     val source = """|class A""".stripMargin
     // format: off
@@ -30,11 +61,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
     // format: on
     checkContinuations(source) {
       case (tree, ctx) =>
-        val f: Byte => (String, Char) = b => (b.toInt.toHexString, b.toChar)
         assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
     }
-
   }
+
   compilerContextWithContinuationsPlugin.test(
     "It should work when there are no continuations".fail) { implicit givenContext =>
     val source = """|class A""".stripMargin
@@ -45,7 +75,23 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       case (tree, ctx) =>
         assertEquals(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
     }
+  }
 
+  compilerContext.test("debug".ignore) {
+    case given Context =>
+      val source =
+        """|package continuations
+           |
+           |def foo()(using Suspend): Int = {
+           |  val x = 5
+           |  println("HI")
+           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |}
+           |""".stripMargin
+      checkCompile("pickleQuotes", source) {
+        case (tree, ctx) =>
+          assertEquals(tree.toString(), """|""".stripMargin)
+      }
   }
 
   compilerContextWithContinuationsPlugin.test(
@@ -61,13 +107,13 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
     val expected =
       """
         |package continuations {
-        |  final lazy module val compileFromString$package: 
+        |  final lazy module val compileFromString$package:
         |    continuations.compileFromString$package
         |   = new continuations.compileFromString$package()
-        |  @SourceFile("compileFromString.scala") final module class 
+        |  @SourceFile("compileFromString.scala") final module class
         |    compileFromString$package
         |  () extends Object() { this: continuations.compileFromString$package.type =>
-        |    private def writeReplace(): AnyRef = 
+        |    private def writeReplace(): AnyRef =
         |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
         |    def foo(x: Int)(using x$2: continuations.Suspend): Int = x.+(1)
         |  }

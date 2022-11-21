@@ -1,25 +1,14 @@
 package continuations
 
-import dotty.tools.dotc.report
-import dotty.tools.dotc.ast.Trees.*
-import dotty.tools.dotc.ast.{Trees, tpd}
-import dotty.tools.dotc.core.Constants.Constant
-import dotty.tools.dotc.core.Contexts.{Context, atPhase}
-import dotty.tools.dotc.core.Decorators.*
-import dotty.tools.dotc.core.Flags.Module
-import dotty.tools.dotc.core.Names.*
-import dotty.tools.dotc.core.StdNames.*
-import dotty.tools.dotc.core.Symbols
-import dotty.tools.dotc.core.Types.{AppliedType, TermParamRef, TermRef, Type}
-import dotty.tools.dotc.plugins.{PluginPhase, StandardPlugin}
-import dotty.tools.dotc.semanticdb.TypeMessage.SealedValue.TypeRef
-import dotty.tools.dotc.transform.{PickleQuotes, Staging}
-import dotty.tools.dotc.core.{Flags, NameKinds}
-
-import scala.annotation.tailrec
-import scala.collection.mutable.ListBuffer
+import dotty.tools.dotc.ast.tpd.*
+import dotty.tools.dotc.core.Contexts.Context
+import dotty.tools.dotc.plugins.PluginPhase
+import dotty.tools.dotc.plugins.StandardPlugin
+import dotty.tools.dotc.transform.PickleQuotes
+import dotty.tools.dotc.transform.Staging
 
 class ContinuationsPlugin extends StandardPlugin:
+
   val name: String = "continuations"
   override val description: String = "CPS transformations"
 
@@ -27,9 +16,12 @@ class ContinuationsPlugin extends StandardPlugin:
     (new ContinuationsPhase) :: Nil
 
 class ContinuationsPhase extends PluginPhase:
-  import tpd.*
 
-  val phaseName = "continuations"
+  override def phaseName: String = "continuations"
+
+  override def changesBaseTypes: Boolean = true
+
+  override def changesMembers: Boolean = true
 
   override val runsAfter = Set(Staging.name)
   override val runsBefore = Set(PickleQuotes.name)
@@ -77,7 +69,7 @@ class ContinuationsPhase extends PluginPhase:
         // TODO nest previous under suspension point. Look at trees dif with example function
         else transformStatements(block, remaining, previous :+ current) // this may be wrong
   */
-  
+
   def isSuspendType(tpe: Type)(using ctx: Context): Boolean =
     tpe.classSymbol.info.hasClassSymbol(Symbols.requiredClass("continuations.Suspend"))
 

@@ -1,14 +1,17 @@
 package examples
 
 import continuations.Continuation.State
-import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
 import continuations.*
-import continuations.jvm.internal.ContinuationImpl
 import continuations.intrinsics.*
+import continuations.jvm.internal.ContinuationImpl
+
+import scala.annotation.switch
+import scala.concurrent.Future
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
 
 import concurrent.ExecutionContext.Implicits.global
-import scala.annotation.switch
 
 def await[A](future: Future[A])(using sos: Suspend): A =
   Continuation.suspendContinuation { (c: Continuation[A]) =>
@@ -56,7 +59,8 @@ def program: Suspend ?=> Int =
   val z = await(bar(x, y)) // suspension point #2
   c(z)
 
-def programSuspendContinuationNoParamResume: Int =
+def programSuspendContinuationTask2: Int =
+  // need to cast on the correct expected type?
   def fooTest()(using s: Suspend): Int =
     Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
 
@@ -126,3 +130,13 @@ def program$expanded(
     if (var10000 == var6) return var6
   val z: Int = var10000.asInstanceOf[Number].intValue
   c(z)
+
+def programSuspendContinuationNoParamNoSuspendContinuation: Int =
+  def fooTest()(using s: Suspend): Int = 1
+  fooTest()
+
+def programSuspendContinuationNoParamResume: Int =
+  def fooTest()(using s: Suspend): Int =
+    Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+
+  fooTest()

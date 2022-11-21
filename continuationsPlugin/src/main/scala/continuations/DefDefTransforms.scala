@@ -1,31 +1,37 @@
 package continuations
 
 import continuations.DefDefTransforms.*
+import dotty.tools.dotc.ast.Trees
 import dotty.tools.dotc.ast.Trees.*
-import dotty.tools.dotc.ast.tpd.TreeOps
-import dotty.tools.dotc.ast.{tpd, Trees}
+import dotty.tools.dotc.ast.tpd
+import dotty.tools.dotc.ast.tpd.TypedTreeCopier
+import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Constants.Constant
-import dotty.tools.dotc.core.Contexts.{ctx, Context}
+import dotty.tools.dotc.core.Contexts.Context
+import dotty.tools.dotc.core.Contexts.ctx
 import dotty.tools.dotc.core.Flags
+import dotty.tools.dotc.core.Names
 import dotty.tools.dotc.core.Names.termName
 import dotty.tools.dotc.core.StdNames.nme
 import dotty.tools.dotc.core.Symbols.*
-import dotty.tools.dotc.core.Types.{OrType, Type}
+import dotty.tools.dotc.core.Types
+import dotty.tools.dotc.core.Types.OrType
+import dotty.tools.dotc.core.Types.Type
+import dotty.tools.dotc.report
 
 import scala.annotation.tailrec
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
 
-class DefDefTransforms(using Context) {
-  import tpd.*
+object DefDefTransforms:
 
   /*
    * It works with only one top level `suspendContinuation` that just calls `resume`
    * and it replaces the parent method body keeping any rows before the `suspendContinuation` (but not ones after).
    */
   private def transformSuspendNoParametersOneContinuationResume(
-      tree: DefDef,
-      resumeArg: Tree): DefDef =
+      tree: tpd.DefDef,
+      resumeArg: tpd.Tree)(using Context): tpd.DefDef =
     val continuationTraitSym: ClassSymbol =
       requiredClass("continuations.Continuation")
     val continuationObjectSym: Symbol =
@@ -40,7 +46,8 @@ class DefDefTransforms(using Context) {
       tree
         .rhs
         .find {
-          case Inlined(fun, _, _) => fun.symbol.showFullName == suspendContinuationFullName
+          case Trees.Inlined(fun, _, _) =>
+            fun.symbol.showFullName == suspendContinuationFullName
           case _ => false
         }
         .map(_.tpe)
@@ -51,11 +58,12 @@ class DefDefTransforms(using Context) {
         .rhs
         .toList
         .flatMap {
-          case Block(trees, tree) => trees :+ tree
+          case Trees.Block(trees, tree) => trees :+ tree
           case tree => List(tree)
         }
         .takeWhile {
-          case Inlined(call, _, _) => call.symbol.showFullName != suspendContinuationFullName
+          case Trees.Inlined(call, _, _) =>
+            call.symbol.showFullName != suspendContinuationFullName
           case _ => true
         }
 
@@ -65,8 +73,8 @@ class DefDefTransforms(using Context) {
     val completion =
       newSymbol(parent, termName("completion"), Flags.LocalParam, continuationTyped)
 
-    val continuation1: ValDef =
-      ValDef(
+    val continuation1: tpd.ValDef =
+      tpd.ValDef(
         newSymbol(parent, termName("continuation1"), Flags.Local, continuationTyped),
         ref(completion))
 
@@ -80,13 +88,14 @@ class DefDefTransforms(using Context) {
         .appliedToNone
 
     val safeContinuationConstructor =
-      New(ref(safeContinuationClassSym))
+      tpd
+        .New(ref(safeContinuationClassSym))
         .select(nme.CONSTRUCTOR)
         .appliedToType(returnType)
         .appliedTo(interceptedCall, undecidedState)
 
-    val safeContinuation: ValDef =
-      ValDef(
+    val safeContinuation: tpd.ValDef =
+      tpd.ValDef(
         newSymbol(
           parent,
           termName("safeContinuation"),
@@ -97,14 +106,14 @@ class DefDefTransforms(using Context) {
     val safeContinuationRef =
       ref(safeContinuation.symbol)
 
-    val suspendContinuation: ValDef =
-      ValDef(
+    val suspendContinuation: tpd.ValDef =
+      tpd.ValDef(
         newSymbol(
           parent,
           termName("suspendContinuation"),
           Flags.Local,
           ctx.definitions.IntType),
-        Literal(Constant(0))
+        tpd.Literal(Constant(0))
       )
 
     val suspendContinuationResume =
@@ -113,7 +122,7 @@ class DefDefTransforms(using Context) {
     val suspendContinuationGetThrow =
       safeContinuationRef.select(termName("getOrThrow")).appliedToNone
 
-    val body = Block(
+    val body = tpd.Block(
       rowsBeforeSuspend ++
         (continuation1 :: safeContinuation :: suspendContinuation :: suspendContinuationResume :: Nil),
       suspendContinuationGetThrow
@@ -128,69 +137,71 @@ class DefDefTransforms(using Context) {
         suspendedState.symbol.namedType,
         soft = false)
 
-    DefDef(parent.asTerm, List(List(completion)), finalMethodReturnType, body)
+    tpd.DefDef(parent.asTerm, List(List(completion)), finalMethodReturnType, body)
 
-  def transformSuspendContinuation(tree: DefDef): DefDef =
+  private def transformContinuationWithSuspend(tree: tpd.DefDef)(using Context): tpd.DefDef =
+    val newTree =
+      tree match
+        case CallsContinuationResumeWith(resumeArg) =>
+          transformSuspendNoParametersOneContinuationResume(tree, resumeArg)
+        case BodyHasSuspensionPoint(_) =>
+          cpy.DefDef(tree)() // any suspension that still needs a transformation
+        case _ => transformNonSuspending(tree, cpy)
+
+    report.logWith(s"new tree:")(newTree)
+
+  def transformSuspendContinuation(tree: tpd.DefDef)(using Context): tpd.DefDef =
     tree match
-      case HasSuspendParameter(_) =>
-        tree match
-          case CallsContinuationResumeWith(resumeArg) =>
-            transformSuspendNoParametersOneContinuationResume(tree, resumeArg)
-          case _ => tree
-      case _ => tree
-}
+      case ReturnsContextFunctionWithSuspendType(_) => transformContinuationWithSuspend(tree)
+      case HasSuspendParameter(_) => transformContinuationWithSuspend(tree)
+      case _ => report.logWith(s"oldTree:")(tree)
 
-object DefDefTransforms {
-  private val suspendFullName = "continuations.Suspend"
-  private val suspendContinuationFullName = "continuations.Continuation.suspendContinuation"
-  private val resumeFullName = "continuations.Continuation.resume"
+  private def transformNonSuspending(tree: tpd.DefDef, cpy: TypedTreeCopier)(
+      using ctx: Context): tpd.DefDef =
+    tree match
+      case Trees.DefDef(name, paramss, tpt, rhs) =>
+        val suspendClazz = requiredClass(suspendFullName)
+        val completion: tpd.ValDef = tpd.ValDef(
+          newSymbol(
+            tree.symbol,
+            Names.termName("completion"),
+            Flags.LocalParam,
+            requiredPackage("continuations")
+              .requiredType("Continuation")
+              .typeRef
+              .appliedTo(Types.OrType(tpt.tpe, ctx.definitions.AnyType, false))
+          ).asTerm,
+          rhs = theEmptyTree
+        )
+        val params: List[tpd.ParamClause] = if (paramss.isEmpty) {
+          List(List(completion))
+        } else
+          tree
+            .paramss
+            .zipWithIndex
+            .map { (pc, i) =>
+              val newPc: tpd.ParamClause = pc
+                .filterNot { param =>
+                  param match {
+                    case p: Trees.ValDef[Type] =>
+                      p.typeOpt.hasClassSymbol(suspendClazz) && p
+                        .symbol
+                        .flags
+                        .isOneOf(Flags.GivenOrImplicit)
+                    case t: Trees.TypeDef[Type] =>
+                      t.typeOpt.hasClassSymbol(suspendClazz) && t
+                        .symbol
+                        .flags
+                        .isOneOf(Flags.GivenOrImplicit)
+                  }
+                }
+                .asInstanceOf[tpd.ParamClause]
+              if (i == 0) {
+                newPc.appended(completion).asInstanceOf[tpd.ParamClause]
+              } else newPc
+            }
+            .filterNot(_.isEmpty)
 
-  object HasSuspendParameter {
-    def unapply(tree: tpd.DefDef)(using Context): Option[tpd.DefDef] =
-      Option(tree).filter {
-        _.paramss.exists {
-          _.exists { v =>
-            v.symbol.is(Flags.Given) && v.tpe.classSymbol.showFullName == suspendFullName
-          }
-        }
-      }
-  }
-
-  object CallsContinuationResumeWith {
-    def unapply(tree: tpd.DefDef)(using Context): Option[tpd.Tree] =
-      val args =
-        tree
-          .rhs
-          .filterSubTrees {
-            case Inlined(fun, _, _) => fun.symbol.showFullName == suspendContinuationFullName
-            case _ => false
-          }
-          .flatMap {
-            case Inlined(
-                  Apply(
-                    Apply(_, List(Block(Nil, Block(List(DefDef(_, _, _, suspendBody)), _)))),
-                    List(_)),
-                  _,
-                  _) =>
-              Option(suspendBody)
-            case Inlined(
-                  Apply(Apply(_, List(Block(List(DefDef(_, _, _, suspendBody)), _))), List(_)),
-                  _,
-                  _) =>
-              Option(suspendBody)
-            case _ =>
-              None
-          }
-          .flatMap {
-            case Block(Nil, Apply(fun, List(arg)))
-                if fun.symbol.showFullName == resumeFullName =>
-              Option(arg.withType(arg.tpe))
-            case Apply(fun, List(arg)) if fun.symbol.showFullName == resumeFullName =>
-              Option(arg.withType(arg.tpe))
-            case _ =>
-              None
-          }
-
-      Option.when(args.size == 1)(args.head)
-  }
-}
+        cpy.DefDef(tree)(
+          paramss = params,
+          tpt = tpd.TypeTree(ctx.definitions.ObjectClass.typeRef))
