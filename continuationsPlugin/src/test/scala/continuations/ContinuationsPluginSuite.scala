@@ -80,20 +80,21 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
     }
   }
 
-  compilerContext.test("debug".ignore) {
+  compilerContext.test("debug".only) {
     case given Context =>
       val source =
         """|package continuations
            |
-           |def foo()(using Suspend): Int = {
-           |  val x = 5
-           |  println("HI")
-           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
-           |}
-           |""".stripMargin
-      checkCompile("pickleQuotes", source) {
-        case (tree, _) =>
-          assertEquals(tree.toString, """|""".stripMargin)
+           |import scala.annotation.tailrec
+           |
+           |@tailrec def gcd(x:Int, y:Int): Int=
+           |{
+           |if (y == 0) x
+           |else gcd(y, x % y)
+           |}""".stripMargin
+      checkCompile("tailrec", source) {
+        case (tree, ctx) =>
+          assertEquals(tree.show, """|""".stripMargin)
       }
   }
 
@@ -650,6 +651,336 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |""".stripMargin
       // format: on
 
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
+  compilerContextWithContinuationsPlugin.test(
+    "it should compile a single arity definition containing a suspend call and a dependent calculation into a state machine:") {
+    case given Context =>
+      val source = """|package continuations
+                      |
+                      |def foo5(x: Int): Int = {
+                      |
+                      |  val y = Continuation.suspendContinuation[Int] { continuation =>
+                      |    continuation.resume(Right(x + 1))
+                      |  }
+                      |  x + y
+                      |}""".stripMargin
+
+      // format: off
+      /**
+        * How to do labels and jumps -- you return from a labeld position to another label.
+        *  Reference
+        *  dotty/compiler/src/dotty/tools/dotc/transform/TailRec.scala: https://github.com/lampepfl/dotty/blob/main/tests/pos-with-compiler-cc/dotc/transform/TailRec.scala#L107
+        * 
+           ```DefDef(gcd,
+             List(
+               List(
+                 ValDef(
+                   x,
+                   TypeTree[
+                     TypeRef(
+                       ThisType(
+                         TypeRef(
+                           NoPrefix,
+                           module class scala
+                         )
+                       ),
+                       class Int
+                     )
+                   ],
+                   EmptyTree
+                 ),
+                 ValDef(
+                   y,
+                   TypeTree[
+                     TypeRef(
+                       ThisType(
+                         TypeRef(
+                           NoPrefix,
+                           module class scala
+                         )
+                       ),
+                       class Int
+                     )
+                   ],
+                   EmptyTree
+                 )
+               )
+             ),
+             TypeTree[
+               TypeRef(
+                 ThisType(
+                   TypeRef(
+                     NoPrefix,
+                     module class scala
+                   )
+                 ),
+                 class Int
+               )
+             ],
+             Block(
+               List(
+                 ValDef(
+                   y$tailLocal1,
+                   TypeTree[
+                     TypeRef(
+                       ThisType(
+                         TypeRef(
+                           NoPrefix,
+                           module class scala
+                         )
+                       ),
+                       class Int
+                     )
+                   ],
+                   Ident(y)
+                 ),
+                 ValDef(
+                   x$tailLocal1,
+                   TypeTree[
+                     TypeRef(
+                       ThisType(
+                         TypeRef(
+                           NoPrefix,
+                           module
+                             class scala
+                         )
+                       ),
+                       class Int
+                     )
+                   ],
+                   Ident(
+                     x
+                   )
+                 )
+               ),
+               WhileDo(
+                 EmptyTree,
+                 Labeled(
+                   Bind(
+                     tailLabel1,
+                     EmptyTree
+                   ),
+                   Return(
+                     Block(
+                       List(),
+                       If(
+                         Apply(
+                           Select(
+                             Ident(y),
+                             ==
+                           ),
+                           List(
+                             Literal(
+                               Constant(0)
+                             )
+                           )
+                         ),
+                         Ident(x),
+                         Block(
+                           List(
+                             ValDef(
+                               x$tailLocal1$tmp1,
+                               TypeTree[
+                                 TypeRef(
+                                   ThisType(
+                                     TypeRef(
+                                       NoPrefix,
+                                       module class scala
+                                     )
+                                   ),
+                                   class Int
+                                 )
+                               ],
+                               Ident(y)
+                             ),
+                             ValDef(
+                               y$tailLocal1$tmp1,
+                               TypeTree[
+                                 TypeRef(
+                                   ThisType(
+                                     TypeRef(
+                                       NoPrefix,
+                                       module class scala
+                                     )
+                                   ),
+                                   class Int
+                                 )
+                               ],
+                               Apply(
+                                 Select(
+                                   Ident(x),
+                                   %
+                                 ),
+                                 List(
+                                   Ident(y)
+                                 )
+                               )
+                             ),
+                             Assign(
+                               Ident(x$tailLocal1),
+                               Ident(x$tailLocal1$tmp1)
+                             ),
+                             Assign(
+                               Ident(y$tailLocal1),
+                               Ident(y$tailLocal1$tmp1)
+                             )
+                           ),
+                           Typed(
+                             Return(
+                               Literal(
+                                 Constant(
+                                   ()
+                                 )
+                               ),
+                               Ident(tailLabel1)
+                             ),
+                             TypeTree[
+                               TypeRef(
+                                 ThisType(
+                                   TypeRef(
+                                     NoPrefix,
+                                     module class scala
+                                   )
+                                 ),
+                                 class Int)
+                             ]
+                           )
+                         )
+                       )
+                     ),
+                     Ident(gcd)
+                   )
+                 )
+               )
+             )
+           )
+           
+           
+           package continuations {
+             final lazy module val ∙
+               compileFromString-4e51bdbb-9913-465a-992f-1ec2923e786a.$package
+             : ∙
+               ∙
+                 continuations.
+                   compileFromString-4e51bdbb-9913-465a-992f-1ec2923e786a.$package
+               ∙
+              = ∙
+               new ∙
+                 ∙
+                   continuations.
+                     compileFromString-4e51bdbb-9913-465a-992f-1ec2923e786a.$package
+                 ∙
+               ()
+             @SourceFile("compileFromString-4e51bdbb-9913-465a-992f-1ec2923e786a..scala") ∙
+               final
+              module class compileFromString-4e51bdbb-9913-465a-992f-1ec2923e786a.$package
+               ()
+              extends Object() {
+               private def writeReplace(): Object = ∙
+                 new scala.runtime.ModuleSerializationProxy(
+                   classOf[
+                     continuations.
+                       compileFromString-4e51bdbb-9913-465a-992f-1ec2923e786a.$package
+                   ]
+                 )
+               @tailrec def gcd(x: Int, y: Int): Int = ∙
+                 {
+                   var y$tailLocal1: Int = y
+                   var x$tailLocal1: Int = x
+                   while <empty> do ∙
+                     tailLabel1[Unit]: ∙
+                       return ∙
+                         {
+                           if y$tailLocal1.==(0) then x$tailLocal1 else ∙
+                             {
+                               val x$tailLocal1$tmp1: Int = y$tailLocal1
+                               val y$tailLocal1$tmp1: Int = x$tailLocal1.%(y$tailLocal1)
+                               x$tailLocal1 = x$tailLocal1$tmp1
+                               y$tailLocal1 = y$tailLocal1$tmp1
+                               (return[tailLabel1] ()):Int
+                             }
+                         }
+                 }
+             }
+           }
+           ```
+        * 
+        */
+      // format: on
+      
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |
+           |    class continuations$foo5$1($completion: continuations.Continuation[Int], var $input: Int, var $label: Int) extends BaseContinuationImpl($completion) {
+           |      var $result: Either[Throwable, Any | Null | Continuation.State.Suspended.type] = _
+           |      override protected def invokeSuspend(
+           |        result: Either[Throwable, Any | Null | Continuation.State.Suspended.type]): Any | Null = {
+           |        this.$result = result
+           |        this.$label = this.$label | Int.MIN_VALUE
+           |        foo5(0, this.asInstanceOf[Continuation[Int]])
+           |      }
+           |    }
+           |    def foo5(x: Int, $completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        var $continuation: Continuation[Any] = _
+           |        var $z: Int = 0
+           |        var $Label_0049 = {
+           |          if(continuation.isInstanceOf[continuations$foo5$1]) {
+           |            var $continuation1 = continuation.asInstanceOf[continuations$foo5$1]
+           |            if(($continuation1.$label & Int.MIN_VALUE) != 0x0){
+           |              val $continuation2 = $continuation1
+           |              $continuation2.$label = $continuation2.$label - Int.MIN_VALUE
+           |              break $Label_0049
+           |            }
+           |          }
+           |          $continuation = new continuations$foo5$1($completion.asInstanceOf[Continuation[Int]]).asInstanceOf[Continuation[Any]]
+           |        }
+           |        var $result = $continuation.asInstanceOf[continuations$foo5$1].$result
+           |        var $orThrow: Object = _
+           |        $continuation.asInstanceOf[continuations$foo5$1].$label match {
+           |          case 0 =>
+           |            $result.fold(t => throw t, _ => ())
+           |            $continuation.asInstanceOf[continuations$foo5$1].$input = x
+           |            
+           |            $continuation.asInstanceOf[continuations$foo5$1].$label = 1
+           |            val $safeContinuation: continuations.SafeContinuation[Int] = 
+           |              new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($completion)(), 
+           |                continuations.Continuation.State.Undecided
+           |            )
+           |            val $continuation2 = $safeContinuation
+           |            $continuation2.resumeWith(Right(x + 1))
+           |            val $o = $orThrow = $continuation2.getOrThrow()
+           |            if($o == continuations.Continuation.State.Suspended)
+           |              return continuations.Continuation.State.Suspended
+           |            }
+           |          case 1 =>
+           |            $z = $continuation.asInstanceOf[continuations$foo5$1].$input
+           |            $result.fold($t => throw $t, _ => ())
+           |            $orThrow = $result
+           |          case _ =>
+           |            throw new IllegalStateException("call to 'resume' before 'invoke' with coroutine")
+           |        }
+           |        val y = $orThrow.asInstanceOf[Int]
+           |        $z + y
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
