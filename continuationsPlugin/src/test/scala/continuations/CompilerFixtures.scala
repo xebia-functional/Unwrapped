@@ -103,7 +103,7 @@
 package continuations
 
 import dotty.tools.dotc.Compiler
-import dotty.tools.dotc.ast.tpd
+import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Comments.ContextDoc
 import dotty.tools.dotc.core.Comments.ContextDocstrings
 import dotty.tools.dotc.core.Contexts.Context
@@ -116,13 +116,35 @@ import dotty.tools.dotc.core.Types.MethodType
 import dotty.tools.dotc.core.Types.Type
 import munit.FunSuite
 import scala.util.Properties
+import dotty.tools.dotc.core.Names
+import dotty.tools.dotc.core.Flags
+import dotty.tools.dotc.core.Flags.EmptyFlags
+import dotty.tools.dotc.core.Constants.Constant
+import dotty.tools.dotc.core.Types
+import dotty.tools.dotc.core.Types.NoPrefix
+import dotty.tools.dotc.ast.Trees
+import dotty.tools.dotc.core.Definitions
+import dotty.tools.dotc.core.Types.TypeRef
 
 trait CompilerFixtures { self: FunSuite =>
 
   val compileSourceIdentifier =
     """-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.""".r
 
-  protected def compilerWithChecker(phase: String)(assertion: (tpd.Tree, Context) => Unit) =
+  protected def compiler(phase: String) = new Compiler {
+    override def phases = {
+      val allPhases = super.phases
+      val targetPhase = allPhases.flatten.find(p => p.phaseName == phase).get
+      val groupsBefore = allPhases.takeWhile(x => !x.contains(targetPhase))
+      val lastGroup =
+        allPhases.find(x => x.contains(targetPhase)).get.takeWhile(x => !(x eq targetPhase))
+      val lastGroupAppended = List(lastGroup ::: targetPhase :: Nil)
+
+      groupsBefore ::: lastGroupAppended
+    }
+  }
+
+  protected def compilerWithChecker(phase: String)(assertion: (Tree, Context) => Unit) =
     new Compiler {
       override def phases = {
         val allPhases = super.phases
@@ -174,9 +196,9 @@ trait CompilerFixtures { self: FunSuite =>
       val context = base.initialCtx.fresh
       context.setSetting(context.settings.encoding, "UTF8")
       context.setSetting(context.settings.language, List("experimental.erasedDefinitions"))
-      context.setSetting(
-        context.settings.classpath,
-        Properties.propOrEmpty("scala-compiler-classpath"))
+      val compilerClasspath = Properties.propOrEmpty(
+        "scala-compiler-classpath") ++ s":${Properties.propOrEmpty("scala-compiler-plugin")}"
+      context.setSetting(context.settings.classpath, compilerClasspath)
       context.setProperty(ContextDoc, new ContextDocstrings)
       base.initialize()(using context)
       context
@@ -184,15 +206,205 @@ trait CompilerFixtures { self: FunSuite =>
     teardown = ctx => {}
   )
 
-  def checkCompile(checkAfterPhase: String, source: String)(
-      assertion: (tpd.Tree, Context) => Unit)(using Context): Context = {
+  val suspendContextFunction = FunFixture[Context ?=> Type](
+    setup = _ => ctxFunctionTpe,
+    teardown = _ => ()
+  )
+
+  val suspendContextFunctionReturningSuspend = FunFixture[Context ?=> Type](
+    setup = _ => {
+      val c = summon[Context]
+      c.definitions
+        .asContextFunctionType(
+          c.definitions.FunctionOf(List(suspend.termRef), suspend.termRef, true, false))
+    },
+    teardown = _ => ()
+  )
+
+  val nonSuspendContextFunctionReturingSuspend = FunFixture[Context ?=> Type](
+    setup = _ => {
+      val c = summon[Context]
+      c.definitions
+        .asContextFunctionType(
+          c.definitions.FunctionOf(List(c.definitions.IntType), suspend.termRef, true, false))
+    },
+    teardown = _ => ()
+  )
+
+  val nonSuspendContextFunction = FunFixture[Context ?=> Type](
+    setup = _ => nonSuspendingContextFunctionType,
+    teardown = _ => ()
+  )
+
+  val zeroArityContextFunctionDefDef = FunFixture[Context ?=> DefDef](
+    setup = _ => {
+      DefDef(
+        Symbols
+          .newSymbol(
+            owner,
+            mySuspendName,
+            EmptyFlags,
+            ctxFunctionTpe
+          )
+          .asTerm,
+        List.empty,
+        ctxFunctionTpe,
+        one
+      )
+    },
+    teardown = _ => ()
+  )
+
+  val suspendingContextFunctionValDef = FunFixture[Context ?=> ValDef](
+    setup = _ => {
+      ValDef(
+        Symbols
+          .newSymbol(
+            owner,
+            mySuspendName,
+            EmptyFlags,
+            ctxFunctionTpe
+          )
+          .asTerm,
+        one
+      )
+    },
+    teardown = _ => ()
+  )
+
+  val nonSuspendingContextFunctionValDef = FunFixture[Context ?=> ValDef](
+    setup = _ => {
+      ValDef(
+        Symbols
+          .newSymbol(
+            owner,
+            mySuspendName,
+            EmptyFlags,
+            nonSuspendingContextFunctionType
+          )
+          .asTerm,
+        one
+      )
+    },
+    teardown = _ => ()
+  )
+
+  val zeroArityNonSuspendNonSuspendingDefDef = FunFixture[Context ?=> DefDef](
+    setup = _ => {
+      DefDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, intType).asTerm,
+        List(
+          List(),
+          List(Symbols.newSymbol(owner, Names.termName("s"), Flags.Param, suspendType))),
+        intType,
+        one
+      )
+    },
+    teardown = _ => ()
+  )
+
+  val suspendContinuation = FunFixture[Context ?=> Inlined](
+    setup = _ => inlinedCallToContinuationsSuspendOfInt,
+    teardown = _ => ()
+  )
+
+  val zeroAritySuspendSuspendingDefDef = FunFixture[Context ?=> DefDef](
+    setup = _ => {
+      val c = summon[Context]
+      DefDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, intType).asTerm,
+        List(List(), List(usingSuspend)),
+        intType,
+        inlinedCallToContinuationsSuspendOfInt
+      )
+    },
+    teardown = _ => ()
+  )
+
+  val zeroAritySuspendNonSuspendingDefDef = FunFixture[Context ?=> DefDef](
+    setup = _ => {
+      val c = summon[Context]
+      val rhs =
+        one
+      DefDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, intType).asTerm,
+        List(List(), List(usingSuspend)),
+        intType,
+        rhs
+      )
+    },
+    teardown = _ => ()
+  )
+
+  val rightOneApply: FunFixture[Context ?=> Apply] =
+    FunFixture(setup = _ => rightOne, teardown = _ => ())
+
+  val oneTree: FunFixture[Context ?=> Literal] =
+    FunFixture(setup = _ => one, teardown = _ => ())
+
+  val continuationsContextAndInlinedSuspendingTree =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, suspendContinuation)
+
+  val continuationsContextAndOneTree =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, oneTree)
+
+  val continuationsContextAndZeroArityNonSuspendNonSuspendingDefDef =
+    FunFixture.map2(
+      compilerContextWithContinuationsPlugin,
+      zeroArityNonSuspendNonSuspendingDefDef)
+
+  val continuationsContextAndZeroAritySuspendSuspendingDefDef =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, zeroAritySuspendSuspendingDefDef)
+
+  val continuationsContextAndZeroAritySuspendSuspendingDefDefAndRightOne =
+    FunFixture.map3(
+      compilerContextWithContinuationsPlugin,
+      zeroAritySuspendSuspendingDefDef,
+      rightOneApply)
+
+  val continuationsContextAndZeroAritySuspendNonSuspendingDefDef =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, zeroAritySuspendNonSuspendingDefDef)
+
+  val continuationsContextAndSuspendContextFunction =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, suspendContextFunction)
+
+  val continuationsContextAndNonSuspendContextFunctionReturingSuspend = FunFixture.map2(
+    compilerContextWithContinuationsPlugin,
+    nonSuspendContextFunctionReturingSuspend)
+
+  val continuationsContextAndSuspendContextFunctionReturningSuspend = FunFixture.map2(
+    compilerContextWithContinuationsPlugin,
+    suspendContextFunctionReturningSuspend)
+
+  val continuationsContextAndNonSuspendContextFunction = FunFixture.map2(
+    compilerContextWithContinuationsPlugin,
+    nonSuspendContextFunction
+  )
+
+  val continuationsContextAndZeroArityContextFunctionDefDef = FunFixture.map2(
+    compilerContextWithContinuationsPlugin,
+    zeroArityContextFunctionDefDef
+  )
+
+  val continuationsContextAndSuspendingContextFunctionValDef = FunFixture.map2(
+    compilerContextWithContinuationsPlugin,
+    suspendingContextFunctionValDef
+  )
+
+  val continuationsContextAndNonSuspendingContextFunctionValDef = FunFixture.map2(
+    compilerContextWithContinuationsPlugin,
+    nonSuspendingContextFunctionValDef
+  )
+
+  def checkCompile(checkAfterPhase: String, source: String)(assertion: (Tree, Context) => Unit)(
+      using Context): Context = {
     val c = compilerWithChecker(checkAfterPhase)(assertion)
     val run = c.newRun
     run.compileFromStrings(List(source))
     run.runContext
   }
 
-  def checkContinuations(source: String)(assertion: (tpd.Tree, Context) => Unit)(
+  def checkContinuations(source: String)(assertion: (Tree, Context) => Unit)(
       using Context): Context = {
     checkCompile("pickleQuotes", source)(assertion)
   }
@@ -216,14 +428,14 @@ trait CompilerFixtures { self: FunSuite =>
     val gatheredSource = s"${source}\nobject A$dummyName {$vals}"
     checkCompile("typer", gatheredSource) { (tree, context) =>
       given Context = context
-      val findValDef: (List[tpd.ValDef], tpd.Tree) => List[tpd.ValDef] =
+      val findValDef: (List[ValDef], Tree) => List[ValDef] =
         (acc, tree) => {
           tree match {
-            case t: tpd.ValDef if t.name.startsWith(dummyName) => t :: acc
+            case t: ValDef if t.name.startsWith(dummyName) => t :: acc
             case _ => acc
           }
         }
-      val d = new tpd.DeepFolder[List[tpd.ValDef]](findValDef).foldOver(Nil, tree)
+      val d = new DeepFolder[List[ValDef]](findValDef).foldOver(Nil, tree)
       val tpes = d.map(_.tpe.widen).reverse
       val tpess = typeStringss
         .foldLeft[(List[Type], List[List[Type]])]((tpes, Nil)) {
@@ -240,4 +452,99 @@ trait CompilerFixtures { self: FunSuite =>
   def methType(names: String*)(paramTypes: Type*)(using Context)(
       resultType: Type = defn.UnitType) =
     MethodType(names.toList map (_.toTermName), paramTypes.toList, resultType)
+
+  private lazy val nonSuspendingContextFunctionType: Context ?=> Type =
+    c.definitions
+      .asContextFunctionType(c.definitions.FunctionOf(List(intType), intType, true, false))
+
+  private lazy val owner: Context ?=> Symbol =
+    c.owner
+
+  private lazy val ctxFunctionTpe: Context ?=> Type =
+    c.definitions
+      .asContextFunctionType(
+        c.definitions.FunctionOf(List(suspend.termRef), intType, true, false))
+
+  private lazy val mySuspendName: Context ?=> Names.SimpleName =
+    Names.termName("mySuspend")
+
+  private lazy val one: Context ?=> Literal =
+    Literal(Constant(1))
+
+  private lazy val suspendType: Context ?=> Type =
+    suspend.info
+
+  private lazy val continuation: Context ?=> Symbol =
+    Symbols.requiredModule("continuations.Continuation")
+
+  private def c(using Context): Context = summon[Context]
+
+  private lazy val anonFunc: Context ?=> TermSymbol =
+    Symbols.newAnonFun(owner, continuation.companionClass.info)
+
+  private lazy val intType: Context ?=> TypeRef =
+    summon[Context].definitions.IntType
+
+  private lazy val right: Context ?=> Symbol =
+    Symbols.requiredModule("scala.util.Right")
+
+  private lazy val continuationVal: Context ?=> Symbol =
+    Symbols.newSymbol(
+      owner,
+      Names.termName("continuation"),
+      EmptyFlags,
+      continuation.companionClass.typeRef.appliedTo(intType)
+    )
+
+  private lazy val rightOne: Context ?=> Apply =
+    ref(right)
+      .select(Names.termName("apply"))
+      .appliedToTypes(List(c.definitions.ThrowableType, intType))
+      .appliedTo(one)
+
+  private lazy val inlinedCallToContinuationsSuspendOfInt: Context ?=> Inlined =
+    Inlined(
+      Apply(
+        Apply(
+          TypeApply(
+            ref(continuation).select(Names.termName("suspendContinuation")),
+            List(TypeTree(intType))),
+          List(
+            Block(
+              Nil,
+              Block(
+                List(
+                  DefDef(
+                    anonFunc,
+                    List(List(continuationVal)),
+                    c.definitions.UnitType,
+                    Block(
+                      Nil,
+                      ref(continuationVal).select(Names.termName("resume")).appliedTo(rightOne)
+                    )
+                  )),
+                Closure(Nil, ref(anonFunc), TypeTree(c.definitions.UnitType))
+              )
+            ))
+        ),
+        List(ref(usingSuspend))
+      ),
+      List(),
+      Typed(
+        Ident(requiredMethod("scala.Predef.???").typeRef),
+        TypeTree(c.definitions.IntType)
+      )
+    )
+
+  private lazy val suspend: Context ?=> Symbol =
+    Symbols.requiredClass("continuations.Suspend")
+
+  private lazy val usingSuspend: Context ?=> Symbol =
+    val c = summon[Context]
+    Symbols.newSymbol(
+      owner,
+      Names.termName("x$1"),
+      Flags.union(Flags.GivenOrImplicit, Flags.Param),
+      suspendType
+    )
 }
