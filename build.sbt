@@ -114,6 +114,7 @@ lazy val scalafxSettings: Seq[Def.Setting[_]] =
 lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
   Seq(
     exportJars := true,
+    autoAPIMappings := true,
     Test / fork := true,
     libraryDependencies ++= List(
       "org.scala-lang" %% "scala3-compiler" % "3.1.2",
@@ -147,17 +148,7 @@ lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
     autoCompilerPlugins := true,
     resolvers += Resolver.mavenLocal,
     Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
-    Compile / scalacOptions += s"-Ylog:pickleQuotes",
-    Compile / scalacOptions += s"-Ydebug:pickleQuotes",
-    Compile / scalacOptions += s"-Yprint-pos",
-    Compile / scalacOptions += s"-Ydebug",
-    Compile / scalacOptions += s"-Yshow-tree-ids",
-    Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}",
-    Test / scalacOptions += s"-Ylog:pickleQuotes",
-    Test / scalacOptions += s"-Ydebug:pickleQuotes",
-    Test / scalacOptions += s"-Yprint-pos",
-    Test / scalacOptions += s"-Ydebug",
-    Test / scalacOptions += s"-Yshow-tree-ids"
+    Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}"
   )
 
 lazy val mySetting = taskKey[String]("example")
@@ -181,6 +172,7 @@ lazy val catsScalaFXSettings = Seq(
     scalacheck % Test
   )
 )
+
 lazy val scalalikeSettings: Seq[Def.Setting[_]] =
   Seq(
     classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
