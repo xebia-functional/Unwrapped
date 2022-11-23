@@ -26,5 +26,7 @@ class ContinuationsPhase extends PluginPhase:
   override val runsAfter = Set(Staging.name)
   override val runsBefore = Set(PickleQuotes.name)
 
-  override def transformDefDef(tree: DefDef)(using Context): Tree =
+  override def transformDefDef(tree: DefDef)(using ctx: Context): Tree =
     DefDefTransforms.transformSuspendContinuation(tree)
+
+end ContinuationsPhase
