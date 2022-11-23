@@ -13,7 +13,7 @@ import scala.util.Try
 
 import concurrent.ExecutionContext.Implicits.global
 
-def await[A](future: Future[A])(using sos: Suspend): A =
+def await[A](future: Future[A]): A =
   Continuation.suspendContinuation { (c: Continuation[A]) =>
     future.onComplete {
       case Success(value) => c.resume(Right(value))
