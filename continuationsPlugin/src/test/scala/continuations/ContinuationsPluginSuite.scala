@@ -82,19 +82,18 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   compilerContext.test("debug".only) {
     case given Context =>
-      val source =
-        """|package continuations
-           |
-           |import scala.annotation.tailrec
-           |
-           |@tailrec def gcd(x:Int, y:Int): Int=
-           |{
-           |if (y == 0) x
-           |else gcd(y, x % y)
-           |}""".stripMargin
-      checkCompile("tailrec", source) {
+      val source = """|package continuations
+                      |
+                      |def foo5(x: Int): Int = {
+                      |
+                      |  val y = Continuation.suspendContinuation[Int] { continuation =>
+                      |    continuation.resume(Right(x + 1))
+                      |  }
+                      |  x + y
+                      |}""".stripMargin
+      checkCompile("typer", source) {
         case (tree, ctx) =>
-          assertEquals(tree.show, """|""".stripMargin)
+          assertEquals(tree.toString(), """|""".stripMargin)
       }
   }
 
@@ -659,6 +658,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   compilerContextWithContinuationsPlugin.test(
     "it should compile a single arity definition containing a suspend call and a dependent calculation into a state machine:") {
     case given Context =>
+      // format: off
       val source = """|package continuations
                       |
                       |def foo5(x: Int): Int = {
@@ -667,9 +667,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
                       |    continuation.resume(Right(x + 1))
                       |  }
                       |  x + y
-                      |}""".stripMargin
-
-      // format: off
+                      |}
+                      |""".stripMargin
       /**
         * How to do labels and jumps -- you return from a labeld position to another label.
         *  Reference
@@ -908,11 +907,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
              }
            }
            ```
-        * 
-        */
-      // format: on
-      
-      // format: off
+       * 
+       */
       val expected =
         """|
            |package continuations {
@@ -934,21 +930,16 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |        foo5(0, this.asInstanceOf[Continuation[Int]])
            |      }
            |    }
-           |    def foo5(x: Int, $completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
-           |      {
-           |        var $continuation: Continuation[Any] = _
-           |        var $z: Int = 0
-           |        var $Label_0049 = {
-           |          if(continuation.isInstanceOf[continuations$foo5$1]) {
-           |            var $continuation1 = continuation.asInstanceOf[continuations$foo5$1]
-           |            if(($continuation1.$label & Int.MIN_VALUE) != 0x0){
-           |              val $continuation2 = $continuation1
-           |              $continuation2.$label = $continuation2.$label - Int.MIN_VALUE
-           |              break $Label_0049
-           |            }
-           |          }
-           |          $continuation = new continuations$foo5$1($completion.asInstanceOf[Continuation[Int]]).asInstanceOf[Continuation[Any]]
-           |        }
+           |    def foo5(x: Int, $completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = {
+           |      var $continuation: Continuation[Any] = _
+           |      var $z: Int = 0
+           |      if($completion.isInstanceOf[continuations$foo5$1]) return[$Label_0049] ()
+           |      var $continuation1 = continuation.asInstanceOf[continuations$foo5$1]
+           |      if(($continuation1.$label & Int.MIN_VALUE) != 0x0){
+           |        val $continuation2 = $continuation1
+           |        $continuation2.$label = $continuation2.$label - Int.MIN_VALUE
+           |      } else return[$Label_0049] ()
+           |      $Label_0049[Unit]: return {
            |        var $result = $continuation.asInstanceOf[continuations$foo5$1].$result
            |        var $orThrow: Object = _
            |        $continuation.asInstanceOf[continuations$foo5$1].$label match {
@@ -971,12 +962,15 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |            $z = $continuation.asInstanceOf[continuations$foo5$1].$input
            |            $result.fold($t => throw $t, _ => ())
            |            $orThrow = $result
+           |            $lbl32[Int]: return {
+           |              val y = $orThrow.asInstanceOf[Int]
+           |              $z.+(y)
+           |            }
            |          case _ =>
            |            throw new IllegalStateException("call to 'resume' before 'invoke' with coroutine")
            |        }
-           |        val y = $orThrow.asInstanceOf[Int]
-           |        $z + y
            |      }
+           |    }
            |  }
            |}
            |""".stripMargin
