@@ -45,7 +45,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |""".stripMargin
 
       checkContinuations(source) {
-        case (tree, ctx) =>
+        case (tree, _) =>
           assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expectedOutput)
       }
   }
@@ -60,7 +60,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
        |""".stripMargin
     // format: on
     checkContinuations(source) {
-      case (tree, ctx) =>
+      case (tree, _) =>
         assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
     }
   }
@@ -72,7 +72,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
                       |  @SourceFile("compileFromString.scala") class B() extends Object() {}
                       |}""".stripMargin
     checkContinuations(source) {
-      case (tree, ctx) =>
+      case (tree, _) =>
         assertEquals(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
     }
   }
@@ -89,7 +89,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |}
            |""".stripMargin
       checkCompile("pickleQuotes", source) {
-        case (tree, ctx) =>
+        case (tree, _) =>
           assertEquals(tree.toString, """|""".stripMargin)
       }
   }
@@ -161,165 +161,6 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
     }
   }
   
-/*
-  compilerContextWithContinuationsPlugin.test(
-    "returnsContextFunctionWithSuspendType should return true for a context function with a call to suspend"
-  ) { implicit givenContext =>
-
-    val source =
-      """
-        |package continuations
-        |
-        |def foo(x: Int): Suspend ?=> Int =
-        |  Continuation.suspendContinuation { (c: Continuation[Int]) =>
-        |    c.resume(Right(x))
-        |    Continuation.State.Suspended
-        |  }
-        |
-        |""".stripMargin
-
-    checkContinuations(source) {
-      case (tree, context) =>
-        given Context = context
-
-        val funName = Names.termName("$anonfun")
-
-        val defDefs = tree.filterSubTrees {
-          case DefDef(name, _, _, _) if name == funName => true
-          case _ => false
-        }
-
-        val foo = defDefs.head.asInstanceOf[tpd.DefDef]
-
-        val sut = new ContinuationsPhase
-        assertEquals(sut.returnsContextFunctionWithSuspendType(foo), true)
-    }
-  }
-
-  compilerContextWithContinuationsPlugin.test(
-    "returnsContextFunctionWithSuspendType should return false for a context function with no call to suspend"
-  ) { implicit givenContext =>
-
-    val source =
-      """
-        |package continuations
-        |
-        |def foo(x: Int): Suspend ?=> Int = x + 1
-        |
-        |""".stripMargin
-
-    checkContinuations(source) {
-      case (tree, context) =>
-        given Context = context
-
-        val funName = Names.termName("$anonfun")
-
-        val defDefs = tree.filterSubTrees {
-          case DefDef(name, _, _, _) if name == funName => true
-          case _ => false
-        }
-
-        val foo = defDefs.head.asInstanceOf[tpd.DefDef]
-
-        val sut = new ContinuationsPhase
-        assertEquals(sut.returnsContextFunctionWithSuspendType(foo), false)
-    }
-  }
-
-  compilerContextWithContinuationsPlugin.test(
-    "returnsContextFunctionWithSuspendType should return true for a function using Suspend with a call to suspend"
-  ) { implicit givenContext =>
-
-    val source =
-      """
-        |package continuations
-        |
-        |def foo(x: Int)(using s: Suspend): Int =
-        |  Continuation.suspendContinuation { (c: Continuation[Int]) =>
-        |    c.resume(Right(x))
-        |    Continuation.State.Suspended
-        |  }
-        |
-        |""".stripMargin
-
-    checkContinuations(source) {
-      case (tree, context) =>
-        given Context = context
-
-        val funName = Names.termName("foo")
-
-        val defDefs = tree.filterSubTrees {
-          case DefDef(name, _, _, _) if name == funName => true
-          case _ => false
-        }
-
-        val foo = defDefs.head.asInstanceOf[tpd.DefDef]
-
-        val sut = new ContinuationsPhase
-        assertEquals(sut.returnsContextFunctionWithSuspendType(foo), true)
-    }
-  }
-
-  compilerContextWithContinuationsPlugin.test(
-    "returnsContextFunctionWithSuspendType should return false for a function using Suspend with no call to suspend"
-  ) { implicit givenContext =>
-
-    val source =
-      """
-        |package continuations
-        |
-        |def foo(x: Int)(using s: Suspend): Int = x + 1
-        |
-        |""".stripMargin
-
-    checkContinuations(source) {
-      case (tree, context) =>
-        given Context = context
-
-        val funName = Names.termName("foo")
-
-        val defDefs = tree.filterSubTrees {
-          case DefDef(name, _, _, _) if name == funName => true
-          case _ => false
-        }
-
-        val foo = defDefs.head.asInstanceOf[tpd.DefDef]
-
-        val sut = new ContinuationsPhase
-        assertEquals(sut.returnsContextFunctionWithSuspendType(foo), false)
-    }
-  }
-
-  compilerContextWithContinuationsPlugin.test(
-    "returnsContextFunctionWithSuspendType should return false for a function with Suspend as a parameter"
-  ) { implicit givenContext =>
-
-    val source =
-      """
-        |package continuations
-        |
-        |def foo(x: Int)(s: Suspend): Int = x + 1
-        |
-        |""".stripMargin
-
-    checkContinuations(source) {
-      case (tree, context) =>
-        given Context = context
-
-        val funName = Names.termName("foo")
-
-        val defDefs = tree.filterSubTrees {
-          case DefDef(name, _, _, _) if name == funName => true
-          case _ => false
-        }
-
-        val foo = defDefs.head.asInstanceOf[tpd.DefDef]
-
-        val sut = new ContinuationsPhase
-        assertEquals(sut.returnsContextFunctionWithSuspendType(foo), false)
-    }
-  }
-*/
   compilerContext.test("It should run the compiler") { implicit givenContext =>
     val source = """
                    |class A
