@@ -150,9 +150,8 @@ lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
     Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
     Compile / scalacOptions += "-Xprint:continuations",
     Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}",
-    Test / scalacOptions += "-Xprint:continuations",
-
-)
+    Test / scalacOptions += "-Xprint:continuations"
+  )
 
 lazy val mySetting = taskKey[String]("example")
 
