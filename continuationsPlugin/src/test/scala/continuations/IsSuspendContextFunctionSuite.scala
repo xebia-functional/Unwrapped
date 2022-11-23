@@ -33,7 +33,7 @@ class IsSuspendContextFunctionSuite extends FunSuite, CompilerFixtures {
   }
 
   continuationsContextAndNonSuspendContextFunction.test(
-    "It should detect context functions without Suspend as a parameter") {
+    "It should not detect context functions without Suspend as a parameter") {
     case (c, nonSuspendContextFunction) =>
       given Context = c
       assertEquals(IsSuspendContextFunction.unapply(nonSuspendContextFunction), None)

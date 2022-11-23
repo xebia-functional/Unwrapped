@@ -181,19 +181,17 @@ object DefDefTransforms:
             .zipWithIndex
             .map { (pc, i) =>
               val newPc: tpd.ParamClause = pc
-                .filterNot { param =>
-                  param match {
-                    case p: Trees.ValDef[Type] =>
-                      p.typeOpt.hasClassSymbol(suspendClazz) && p
-                        .symbol
-                        .flags
-                        .isOneOf(Flags.GivenOrImplicit)
-                    case t: Trees.TypeDef[Type] =>
-                      t.typeOpt.hasClassSymbol(suspendClazz) && t
-                        .symbol
-                        .flags
-                        .isOneOf(Flags.GivenOrImplicit)
-                  }
+                .filterNot {
+                  case p: Trees.ValDef[Type] =>
+                    p.typeOpt.hasClassSymbol(suspendClazz) && p
+                      .symbol
+                      .flags
+                      .isOneOf(Flags.GivenOrImplicit)
+                  case t: Trees.TypeDef[Type] =>
+                    t.typeOpt.hasClassSymbol(suspendClazz) && t
+                      .symbol
+                      .flags
+                      .isOneOf(Flags.GivenOrImplicit)
                 }
                 .asInstanceOf[tpd.ParamClause]
               if (i == 0) {
