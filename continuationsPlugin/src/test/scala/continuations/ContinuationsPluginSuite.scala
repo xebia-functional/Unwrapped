@@ -28,6 +28,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       val source =
         """| import continuations.*
            | def foo()(using Suspend): Int = 1""".stripMargin
+        
+      // format: off
       val expectedOutput =
         """|package <empty> {
            |  import continuations.*
@@ -43,6 +45,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  }
            |}
            |""".stripMargin
+      // format: on
 
       checkContinuations(source) {
         case (tree, _) =>
@@ -103,7 +106,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
         |
         |def foo(x: Int)(using Suspend): Int = x + 1
         |""".stripMargin
-
+    
+    // format: off
     val expected =
       """|package <empty> {
          |  import continuations.*
@@ -119,6 +123,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
          |  }
          |}
          |""".stripMargin
+    // format: on
 
     checkContinuations(source) {
       case (tree, _) =>
@@ -136,7 +141,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
         |
         |def foo(x: Int, z: String*)(using s: Suspend, ec: ExecutionContext): Int = x + 1
         |""".stripMargin
-
+    
+    // format: off
     val expected =
       """|package <empty> {
          |  import continuations.*
@@ -154,13 +160,14 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
          |  }
          |}
          |""".stripMargin
+    // format: on
 
     checkContinuations(source) {
       case (tree, _) =>
         assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
     }
   }
-  
+
   compilerContext.test("It should run the compiler") { implicit givenContext =>
     val source = """
                    |class A
