@@ -2,9 +2,9 @@ package continuations
 
 import dotty.tools.dotc.ast.tpd
 import dotty.tools.dotc.config.Printers
-import dotty.tools.dotc.core.Contexts.{Context, ctx}
+import dotty.tools.dotc.core.Contexts.{ctx, Context}
 import dotty.tools.dotc.core.Symbols
-import dotty.tools.dotc.core.Symbols.{ClassSymbol, newSymbol}
+import dotty.tools.dotc.core.Symbols.{newSymbol, ClassSymbol}
 import dotty.tools.dotc.core.{Flags, Names}
 import dotty.tools.dotc.core.Flags.EmptyFlags
 import dotty.tools.dotc.core.Constants.Constant
