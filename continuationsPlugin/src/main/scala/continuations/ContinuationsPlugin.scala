@@ -26,50 +26,10 @@ class ContinuationsPhase extends PluginPhase:
   override val runsAfter = Set(Staging.name)
   override val runsBefore = Set(PickleQuotes.name)
 
-  override def transformDefDef(tree: tpd.DefDef)(using ctx: Context): Tree =
-    tree match
-      case t if returnsContextFunctionWithSuspendType(t) =>
-        report.logWith("transformDefDef - new tree")(tree.show)
-        report.logWith("transformDefDef - new tree")(tree)
+  override def transformDefDef(tree: DefDef)(using ctx: Context): Tree =
+    DefDefTransforms.transformSuspendContinuation(tree)
 
-      case _ =>
-        report.logWith("transformDefDef - original tree")(tree.show)
-        report.logWith("transformDefDef - original tree")(tree)
-
-  override def transformBlock(tree: Block)(using ctx: Context): Tree =
-//    //val state = suspensionState(tree)
-//    report.error("DEEP FOLD")
-//    tree.deepFold(())((acc, tree) => {
-//      report.error(tree.show)
-//      acc
-//    })
-//    report.error("SHALLOW FOLD")
-//    tree.shallowFold(())((acc, tree) => {
-//      report.error(tree.show)
-//      acc
-//    })
-    tree
-
-  /*
-  override def transformDefDef(tree: DefDef)(using Context): Tree =
-    new DefDefTransforms().transformSuspendContinuation(tree)
-  */
-
-  /*
-  @tailrec final def transformStatements(
-      block: Block,
-      statements: List[Tree],
-      previous: List[Tree])(using ctx: Context): Block =
-    statements match
-      case Nil => block
-      case current :: remaining =>
-        if (hasInnerSuspensionPoint(current))
-          val newBlock = Block(???, ???)
-          transformStatements(newBlock, remaining, Nil)
-        // TODO nest previous under suspension point. Look at trees dif with example function
-        else transformStatements(block, remaining, previous :+ current) // this may be wrong
-  */
-
+/*
   def isSuspendType(tpe: Type)(using ctx: Context): Boolean =
     tpe.classSymbol.info.hasClassSymbol(Symbols.requiredClass("continuations.Suspend"))
 
@@ -98,5 +58,5 @@ class ContinuationsPhase extends PluginPhase:
 
   def isCallToSuspend(trees: List[Tree], suspendParamName: ValDef)(using ctx: Context): Boolean =
     trees.exists(_.symbol == suspendParamName.symbol)
-
+ */
 end ContinuationsPhase

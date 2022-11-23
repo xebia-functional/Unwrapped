@@ -3,7 +3,7 @@ package continuations
 import dotty.tools.dotc.core.Contexts.Context
 import munit.FunSuite
 
-class HasSuspendParmeterSuite extends FunSuite, CompilerFixtures {
+class HasSuspendParameterSuite extends FunSuite, CompilerFixtures {
 
   continuationsContextAndZeroAritySuspendNonSuspendingDefDef.test(
     "#unapply(defDefTree): def mySuspend()(using Suspend): Int = 1 should be Some(tree)") {

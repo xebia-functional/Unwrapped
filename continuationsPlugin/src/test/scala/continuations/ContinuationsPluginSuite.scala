@@ -31,13 +31,13 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       val expectedOutput =
         """|package <empty> {
            |  import continuations.*
-           |  final lazy module val compileFromString$package:
+           |  final lazy module val compileFromString$package: 
            |    compileFromString$package
            |   = new compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class
+           |  @SourceFile("compileFromString.scala") final module class 
            |    compileFromString$package
            |  () extends Object() { this: compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef =
+           |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
            |    def foo(completion: continuations.Continuation[Int | Any]): Object = 1
            |  }
@@ -90,7 +90,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |""".stripMargin
       checkCompile("pickleQuotes", source) {
         case (tree, ctx) =>
-          assertEquals(tree.toString(), """|""".stripMargin)
+          assertEquals(tree.toString, """|""".stripMargin)
       }
   }
 
@@ -99,26 +99,26 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   ) { implicit givenContext =>
     val source =
       """
-        |package continuations
+        |import continuations.*
         |
         |def foo(x: Int)(using Suspend): Int = x + 1
         |""".stripMargin
 
     val expected =
-      """
-        |package continuations {
-        |  final lazy module val compileFromString$package:
-        |    continuations.compileFromString$package
-        |   = new continuations.compileFromString$package()
-        |  @SourceFile("compileFromString.scala") final module class
-        |    compileFromString$package
-        |  () extends Object() { this: continuations.compileFromString$package.type =>
-        |    private def writeReplace(): AnyRef =
-        |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-        |    def foo(x: Int)(using x$2: continuations.Suspend): Int = x.+(1)
-        |  }
-        |}
-        |""".stripMargin
+      """|package <empty> {
+         |  import continuations.*
+         |  final lazy module val compileFromString$package: 
+         |    compileFromString$package
+         |   = new compileFromString$package()
+         |  @SourceFile("compileFromString.scala") final module class 
+         |    compileFromString$package
+         |  () extends Object() { this: compileFromString$package.type =>
+         |    private def writeReplace(): AnyRef = 
+         |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
+         |    def foo(x: Int, completion: continuations.Continuation[Int | Any]): Object = x.+(1)
+         |  }
+         |}
+         |""".stripMargin
 
     checkContinuations(source) {
       case (tree, _) =>
@@ -126,6 +126,42 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
     }
   }
 
+  compilerContextWithContinuationsPlugin.test(
+    "It should convert a suspended def with a single constant and a non suspended body to CPS"
+  ) { implicit givenContext =>
+    val source =
+      """
+        |import continuations.*
+        |import scala.concurrent.ExecutionContext
+        |
+        |def foo(x: Int, z: String*)(using s: Suspend, ec: ExecutionContext): Int = x + 1
+        |""".stripMargin
+
+    val expected =
+      """|package <empty> {
+         |  import continuations.*
+         |  import scala.concurrent.ExecutionContext
+         |  final lazy module val compileFromString$package: 
+         |    compileFromString$package
+         |   = new compileFromString$package()
+         |  @SourceFile("compileFromString.scala") final module class 
+         |    compileFromString$package
+         |  () extends Object() { this: compileFromString$package.type =>
+         |    private def writeReplace(): AnyRef = 
+         |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
+         |    def foo(x: Int, z: Seq[String] @Repeated, completion: continuations.Continuation[Int | Any])(using ec: concurrent.ExecutionContext): Object = 
+         |      x.+(1)
+         |  }
+         |}
+         |""".stripMargin
+
+    checkContinuations(source) {
+      case (tree, _) =>
+        assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+    }
+  }
+  
+/*
   compilerContextWithContinuationsPlugin.test(
     "returnsContextFunctionWithSuspendType should return true for a context function with a call to suspend"
   ) { implicit givenContext =>
@@ -283,7 +319,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
         assertEquals(sut.returnsContextFunctionWithSuspendType(foo), false)
     }
   }
-
+*/
   compilerContext.test("It should run the compiler") { implicit givenContext =>
     val source = """
                    |class A
