@@ -123,10 +123,118 @@ import dotty.tools.dotc.core.Constants.Constant
 import dotty.tools.dotc.core.Types
 import dotty.tools.dotc.core.Types.NoPrefix
 import dotty.tools.dotc.ast.Trees
+import TreeOps.*
 import dotty.tools.dotc.core.Definitions
 import dotty.tools.dotc.core.Types.TypeRef
+import dotty.tools.dotc.ast.tpd
 
 trait CompilerFixtures { self: FunSuite =>
+
+  private lazy val nonSuspendingContextFunctionType: Context ?=> Type =
+    c.definitions
+      .asContextFunctionType(c.definitions.FunctionOf(List(intType), intType, true, false))
+
+  private lazy val owner: Context ?=> Symbol =
+    c.owner
+
+  private lazy val ctxFunctionTpe: Context ?=> Type =
+    c.definitions
+      .asContextFunctionType(
+        c.definitions.FunctionOf(List(suspend.termRef), intType, true, false))
+
+  private lazy val mySuspendName: Context ?=> Names.SimpleName =
+    Names.termName("mySuspend")
+
+  private lazy val one: Context ?=> Literal =
+    Literal(Constant(1))
+
+  private lazy val suspendType: Context ?=> Type =
+    suspend.info
+
+  private lazy val continuation: Context ?=> Symbol =
+    Symbols.requiredModule("continuations.Continuation")
+
+  private def c(using Context): Context = summon[Context]
+
+  private lazy val anonFunc: Context ?=> TermSymbol =
+    Symbols.newAnonFun(owner, continuation.companionClass.info)
+
+  private lazy val intType: Context ?=> TypeRef =
+    summon[Context].definitions.IntType
+
+  private lazy val right: Context ?=> Symbol =
+    Symbols.requiredModule("scala.util.Right")
+
+  private lazy val continuationVal: Context ?=> Symbol =
+    Symbols.newSymbol(
+      owner,
+      Names.termName("continuation"),
+      EmptyFlags,
+      continuation.companionClass.typeRef.appliedTo(intType)
+    )
+
+  private lazy val rightOne: Context ?=> Apply =
+    ref(right)
+      .select(Names.termName("apply"))
+      .appliedToTypes(List(c.definitions.ThrowableType, intType))
+      .appliedTo(one)
+
+  private lazy val inlinedCallToContinuationsSuspendOfInt: Context ?=> Inlined =
+    Inlined(
+      Apply(
+        Apply(
+          TypeApply(
+            ref(continuation).select(Names.termName("suspendContinuation")),
+            List(TypeTree(intType))),
+          List(
+            Block(
+              Nil,
+              Block(
+                List(
+                  DefDef(
+                    anonFunc,
+                    List(List(continuationVal)),
+                    c.definitions.UnitType,
+                    Block(
+                      Nil,
+                      ref(continuationVal).select(Names.termName("resume")).appliedTo(rightOne)
+                    )
+                  )),
+                Closure(Nil, ref(anonFunc), TypeTree(c.definitions.UnitType))
+              )
+            ))
+        ),
+        List(ref(usingSuspend))
+      ),
+      List(),
+      Typed(
+        Ident(requiredMethod("scala.Predef.???").typeRef),
+        TypeTree(c.definitions.IntType)
+      )
+    )
+
+  private lazy val suspend: Context ?=> Symbol =
+    Symbols.requiredClass("continuations.Suspend")
+
+  private def usingSuspend(owner: Symbol)(using c: Context): Symbol =
+    Symbols.newSymbol(
+      owner,
+      Names.termName("x$1"),
+      Flags.union(Flags.GivenOrImplicit, Flags.Param),
+      suspendType
+    )
+
+  private lazy val usingSuspend: Context ?=> Symbol =
+    val c = summon[Context]
+    Symbols.newSymbol(
+      owner,
+      Names.termName("x$1"),
+      Flags.union(Flags.GivenOrImplicit, Flags.Param),
+      suspendType
+    )
+
+  private def suspendIntMethod(owner: Symbol)(using c: Context): Symbol =
+    Symbols.newSymbol(owner, mySuspendName, EmptyFlags, intType)
 
   val compileSourceIdentifier =
     """-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.""".r
@@ -311,9 +419,10 @@ trait CompilerFixtures { self: FunSuite =>
   val zeroAritySuspendSuspendingDefDef = FunFixture[Context ?=> DefDef](
     setup = _ => {
       val c = summon[Context]
+      val mySuspendMethod = suspendIntMethod(owner)
       DefDef(
-        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, intType).asTerm,
-        List(List(), List(usingSuspend)),
+        mySuspendMethod.asTerm,
+        List(List(), List(usingSuspend(mySuspendMethod))),
         intType,
         inlinedCallToContinuationsSuspendOfInt
       )
@@ -326,9 +435,10 @@ trait CompilerFixtures { self: FunSuite =>
       val c = summon[Context]
       val rhs =
         one
+      val methodSymbol = suspendIntMethod(c.owner)
       DefDef(
-        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, intType).asTerm,
-        List(List(), List(usingSuspend)),
+        methodSymbol.asTerm,
+        List(List(), List(usingSuspend(methodSymbol))),
         intType,
         rhs
       )
@@ -341,6 +451,145 @@ trait CompilerFixtures { self: FunSuite =>
 
   val oneTree: FunFixture[Context ?=> Literal] =
     FunFixture(setup = _ => one, teardown = _ => ())
+
+  val suspendingSingleArityWithDependentNonSuspendingCaclulation =
+    FunFixture[Context ?=> Tree](
+      setup = _ => {
+        val c = summon[Context]
+        val mySuspend = suspendIntMethod(c.owner)
+        val x = Symbols.newSymbol(mySuspend, Names.termName("x"), Flags.Param, intType)
+        val usingSuspendArg = usingSuspend(mySuspend)
+        val y =
+          Symbols.newSymbol(mySuspend, Names.termName("y"), Flags.EmptyFlags, intType)
+        val continuationName = Names.termName("continuation")
+        val closureMethodType = MethodType.apply(
+          List(
+            continuationName
+          ),
+          List(
+            continuationVal.info
+          ),
+          c.definitions.UnitType
+        )
+        val experimentalXSymbol =
+          Symbols.newSymbol(c.owner, Names.termName("x"), EmptyFlags, intType)
+        val experimentalX = ValDef(experimentalXSymbol.asTerm, one)
+        DefDef(
+          mySuspend.asTerm,
+          List(List(x), List(usingSuspendArg)),
+          intType,
+          Block(
+            List(
+              ValDef(
+                y.asTerm,
+                ref(requiredModuleRef(continuationFullName).select(
+                  Names.termName("suspendContinuation")))
+                  .appliedToType(intType)
+                  .appliedTo(
+                    Lambda(
+                      closureMethodType,
+                      (tss: List[Tree]) =>
+                        Block(
+                          List(
+                          ),
+                          ref(tss.head.symbol)
+                            .select(Names.termName("resume"))
+                            .appliedTo(
+                              ref(right)
+                                .select(Names.termName("apply"))
+                                .appliedToTypes(
+                                  List(c.definitions.ThrowableType, intType)
+                                )
+                                .appliedTo(
+                                  ref(x)
+                                    .select(Names.termName("+")).etaExpandCFT.appliedTo(one)
+                                )
+                            )
+                        )
+                    )
+                  )
+                  .appliedTo(ref(usingSuspendArg))
+              )
+            ),
+            ref(x).select(Names.termName("+")).etaExpandCFT.appliedTo(ref(y))
+          )
+        )
+      },
+      teardown = _ => ()
+    )
+
+  val inlinedSuspendingSingleArityWithDependentNonSuspendingCaclulation =
+    FunFixture[Context ?=> Tree](
+      setup = _ => {
+        val c = summon[Context]
+        val mySuspend = suspendIntMethod(c.owner)
+        val x = Symbols.newSymbol(mySuspend, Names.termName("x"), Flags.Param, intType)
+        val usingSuspendArg = usingSuspend(mySuspend)
+        val y =
+          Symbols.newSymbol(mySuspend, Names.termName("y"), Flags.EmptyFlags, intType)
+        val continuationName = Names.termName("continuation")
+        val closureMethodType = MethodType.apply(
+          List(
+            continuationName
+          ),
+          List(
+            continuationVal.info
+          ),
+          c.definitions.UnitType
+        )
+        val experimentalXSymbol =
+          Symbols.newSymbol(c.owner, Names.termName("x"), EmptyFlags, intType)
+        val experimentalX = ValDef(experimentalXSymbol.asTerm, one)
+        DefDef(
+          mySuspend.asTerm,
+          List(List(x), List(usingSuspendArg)),
+          intType,
+          Block(
+            List(
+              ValDef(
+                y.asTerm,
+                Inlined(
+                ref(requiredModuleRef(continuationFullName).select(
+                  Names.termName("suspendContinuation")))
+                  .appliedToType(intType)
+                  .appliedTo(
+                    Lambda(
+                      closureMethodType,
+                      (tss: List[Tree]) =>
+                        Block(
+                          List(
+                          ),
+                          ref(tss.head.symbol)
+                            .select(Names.termName("resume"))
+                            .appliedTo(
+                              ref(right)
+                                .select(Names.termName("apply"))
+                                .appliedToTypes(
+                                  List(c.definitions.ThrowableType, intType)
+                                )
+                                .appliedTo(
+                                  ref(x)
+                                    .select(Names.termName("+")).etaExpandCFT.appliedTo(one)
+                                )
+                            )
+                        )
+                    )
+                  )
+                  .appliedTo(ref(usingSuspendArg)),
+                  List(),
+                  Typed(
+                    Ident(requiredMethod("scala.Predef.???").typeRef),
+                    TypeTree(c.definitions.IntType)
+                  )
+                )
+              )
+            ),
+            ref(x).select(Names.termName("+")).etaExpandCFT.appliedTo(ref(y))
+          )
+        )
+      },
+      teardown = _ => ()
+    )
 
   val continuationsContextAndInlinedSuspendingTree =
     FunFixture.map2(compilerContextWithContinuationsPlugin, suspendContinuation)
@@ -395,6 +644,16 @@ trait CompilerFixtures { self: FunSuite =>
     compilerContextWithContinuationsPlugin,
     nonSuspendingContextFunctionValDef
   )
+
+  val continutationsContextAndSuspendingSingleArityWithDependentNonSuspendingCaclulation =
+    FunFixture.map2(
+      compilerContextWithContinuationsPlugin,
+      suspendingSingleArityWithDependentNonSuspendingCaclulation)
+
+  val continutationsContextAndInlinedSuspendingSingleArityWithDependentNonSuspendingCaclulation =
+    FunFixture.map2(
+      compilerContextWithContinuationsPlugin,
+      inlinedSuspendingSingleArityWithDependentNonSuspendingCaclulation)
 
   def checkCompile(checkAfterPhase: String, source: String)(assertion: (Tree, Context) => Unit)(
       using Context): Context = {
@@ -453,98 +712,4 @@ trait CompilerFixtures { self: FunSuite =>
       resultType: Type = defn.UnitType) =
     MethodType(names.toList map (_.toTermName), paramTypes.toList, resultType)
 
-  private lazy val nonSuspendingContextFunctionType: Context ?=> Type =
-    c.definitions
-      .asContextFunctionType(c.definitions.FunctionOf(List(intType), intType, true, false))
-
-  private lazy val owner: Context ?=> Symbol =
-    c.owner
-
-  private lazy val ctxFunctionTpe: Context ?=> Type =
-    c.definitions
-      .asContextFunctionType(
-        c.definitions.FunctionOf(List(suspend.termRef), intType, true, false))
-
-  private lazy val mySuspendName: Context ?=> Names.SimpleName =
-    Names.termName("mySuspend")
-
-  private lazy val one: Context ?=> Literal =
-    Literal(Constant(1))
-
-  private lazy val suspendType: Context ?=> Type =
-    suspend.info
-
-  private lazy val continuation: Context ?=> Symbol =
-    Symbols.requiredModule("continuations.Continuation")
-
-  private def c(using Context): Context = summon[Context]
-
-  private lazy val anonFunc: Context ?=> TermSymbol =
-    Symbols.newAnonFun(owner, continuation.companionClass.info)
-
-  private lazy val intType: Context ?=> TypeRef =
-    summon[Context].definitions.IntType
-
-  private lazy val right: Context ?=> Symbol =
-    Symbols.requiredModule("scala.util.Right")
-
-  private lazy val continuationVal: Context ?=> Symbol =
-    Symbols.newSymbol(
-      owner,
-      Names.termName("continuation"),
-      EmptyFlags,
-      continuation.companionClass.typeRef.appliedTo(intType)
-    )
-
-  private lazy val rightOne: Context ?=> Apply =
-    ref(right)
-      .select(Names.termName("apply"))
-      .appliedToTypes(List(c.definitions.ThrowableType, intType))
-      .appliedTo(one)
-
-  private lazy val inlinedCallToContinuationsSuspendOfInt: Context ?=> Inlined =
-    Inlined(
-      Apply(
-        Apply(
-          TypeApply(
-            ref(continuation).select(Names.termName("suspendContinuation")),
-            List(TypeTree(intType))),
-          List(
-            Block(
-              Nil,
-              Block(
-                List(
-                  DefDef(
-                    anonFunc,
-                    List(List(continuationVal)),
-                    c.definitions.UnitType,
-                    Block(
-                      Nil,
-                      ref(continuationVal).select(Names.termName("resume")).appliedTo(rightOne)
-                    )
-                  )),
-                Closure(Nil, ref(anonFunc), TypeTree(c.definitions.UnitType))
-              )
-            ))
-        ),
-        List(ref(usingSuspend))
-      ),
-      List(),
-      Typed(
-        Ident(requiredMethod("scala.Predef.???").typeRef),
-        TypeTree(c.definitions.IntType)
-      )
-    )
-
-  private lazy val suspend: Context ?=> Symbol =
-    Symbols.requiredClass("continuations.Suspend")
-
-  private lazy val usingSuspend: Context ?=> Symbol =
-    val c = summon[Context]
-    Symbols.newSymbol(
-      owner,
-      Names.termName("x$1"),
-      Flags.union(Flags.GivenOrImplicit, Flags.Param),
-      suspendType
-    )
 }
