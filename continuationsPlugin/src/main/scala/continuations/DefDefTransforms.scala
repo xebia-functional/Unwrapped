@@ -66,10 +66,16 @@ object DefDefTransforms:
    * @param oldCount
    *   The value of the previous counter.
    * @return
-   *   The sum of the count and the old count.
+   *   The number of suspension points + 6 + the oldCount.
    */
   def countContinuationSynthetics(defdef: DefDef, oldCount: Int)(using Context): Int =
-    ???
+    defdef match
+      case ReturnsContextFunctionWithSuspendType(_) | HasSuspendParameter(_) =>
+        defdef match
+          case HasSuspensionWithDependency(_) =>
+            SuspensionPoints.unapplySeq(defdef).fold(0)(_.size + 6 + oldCount)
+          case _ => oldCount
+      case _ => oldCount
 
   /*
    * It works with only one top level `suspendContinuation` that just calls `resume`
@@ -295,8 +301,8 @@ object DefDefTransforms:
 
   def transformSuspendContinuation(tree: DefDef)(using Context): DefDef =
     tree match
-      case ReturnsContextFunctionWithSuspendType(_) => transformContinuationWithSuspend(tree)
-      case HasSuspendParameter(_) => transformContinuationWithSuspend(tree)
+      case ReturnsContextFunctionWithSuspendType(_) | HasSuspendParameter(_) =>
+        transformContinuationWithSuspend(tree)
       case _ => report.logWith(s"oldTree:")(tree)
 
   private def transformNonSuspending(tree: DefDef, cpy: TypedTreeCopier)(
