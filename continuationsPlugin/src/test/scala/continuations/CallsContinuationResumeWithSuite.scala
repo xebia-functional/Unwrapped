@@ -1,9 +1,9 @@
 package continuations
 
 import dotty.tools.dotc.ast.tpd
+import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Constants.Constant
-import dotty.tools.dotc.core.Contexts.Context
-import dotty.tools.dotc.core.Contexts.ctx
+import dotty.tools.dotc.core.Contexts.{ctx, Context}
 import dotty.tools.dotc.core.Flags.*
 import dotty.tools.dotc.core.Names.*
 import dotty.tools.dotc.core.Symbols.*
@@ -14,7 +14,7 @@ class CallsContinuationResumeWithSuite extends FunSuite, CompilerFixtures:
   continuationsContextAndZeroAritySuspendSuspendingDefDefAndRightOne.test(
     "CallsContinuationResumeWith#unapply(defDefTree): def mySuspend()(using Suspend): Int = " +
       "Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) } should be Some(tree) " +
-      "where true == Right(1)") {
+      "where tree == Right(1)") {
     case (given Context, defdef, rightOne) =>
       // because this is a subtree projection, we cannot use tree
       // equality on the returned trees, as the rightOne fixture and
@@ -35,7 +35,6 @@ class CallsContinuationResumeWithSuite extends FunSuite, CompilerFixtures:
 
       val suspend = requiredClass(suspendFullName)
       val continuation = requiredModule(continuationFullName)
-      val right = requiredModule("scala.util.Right")
 
       val intType = ctx.definitions.IntType
 
@@ -51,12 +50,6 @@ class CallsContinuationResumeWithSuite extends FunSuite, CompilerFixtures:
         EmptyFlags,
         continuation.companionClass.typeRef.appliedTo(intType)
       )
-
-      val rightOne =
-        ref(right)
-          .select(termName("apply"))
-          .appliedToTypes(List(ctx.definitions.ThrowableType, intType))
-          .appliedTo(Literal(Constant(1)))
 
       val rhs =
         Inlined(
@@ -94,4 +87,97 @@ class CallsContinuationResumeWithSuite extends FunSuite, CompilerFixtures:
       )
 
       assertEquals(CallsContinuationResumeWith.unapply(d), None)
+  }
+
+  compilerContext.test("It should return the resume argument if the continuation is reachabl") {
+    implicit givenContext =>
+      val source =
+        """
+          |package continuations
+          |
+          |def mySuspend()(using Suspend): Int =
+          | val x = 3
+          | println("Hi")
+          | Continuation.suspendContinuation[Int] { continuation =>
+          |   continuation.resume(Right(1))
+          | }
+          |""".stripMargin
+
+      checkCompile("pickleQuotes", source) {
+        case (tree, ctx) =>
+          given Context = ctx
+
+          val defDefs = tree.filterSubTrees {
+            case DefDef(name, _, _, _) if name.show == "mySuspend" => true
+            case _ => false
+          }
+
+          val foo = defDefs.head.asInstanceOf[tpd.DefDef]
+
+          assertNoDiff(
+            CallsContinuationResumeWith.unapply(foo).get.show,
+            "Right.apply[Nothing, Int](1)")
+      }
+  }
+
+  compilerContext.test("It should return None is the continuation isn't reachable") {
+    implicit givenContext =>
+      val source =
+        """
+          |package continuations
+          |
+          |def mySuspend()(using Suspend): Int =
+          | val x = 3
+          | println("Hi")
+          | return x
+          | Continuation.suspendContinuation[Int] { continuation =>
+          |   continuation.resume(Right(1))
+          | }
+          |""".stripMargin
+
+      checkCompile("pickleQuotes", source) {
+        case (tree, ctx) =>
+          given Context = ctx
+
+          val defDefs = tree.filterSubTrees {
+            case DefDef(name, _, _, _) if name.show == "mySuspend" => true
+            case _ => false
+          }
+
+          val foo = defDefs.head.asInstanceOf[tpd.DefDef]
+
+          assertEquals(CallsContinuationResumeWith.unapply(foo), None)
+      }
+  }
+
+  compilerContext.test(
+    "It should return the resume argument if the continuation is reachable even if there is a return") {
+    implicit givenContext =>
+      val source =
+        """
+          |package continuations
+          |
+          |def mySuspend()(using Suspend): Int =
+          | val x = 3
+          | println("Hi")
+          | return Continuation.suspendContinuation[Int] { continuation =>
+          |   continuation.resume(Right(1))
+          | }
+          |""".stripMargin
+
+      checkCompile("pickleQuotes", source) {
+        case (tree, ctx) =>
+          given Context = ctx
+
+          val defDefs = tree.filterSubTrees {
+            case DefDef(name, _, _, _) if name.show == "mySuspend" => true
+            case _ => false
+          }
+
+          val foo = defDefs.head.asInstanceOf[tpd.DefDef]
+
+          assertNoDiff(
+            CallsContinuationResumeWith.unapply(foo).get.show,
+            "Right.apply[Nothing, Int](1)")
+      }
   }

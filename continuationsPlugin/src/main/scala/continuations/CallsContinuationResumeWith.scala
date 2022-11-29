@@ -26,7 +26,14 @@ private[continuations] object CallsContinuationResumeWith:
         .filterSubTrees {
           case Inlined(fun, _, _) =>
             fun.denot.matches(requiredMethod(suspendContinuationFullName))
+          case Return(_, _) => true
           case _ => false
+        }
+        .takeWhile {
+          case Return(Inlined(fun, _, _), _) =>
+            fun.denot.matches(requiredMethod(suspendContinuationFullName))
+          case Return(_, _) => false
+          case _ => true
         }
         .flatMap {
           case Inlined(
