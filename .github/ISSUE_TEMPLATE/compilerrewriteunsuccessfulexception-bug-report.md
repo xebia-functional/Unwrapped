@@ -2,7 +2,7 @@
 name: CompilerRewriteUnsuccessfulException Bug report
 about: Create a report to help us improve
 title: CompilerRewriteUnsuccessfulException Bug
-labels: ''
+labels: 'bug'
 assignees: ''
 
 ---
