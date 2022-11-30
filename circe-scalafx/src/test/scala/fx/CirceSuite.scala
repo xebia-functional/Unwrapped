@@ -1,7 +1,6 @@
 package circefx
 
 import munit.fx.ScalaFXSuite
-// import java.lang.Throwable
 
 import fx.*
 import fx.Control
@@ -17,14 +16,21 @@ class CirceSuite extends ScalaFXSuite, CirceFixtures:
       assertEqualsFX(x, 1)
   }
 
-  // jsonError.testFX("JSON error") {
-  //   case (errorJson: String) =>
-  //     val test = parsing[Throwable, Json](errorJson)
-  //     assertEqualsFX(1, 1)
-  // }
-
   jsonTest.testFX("JSON test") {
     case (testJson: String) =>
-      val test = parsing[Throwable, Json](testJson)
+      val test: Json = parsing(testJson)
       assertEqualsFX(1, 1)
   }
+
+  jsonError.testFX("JSON error".fail) {
+    case (errorJson: String) =>
+     val test: Json = parsing(errorJson)
+      assertEqualsFX(1, 1)
+  }
+
+  // jsonError.testFX("JSON error") {
+  //   case (errorJson: String) =>
+  //     assertsShiftsToFX(
+  //       parsing[Throwable, Json](errorJson),
+  //       ParsingFailure("test", new Exception()))
+  // }

@@ -5,7 +5,7 @@ import munit.fx.ScalaFXSuite
 
 val testJson: String =
   """{
-    |  "test": "blah"
+    |  "test":"blah"
     |}
       """.stripMargin
 
