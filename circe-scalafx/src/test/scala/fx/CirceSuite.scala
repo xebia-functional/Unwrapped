@@ -24,13 +24,15 @@ class CirceSuite extends ScalaFXSuite, CirceFixtures:
 
   jsonError.testFX("JSON error".fail) {
     case (errorJson: String) =>
-     val test: Json = parsing(errorJson)
+      val test: Json = parsing(errorJson)
       assertEqualsFX(1, 1)
   }
 
-  // jsonError.testFX("JSON error") {
-  //   case (errorJson: String) =>
-  //     assertsShiftsToFX(
-  //       parsing[Throwable, Json](errorJson),
-  //       ParsingFailure("test", new Exception()))
-  // }
+  jsonError.testFX("JSON error") {
+    case (errorJson: String) =>
+      assertsShiftsToException(
+        parsing[Throwable, Json](errorJson),
+        ParsingFailure(
+          "expected json value got \'error ...\' (line 1, column 1)",
+          new Exception()))
+  }
