@@ -16,7 +16,7 @@ class BodyHasSuspensionPointSuite extends FunSuite, CompilerFixtures:
   continuationsContextAndZeroAritySuspendSuspendingDefDef.test(
     """|BodyHasNoSuspensionPoint#unapply(defDefTree):
        |def mySuspend()(using Suspend): Int =
-       |  Continuation.suspendContinuation[Int] {continuation =>
+       |  summon[Suspend].suspendContinuation[Int] {continuation =>
        |    continuation.resume(Right(1))
        |  }
        |should be some(mySuspend)""".stripMargin) {

@@ -14,12 +14,11 @@ import scala.util.Try
 import concurrent.ExecutionContext.Implicits.global
 
 def await[A](future: Future[A]): A =
-  Continuation.suspendContinuation { (c: Continuation[A]) =>
+  Suspend.given_Suspend.suspendContinuation { (c: Continuation[A]) =>
     future.onComplete {
       case Success(value) => c.resume(Right(value))
       case Failure(exception) => c.resume(Left(exception))
     }
-    Continuation.State.Suspended
   }
 
 def await$expanded[A](future: Future[A])(using completion: Continuation[Any | Null]): Any =
@@ -58,13 +57,6 @@ def program: Suspend ?=> Int =
   b()
   val z = await(bar(x, y)) // suspension point #2
   c(z)
-
-def programSuspendContinuationTask2: Int =
-  // need to cast on the correct expected type?
-  def fooTest()(using s: Suspend): Int =
-    Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
-
-  fooTest()
 
 import continuations.jvm.internal.ContinuationImpl
 
@@ -137,6 +129,6 @@ def programSuspendContinuationNoParamNoSuspendContinuation: Int =
 
 def programSuspendContinuationNoParamResume: Int =
   def fooTest()(using s: Suspend): Int =
-    Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+    s.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
 
   fooTest()
