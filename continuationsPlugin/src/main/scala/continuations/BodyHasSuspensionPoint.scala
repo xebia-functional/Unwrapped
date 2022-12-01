@@ -7,7 +7,7 @@ import dotty.tools.dotc.core.Symbols.*
 /**
  * A matcher for identifying methods with suspending continuations in their bodies.
  */
-private[continuations] object BodyHasSuspensionPoint:
+private[continuations] object BodyHasSuspensionPoint extends TreesChecks:
 
   /**
    * Matches methods with a using [[continuations.Suspend]] parameter that suspend a

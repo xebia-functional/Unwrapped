@@ -23,7 +23,7 @@ import scala.annotation.tailrec
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
 
-object DefDefTransforms:
+object DefDefTransforms extends Trees:
 
   /*
    * It works with only one top level `suspendContinuation` that just calls `resume`

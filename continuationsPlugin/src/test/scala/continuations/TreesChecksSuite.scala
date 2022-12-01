@@ -3,7 +3,7 @@ package continuations
 import dotty.tools.dotc.core.Contexts.Context
 import munit.FunSuite
 
-class subtreeCallsSuspendSuite extends FunSuite, CompilerFixtures {
+class TreesChecksSuite extends FunSuite, CompilerFixtures, TreesChecks {
 
   continuationsContextAndInlinedSuspendingTree.test(
     """|subtreeCallsSuspend(Suspend#suspendContinuation[Int] {continuation =>
