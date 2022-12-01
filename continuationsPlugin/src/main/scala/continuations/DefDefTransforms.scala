@@ -43,15 +43,7 @@ object DefDefTransforms:
 
     val parent: Symbol = tree.symbol
     val returnType: Type =
-      tree
-        .rhs
-        .find {
-          case Trees.Inlined(fun, _, _) =>
-            fun.symbol.showFullName == suspendContinuationFullName
-          case _ => false
-        }
-        .map(_.tpe)
-        .get
+      tree.rhs.find(_.denot.matches(suspendContinuationMethod.symbol)).map(_.tpe).get
 
     val rowsBeforeSuspend =
       tree
@@ -61,11 +53,7 @@ object DefDefTransforms:
           case Trees.Block(trees, tree) => trees :+ tree
           case tree => List(tree)
         }
-        .takeWhile {
-          case Trees.Inlined(call, _, _) =>
-            call.symbol.showFullName != suspendContinuationFullName
-          case _ => true
-        }
+        .takeWhile(!_.denot.matches(suspendContinuationMethod.symbol))
 
     val continuationTyped: Type =
       continuationTraitSym.typeRef.appliedTo(returnType)

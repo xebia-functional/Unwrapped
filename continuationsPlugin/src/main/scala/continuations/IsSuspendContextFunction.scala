@@ -21,7 +21,7 @@ object IsSuspendContextFunction:
     val isContextFunction = c.definitions.isContextFunctionType(t)
     val argTypes = c.definitions.asContextFunctionType(t).argTypes
     val isSuspendClass = (t: Type) =>
-      t.hasClassSymbol(Symbols.requiredClass("continuations.Suspend"))
+      t.hasClassSymbol(Symbols.requiredClass(suspendFullName))
     if (isContextFunction && argTypes.zipWithIndex.exists { (tpe, index) =>
         isSuspendClass(tpe) && index != argTypes.length - 1
       }) Option(t)

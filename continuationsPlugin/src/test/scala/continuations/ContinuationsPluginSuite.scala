@@ -88,7 +88,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |def foo()(using Suspend): Int = {
            |  val x = 5
            |  println("HI")
-           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
            |}
            |""".stripMargin
       checkCompile("pickleQuotes", source) {
@@ -208,7 +208,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
            |""".stripMargin
 
       // format: off
@@ -254,7 +254,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  Continuation.suspendContinuation[Int](continuation => continuation.resume(Right(1)))
+           |  summon[Suspend].suspendContinuation[Int](continuation => continuation.resume(Right(1)))
            |""".stripMargin
 
       // format: off
@@ -300,7 +300,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  Continuation.suspendContinuation[Int] { _.resume(Right(1)) }
+           |  summon[Suspend].suspendContinuation[Int] { _.resume(Right(1)) }
            |""".stripMargin
 
       // format: off
@@ -346,7 +346,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  Continuation.suspendContinuation[Int](_.resume(Right(1)))
+           |  summon[Suspend].suspendContinuation[Int](_.resume(Right(1)))
            |""".stripMargin
 
       // format: off
@@ -392,7 +392,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Left(new Exception("error"))) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Left(new Exception("error"))) }
            |""".stripMargin
 
       // format: off
@@ -430,6 +430,52 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
+    "it should convert simple suspended def with a named implicit Suspend") {
+    implicit givenContext =>
+
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using s: Suspend): Int =
+           |  s.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        val continuation1: continuations.Continuation[Int] = completion
+           |        val safeContinuation: continuations.SafeContinuation[Int] = 
+           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |            continuations.Continuation.State.Undecided
+           |          )
+           |        val suspendContinuation: Int = 0
+           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |        safeContinuation.getOrThrow()
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
     "it should convert simple suspended def with no parameters keeping the rows before the suspend call") {
     implicit givenContext =>
 
@@ -440,7 +486,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |def foo()(using Suspend): Int = {
            |  val x = 5
            |  println("HI")
-           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
            |}
            |""".stripMargin
 
@@ -491,7 +537,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |def foo()(using Suspend): Int = {
            |  val x = 5
            |  println("HI")
-           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
            |  10
            |}
            |""".stripMargin
@@ -541,7 +587,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  Continuation.suspendContinuation[Int] { _ => () }
+           |  summon[Suspend].suspendContinuation[Int] { _ => () }
            |""".stripMargin
 
       // format: off
@@ -556,7 +602,18 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo()(using x$1: continuations.Suspend): Int = ??? :Int
+           |    def foo()(using x$1: continuations.Suspend): Int = 
+           |      x$1.suspendContinuation(x$1)[Int](
+           |        {
+           |          {
+           |            def $anonfun(_$1: continuations.Continuation[Int]): Unit = 
+           |              {
+           |                ()
+           |              }
+           |            closure($anonfun)
+           |          }
+           |        }
+           |      )
            |  }
            |}
            |""".stripMargin
@@ -577,8 +634,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |package continuations
            |
            |def foo()(using Suspend): Int = {
-           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
-           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
            |}
            |""".stripMargin
 
@@ -596,8 +653,28 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
            |    def foo()(using x$1: continuations.Suspend): Int = 
            |      {
-           |        ??? :Int
-           |        ??? :Int
+           |        x$1.suspendContinuation(x$1)[Int](
+           |          {
+           |            {
+           |              def $anonfun(continuation: continuations.Continuation[Int]): Unit = 
+           |                {
+           |                  continuation.resume(Right.apply[Nothing, Int](1))
+           |                }
+           |              closure($anonfun)
+           |            }
+           |          }
+           |        )
+           |        x$1.suspendContinuation(x$1)[Int](
+           |          {
+           |            {
+           |              def $anonfun(continuation: continuations.Continuation[Int]): Unit = 
+           |                {
+           |                  continuation.resume(Right.apply[Nothing, Int](1))
+           |                }
+           |              closure($anonfun)
+           |            }
+           |          }
+           |        )
            |      }
            |  }
            |}
