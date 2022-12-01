@@ -13,7 +13,7 @@ class CallsContinuationResumeWithSuite extends FunSuite, CompilerFixtures:
 
   continuationsContextAndZeroAritySuspendSuspendingDefDefAndRightOne.test(
     "CallsContinuationResumeWith#unapply(defDefTree): def mySuspend()(using Suspend): Int = " +
-      "Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) } should be Some(tree) " +
+      "summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) } should be Some(tree) " +
       "where true == Right(1)") {
     case (given Context, defdef, rightOne) =>
       // because this is a subtree projection, we cannot use tree
@@ -29,7 +29,7 @@ class CallsContinuationResumeWithSuite extends FunSuite, CompilerFixtures:
 
   compilerContextWithContinuationsPlugin.test(
     "CallsContinuationResumeWith#unapply(defDefTree): def mySuspend()(using Suspend): Int = " +
-      "Continuation.suspendContinuation[Int] { continuation => () } should be None") {
+      "summon[Suspend].suspendContinuation[Int] { continuation => () } should be None") {
     case given Context =>
       import tpd.*
 
