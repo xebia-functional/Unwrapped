@@ -9,20 +9,9 @@ val testJson: String =
     |}
       """.stripMargin
 
+case class TestEnconder(x: Int, y: String)
+
 trait CirceFixtures { self: ScalaFXSuite =>
-  val intFixture = FunFixture(
-    setup = _ => 1,
-    teardown = _ => ()
-  )
-
-  val stringFixture = FunFixture(
-    setup = _ => "test",
-    teardown = _ => ()
-  )
-
-  val combined: FunFixture[(Int, String)] =
-    FunFixture.map2(intFixture, stringFixture)
-
   val jsonError = FunFixture(
     setup = _ => "error Json",
     teardown = _ => ()
@@ -30,6 +19,16 @@ trait CirceFixtures { self: ScalaFXSuite =>
 
   val jsonTest = FunFixture(
     setup = _ => testJson,
+    teardown = _ => ()
+  )
+
+  val successfullEncoding = FunFixture(
+    setup = _ => List(1, 2, 3),
+    teardown = _ => ()
+  )
+
+  val encondingDerived = FunFixture(
+    setup = _ => TestEnconder(1, "test"),
     teardown = _ => ()
   )
 }

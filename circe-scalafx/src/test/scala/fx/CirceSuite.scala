@@ -10,22 +10,22 @@ import io.circe.parser._
 import io.circe.syntax._
 import Circefx.*
 
-class CirceSuite extends ScalaFXSuite, CirceFixtures:
-  combined.testFX("Circe FX test") {
-    case (x: Int, y: String) =>
-      assertEqualsFX(x, 1)
-  }
+import cats.implicits._
+import cats.syntax._
 
+import io.circe._, io.circe.generic.semiauto._
+
+class CirceSuite extends ScalaFXSuite, CirceFixtures:
   jsonTest.testFX("JSON test") {
     case (testJson: String) =>
       val test: Json = parsing(testJson)
-      assertEqualsFX(1, 1)
+      assertFX(test.toString().size > 0)
   }
 
   jsonError.testFX("JSON error".fail) {
     case (errorJson: String) =>
       val test: Json = parsing(errorJson)
-      assertEqualsFX(1, 1)
+      assertFX(test.toString().size > 0)
   }
 
   jsonError.testFX("JSON error") {
@@ -35,4 +35,17 @@ class CirceSuite extends ScalaFXSuite, CirceFixtures:
         ParsingFailure(
           "expected json value got \'error ...\' (line 1, column 1)",
           new Exception()))
+  }
+
+  successfullEncoding.testFX("Encoding success") {
+    case (instance: List[Int]) =>
+      val test: Json = encoding(instance)
+      assertFX(test =!= Json.Null)
+  }
+
+  encondingDerived.testFX("Encoding derived") {
+    case (testEnc: TestEnconder) =>
+      given e: Encoder[TestEnconder] = deriveEncoder[TestEnconder]
+      val test: Json = encoding(testEnc)
+      assertFX(test =!= Json.Null)
   }
