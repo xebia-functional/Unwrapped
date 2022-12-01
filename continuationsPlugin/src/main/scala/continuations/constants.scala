@@ -10,6 +10,3 @@ private[continuations] val suspendContinuationName = "suspendContinuation"
 private[continuations] val suspendFullName = s"$continuationPackageName.Suspend"
 private[continuations] val continuationFullName = s"$continuationPackageName.Continuation"
 private[continuations] val resumeFullName = s"$continuationPackageName.Continuation.resume"
-
-private[continuations] def suspendContinuationMethod(using Context): Select =
-  ref(requiredClass(suspendFullName)).select(termName(suspendContinuationName))

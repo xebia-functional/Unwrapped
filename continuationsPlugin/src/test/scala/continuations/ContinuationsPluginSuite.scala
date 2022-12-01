@@ -54,30 +54,32 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "It should work when there are no continuations") { implicit givenContext =>
-    val source = """|class A""".stripMargin
-    // format: off
-    val expected = """|package <empty> {
-       |  @SourceFile("compileFromString.scala") class A() extends Object() {}
-       |}
-       |""".stripMargin
-    // format: on
-    checkContinuations(source) {
-      case (tree, _) =>
-        assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
-    }
+    "It should work when there are no continuations") {
+    case given Context =>
+      val source = """|class A""".stripMargin
+      // format: off
+      val expected = """|package <empty> {
+        |  @SourceFile("compileFromString.scala") class A() extends Object() {}
+        |}
+        |""".stripMargin
+      // format: on
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "It should work when there are no continuations".fail) { implicit givenContext =>
-    val source = """|class A""".stripMargin
-    val expected = """|package <empty> {
-                      |  @SourceFile("compileFromString.scala") class B() extends Object() {}
-                      |}""".stripMargin
-    checkContinuations(source) {
-      case (tree, _) =>
-        assertEquals(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
-    }
+    "It should work when there are no continuations".fail) {
+    case given Context =>
+      val source = """|class A""".stripMargin
+      val expected = """|package <empty> {
+                        |  @SourceFile("compileFromString.scala") class B() extends Object() {}
+                        |}""".stripMargin
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertEquals(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
   }
 
   compilerContext.test("debug".ignore) {
@@ -99,110 +101,112 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   compilerContextWithContinuationsPlugin.test(
     "It should convert a suspended def with a single constant and a non suspended body to CPS"
-  ) { implicit givenContext =>
-    val source =
-      """
-        |import continuations.*
-        |
-        |def foo(x: Int)(using Suspend): Int = x + 1
-        |""".stripMargin
-    
-    // format: off
-    val expected =
-      """|package <empty> {
-         |  import continuations.*
-         |  final lazy module val compileFromString$package: 
-         |    compileFromString$package
-         |   = new compileFromString$package()
-         |  @SourceFile("compileFromString.scala") final module class 
-         |    compileFromString$package
-         |  () extends Object() { this: compileFromString$package.type =>
-         |    private def writeReplace(): AnyRef = 
-         |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
-         |    def foo(x: Int, completion: continuations.Continuation[Int | Any]): Object = x.+(1)
-         |  }
-         |}
-         |""".stripMargin
-    // format: on
+  ) {
+    case given Context =>
+      val source =
+        """
+          |import continuations.*
+          |
+          |def foo(x: Int)(using Suspend): Int = x + 1
+          |""".stripMargin
 
-    checkContinuations(source) {
-      case (tree, _) =>
-        assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
-    }
+      // format: off
+      val expected =
+        """|package <empty> {
+           |  import continuations.*
+           |  final lazy module val compileFromString$package: 
+           |    compileFromString$package
+           |   = new compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
+           |    def foo(x: Int, completion: continuations.Continuation[Int | Any]): Object = x.+(1)
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
   }
 
   compilerContextWithContinuationsPlugin.test(
     "It should convert a suspended def with a single constant and a non suspended body to CPS"
-  ) { implicit givenContext =>
-    val source =
-      """
-        |import continuations.*
-        |import scala.concurrent.ExecutionContext
-        |
-        |def foo(x: Int, z: String*)(using s: Suspend, ec: ExecutionContext): Int = x + 1
-        |""".stripMargin
-    
-    // format: off
-    val expected =
-      """|package <empty> {
-         |  import continuations.*
-         |  import scala.concurrent.ExecutionContext
-         |  final lazy module val compileFromString$package: 
-         |    compileFromString$package
-         |   = new compileFromString$package()
-         |  @SourceFile("compileFromString.scala") final module class 
-         |    compileFromString$package
-         |  () extends Object() { this: compileFromString$package.type =>
-         |    private def writeReplace(): AnyRef = 
-         |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
-         |    def foo(x: Int, z: Seq[String] @Repeated, completion: continuations.Continuation[Int | Any])(using ec: concurrent.ExecutionContext): Object = 
-         |      x.+(1)
-         |  }
-         |}
-         |""".stripMargin
-    // format: on
+  ) {
+    case given Context =>
+      val source =
+        """
+          |import continuations.*
+          |import scala.concurrent.ExecutionContext
+          |
+          |def foo(x: Int, z: String*)(using s: Suspend, ec: ExecutionContext): Int = x + 1
+          |""".stripMargin
 
-    checkContinuations(source) {
-      case (tree, _) =>
-        assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
-    }
+      // format: off
+      val expected =
+        """|package <empty> {
+           |  import continuations.*
+           |  import scala.concurrent.ExecutionContext
+           |  final lazy module val compileFromString$package: 
+           |    compileFromString$package
+           |   = new compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
+           |    def foo(x: Int, z: Seq[String] @Repeated, completion: continuations.Continuation[Int | Any])(using ec: concurrent.ExecutionContext): Object = 
+           |      x.+(1)
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
   }
 
-  compilerContext.test("It should run the compiler") { implicit givenContext =>
-    val source = """
-                   |class A
-                   |class B extends A
+  compilerContext.test("It should run the compiler") {
+    case given Context =>
+      val source = """
+                     |class A
+                     |class B extends A
     """.stripMargin
 
-    val types = List(
-      "A",
-      "B",
-      "List[?]",
-      "List[Int]",
-      "List[AnyRef]",
-      "List[String]",
-      "List[A]",
-      "List[B]"
-    )
+      val types = List(
+        "A",
+        "B",
+        "List[?]",
+        "List[Int]",
+        "List[AnyRef]",
+        "List[String]",
+        "List[A]",
+        "List[B]"
+      )
 
-    checkTypes(source, types: _*) {
-      case (List(a, b, lu, li, lr, ls, la, lb), context) =>
-        given Context = context
-        assert(b <:< a)
-        assert(li <:< lu)
-        assert(!(li <:< lr))
-        assert(ls <:< lr)
-        assert(lb <:< la)
-        assert(!(la <:< lb))
+      checkTypes(source, types: _*) {
+        case (List(a, b, lu, li, lr, ls, la, lb), context) =>
+          given Context = context
+          assert(b <:< a)
+          assert(li <:< lu)
+          assert(!(li <:< lr))
+          assert(ls <:< lr)
+          assert(lb <:< la)
+          assert(!(la <:< lb))
 
-      case _ => fail(s"no list or context compiled from source ${source}, ${types}")
-    }
+        case _ => fail(s"no list or context compiled from source ${source}, ${types}")
+      }
   }
 
   compilerContextWithContinuationsPlugin.test(
     "it should convert simple suspended def with no parameters with a Right input") {
-    implicit givenContext =>
-
+    case given Context =>
       val source =
         """|
            |package continuations
@@ -247,8 +251,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   compilerContextWithContinuationsPlugin.test(
     "it should convert simple suspended def with no parameters with a Right input using braces") {
-    implicit givenContext =>
-
+    case given Context =>
       val source =
         """|
            |package continuations
@@ -293,8 +296,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   compilerContextWithContinuationsPlugin.test(
     "it should convert simple suspended def with no parameters with a Right input but no inner var") {
-    implicit givenContext =>
-
+    case given Context =>
       val source =
         """|
            |package continuations
@@ -339,8 +341,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   compilerContextWithContinuationsPlugin.test(
     "it should convert simple suspended def with no parameters with a Right input but no inner var using braces") {
-    implicit givenContext =>
-
+    case given Context =>
       val source =
         """|
            |package continuations
@@ -385,8 +386,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   compilerContextWithContinuationsPlugin.test(
     "it should convert simple suspended def with no parameters with a Left input") {
-    implicit givenContext =>
-
+    case given Context =>
       val source =
         """|
            |package continuations
@@ -431,8 +431,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   compilerContextWithContinuationsPlugin.test(
     "it should convert simple suspended def with a named implicit Suspend") {
-    implicit givenContext =>
-
+    case given Context =>
       val source =
         """|
            |package continuations
@@ -477,8 +476,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   compilerContextWithContinuationsPlugin.test(
     "it should convert simple suspended def with no parameters keeping the rows before the suspend call") {
-    implicit givenContext =>
-
+    case given Context =>
       val source =
         """|
            |package continuations
@@ -528,8 +526,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   compilerContextWithContinuationsPlugin.test(
     "it should convert simple suspended def with no parameters ignoring any rows after the suspend call") {
-    implicit givenContext =>
-
+    case given Context =>
       val source =
         """|
            |package continuations
@@ -580,8 +577,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   compilerContextWithContinuationsPlugin.test(
     "it should not convert suspended def with no parameters that doesn't call resume") {
-    implicit givenContext =>
-
+    case given Context =>
       val source =
         """|
            |package continuations
@@ -602,7 +598,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo()(using x$1: continuations.Suspend): Int = (throw continuations.Suspend.CompilerRewriteUnsuccessfulException):Int
+           |    def foo()(using x$1: continuations.Suspend): Int = 
+           |      {
+           |        val Suspend_this: (x$1 : continuations.Suspend) = x$1
+           |        (throw Suspend_this.continuations$Suspend$$inline$CompilerRewriteUnsuccessfulException):Int
+           |      }
            |  }
            |}
            |""".stripMargin
@@ -616,8 +616,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
   compilerContextWithContinuationsPlugin.test(
     "it should not convert simple suspended def with no parameters with multiple `suspendContinuation`") {
-    implicit givenContext =>
-
+    case given Context =>
       val source =
         """|
            |package continuations
@@ -642,8 +641,14 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
            |    def foo()(using x$1: continuations.Suspend): Int = 
            |      {
-           |        (throw continuations.Suspend.CompilerRewriteUnsuccessfulException):Int
-           |        (throw continuations.Suspend.CompilerRewriteUnsuccessfulException):Int
+           |        {
+           |          val Suspend_this: (x$1 : continuations.Suspend) = x$1
+           |          (throw Suspend_this.continuations$Suspend$$inline$CompilerRewriteUnsuccessfulException):Int
+           |        }
+           |        {
+           |          val Suspend_this: (x$1 : continuations.Suspend) = x$1
+           |          (throw Suspend_this.continuations$Suspend$$inline$CompilerRewriteUnsuccessfulException):Int
+           |        }
            |      }
            |  }
            |}
