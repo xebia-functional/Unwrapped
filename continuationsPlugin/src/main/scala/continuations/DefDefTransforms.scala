@@ -25,13 +25,51 @@ import scala.collection.mutable.ListBuffer
 
 object DefDefTransforms extends Trees:
 
+  private def generateCompletion(owner: Symbol, returnType: Type)(using Context): Symbol =
+    newSymbol(
+      owner,
+      Names.termName("completion"),
+      Flags.LocalParam,
+      requiredPackage("continuations")
+        .requiredType("Continuation")
+        .typeRef
+        .appliedTo(returnType)
+    )
+
+  private def params(tree: tpd.DefDef, completionSym: Symbol)(
+      using Context): List[tpd.ParamClause] =
+    val suspendClazz = requiredClass(suspendFullName)
+    val completion: tpd.ValDef = tpd.ValDef(completionSym.asTerm, theEmptyTree)
+
+    if (tree.paramss.isEmpty) {
+      List(List(completion))
+    } else
+      tree
+        .paramss
+        .zipWithIndex
+        .map { (pc, i) =>
+          val newPc: tpd.ParamClause = pc
+            .filterNot {
+              case p: Trees.ValDef[Type] =>
+                p.typeOpt
+                  .hasClassSymbol(suspendClazz) && p.symbol.flags.isOneOf(Flags.GivenOrImplicit)
+              case t: Trees.TypeDef[Type] =>
+                t.typeOpt
+                  .hasClassSymbol(suspendClazz) && t.symbol.flags.isOneOf(Flags.GivenOrImplicit)
+            }
+            .asInstanceOf[tpd.ParamClause]
+          if (i == 0) {
+            newPc.appended(completion).asInstanceOf[tpd.ParamClause]
+          } else newPc
+        }
+        .filterNot(_.isEmpty)
+
   /*
    * It works with only one top level `suspendContinuation` that just calls `resume`
    * and it replaces the parent method body keeping any rows before the `suspendContinuation` (but not ones after).
    */
-  private def transformSuspendNoParametersOneContinuationResume(
-      tree: tpd.DefDef,
-      resumeArg: tpd.Tree)(using Context): tpd.DefDef =
+  private def transformSuspendOneContinuationResume(tree: tpd.DefDef, resumeArg: tpd.Tree)(
+      using Context): tpd.DefDef =
     val continuationTraitSym: ClassSymbol =
       requiredClass("continuations.Continuation")
     val continuationObjectSym: Symbol =
@@ -69,13 +107,12 @@ object DefDefTransforms extends Trees:
     val continuationTyped: Type =
       continuationTraitSym.typeRef.appliedTo(returnType)
 
-    val completion =
-      newSymbol(parent, termName("completion"), Flags.LocalParam, continuationTyped)
+    val completion = generateCompletion(parent, returnType)
 
     val continuation1: tpd.ValDef =
       tpd.ValDef(
-        newSymbol(parent, termName("continuation1"), Flags.Local, continuationTyped),
-        ref(completion))
+        sym = newSymbol(parent, termName("continuation1"), Flags.Local, continuationTyped),
+        rhs = ref(completion))
 
     val undecidedState =
       ref(continuationObjectSym).select(termName("State")).select(termName("Undecided"))
@@ -130,19 +167,25 @@ object DefDefTransforms extends Trees:
     val suspendedState =
       ref(continuationObjectSym).select(termName("State")).select(termName("Suspended"))
 
-    val finalMethodReturnType =
-      OrType(
-        OrType(ctx.definitions.AnyType, ctx.definitions.NullType, soft = false),
-        suspendedState.symbol.namedType,
-        soft = false)
+    val finalMethodReturnType: tpd.TypeTree =
+      tpd.TypeTree(
+        OrType(
+          OrType(ctx.definitions.AnyType, ctx.definitions.NullType, soft = false),
+          suspendedState.symbol.namedType,
+          soft = false)
+      )
 
-    tpd.DefDef(parent.asTerm, List(List(completion)), finalMethodReturnType, body)
+    cpy.DefDef(tree)(
+      paramss = params(tree, completion),
+      tpt = finalMethodReturnType,
+      rhs = body
+    )
 
   private def transformContinuationWithSuspend(tree: tpd.DefDef)(using Context): tpd.DefDef =
     val newTree =
       tree match
         case CallsContinuationResumeWith(resumeArg) =>
-          transformSuspendNoParametersOneContinuationResume(tree, resumeArg)
+          transformSuspendOneContinuationResume(tree, resumeArg)
         case BodyHasSuspensionPoint(_) =>
           cpy.DefDef(tree)() // any suspension that still needs a transformation
         case _ => transformNonSuspending(tree, cpy)
@@ -157,48 +200,8 @@ object DefDefTransforms extends Trees:
 
   private def transformNonSuspending(tree: tpd.DefDef, cpy: TypedTreeCopier)(
       using ctx: Context): tpd.DefDef =
-    tree match
-      case Trees.DefDef(name, paramss, tpt, rhs) =>
-        val suspendClazz = requiredClass(suspendFullName)
-        val completion: tpd.ValDef = tpd.ValDef(
-          newSymbol(
-            tree.symbol,
-            Names.termName("completion"),
-            Flags.LocalParam,
-            requiredPackage("continuations")
-              .requiredType("Continuation")
-              .typeRef
-              .appliedTo(Types.OrType(tpt.tpe, ctx.definitions.AnyType, false))
-          ).asTerm,
-          rhs = theEmptyTree
-        )
-        val params: List[tpd.ParamClause] = if (paramss.isEmpty) {
-          List(List(completion))
-        } else
-          tree
-            .paramss
-            .zipWithIndex
-            .map { (pc, i) =>
-              val newPc: tpd.ParamClause = pc
-                .filterNot {
-                  case p: Trees.ValDef[Type] =>
-                    p.typeOpt.hasClassSymbol(suspendClazz) && p
-                      .symbol
-                      .flags
-                      .isOneOf(Flags.GivenOrImplicit)
-                  case t: Trees.TypeDef[Type] =>
-                    t.typeOpt.hasClassSymbol(suspendClazz) && t
-                      .symbol
-                      .flags
-                      .isOneOf(Flags.GivenOrImplicit)
-                }
-                .asInstanceOf[tpd.ParamClause]
-              if (i == 0) {
-                newPc.appended(completion).asInstanceOf[tpd.ParamClause]
-              } else newPc
-            }
-            .filterNot(_.isEmpty)
-
-        cpy.DefDef(tree)(
-          paramss = params,
-          tpt = tpd.TypeTree(ctx.definitions.ObjectClass.typeRef))
+    val returnType = Types.OrType(tree.tpt.tpe, ctx.definitions.AnyType, false)
+    val completion = generateCompletion(tree.symbol, returnType)
+    cpy.DefDef(tree)(
+      paramss = params(tree, completion),
+      tpt = tpd.TypeTree(ctx.definitions.ObjectClass.typeRef))
