@@ -17,7 +17,7 @@ object SuspensionPoints:
    * @return
    *   A Some containing a list of [[dotty.tools.dotc.ast.tpd.Tree]]s that suspend from the body
    */
-  def unapplySeq(tree: Tree)(using Context): Option[Seq[Tree]] =
+  def unapplySeq(tree: Tree)(using Context): Option[List[Tree]] =
     val treeIsContinuatlionsSuspendContinuation: Context ?=> Tree => Boolean = t =>
       t.denot.matches(requiredMethod(suspendContinuationFullName))
 

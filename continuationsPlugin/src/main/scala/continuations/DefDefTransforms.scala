@@ -14,6 +14,7 @@ import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Types.OrType
 import dotty.tools.dotc.core.Types.Type
 import dotty.tools.dotc.report
+import scala.annotation.tailrec
 
 object DefDefTransforms:
 
@@ -77,6 +78,24 @@ object DefDefTransforms:
           case _ => oldCount
       case _ => oldCount
 
+  /**
+   * Transforms suspended functions into a continuations state machine.
+   *
+   * @param tree
+   *   The tree to potentially suspend.
+   * @return
+   *   If the tree is not a suspending DefDef, then the tree is returned as is. If the tree is a
+   *   suspended DefDef, then a continuation taking te return type of the suspended DefDef is
+   *   added as a synthetic argument to the DefDef. The body is translated into a state machine.
+   *   A single continuation is a simple throw or get. Any dependent calculations on suspended
+   *   continuations within the defdef body create return labels that are jumped to as the
+   *   continuation transitions from suspended to completed states.
+   */
+  def transformSuspendContinuation(tree: DefDef)(using Context): DefDef =
+    tree match
+      case ReturnsContextFunctionWithSuspendType(_) | HasSuspendParameter(_) =>
+        report.logWith(s"transformed tree: ")(transformContinuationWithSuspend(tree))
+      case _ => report.logWith(s"oldTree:")(tree)
   /*
    * It works with only one top level `suspendContinuation` that just calls `resume`
    * and it replaces the parent method body keeping any rows before the `suspendContinuation` (but not ones after).
@@ -288,9 +307,47 @@ object DefDefTransforms:
 
     DefDef(parent.asTerm, List(List(completion)), finalMethodReturnType.tpe, body)
 
+  @tailrec
+  def createSyntheticNames(
+      oldCounter: Int,
+      suspensionPoints: List[Tree],
+      counter: Int,
+      names: List[String]): List[String] =
+    suspensionPoints match
+      case tree :: remaining =>
+        createSyntheticNames(oldCounter, remaining, counter - 1, s"$label$$$counter" :: names)
+      case Nil if counter - oldCounter == oldCounter + 5 => createSyntheticNames(oldCounter, Nil, counter - 1, s"${label}result$$$counter" :: names)
+      case Nil if counter - oldCounter == oldCounter + 4 => createSyntheticNames(oldCounter, Nil, counter - 1, s"result$$${counter}" :: names)
+      case Nil if counter != oldCounter =>
+        createSyntheticNames(
+          oldCounter,
+          suspensionPoints,
+          counter - 1,
+          s"continuation$$${counter}" :: names)
+      case Nil => names
+
+  private def transformSuspendingStateMachine(tree: DefDef)(using ctx: Context) =
+    SuspensionPoints.unapplySeq(report.logWith("tree has no suspension points:")(tree)).fold(tree) { suspensionPoints =>
+      val initialCounter =
+        ctx.store(ctx.property(ContinuationsPhase.continuationsPhaseCounterPropertyKey).get)
+      val stateMachineContinuationClassName =
+        s"${ctx.owner.name.show}Continuation$$${initialCounter}"
+      val names = createSyntheticNames(
+        ctx.store(ctx.property(ContinuationsPhase.continuationsPhaseOldCounterPropertyKey).get),
+        suspensionPoints,
+        initialCounter - 1,
+        Nil
+      )
+      val continuationNames = names.takeWhile(_.startsWith(continuation))
+      val resultName = names.drop(continuationNames.size).take(1).head
+      val labels = names.drop(continuationNames.size + 1)
+      report.logWith("state machine and new defdef:")(???)
+    }
+
   private def transformContinuationWithSuspend(tree: DefDef)(using Context): DefDef =
     val newTree =
       tree match
+        case HasSuspensionWithDependency(_) => transformSuspendingStateMachine(tree)
         case CallsContinuationResumeWith(resumeArg) =>
           transformSuspendOneContinuationResume(tree, resumeArg)
         case BodyHasSuspensionPoint(_) =>
@@ -298,12 +355,6 @@ object DefDefTransforms:
         case _ => transformNonSuspending(tree, cpy)
 
     report.logWith(s"new tree:")(newTree)
-
-  def transformSuspendContinuation(tree: DefDef)(using Context): DefDef =
-    tree match
-      case ReturnsContextFunctionWithSuspendType(_) | HasSuspendParameter(_) =>
-        transformContinuationWithSuspend(tree)
-      case _ => report.logWith(s"oldTree:")(tree)
 
   private def transformNonSuspending(tree: DefDef, cpy: TypedTreeCopier)(
       using ctx: Context): DefDef =

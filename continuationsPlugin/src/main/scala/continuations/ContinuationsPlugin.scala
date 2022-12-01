@@ -63,11 +63,22 @@ class ContinuationsPhase extends PluginPhase:
   override def prepareForUnit(tree: tpd.Tree)(using ctx: Context): Context = {
     val newContext = ctx.fresh
     val key = ContinuationsPhase.continuationsPhaseCounterPropertyKey
+    val oldKey = ContinuationsPhase.continuationsPhaseOldCounterPropertyKey
     val contextPropertyCounter = newContext.property(key)
+    val oldContextPropertyCounter = newContext.property(key)
+    if(!oldContextPropertyCounter.isDefined){
+      val oldCounterLocation = newContext.addLocation(1)
+      newContext.setProperty(oldKey, oldCounterLocation)
+    }
     if (contextPropertyCounter.isDefined) {
+      val oldCounterLocation = newContext.property(oldKey).get
+      val currentCounterLocation = newContext.property(key).get
+      newContext.updateStore(oldCounterLocation, newContext.store(currentCounterLocation))
       newContext
     } else {
+      val oldCounterLocation = newContext.property(oldKey).get
       val counterLocation = newContext.addLocation(1)
+      newContext.updateStore(oldCounterLocation, newContext.store(oldCounterLocation))
       newContext.setProperty(key, counterLocation)
     }
   }
@@ -85,5 +96,7 @@ end ContinuationsPhase
 
 object ContinuationsPhase {
   val continuationsPhaseCounterPropertyKey =
+    new StickyKey[Location[Int]]{}
+  val continuationsPhaseOldCounterPropertyKey =
     new StickyKey[Location[Int]]{}
 }

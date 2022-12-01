@@ -6,3 +6,5 @@ private[continuations] val continuationFullName = s"$continuationPackageName.Con
 private[continuations] val suspendContinuationFullName =
   s"$continuationFullName.suspendContinuation"
 private[continuations] val resumeFullName = s"$continuationPackageName.Continuation.resume"
+private[continuations] val label = "label"
+private[continuations] val continuation = "continuation"
