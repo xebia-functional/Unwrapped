@@ -15,5 +15,5 @@ object Circefx:
       d: Decoder[A]): A =
     parse(s).bind.as[A].bind
 
-  def encoding[E, A](instance: A)(using cx: Control[NonEmptyList[E]], e: Encoder[A]) =
+  def encoding[E, A](instance: A)(using e: Encoder[A]) =
     instance.asJson
