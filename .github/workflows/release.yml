@@ -25,10 +25,7 @@ jobs:
           distribution: 'temurin'
           java-version: 19
       - name: Setup GPG
-        uses: actions/setup-java@v3.6.0
-        with:
-          distribution: 'temurin'
-          java-version: 19
+        uses: olafurpg/setup-gpg@v3
       - name: Release new version
         run: sbt ci-publish
         env:
