@@ -303,8 +303,8 @@ trait CompilerFixtures { self: FunSuite =>
     teardown = _ => ()
   )
 
-  val suspendContinuation = FunFixture[Context ?=> Apply](
-    setup = _ => callToContinuationsSuspendOfInt,
+  val suspendContinuation = FunFixture[Context ?=> Inlined](
+    setup = _ => inlinedCallToContinuationsSuspendOfInt,
     teardown = _ => ()
   )
 
@@ -315,7 +315,7 @@ trait CompilerFixtures { self: FunSuite =>
         Symbols.newSymbol(owner, mySuspendName, EmptyFlags, intType).asTerm,
         List(List(), List(usingSuspend)),
         intType,
-        callToContinuationsSuspendOfInt
+        inlinedCallToContinuationsSuspendOfInt
       )
     },
     teardown = _ => ()
@@ -502,31 +502,38 @@ trait CompilerFixtures { self: FunSuite =>
       .appliedToTypes(List(c.definitions.ThrowableType, intType))
       .appliedTo(one)
 
-  lazy val callToContinuationsSuspendOfInt: Context ?=> Apply =
-    Apply(
-      TypeApply(
-        Apply(
-          ref(suspend).select(Names.termName("suspendContinuation")),
-          List(ref(suspend))
-        ),
-        List(TypeTree(intType))),
-      List(
-        Block(
-          Nil,
+  lazy val inlinedCallToContinuationsSuspendOfInt: Context ?=> Inlined =
+    Inlined(
+      Apply(
+        TypeApply(
+          Apply(
+            ref(suspend).select(Names.termName("suspendContinuation")),
+            List(ref(suspend))
+          ),
+          List(TypeTree(intType))),
+        List(
           Block(
-            List(
-              DefDef(
-                anonFunc,
-                List(List(continuationVal)),
-                c.definitions.UnitType,
-                Block(
-                  Nil,
-                  ref(continuationVal).select(Names.termName("resume")).appliedTo(rightOne)
-                )
-              )),
-            Closure(Nil, ref(anonFunc), TypeTree(c.definitions.UnitType))
-          )
-        ))
+            Nil,
+            Block(
+              List(
+                DefDef(
+                  anonFunc,
+                  List(List(continuationVal)),
+                  c.definitions.UnitType,
+                  Block(
+                    Nil,
+                    ref(continuationVal).select(Names.termName("resume")).appliedTo(rightOne)
+                  )
+                )),
+              Closure(Nil, ref(anonFunc), TypeTree(c.definitions.UnitType))
+            )
+          ))
+      ),
+      List(),
+      Typed(
+        Ident(requiredMethod("scala.Predef.???").typeRef),
+        TypeTree(c.definitions.IntType)
+      )
     )
 
   private lazy val suspend: Context ?=> Symbol =
