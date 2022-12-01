@@ -670,7 +670,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |package continuations
            |
            |def foo(x: Int)(using Suspend): Int =
-           |  Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(x + 1)) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(x + 1)) }
            |""".stripMargin
 
       // format: off
