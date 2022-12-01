@@ -9,7 +9,7 @@ import dotty.tools.dotc.core.Names.*
  * Matcher for detecting methods that call and [[continuations.Suspend#suspendContinuation]]
  * [[continuations.Continuation.resume
  */
-private[continuations] object CallsContinuationResumeWith:
+private[continuations] object CallsContinuationResumeWith extends Trees:
 
   /**
    * @param tree
