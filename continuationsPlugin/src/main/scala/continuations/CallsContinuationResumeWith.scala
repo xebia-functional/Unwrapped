@@ -23,11 +23,18 @@ private[continuations] object CallsContinuationResumeWith:
     val args =
       tree
         .rhs
-        .filterSubTrees(_.denot.matches(suspendContinuationMethod.symbol))
+        .filterSubTrees {
+          case Inlined(fun, _, _) =>
+            fun.denot.matches(suspendContinuationMethod.symbol)
+          case _ => false
+        }
         .flatMap {
-          case Apply(_, List(Block(Nil, Block(List(DefDef(_, _, _, suspendBody)), _)))) =>
+          case Inlined(
+                Apply(_, List(Block(Nil, Block(List(DefDef(_, _, _, suspendBody)), _)))),
+                _,
+                _) =>
             Option(suspendBody)
-          case Apply(_, List(Block(List(DefDef(_, _, _, suspendBody)), _))) =>
+          case Inlined(Apply(_, List(Block(List(DefDef(_, _, _, suspendBody)), _))), _, _) =>
             Option(suspendBody)
           case _ =>
             None

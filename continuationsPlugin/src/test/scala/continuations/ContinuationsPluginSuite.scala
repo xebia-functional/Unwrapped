@@ -602,18 +602,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo()(using x$1: continuations.Suspend): Int = 
-           |      x$1.suspendContinuation(x$1)[Int](
-           |        {
-           |          {
-           |            def $anonfun(_$1: continuations.Continuation[Int]): Unit = 
-           |              {
-           |                ()
-           |              }
-           |            closure($anonfun)
-           |          }
-           |        }
-           |      )
+           |    def foo()(using x$1: continuations.Suspend): Int = (throw continuations.Suspend.CompilerRewriteUnsuccessfulException):Int
            |  }
            |}
            |""".stripMargin
@@ -653,28 +642,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
            |    def foo()(using x$1: continuations.Suspend): Int = 
            |      {
-           |        x$1.suspendContinuation(x$1)[Int](
-           |          {
-           |            {
-           |              def $anonfun(continuation: continuations.Continuation[Int]): Unit = 
-           |                {
-           |                  continuation.resume(Right.apply[Nothing, Int](1))
-           |                }
-           |              closure($anonfun)
-           |            }
-           |          }
-           |        )
-           |        x$1.suspendContinuation(x$1)[Int](
-           |          {
-           |            {
-           |              def $anonfun(continuation: continuations.Continuation[Int]): Unit = 
-           |                {
-           |                  continuation.resume(Right.apply[Nothing, Int](1))
-           |                }
-           |              closure($anonfun)
-           |            }
-           |          }
-           |        )
+           |        (throw continuations.Suspend.CompilerRewriteUnsuccessfulException):Int
+           |        (throw continuations.Suspend.CompilerRewriteUnsuccessfulException):Int
            |      }
            |  }
            |}
