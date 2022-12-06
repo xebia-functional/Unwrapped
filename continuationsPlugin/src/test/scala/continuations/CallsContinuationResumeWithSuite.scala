@@ -13,7 +13,7 @@ class CallsContinuationResumeWithSuite extends FunSuite, CompilerFixtures:
 
   continuationsContextAndZeroAritySuspendSuspendingDefDefAndRightOne.test(
     "CallsContinuationResumeWith#unapply(defDefTree): def mySuspend()(using Suspend): Int = " +
-      "Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) } should be Some(tree) " +
+      "summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) } should be Some(tree) " +
       "where true == Right(1)") {
     case (given Context, defdef, rightOne) =>
       // because this is a subtree projection, we cannot use tree
@@ -29,13 +29,12 @@ class CallsContinuationResumeWithSuite extends FunSuite, CompilerFixtures:
 
   compilerContextWithContinuationsPlugin.test(
     "CallsContinuationResumeWith#unapply(defDefTree): def mySuspend()(using Suspend): Int = " +
-      "Continuation.suspendContinuation[Int] { continuation => () } should be None") {
+      "summon[Suspend].suspendContinuation[Int] { continuation => () } should be None") {
     case given Context =>
       import tpd.*
 
       val suspend = requiredClass(suspendFullName)
       val continuation = requiredModule(continuationFullName)
-      val right = requiredModule("scala.util.Right")
 
       val intType = ctx.definitions.IntType
 
@@ -52,35 +51,29 @@ class CallsContinuationResumeWithSuite extends FunSuite, CompilerFixtures:
         continuation.companionClass.typeRef.appliedTo(intType)
       )
 
-      val rightOne =
-        ref(right)
-          .select(termName("apply"))
-          .appliedToTypes(List(ctx.definitions.ThrowableType, intType))
-          .appliedTo(Literal(Constant(1)))
-
       val rhs =
         Inlined(
           Apply(
-            Apply(
-              TypeApply(
-                ref(continuation).select(termName("suspendContinuation")),
-                List(TypeTree(intType))),
-              List(
+            TypeApply(
+              Apply(
+                ref(suspend).select(termName("suspendContinuation")),
+                List(ref(suspend))
+              ),
+              List(TypeTree(intType))),
+            List(
+              Block(
+                Nil,
                 Block(
-                  Nil,
-                  Block(
-                    List(
-                      DefDef(
-                        anonFunc,
-                        List(List(continuationVal)),
-                        ctx.definitions.UnitType,
-                        Block(Nil, ref(ctx.definitions.UnitClass))
-                      )),
-                    Closure(Nil, ref(anonFunc), TypeTree(ctx.definitions.UnitType))
-                  )
-                ))
-            ),
-            List(ref(usingSuspend))
+                  List(
+                    DefDef(
+                      anonFunc,
+                      List(List(continuationVal)),
+                      ctx.definitions.UnitType,
+                      Block(Nil, ref(ctx.definitions.UnitClass))
+                    )),
+                  Closure(Nil, ref(anonFunc), TypeTree(ctx.definitions.UnitType))
+                )
+              ))
           ),
           List.empty,
           EmptyTree

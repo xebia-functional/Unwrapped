@@ -475,12 +475,12 @@ trait CompilerFixtures { self: FunSuite =>
     suspend.info
 
   private lazy val continuation: Context ?=> Symbol =
-    Symbols.requiredModule("continuations.Continuation")
+    Symbols.requiredClass("continuations.Continuation")
 
   private def c(using Context): Context = summon[Context]
 
   private lazy val anonFunc: Context ?=> TermSymbol =
-    Symbols.newAnonFun(owner, continuation.companionClass.info)
+    Symbols.newAnonFun(owner, continuation.info)
 
   private lazy val intType: Context ?=> TypeRef =
     summon[Context].definitions.IntType
@@ -493,7 +493,7 @@ trait CompilerFixtures { self: FunSuite =>
       owner,
       Names.termName("continuation"),
       EmptyFlags,
-      continuation.companionClass.typeRef.appliedTo(intType)
+      continuation.typeRef.appliedTo(intType)
     )
 
   private lazy val rightOne: Context ?=> Apply =
@@ -502,32 +502,32 @@ trait CompilerFixtures { self: FunSuite =>
       .appliedToTypes(List(c.definitions.ThrowableType, intType))
       .appliedTo(one)
 
-  private lazy val inlinedCallToContinuationsSuspendOfInt: Context ?=> Inlined =
+  lazy val inlinedCallToContinuationsSuspendOfInt: Context ?=> Inlined =
     Inlined(
       Apply(
-        Apply(
-          TypeApply(
-            ref(continuation).select(Names.termName("suspendContinuation")),
-            List(TypeTree(intType))),
-          List(
+        TypeApply(
+          Apply(
+            ref(suspend).select(Names.termName("suspendContinuation")),
+            List(ref(suspend))
+          ),
+          List(TypeTree(intType))),
+        List(
+          Block(
+            Nil,
             Block(
-              Nil,
-              Block(
-                List(
-                  DefDef(
-                    anonFunc,
-                    List(List(continuationVal)),
-                    c.definitions.UnitType,
-                    Block(
-                      Nil,
-                      ref(continuationVal).select(Names.termName("resume")).appliedTo(rightOne)
-                    )
-                  )),
-                Closure(Nil, ref(anonFunc), TypeTree(c.definitions.UnitType))
-              )
-            ))
-        ),
-        List(ref(usingSuspend))
+              List(
+                DefDef(
+                  anonFunc,
+                  List(List(continuationVal)),
+                  c.definitions.UnitType,
+                  Block(
+                    Nil,
+                    ref(continuationVal).select(Names.termName("resume")).appliedTo(rightOne)
+                  )
+                )),
+              Closure(Nil, ref(anonFunc), TypeTree(c.definitions.UnitType))
+            )
+          ))
       ),
       List(),
       Typed(

@@ -6,18 +6,18 @@ import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Names.*
 
 /**
- * Matcher for detecting methods that call and
- * [[continuations.Continuation.suspendContinuation]] [[continuations.Continuation.resume
+ * Matcher for detecting methods that call and [[continuations.Suspend#suspendContinuation]]
+ * [[continuations.Continuation.resume
  */
-private[continuations] object CallsContinuationResumeWith:
+private[continuations] object CallsContinuationResumeWith extends Trees:
 
   /**
    * @param tree
    *   the [[dotty.tools.dotc.ast.tpd.Tree]] to match upon
    * @return
    *   [[scala.Some]] if the tree contains a subtree call to
-   *   [[continuations.Continuation.suspendContinuation]] and
-   *   [[continuations.Continuation.resume]], [[scala.None]] otherwise
+   *   [[continuations.Suspend#suspendContinuation]] and [[continuations.Continuation.resume]],
+   *   [[scala.None]] otherwise
    */
   def unapply(tree: DefDef)(using Context): Option[Tree] =
     val args =
@@ -25,21 +25,16 @@ private[continuations] object CallsContinuationResumeWith:
         .rhs
         .filterSubTrees {
           case Inlined(fun, _, _) =>
-            fun.denot.matches(requiredMethod(suspendContinuationFullName))
+            fun.denot.matches(suspendContinuationMethod.symbol)
           case _ => false
         }
         .flatMap {
           case Inlined(
-                Apply(
-                  Apply(_, List(Block(Nil, Block(List(DefDef(_, _, _, suspendBody)), _)))),
-                  List(_)),
+                Apply(_, List(Block(Nil, Block(List(DefDef(_, _, _, suspendBody)), _)))),
                 _,
                 _) =>
             Option(suspendBody)
-          case Inlined(
-                Apply(Apply(_, List(Block(List(DefDef(_, _, _, suspendBody)), _))), List(_)),
-                _,
-                _) =>
+          case Inlined(Apply(_, List(Block(List(DefDef(_, _, _, suspendBody)), _))), _, _) =>
             Option(suspendBody)
           case _ =>
             None

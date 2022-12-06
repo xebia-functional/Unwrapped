@@ -23,7 +23,7 @@ import scala.annotation.tailrec
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
 
-object DefDefTransforms:
+object DefDefTransforms extends Trees:
 
   private def generateCompletion(owner: Symbol, returnType: Type)(using Context): Symbol =
     newSymbol(
@@ -84,8 +84,7 @@ object DefDefTransforms:
       tree
         .rhs
         .find {
-          case Trees.Inlined(fun, _, _) =>
-            fun.symbol.showFullName == suspendContinuationFullName
+          case Trees.Inlined(fun, _, _) => fun.denot.matches(suspendContinuationMethod.symbol)
           case _ => false
         }
         .map(_.tpe)
@@ -101,7 +100,7 @@ object DefDefTransforms:
         }
         .takeWhile {
           case Trees.Inlined(call, _, _) =>
-            call.symbol.showFullName != suspendContinuationFullName
+            !call.denot.matches(suspendContinuationMethod.symbol)
           case _ => true
         }
 

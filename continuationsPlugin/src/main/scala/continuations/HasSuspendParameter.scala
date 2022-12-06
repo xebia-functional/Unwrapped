@@ -31,7 +31,7 @@ private[continuations] object HasSuspendParameter:
             .tpe
             .classSymbol
             .info
-            .hasClassSymbol(Symbols.requiredClass("continuations.Suspend"))
+            .hasClassSymbol(Symbols.requiredClass(suspendFullName))
         })) {
       Option(tree)
     } else None

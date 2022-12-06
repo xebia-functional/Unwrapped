@@ -13,12 +13,6 @@ object Continuation:
   enum State:
     case Suspended, Undecided, Resumed
 
-  /**
-   * No body needed as the compiler plugin replaces this in call sites
-   */
-  inline def suspendContinuation[A](f: Continuation[A] => Unit)(using s: Suspend): A =
-    ???
-
 abstract class RestrictedContinuation(
     completion: Continuation[Any | Null] | Null
 ) extends BaseContinuationImpl(completion):

@@ -3,10 +3,10 @@ package continuations
 import dotty.tools.dotc.core.Contexts.Context
 import munit.FunSuite
 
-class subtreeCallsSuspendSuite extends FunSuite, CompilerFixtures {
+class TreesChecksSuite extends FunSuite, CompilerFixtures, TreesChecks {
 
   continuationsContextAndInlinedSuspendingTree.test(
-    """|subtreeCallsSuspend(Continuation.suspendContinuation[Int] {continuation =>
+    """|subtreeCallsSuspend(Suspend#suspendContinuation[Int] {continuation =>
        |  continuation.resume(Right(1))
        |})
        | should be true""".stripMargin) {
