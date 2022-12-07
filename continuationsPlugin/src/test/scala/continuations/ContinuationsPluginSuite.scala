@@ -80,17 +80,21 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
     }
   }
 
-  compilerContext.test("debug".only) {
+  compilerContext.test("debug".ignore) {
     case given Context =>
       val source = """|package continuations
+                      |import scala.annotation.switch
+                      |val Constant = 'Q'
+                      |def tokenMe(ch: Char) = (ch: @switch) match {
+                      |  case ' ' | '\t' | '\n'  => 1
+                      |  case 'A' | 'Z' | '$'    => 2
+                      |  case '5' | Constant     => 3  // a non-literal may prevent switch generation: this would not compile
+                      |  case _                  => 4
+                      |}
                       |
-                      |def foo5(x: Int): Int = {
                       |
-                      |  val y = Continuation.suspendContinuation[Int] { continuation =>
-                      |    continuation.resume(Right(x + 1))
-                      |  }
-                      |  x + y
-                      |}""".stripMargin
+                      |
+                      |""".stripMargin
       checkCompile("typer", source) {
         case (tree, ctx) =>
           assertEquals(tree.toString(), """|""".stripMargin)
@@ -656,12 +660,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       }
   }
   compilerContextWithContinuationsPlugin.test(
-    "it should compile a single arity definition containing a suspend call and a dependent calculation into a state machine:") {
+    "it should compile a single arity definition containing a suspend call and a dependent calculation into a state machine:".only) {
     case given Context =>
       // format: off
       val source = """|package continuations
                       |
-                      |def foo5(x: Int): Int = {
+                      |def foo5(x: Int)(using Suspend): Int = {
                       |
                       |  val y = Continuation.suspendContinuation[Int] { continuation =>
                       |    continuation.resume(Right(x + 1))
@@ -962,7 +966,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |            $z = $continuation.asInstanceOf[continuations$foo5$1].$input
            |            $result.fold($t => throw $t, _ => ())
            |            $orThrow = $result
-           |            $lbl32[Int]: return {
+           |            $lbl32a[Int]: return {
            |              val y = $orThrow.asInstanceOf[Int]
            |              $z.+(y)
            |            }
@@ -977,6 +981,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       // format: on
       checkContinuations(source) {
         case (tree, _) =>
+          println(tree.show)
           assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
       }
   }

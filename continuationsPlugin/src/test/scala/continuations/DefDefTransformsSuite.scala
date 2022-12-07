@@ -13,7 +13,7 @@ class DefDefTransformsSuite extends FunSuite, CompilerFixtures:
       case (given Context, tree) =>
         assertEquals(
           DefDefTransforms.countContinuationSynthetics(tree.asInstanceOf[DefDef], 0),
-          7)
+          8)
     }
 
   continuationsContextAndZeroAritySuspendNonSuspendingDefDef.test(
@@ -42,7 +42,7 @@ class DefDefTransformsSuite extends FunSuite, CompilerFixtures:
       case (given Context, tree) =>
         assertEquals(
           DefDefTransforms.countContinuationSynthetics(tree.asInstanceOf[DefDef], 1),
-          8)
+          9)
     }
 
   continuationsContextAndZeroAritySuspendNonSuspendingDefDef.test(
@@ -71,7 +71,7 @@ class DefDefTransformsSuite extends FunSuite, CompilerFixtures:
       case (given Context, tree) =>
         assertEquals(
           DefDefTransforms.countContinuationSynthetics(tree.asInstanceOf[DefDef], 2),
-          9)
+          10)
     }
 
   continuationsContextAndZeroAritySuspendNonSuspendingDefDef.test(

@@ -284,6 +284,7 @@ trait CompilerFixtures { self: FunSuite =>
       context.setSetting(context.settings.noindent, true)
       context.setSetting(context.settings.XprintDiffDel, true)
       context.setSetting(context.settings.pageWidth, 149)
+      // context.setSetting(context.settings.Ydebug, true)
       if (compilerPlugin.nonEmpty) {
         context.setSetting(context.settings.classpath, compilerClasspath)
       }
@@ -660,6 +661,8 @@ trait CompilerFixtures { self: FunSuite =>
     val c = compilerWithChecker(checkAfterPhase)(assertion)
     val run = c.newRun
     run.compileFromStrings(List(source))
+    run
+    run.printSummary()
     run.runContext
   }
 
