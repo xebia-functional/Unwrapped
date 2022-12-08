@@ -44,8 +44,13 @@ class CirceSuite extends ScalaFXSuite, CirceFixtures:
   }
 
   encondingDerived.testFX("Encoding derived") {
-    case (testEnc: TestEnconder) =>
-      given e: Encoder[TestEnconder] = deriveEncoder[TestEnconder]
+    case (testEnc: TestEncoder) =>
+      given e: Encoder[TestEncoder] = deriveEncoder[TestEncoder]
       val test: Json = encoding(testEnc)
       assertFX(test =!= Json.Null)
+  }
+
+  testEncoderInstanceAndDecoderDerived.testFX("Decoding test") {
+    (expected: TestEncoder, givenJsonStr: String) =>
+      assertEqualsFX(parsing[Throwable, TestEncoder](givenJsonStr), expected)
   }
