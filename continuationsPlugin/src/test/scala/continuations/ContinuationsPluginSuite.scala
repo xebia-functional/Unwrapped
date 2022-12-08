@@ -706,4 +706,98 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
           assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
       }
   }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert a zero arity definition that contains a suspend call but returns a non-suspending value into a state machine:") {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using Suspend): Int = {
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  10
+           |}
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |
+           |    class continuations$foo$1($completion: continuations.Continuation[Any | Null])
+           |      extends ContinuationImpl($completion, $completion.context) {
+           |        var $result: Either[Throwable, Any | Null | Continuation.State.Suspended.type] = _
+           |        var $label: Int = _
+           |
+           |        override protected def invokeSuspend(
+           |          result: Either[Throwable, Any | Null | Continuation.State.Suspended.type]): Any | Null = {
+           |          this.$result = result
+           |          this.$label = this.$label | Int.MinValue
+           |          foo(this.asInstanceOf[Continuation[Int]])
+           |        }
+           |    }
+           |
+           |    def foo(completion: Continuation[Int]): Int | Null | Continuation.State.Suspended.type = {
+           |      var $continuation: Continuation[Any] | Null = null
+           |
+           |      if (completion.isInstanceOf[continuations$foo$1]) {
+           |        $continuation = completion.asInstanceOf[continuations$foo$1]
+           |
+           |        if (($continuation.asInstanceOf[continuations$foo$1].$label & Int.MinValue) != 0x0) {
+           |          $continuation.asInstanceOf[continuations$foo$1].$label =
+           |            $continuation.asInstanceOf[continuations$foo$1].$label - Int.MinValue
+           |          (return[$Label_0049] ()): Int
+           |        }
+           |      }
+           |
+           |      $continuation = new continuations$foo$1(completion.asInstanceOf[Continuation[Any | Null]])
+           |
+           |      $Label_0049[Unit]: {
+           |        return {
+           |          val $result: Either[Throwable, Any | Null | Continuation.State.Suspended.type] =
+           |            $continuation.asInstanceOf[continuations$foo$1].$result
+           |
+           |          $continuation.asInstanceOf[continuations$foo$1].$label match
+           |            case 0 =>
+           |              $result.fold (t => throw t, _ => ())
+           |
+           |              $continuation.asInstanceOf[continuations$foo$1].$label = 1
+           |
+           |              val safeContinuation: continuations.SafeContinuation[Int] =
+           |                new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
+           |                continuations.Continuation.State.Undecided
+           |              )
+           |              safeContinuation.resume(Right(1))
+           |
+           |              val orThrow: Any | Null | Continuation.State.Suspended.type = safeContinuation.getOrThrow()
+           |              if (orThrow == Continuation.State.Suspended) {
+           |                return Continuation.State.Suspended
+           |              }
+           |            case 1 =>
+           |              $result.fold(t => throw t, _ => ())
+           |            case _ =>
+           |              throw new IllegalStateException ("call to 'resume' before 'invoke' with coroutine")
+           |          10
+           |        }
+           |      }
+           |    }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
 }
