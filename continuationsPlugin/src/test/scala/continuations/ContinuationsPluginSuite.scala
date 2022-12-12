@@ -749,46 +749,43 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |    def foo(completion: Continuation[Int]): Int | Null | Continuation.State.Suspended.type = {
            |      var $continuation: Continuation[Any] | Null = null
            |
-           |      if (completion.isInstanceOf[continuations$foo$1]) {
-           |        $continuation = completion.asInstanceOf[continuations$foo$1]
+           |      (completion: @switch) match {
+           |        case continuations$foo$ : continuations$foo$1
+           |            if (continuations$foo$.$label & Int.MinValue) != 0x0 =>
+           |          $continuation = continuations$foo$
            |
-           |        if (($continuation.asInstanceOf[continuations$foo$1].$label & Int.MinValue) != 0x0) {
            |          $continuation.asInstanceOf[continuations$foo$1].$label =
            |            $continuation.asInstanceOf[continuations$foo$1].$label - Int.MinValue
-           |          (return[$Label_0049] ()): Int
-           |        }
+           |
+           |        case _ =>
+           |          $continuation = new continuations$foo$1(
+           |            completion.asInstanceOf[Continuation[Any | Null]])
            |      }
            |
-           |      $continuation = new continuations$foo$1(completion.asInstanceOf[Continuation[Any | Null]])
+           |      val $result: Either[Throwable, Any | Null | Continuation.State.Suspended.type] =
+           |        $continuation.asInstanceOf[continuations$foo$1].$result
            |
-           |      $Label_0049[Unit]: {
-           |        return {
-           |          val $result: Either[Throwable, Any | Null | Continuation.State.Suspended.type] =
-           |            $continuation.asInstanceOf[continuations$foo$1].$result
+           |      ($continuation.asInstanceOf[continuations$foo$1].$label: @switch) match
+           |        case 0 =>
+           |          $result.fold (t => throw t, _ => ())
            |
-           |          $continuation.asInstanceOf[continuations$foo$1].$label match
-           |            case 0 =>
-           |              $result.fold (t => throw t, _ => ())
+           |          $continuation.asInstanceOf[continuations$foo$1].$label = 1
            |
-           |              $continuation.asInstanceOf[continuations$foo$1].$label = 1
+           |          val safeContinuation: continuations.SafeContinuation[Int] =
+           |            new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
+           |              continuations.Continuation.State.Undecided
+           |            )
+           |          safeContinuation.resume(Right(1))
            |
-           |              val safeContinuation: continuations.SafeContinuation[Int] =
-           |                new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
-           |                continuations.Continuation.State.Undecided
-           |              )
-           |              safeContinuation.resume(Right(1))
-           |
-           |              val orThrow: Any | Null | Continuation.State.Suspended.type = safeContinuation.getOrThrow()
-           |              if (orThrow == Continuation.State.Suspended) {
-           |                return Continuation.State.Suspended
-           |              }
-           |            case 1 =>
-           |              $result.fold(t => throw t, _ => ())
-           |            case _ =>
-           |              throw new IllegalStateException ("call to 'resume' before 'invoke' with coroutine")
-           |          10
-           |        }
-           |      }
+           |          val orThrow: Any | Null | Continuation.State.Suspended.type = safeContinuation.getOrThrow()
+           |          if (orThrow == Continuation.State.Suspended) {
+           |            return Continuation.State.Suspended
+           |          }
+           |        case 1 =>
+           |          $result.fold(t => throw t, _ => ())
+           |        case _ =>
+           |          throw new IllegalStateException ("call to 'resume' before 'invoke' with coroutine")
+           |      10
            |    }
            |  }
            |}
