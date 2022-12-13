@@ -6,17 +6,17 @@ import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Names.*
 
 /**
- * Matcher for detecting methods that call and [[continuations.Suspend#suspendContinuation]]
- * [[continuations.Continuation.resume
+ * Matcher for detecting methods that call [[continuations.Suspend#suspendContinuation]] and
+ * [[continuations.Continuation#resume]]
  */
-private[continuations] object CallsContinuationResumeWith extends Trees:
+private[continuations] object CallsContinuationResumeWith extends TreesChecks:
 
   /**
    * @param tree
    *   the [[dotty.tools.dotc.ast.tpd.Tree]] to match upon
    * @return
    *   [[scala.Some]] if the tree contains a subtree call to
-   *   [[continuations.Suspend#suspendContinuation]] and [[continuations.Continuation.resume]],
+   *   [[continuations.Suspend#suspendContinuation]] and [[continuations.Continuation#resume]],
    *   [[scala.None]] otherwise
    */
   def unapply(tree: DefDef)(using Context): Option[Tree] =
@@ -40,9 +40,9 @@ private[continuations] object CallsContinuationResumeWith extends Trees:
             None
         }
         .flatMap {
-          case Block(Nil, Apply(fun, List(arg))) if treeIsContinuationsResume(fun) =>
+          case Block(Nil, Apply(fun, List(arg))) if subtreeCallsResume(fun) =>
             Option(arg.withType(arg.tpe))
-          case Apply(fun, List(arg)) if treeIsContinuationsResume(fun) =>
+          case Apply(fun, List(arg)) if subtreeCallsResume(fun) =>
             Option(arg.withType(arg.tpe))
           case _ =>
             None
