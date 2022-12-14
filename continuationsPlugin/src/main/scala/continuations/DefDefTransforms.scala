@@ -1,7 +1,7 @@
 package continuations
 
 import continuations.DefDefTransforms.*
-import dotty.tools.dotc.ast.{tpd, Trees}
+import dotty.tools.dotc.ast.{tpd, untpd, TreeTypeMap, Trees}
 import dotty.tools.dotc.ast.Trees.*
 import dotty.tools.dotc.ast.tpd.TypedTreeCopier
 import dotty.tools.dotc.ast.tpd.*
@@ -9,8 +9,9 @@ import dotty.tools.dotc.core.Annotations.ConcreteAnnotation
 import dotty.tools.dotc.core.Constants.Constant
 import dotty.tools.dotc.core.Contexts.{ctx, Context}
 import dotty.tools.dotc.core.Flags
+import dotty.tools.dotc.core.Flags.*
 import dotty.tools.dotc.core.Names
-import dotty.tools.dotc.core.Names.termName
+import dotty.tools.dotc.core.Names.{termName, typeName}
 import dotty.tools.dotc.core.Scopes
 import dotty.tools.dotc.core.StdNames.nme
 import dotty.tools.dotc.core.Symbols.*
@@ -29,7 +30,7 @@ object DefDefTransforms extends Trees:
     newSymbol(
       owner,
       Names.termName("completion"),
-      Flags.LocalParam,
+      Flags.LocalParam | Flags.SyntheticParam,
       requiredPackage("continuations")
         .requiredType("Continuation")
         .typeRef
@@ -171,7 +172,7 @@ object DefDefTransforms extends Trees:
       rhs = body
     )
 
-  private def transformContinuationWithSuspend(tree: tpd.DefDef)(using Context): tpd.DefDef =
+  private def transformContinuationWithSuspend(tree: tpd.DefDef)(using Context): tpd.Tree =
     val newTree =
       tree match
         // maybe we need to check that CallsContinuationResumeWith/subtreeCallsResume as well?
@@ -185,7 +186,7 @@ object DefDefTransforms extends Trees:
 
     report.logWith(s"new tree:")(newTree)
 
-  def transformSuspendContinuation(tree: tpd.DefDef)(using Context): tpd.DefDef =
+  def transformSuspendContinuation(tree: tpd.DefDef)(using Context): tpd.Tree =
     tree match
       case ReturnsContextFunctionWithSuspendType(_) | HasSuspendParameter(_) =>
         transformContinuationWithSuspend(tree)
@@ -236,12 +237,63 @@ object DefDefTransforms extends Trees:
         names
 
   private def transformSuspendingStateMachine(tree: tpd.DefDef)(using ctx: Context) =
-    val resumesArgs = CallsContinuationResumeWith.unapply(tree).get //
-    val defName = tree.symbol.name
-
     SuspensionPoints
       .unapplySeq(report.logWith("tree has no suspension points:")(tree))
       .fold(tree) { suspensionPoints =>
+        val continuationClassRef = requiredClassRef(continuationFullName)
+        val continuationModule = requiredModule(continuationFullName)
+        val safeContinuationClass = requiredClass("continuations.SafeContinuation")
+        val interceptedMethod =
+          requiredPackage("continuations.intrinsics").requiredMethod("intercepted")
+        val continuationImplClass = requiredClass("continuations.jvm.internal.ContinuationImpl")
+
+        val parent = tree.symbol
+        val treeOwner = parent.owner
+        val defName = parent.name
+        val returnType = tree.tpt.tpe
+
+        // another way?
+        val resumeArg = CallsContinuationResumeWith.unapply(tree).get
+
+        // only works for one suspendContinuationMethod, use TreeTypeMap?
+        val suspendContinuationType =
+          tree
+            .rhs
+            .find {
+              case Trees.Inlined(fun, _, _) =>
+                fun.denot.matches(suspendContinuationMethod.symbol)
+              case _ => false
+            }
+            .map(_.tpe)
+            .get
+
+        val lastRow =
+          tree.rhs match {
+            case Trees.Block(_, tree) => tree
+            case tree => tree
+          }
+
+        val suspendedState =
+          ref(continuationModule).select(termName("State")).select(termName("Suspended"))
+
+        val integerOR =
+          ctx.definitions.IntClass.requiredMethod(nme.OR, List(ctx.definitions.IntType))
+        val integerAND =
+          ctx.definitions.IntClass.requiredMethod(nme.AND, List(ctx.definitions.IntType))
+        val integerNE =
+          ctx.definitions.IntClass.requiredMethod(nme.NE, List(ctx.definitions.IntType))
+        val integerMin =
+          ref(requiredModuleRef("scala.Int").select(Names.termName("MinValue")).symbol)
+
+        val intType = ctx.definitions.IntType
+        val anyType = ctx.definitions.AnyType
+        val anyOrNullType = Types.OrNull(anyType)
+        val anyNullSuspendedType =
+          Types.OrType(
+            Types.OrNull(ctx.definitions.AnyType),
+            suspendedState.symbol.namedType,
+            false)
+
         val initialCounter =
           ctx.store(ctx.property(ContinuationsPhase.continuationsPhaseCounterPropertyKey).get)
         val stateMachineContinuationClassName =
@@ -258,50 +310,40 @@ object DefDefTransforms extends Trees:
         val labels = names.drop(continuationNames.size + 1)
 
         val continuationsStateMachineScope = Scopes.newScope
-        val treeOwner = tree.symbol.owner
-        val continuationImplClazz = requiredClass("continuations.jvm.internal.ContinuationImpl")
 
         // class compileFromString-55580126-00e0-477a-8040-f0c76732df77.$package$foo$1
-        val continuationsStateMachineSymbol = Symbols.newCompleteClassSymbol(
+        val continuationsStateMachineSymbol = newCompleteClassSymbol(
           treeOwner,
-          Names.typeName(stateMachineContinuationClassName),
-          Flags.SyntheticArtifact,
-          List(continuationImplClazz.typeRef),
+          typeName(stateMachineContinuationClassName),
+          SyntheticArtifact,
+          List(continuationImplClass.typeRef),
           continuationsStateMachineScope,
           Types.NoType,
           treeOwner
         )
 
         val continuationsStateMachineConstructorMethodCompletionParamName =
-          Names.termName("$completion")
+          termName("$completion")
+        val continuationsStateMachineResultName = termName("$result")
+        val continuationsStateMachineLabelParam = termName("$label")
 
-        val intType = ctx.definitions.IntType
-        val anyType = ctx.definitions.AnyType
-
-        val continuationsStateMachineConstructorMethodSymbol = Symbols.newConstructor(
+        val continuationsStateMachineConstructorMethodSymbol = newConstructor(
           continuationsStateMachineSymbol,
           Flags.Synthetic,
           List(continuationsStateMachineConstructorMethodCompletionParamName),
-          List(
-            requiredClassRef(continuationFullName).appliedTo(OrType(intType, anyType, false)))
+          List(continuationClassRef.appliedTo(anyOrNullType))
         )
         val continuationsStateMachineConstructor =
           tpd.DefDef(continuationsStateMachineConstructorMethodSymbol)
 
-        val continuationsStateMachineResultName = Names.termName("$result")
-        val continuationsStateMachineLabelParam = Names.termName("$label")
-
         val eitherThrowableAnyNullSuspendedType =
           requiredClassRef("scala.util.Either").appliedTo(
             ctx.definitions.ThrowableType,
-            Types.OrType(
-              Types.OrNull(ctx.definitions.AnyType),
-              requiredModuleRef("continuations.Continuation.State.Suspended"),
-              false)
+            anyNullSuspendedType
           )
         val continuationStateMachineResult = tpd.ValDef(
           continuationsStateMachineScope.enter(
-            Symbols.newSymbol(
+            newSymbol(
               continuationsStateMachineSymbol,
               continuationsStateMachineResultName,
               Flags.Synthetic | Flags.Mutable,
@@ -311,7 +353,7 @@ object DefDefTransforms extends Trees:
 
         val continuationStateMachineLabel = tpd.ValDef(
           continuationsStateMachineScope.enter(
-            Symbols.newSymbol(
+            newSymbol(
               continuationsStateMachineSymbol,
               continuationsStateMachineLabelParam,
               Flags.Synthetic | Flags.Mutable,
@@ -319,17 +361,15 @@ object DefDefTransforms extends Trees:
           Underscore(intType)
         )
 
-        val anyOrNullType = Types.OrNull(ctx.definitions.AnyType)
-
         val invokeSuspendSymbol = continuationsStateMachineScope.enter(
-          Symbols.newSymbol(
+          newSymbol(
             continuationsStateMachineSymbol,
             Names.termName("invokeSuspend"),
             Flags.Override | Flags.Method,
             anyOrNullType))
 
         val invokeSuspendResultParam = tpd.ValDef(
-          Symbols.newSymbol(
+          newSymbol(
             invokeSuspendSymbol,
             Names.termName("result"),
             Flags.LocalParam,
@@ -342,6 +382,10 @@ object DefDefTransforms extends Trees:
         val continuationsStateMachineLabelSelect =
           continuationsStateMachineThis.select(continuationsStateMachineLabelParam)
 
+        // TODO: to deal with the forward reference issue when we need to use it in `invokeSuspendMethod`
+        var transformedMethod: tpd.DefDef = cpy.DefDef(tree)()
+
+        // override protected def invokeSuspend
         val invokeSuspendMethod = tpd.DefDef(
           invokeSuspendSymbol.asTerm,
           List(List(invokeSuspendResultParam)).map(_.map(_.symbol)),
@@ -353,19 +397,14 @@ object DefDefTransforms extends Trees:
                 ref(invokeSuspendResultParam.symbol)),
               tpd.Assign(
                 continuationsStateMachineLabelSelect,
-                continuationsStateMachineLabelSelect
-                  .select(Names.termName("|"))
-                  // returns an issue maybe because `|` is synthetic but works?: "value | does not take parameters"
-                  .appliedTo(
-                    ref(requiredModuleRef("scala.Int").select(Names.termName("MinValue"))))
+                continuationsStateMachineLabelSelect.select(integerOR).appliedTo(integerMin)
               )
             ),
-            // for now complains because the tree has the old signature but hopefully after the cpy.DefDef it will work
-            ref(tree.symbol).appliedTo(
+            // TODO: for now complains because the tree has the old signature but hopefully after the cpy.DefDef it will work
+            ref(transformedMethod.symbol).appliedTo(
               continuationsStateMachineThis
-                .select(Names.termName("asInstanceOf"))
-                .appliedToType(
-                  requiredClassRef(continuationFullName).appliedTo(ctx.definitions.IntType))
+                .select(nme.asInstanceOf_)
+                .appliedToType(continuationClassRef.appliedTo(returnType))
             )
           )
         )
@@ -376,7 +415,7 @@ object DefDefTransforms extends Trees:
           continuationsStateMachineSymbol,
           continuationsStateMachineConstructor,
           List(
-            ref(continuationImplClazz.primaryConstructor).appliedTo(
+            ref(continuationImplClass.primaryConstructor).appliedTo(
               ref($completion),
               ref($completion).select(termName("context"))
             )),
@@ -386,24 +425,220 @@ object DefDefTransforms extends Trees:
             invokeSuspendMethod)
         )
 
-        // private[compileFromString-8d546b86-1d3b-4bb7-8781-4399417354a2.$package] class compileFromString-8d546b86-1d3b-4bb7-8781-4399417354a2.$package$foo$1(
-        //  $completion: continuations.Continuation[Int | Any]
-        // ) extends ContinuationImpl.this($completion, $completion.context) {
-        //  var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
-        //  var $label: Int = _
-        //  override def invokeSuspend(result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type]): Any | Null =
-        //    {
-        //      this.$result = result
-        //      this.$label = this.$label.|(Int.MinValue)
-        //      continuations.compileFromString-8d546b86-1d3b-4bb7-8781-4399417354a2.$package.foo(this.asInstanceOf[continuations.Continuation[Int]])
-        //    }
-        // }
-        println(continuationStateMachineClass.show)
+        // foo method
+        val completion = generateCompletion(parent, returnType)
+
+        // var $continuation: Continuation[Any] | Null = _
+        val $continuation = tpd.ValDef(
+          newSymbol(
+            parent,
+            termName("$continuation"),
+            Local | Mutable | Synthetic,
+            OrType(
+              continuationClassRef.appliedTo(anyType),
+              ctx.definitions.NullType,
+              soft = false)),
+          nullLiteral
+        )
+
+        val continuationAsStateMachineClass =
+          ref($continuation.symbol)
+            .select(nme.asInstanceOf_)
+            .appliedToType(continuationStateMachineClass.tpe)
+
+        // case continuations$foo$ : continuations$foo$1 ...
+        val case11Param = tpd.Bind( // maybe Typed
+          newSymbol(parent, nme.x_0, EmptyFlags, continuationStateMachineClass.tpe),
+          ref(continuationStateMachineClass.symbol))
+        // TODO: an alternative to case11Param
+        val case111Param =
+          untpd.Ident(termName("xxx")).withType(continuationStateMachineClass.tpe)
+        val $continuationLabel =
+          continuationAsStateMachineClass.select(continuationsStateMachineLabelParam)
+        val case11 = tpd.CaseDef(
+          case11Param,
+          ref(case11Param.symbol)
+            .select(continuationsStateMachineLabelParam)
+            .select(integerAND)
+            .appliedTo(integerMin)
+            .select(integerNE)
+            .appliedTo(tpd.Literal(Constant("0x0"))),
+          tpd.Block(
+            List(tpd.Assign(ref($continuation.symbol), ref(case11Param.symbol))),
+            tpd.Assign(
+              $continuationLabel,
+              $continuationLabel.select(ctx.definitions.Int_-).appliedTo(integerMin))
+          )
+        )
+
+        // case _ => ...
+        val case12 = tpd.CaseDef(
+          Underscore(anyType),
+          tpd.EmptyTree,
+          tpd.Assign(
+            ref($continuation.symbol),
+            tpd
+              .New(ref(continuationStateMachineClass.symbol))
+              .select(nme.CONSTRUCTOR) // TODO: does not have a constructor???
+              .appliedTo(
+                ref(completion)
+                  .select(nme.asInstanceOf_)
+                  .appliedToType(
+                    continuationClassRef.appliedTo(anyOrNullType)
+                  ))
+          )
+        )
+
+        // completion match {...}
+        val completionMatch = tpd.Match(ref(completion), List(case11, case12))
+
+        // $val result
+        val $result =
+          tpd.ValDef(
+            newSymbol(parent, termName("$result"), Local, eitherThrowableAnyNullSuspendedType),
+            continuationAsStateMachineClass.select(continuationsStateMachineResultName)
+          )
+
+        // $result.fold(t => throw t, _ => ())
+        val $resultFold = ref($result.symbol)
+          .select(termName("fold"))
+          .appliedToType(ctx.definitions.UnitType)
+          .appliedTo(
+            tpd.Lambda(
+              MethodType.apply(List(ctx.definitions.ThrowableType))(_ =>
+                ctx.definitions.NothingType),
+              trees => tpd.Throw(trees.head)),
+            tpd.Lambda(
+              MethodType(List(eitherThrowableAnyNullSuspendedType))(_ =>
+                ctx.definitions.UnitType),
+              _ => unitLiteral)
+          )
+
+        // val safeContinuation ...
+        val undecidedState =
+          ref(continuationModule).select(termName("State")).select(termName("Undecided"))
+
+        val interceptedCall =
+          ref(interceptedMethod)
+            .appliedToType(suspendContinuationType)
+            .appliedTo(ref($continuation.symbol))
+            .appliedToNone
+
+        val safeContinuationConstructor =
+          tpd
+            .New(ref(safeContinuationClass))
+            .select(nme.CONSTRUCTOR)
+            .appliedToType(suspendContinuationType)
+            .appliedTo(interceptedCall, undecidedState)
+
+        val safeContinuation: tpd.ValDef =
+          tpd.ValDef(
+            newSymbol(
+              parent,
+              termName("safeContinuation"),
+              Flags.Local,
+              safeContinuationConstructor.tpe),
+            safeContinuationConstructor)
+
+        val safeContinuationRef =
+          ref(safeContinuation.symbol)
+
+        val suspendContinuationResume =
+          safeContinuationRef.select(termName("resume")).appliedTo(resumeArg)
+
+        val suspendContinuationGetThrow =
+          tpd.ValDef(
+            newSymbol(parent, termName("orThrow"), Flags.Local, anyNullSuspendedType),
+            safeContinuationRef.select(termName("getOrThrow")).appliedToNone
+          )
+
+        // if (orThrow == ...){}
+        val ifOrThrowReturn =
+          tpd.If(
+            ref(suspendContinuationGetThrow.symbol)
+              .select(nme.Equals)
+              .appliedTo(suspendedState),
+            tpd.Return(suspendedState, parent),
+            tpd.EmptyTree
+          )
+
+        // case 0
+        val case21 = tpd.CaseDef(
+          tpd.Literal(Constant(0)),
+          tpd.EmptyTree,
+          tpd.Block(
+            List(
+              $resultFold,
+              tpd.Assign(
+                continuationAsStateMachineClass.select(continuationsStateMachineLabelParam),
+                tpd.Literal(Constant(1))),
+              safeContinuation,
+              suspendContinuationResume,
+              suspendContinuationGetThrow
+            ),
+            ifOrThrowReturn
+          )
+        )
+
+        // case 1
+        val case22 = tpd.CaseDef(
+          tpd.Literal(Constant(1)),
+          tpd.EmptyTree,
+          $resultFold
+        )
+
+        // case _
+        val case23 = tpd.CaseDef(
+          tpd.Underscore(intType),
+          tpd.EmptyTree,
+          tpd.Throw(
+            tpd
+              .New(ref(requiredClass("java.lang.IllegalArgumentException")))
+              .select(nme.CONSTRUCTOR)
+              .appliedTo(
+                tpd.Literal(Constant("call to 'resume' before 'invoke' with coroutine"))))
+        )
+
+        // $label match {...}
+        val labelMatch = tpd.Match(
+          continuationAsStateMachineClass.select(continuationsStateMachineLabelParam),
+          List(case21, case22, case23)
+        )
+
+//        transformedMethod = tpd.DefDef(
+//          sym = Symbols.newSymbol(
+//            parent,
+//            Names.termName("HI"),
+//            Flags.Synthetic | Flags.Method,
+//            anyNullSuspendedType),
+//          paramss = params(tree, completion).map {
+//            _.map {
+//              case p: tpd.ValDef => p.symbol
+//              case t: tpd.TypeDef => t.symbol
+//            }
+//          },
+//          resultType = anyNullSuspendedType,
+//          rhs = tpd.EmptyTree
+//        )
+        transformedMethod = cpy.DefDef(tree)(
+          paramss = params(tree, completion),
+          tpt = tpd.TypeTree(
+            Types.OrType(Types.OrNull(returnType), suspendedState.symbol.namedType, false)
+          ),
+          rhs = tpd.Block(List($continuation, completionMatch, $result, labelMatch), lastRow)
+        )
+
+        val transformedTree =
+          tpd.Block(
+            List(continuationStateMachineClass),
+            transformedMethod
+          )
+
+        println(transformedTree.show)
 
         println(s"state machine and new defdef names: $names")
         println(s"state machine and new defdef continuationNames: $continuationNames")
         println(s"state machine and new defdef resultName: $resultName")
         println(s"state machine and new defdef labels: $labels")
-//        report.logWith("state machine and new defdef:")(tree)
-        tree
+        report.logWith("state machine and new defdef:")(transformedTree)
       }
