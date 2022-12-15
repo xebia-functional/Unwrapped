@@ -26,11 +26,39 @@ trait TreesChecks extends Trees {
 
   /**
    * @param tree
-   *   A [[dotty.tools.dotc.ast.tpd.Tree]] to check if [[continuations.Continuation.resume]] is
-   *   called
+   *   A [[dotty.tools.dotc.ast.tpd.Tree]] to check if it calls
+   *   [[continuations.Suspend#suspendContinuation]]
    * @return
-   *   True if the calls calls the method [[continuations.Continuation.resume]]
+   *   True if the tree calls the method [[continuations.Suspend#suspendContinuation]]
    */
-  private[continuations] def subtreeCallsResume[A](tree: TTree[A])(using Context): Boolean =
+  private[continuations] def treeCallsSuspend(tree: Tree)(using Context): Boolean =
+    val treeIsContinuationsSuspendContinuation: Context ?=> Tree => Boolean = t =>
+      t.denot.matches(suspendContinuationMethod.symbol)
+
+    tree match
+      case Inlined(call, _, _) => treeIsContinuationsSuspendContinuation(call)
+      case _ => false
+
+  /**
+   * @param tree
+   *   A [[dotty.tools.dotc.ast.tpd.Tree]] to check if it calls
+   *   [[continuations.Continuation.resume]]
+   * @return
+   *   True if the tree calls the method [[continuations.Continuation.resume]]
+   */
+  private[continuations] def treeCallsResume[A](tree: TTree[A])(using Context): Boolean =
     tree.denot.matches(continuationResumeMethod.symbol)
+
+  /**
+   * @param tree
+   *   A [[dotty.tools.dotc.ast.tpd.Tree]] to check if its subtrees call
+   *   [[continuations.Continuation.resume]]
+   * @return
+   *   True if the subtrees call the method [[continuations.Continuation.resume]]
+   */
+  private[continuations] def subtreesCallsResume(tree: Tree)(using Context): Boolean =
+    tree.existsSubTree {
+      case Inlined(call, _, _) => treeCallsResume(call)
+      case t => treeCallsResume(t)
+    }
 }

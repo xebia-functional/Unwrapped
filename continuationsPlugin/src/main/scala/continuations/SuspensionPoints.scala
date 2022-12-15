@@ -17,6 +17,7 @@ object SuspensionPoints extends TreesChecks:
   def unapplySeq(tree: Tree)(using Context): Option[List[Tree]] =
     val result = tree.filterSubTrees {
       case st @ ValDef(_, _, _) => subtreeCallsSuspend(st.forceIfLazy)
-      case t: Tree => subtreeCallsSuspend(t)
+      // TODO: it returns wrong value if it is val x = suspendContinuation
+      case t: Tree => treeCallsSuspend(t)
     }
     if (result.nonEmpty) Some(result) else None

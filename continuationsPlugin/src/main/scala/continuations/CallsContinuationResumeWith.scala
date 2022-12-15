@@ -23,11 +23,7 @@ private[continuations] object CallsContinuationResumeWith extends TreesChecks:
     val args =
       tree
         .rhs
-        .filterSubTrees {
-          case Inlined(fun, _, _) =>
-            fun.denot.matches(suspendContinuationMethod.symbol)
-          case _ => false
-        }
+        .filterSubTrees { treeCallsSuspend }
         .flatMap {
           case Inlined(
                 Apply(_, List(Block(Nil, Block(List(DefDef(_, _, _, suspendBody)), _)))),
@@ -40,9 +36,9 @@ private[continuations] object CallsContinuationResumeWith extends TreesChecks:
             None
         }
         .flatMap {
-          case Block(Nil, Apply(fun, List(arg))) if subtreeCallsResume(fun) =>
+          case Block(Nil, Apply(fun, List(arg))) if treeCallsResume(fun) =>
             Option(arg.withType(arg.tpe))
-          case Apply(fun, List(arg)) if subtreeCallsResume(fun) =>
+          case Apply(fun, List(arg)) if treeCallsResume(fun) =>
             Option(arg.withType(arg.tpe))
           case _ =>
             None
