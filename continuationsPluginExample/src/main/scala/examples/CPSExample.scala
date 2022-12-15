@@ -132,3 +132,14 @@ def programSuspendContinuationNoParamResume: Int =
     s.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
 
   fooTest()
+
+/*
+def programNestedContinuationCompilationError: Int =
+  def fooTest()(using s: Suspend): Int =
+    s.suspendContinuation[Int] { continuation =>
+      val x = s.suspendContinuation[Int] { continuation1 => continuation1.resume(Right(1)) }
+      continuation.resume(Right(x + 1))
+    }
+
+  fooTest()
+ */
