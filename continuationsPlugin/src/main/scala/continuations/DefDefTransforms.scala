@@ -250,6 +250,10 @@ object DefDefTransforms extends TreesChecks:
 
         val suspendedState =
           ref(continuationModule).select(termName("State")).select(termName("Suspended"))
+        val newReturnType =
+          tpd.TypeTree(
+            Types.OrType(Types.OrNull(returnType), suspendedState.symbol.namedType, false)
+          )
 
         val integerOR =
           defn.IntClass.requiredMethod(nme.OR, List(defn.IntType))
@@ -291,7 +295,7 @@ object DefDefTransforms extends TreesChecks:
           List(continuationImplClass.typeRef),
           continuationsStateMachineScope,
           Types.NoType,
-          treeOwner
+          NoSymbol // treeOwner
         )
 
         val continuationsStateMachineConstructorMethodCompletionParamName =
@@ -356,10 +360,21 @@ object DefDefTransforms extends TreesChecks:
 
         val completion = generateCompletion(parent, returnType)
 
-        // TODO: to deal with the forward reference issue when we need to use it in `invokeSuspendMethod`
-        var transformedMethod: tpd.DefDef = cpy.DefDef(tree)(
-          paramss = params(tree, completion)
+        val transformedMethod: tpd.DefDef = cpy.DefDef(tree)(
+          paramss = params(tree, completion),
+          tpt = newReturnType
         )
+
+        val callTransformedMethod: tpd.Tree =
+          untpd
+            .Apply(
+              tpd.Ident(transformedMethod.namedType),
+              List(
+                continuationsStateMachineThis
+                  .select(nme.asInstanceOf_)
+                  .appliedToType(continuationClassRef.appliedTo(returnType)))
+            )
+            .withType(newReturnType.tpe)
 
         // override protected def invokeSuspend
         val invokeSuspendMethod = tpd.DefDef(
@@ -376,12 +391,7 @@ object DefDefTransforms extends TreesChecks:
                 continuationsStateMachineLabelSelect.select(integerOR).appliedTo(integerMin)
               )
             ),
-            // TODO: complains because the tree has the old signature
-            ref(transformedMethod.symbol).appliedTo(
-              continuationsStateMachineThis
-                .select(nme.asInstanceOf_)
-                .appliedToType(continuationClassRef.appliedTo(returnType))
-            )
+            callTransformedMethod
           )
         )
 
@@ -647,18 +657,13 @@ object DefDefTransforms extends TreesChecks:
         //          resultType = anyNullSuspendedType,
         //          rhs = tpd.EmptyTree
         //        )
-        transformedMethod = cpy.DefDef(tree)(
-          paramss = params(tree, completion),
-          tpt = tpd.TypeTree(
-            Types.OrType(Types.OrNull(returnType), suspendedState.symbol.namedType, false)
-          ),
-          rhs = substituteContinuation.transform(tree.rhs)
-        )
 
         val transformedTree =
           tpd.Block(
             List(continuationStateMachineClass),
-            transformedMethod
+            cpy.DefDef(transformedMethod)(
+              rhs = substituteContinuation.transform(tree.rhs)
+            )
           )
 
         println(transformedTree.show)
