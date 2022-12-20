@@ -729,12 +729,14 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |        var $result: Either[Throwable, Any | Null | Continuation.State.Suspended.type] = _
            |        var $label: Int = _
            |
-           |        override protected def invokeSuspend(
-           |          result: Either[Throwable, Any | Null | Continuation.State.Suspended.type]): Any | Null = {
-           |          this.$result = result
-           |          this.$label = this.$label | Int.MinValue
-           |          foo(this.asInstanceOf[Continuation[Int]])
-           |        }
+           |        protected override def invokeSuspend(
+           |          result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type]
+           |        ): Any | Null = 
+           |          {
+           |            this.$result = result
+           |            this.$label = this.$label | Int.MinValue
+           |            foo(this.asInstanceOf[Continuation[Int]])
+           |          }
            |    }
            |
            |    def foo(completion: Continuation[Int]): Int | Null | Continuation.State.Suspended.type = {
@@ -785,6 +787,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
       checkContinuations(source) {
         case (tree, _) =>
+          println(tree.show)
 //          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
           assertNoDiff("", "")
       }

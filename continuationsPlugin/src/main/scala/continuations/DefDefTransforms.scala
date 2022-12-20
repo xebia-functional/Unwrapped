@@ -344,15 +344,12 @@ object DefDefTransforms extends TreesChecks:
             continuationsStateMachineSymbol,
             Names.termName("invokeSuspend"),
             Flags.Override | Flags.Protected | Flags.Method,
-            anyOrNullType))
-
-        val invokeSuspendResultParam = tpd.ValDef(
-          newSymbol(
-            invokeSuspendSymbol,
-            Names.termName("result"),
-            Flags.LocalParam,
-            eitherThrowableAnyNullSuspendedType),
-          tpd.EmptyTree)
+            MethodType(
+              List(termName("result")),
+              List(eitherThrowableAnyNullSuspendedType),
+              anyOrNullType
+            )
+          ))
 
         val continuationsStateMachineThis: tpd.This =
           tpd.This(continuationsStateMachineSymbol)
@@ -399,13 +396,11 @@ object DefDefTransforms extends TreesChecks:
         // override protected def invokeSuspend
         val invokeSuspendMethod = tpd.DefDef(
           invokeSuspendSymbol.asTerm,
-          List(List(invokeSuspendResultParam)).map(_.map(_.symbol)),
-          anyOrNullType,
           tpd.Block(
             List(
               tpd.Assign(
                 continuationsStateMachineThis.select(continuationsStateMachineResultName),
-                ref(invokeSuspendResultParam.symbol)),
+                ref(invokeSuspendSymbol.paramSymss.head.head)),
               tpd.Assign(
                 continuationsStateMachineLabelSelect,
                 continuationsStateMachineLabelSelect.select(integerOR).appliedTo(integerMin)
