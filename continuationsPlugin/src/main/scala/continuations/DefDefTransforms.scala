@@ -1,9 +1,8 @@
 package continuations
 
 import continuations.DefDefTransforms.*
-import dotty.tools.dotc.ast.{tpd, untpd, TreeTypeMap, Trees}
+import dotty.tools.dotc.ast.{tpd, TreeTypeMap, Trees}
 import dotty.tools.dotc.ast.Trees.*
-import dotty.tools.dotc.ast.tpd.TypedTreeCopier
 import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Annotations.ConcreteAnnotation
 import dotty.tools.dotc.core.Constants.Constant
@@ -293,10 +292,8 @@ object DefDefTransforms extends TreesChecks:
           typeName(stateMachineContinuationClassName),
           SyntheticArtifact,
           List(continuationImplClass.typeRef),
-          continuationsStateMachineScope,
-          Types.NoType,
-          NoSymbol // treeOwner
-        )
+          continuationsStateMachineScope
+        ).entered.asClass
 
         val continuationsStateMachineConstructorMethodCompletionParamName =
           termName("$completion")
@@ -309,6 +306,11 @@ object DefDefTransforms extends TreesChecks:
           List(continuationsStateMachineConstructorMethodCompletionParamName),
           List(continuationClassRef.appliedTo(anyOrNullType))
         )
+
+        continuationsStateMachineSymbol.enter(
+          continuationsStateMachineConstructorMethodSymbol,
+          continuationsStateMachineScope)
+
         val continuationsStateMachineConstructor =
           tpd.DefDef(continuationsStateMachineConstructorMethodSymbol)
 
@@ -341,7 +343,7 @@ object DefDefTransforms extends TreesChecks:
           newSymbol(
             continuationsStateMachineSymbol,
             Names.termName("invokeSuspend"),
-            Flags.Override | Flags.Method,
+            Flags.Override | Flags.Protected | Flags.Method,
             anyOrNullType))
 
         val invokeSuspendResultParam = tpd.ValDef(
@@ -360,21 +362,39 @@ object DefDefTransforms extends TreesChecks:
 
         val completion = generateCompletion(parent, returnType)
 
-        val transformedMethod: tpd.DefDef = cpy.DefDef(tree)(
-          paramss = params(tree, completion),
-          tpt = newReturnType
-        )
+        val transformedMethodParams = params(tree, completion)
 
-        val callTransformedMethod: tpd.Tree =
-          untpd
-            .Apply(
-              tpd.Ident(transformedMethod.namedType),
-              List(
-                continuationsStateMachineThis
-                  .select(nme.asInstanceOf_)
-                  .appliedToType(continuationClassRef.appliedTo(returnType)))
-            )
-            .withType(newReturnType.tpe)
+        val transformedMethodSymbol =
+          newSymbol(
+            treeOwner,
+            tree.name,
+            parent.flags,
+            MethodType(
+              transformedMethodParams.flatMap {
+                _.map {
+                  case p: tpd.ValDef => p.name
+                  case t: tpd.TypeDef => t.name.toTermName
+                }
+              },
+              transformedMethodParams.flatMap {
+                _.map {
+                  case p: tpd.ValDef => p.tpt.tpe
+                  case t: tpd.TypeDef => t.tpe
+                }
+              },
+              newReturnType.tpe
+            ),
+            parent.privateWithin,
+            parent.coord
+          )
+
+        treeOwner.unforcedDecls.openForMutations.replace(parent, transformedMethodSymbol)
+
+        val transformedMethod: tpd.DefDef =
+          tpd.DefDef(
+            sym = transformedMethodSymbol,
+            rhs = tree.rhs
+          )
 
         // override protected def invokeSuspend
         val invokeSuspendMethod = tpd.DefDef(
@@ -391,7 +411,11 @@ object DefDefTransforms extends TreesChecks:
                 continuationsStateMachineLabelSelect.select(integerOR).appliedTo(integerMin)
               )
             ),
-            callTransformedMethod
+            ref(transformedMethod.symbol).appliedTo(
+              continuationsStateMachineThis
+                .select(nme.asInstanceOf_)
+                .appliedToType(continuationClassRef.appliedTo(returnType))
+            )
           )
         )
 
@@ -461,12 +485,9 @@ object DefDefTransforms extends TreesChecks:
             tpd.EmptyTree,
             tpd.Assign(
               ref($continuation.symbol),
-              untpd
-                .Select(
-                  tpd.New(tpd.TypeTree(continuationStateMachineClass.tpe)),
-                  nme.CONSTRUCTOR
-                )
-                .withType(continuationsStateMachineConstructorMethodSymbol.info)
+              tpd
+                .New(tpd.TypeTree(continuationStateMachineClass.tpe))
+                .select(nme.CONSTRUCTOR)
                 .appliedTo(
                   ref(completion)
                     .select(nme.asInstanceOf_)
@@ -652,7 +673,7 @@ object DefDefTransforms extends TreesChecks:
             )
           )
 
-        println(transformedTree.show)
+//        println(transformedTree.show)
 
         println(s"state machine and new defdef names: $names")
         println(s"state machine and new defdef continuationNames: $continuationNames")
