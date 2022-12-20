@@ -461,10 +461,12 @@ object DefDefTransforms extends TreesChecks:
             tpd.EmptyTree,
             tpd.Assign(
               ref($continuation.symbol),
-              tpd
-                .New(ref(continuationStateMachineClass.symbol))
-                // TODO: does not have a constructor? for some reason <init> is there but it can't actually find it
-                .select(nme.CONSTRUCTOR)
+              untpd
+                .Select(
+                  tpd.New(tpd.TypeTree(continuationStateMachineClass.tpe)),
+                  nme.CONSTRUCTOR
+                )
+                .withType(continuationsStateMachineConstructorMethodSymbol.info)
                 .appliedTo(
                   ref(completion)
                     .select(nme.asInstanceOf_)
@@ -641,22 +643,6 @@ object DefDefTransforms extends TreesChecks:
             case tree => tree
           }
         )
-
-        //        transformedMethod = tpd.DefDef(
-        //          sym = Symbols.newSymbol(
-        //            parent,
-        //            Names.termName("HI"),
-        //            Flags.Synthetic | Flags.Method,
-        //            anyNullSuspendedType),
-        //          paramss = params(tree, completion).map {
-        //            _.map {
-        //              case p: tpd.ValDef => p.symbol
-        //              case t: tpd.TypeDef => t.symbol
-        //            }
-        //          },
-        //          resultType = anyNullSuspendedType,
-        //          rhs = tpd.EmptyTree
-        //        )
 
         val transformedTree =
           tpd.Block(
