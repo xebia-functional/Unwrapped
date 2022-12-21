@@ -644,10 +644,12 @@ object DefDefTransforms extends TreesChecks:
           )
 
           // $label match {...}
-          val labelMatch = tpd.Match(
-            continuationAsStateMachineClass.select(continuationsStateMachineLabelParam),
-            List(case21, case22, case23)
-          )
+          val labelMatch = tpd
+            .Match(
+              continuationAsStateMachineClass.select(continuationsStateMachineLabelParam),
+              List(case21, case22, case23)
+            )
+            .withType(anyNullSuspendedType)
 
           tpd.Block(List($continuation, completionMatch, $result), labelMatch)
         }
