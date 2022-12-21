@@ -15,6 +15,7 @@ import dotty.tools.dotc.core.StdNames.nme
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Types.{MethodType, OrType, Type}
 import dotty.tools.dotc.report
+import dotty.tools.dotc.transform.Getters
 
 import scala.annotation.tailrec
 import scala.collection.immutable.List
@@ -284,15 +285,13 @@ object DefDefTransforms extends TreesChecks:
         val resultName = names.slice(continuationNames.size, continuationNames.size + 1)
         val labels = names.drop(continuationNames.size + 1)
 
-        val continuationsStateMachineScope = Scopes.newScope
-
         // class compileFromString-55580126-00e0-477a-8040-f0c76732df77.$package$foo$1
         val continuationsStateMachineSymbol = newCompleteClassSymbol(
           treeOwner,
           typeName(stateMachineContinuationClassName),
           SyntheticArtifact,
           List(continuationImplClass.typeRef),
-          continuationsStateMachineScope
+          Scopes.newScope
         ).entered.asClass
 
         val continuationsStateMachineConstructorMethodCompletionParamName =
@@ -305,11 +304,7 @@ object DefDefTransforms extends TreesChecks:
           Flags.Synthetic,
           List(continuationsStateMachineConstructorMethodCompletionParamName),
           List(continuationClassRef.appliedTo(anyOrNullType))
-        )
-
-        continuationsStateMachineSymbol.enter(
-          continuationsStateMachineConstructorMethodSymbol,
-          continuationsStateMachineScope)
+        ).entered.asTerm // .enteredAfter(new Getters).asTerm
 
         val continuationsStateMachineConstructor =
           tpd.DefDef(continuationsStateMachineConstructorMethodSymbol)
@@ -320,26 +315,24 @@ object DefDefTransforms extends TreesChecks:
             anyNullSuspendedType
           )
         val continuationStateMachineResult = tpd.ValDef(
-          continuationsStateMachineScope.enter(
-            newSymbol(
-              continuationsStateMachineSymbol,
-              continuationsStateMachineResultName,
-              Flags.Synthetic | Flags.Mutable,
-              eitherThrowableAnyNullSuspendedType)),
+          newSymbol(
+            continuationsStateMachineSymbol,
+            continuationsStateMachineResultName,
+            Flags.Synthetic | Flags.Mutable,
+            eitherThrowableAnyNullSuspendedType).entered.asTerm,
           Underscore(eitherThrowableAnyNullSuspendedType)
         )
 
         val continuationStateMachineLabel = tpd.ValDef(
-          continuationsStateMachineScope.enter(
-            newSymbol(
-              continuationsStateMachineSymbol,
-              continuationsStateMachineLabelParam,
-              Flags.Synthetic | Flags.Mutable,
-              intType)),
+          newSymbol(
+            continuationsStateMachineSymbol,
+            continuationsStateMachineLabelParam,
+            Flags.Synthetic | Flags.Mutable,
+            intType).entered.asTerm,
           Underscore(intType)
         )
 
-        val invokeSuspendSymbol = continuationsStateMachineScope.enter(
+        val invokeSuspendSymbol =
           newSymbol(
             continuationsStateMachineSymbol,
             Names.termName("invokeSuspend"),
@@ -349,7 +342,7 @@ object DefDefTransforms extends TreesChecks:
               List(eitherThrowableAnyNullSuspendedType),
               anyOrNullType
             )
-          ))
+          ).entered.asTerm
 
         val continuationsStateMachineThis: tpd.This =
           tpd.This(continuationsStateMachineSymbol)
@@ -395,7 +388,7 @@ object DefDefTransforms extends TreesChecks:
 
         // override protected def invokeSuspend
         val invokeSuspendMethod = tpd.DefDef(
-          invokeSuspendSymbol.asTerm,
+          invokeSuspendSymbol,
           tpd.Block(
             List(
               tpd.Assign(
