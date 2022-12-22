@@ -21,10 +21,10 @@ trait HttpExtensionsSuiteFixtures { self: ScalaFXSuite =>
       setup = _ => {
         for {
           server <- Resource(
-            HttpServer.create(InetSocketAddress(0), 0),
+            () => HttpServer.create(InetSocketAddress(0), 0),
             (server, _) => server.stop(0))
           serverExecutor <- Resource(
-            Executors.newVirtualThreadPerTaskExecutor,
+            () => Executors.newVirtualThreadPerTaskExecutor,
             (executor, _) => executor.shutdown())
           _ = server.setExecutor(serverExecutor)
           httpContext = server.createContext("/root", handler)
