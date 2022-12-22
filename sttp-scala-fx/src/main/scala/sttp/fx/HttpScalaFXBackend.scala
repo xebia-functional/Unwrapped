@@ -39,7 +39,7 @@ import sttp.client3.StringBody
 
 class HttpScalaFXBackend()(
     using client: HttpClient,
-    control: Control[Throwable | HttpExecutionException],
+    control: Raise[Throwable | HttpExecutionException],
     config: HttpClientConfig
 ) extends SttpBackend[Http, ReceiveStreams] {
 
@@ -57,13 +57,13 @@ class HttpScalaFXBackend()(
       case x @ StreamBody(_) => {
         val body = handle[Exception, StreamBody[Receive[Byte], ReceiveStreams]](
           x.asInstanceOf[StreamBody[Receive[Byte], ReceiveStreams]]) { e =>
-          HttpExecutionException(e).shift[StreamBody[Receive[Byte], ReceiveStreams]]
+          HttpExecutionException(e).raise
         }.httpValue
         makeRequest(request, body)
       }
       case x @ MultipartBody(_) =>
         val body = handle[Exception, MultipartBody[R]](x.asInstanceOf[MultipartBody[R]]) { e =>
-          HttpExecutionException(e).shift[MultipartBody[R]]
+          HttpExecutionException(e).raise
         }.httpValue
         makeRequest(request, body)
     }
@@ -83,14 +83,14 @@ class HttpScalaFXBackend()(
         // signature, we cast
       }
     }
-    def error[T](t: Throwable): Http[T] = t.shift
+    def error[T](t: Throwable): Http[T] = t.raise
     def flatMap[T, T2](fa: Http[T])(f: T => Http[T2]): Http[T2] = fa.bindMap(f)
     protected def handleWrappedError[T](rt: Http[T])(
         h: PartialFunction[Throwable, Http[T]]): Http[T] = {
       val x: Throwable | T = run(rt)
       x match {
         case ex: Throwable if h.isDefinedAt(ex) => h(ex)
-        case ex: Throwable => ex.shift[T]
+        case ex: Throwable => ex.raise
         case a => unit(a.asInstanceOf[T]) // because the only other
         // possible value is T, and
         // we cannot change the
@@ -105,7 +105,7 @@ class HttpScalaFXBackend()(
 
   private def requestAsBody[R, A <: RequestBody[R]](r: A)(
       using ToHttpBodyMapper[A]): Http[HttpBodyMapper[A]] =
-    handle(r.toHttpBodyMapper()) { e => HttpExecutionException(e).shift }
+    handle(r.toHttpBodyMapper()) { e => HttpExecutionException(e).raise }
 
   private def getRequestHeaders[T, R >: ReceiveStreams with Effect[Http], A](
       request: Request[T, R],
@@ -156,14 +156,14 @@ class HttpScalaFXBackend()(
       override protected def regularIgnore(
           response: jnh.HttpResponse[Receive[Byte]]): Http[Unit] = {
         val x: Http[Receive[Byte]] = handle[Exception, Receive[Byte]](response.body()) { e =>
-          HttpExecutionException(e).shift[Receive[Byte]]
+          HttpExecutionException(e).raise
         }.httpValue
         Http(())
       }
       override protected def regularAsByteArray(
           response: jnh.HttpResponse[Receive[Byte]]): Http[Array[Byte]] =
         handle[Exception, Array[Byte]](response.body().toList.toArray) { e =>
-          HttpExecutionException(e).shift[Array[Byte]]
+          HttpExecutionException(e).raise
         }
 
       override protected def regularAsFile(
@@ -171,7 +171,7 @@ class HttpScalaFXBackend()(
           file: SttpFile): Http[SttpFile] = {
         val pathWritten =
           handle[Exception, Path](Files.write(file.toPath, response.body.toList.toArray)) { e =>
-            HttpExecutionException(e).shift[Path]
+            HttpExecutionException(e).raise
           }.httpValue
         Http(file)
       }
@@ -179,15 +179,13 @@ class HttpScalaFXBackend()(
       override protected def regularAsStream(
           response: jnh.HttpResponse[Receive[Byte]]): Http[(Receive[Byte], () => Http[Unit])] =
         handle[Exception, (Receive[Byte], () => Http[Unit])](
-          (response.body(), () => Http(()))) { e =>
-          HttpExecutionException(e).shift[(Receive[Byte], () => Http[Unit])]
-        }
+          (response.body(), () => Http(()))) { e => HttpExecutionException(e).raise }
 
       override protected def handleWS[T](
           responseAs: WebSocketResponseAs[T, _],
           meta: ResponseMetadata,
           ws: Nothing): Http[T] =
-        HttpExecutionException(new RuntimeException("Websockets are unsupported")).shift[T]
+        HttpExecutionException(new RuntimeException("Websockets are unsupported")).raise
 
       override protected def cleanupWhenNotAWebSocket(
           response: jnh.HttpResponse[Receive[Byte]],
@@ -197,7 +195,7 @@ class HttpScalaFXBackend()(
       override protected def cleanupWhenGotWebSocket(
           response: Nothing,
           e: GotAWebSocketException): Http[Unit] =
-        HttpExecutionException(new RuntimeException("Websockets are unsupported")).shift[Unit]
+        HttpExecutionException(new RuntimeException("Websockets are unsupported")).raise
     }
   }
 
@@ -220,7 +218,7 @@ class HttpScalaFXBackend()(
 
   private def getUri[T, R >: ReceiveStreams with Effect[Http]](
       request: Request[T, R]): Http[URI] = {
-    handle(request.uri.toJavaUri) { e => HttpExecutionException(e).shift }
+    handle(request.uri.toJavaUri) { e => HttpExecutionException(e).raise }
   }
 
   private def makeRequest[T, R >: ReceiveStreams with Effect[Http], A](
@@ -261,8 +259,7 @@ class HttpScalaFXBackend()(
       case Method.PUT => toResponse(request, uri.put[Receive[Byte]](body, timeout, headers: _*))
       case Method.TRACE => toResponse(request, uri.TRACE(timeout, headers: _*))
       case m @ _ =>
-        HttpExecutionException(new RuntimeException(s"Method: $m is unsupported."))
-          .shift[Response[T]]
+        HttpExecutionException(new RuntimeException(s"Method: $m is unsupported.")).raise
     }
   }
 

@@ -32,10 +32,10 @@ object StructuredTests extends Properties("Structured Concurrency Tests"):
     r.get() == s"$b$a"
   }
 
-  property("concurrent shift on fork join propagates") = forAll { (a: Int, b: Int) =>
-    val x: Control[Int] ?=> Structured ?=> String =
-      val fa = fork[String](() => a.shift)
-      val fb = fork[String](() => b.shift)
+  property("concurrent raise on fork join propagates") = forAll { (a: Int, b: Int) =>
+    val x: Raise[Int] ?=> Structured ?=> String =
+      val fa = fork[String](() => a.raise)
+      val fb = fork[String](() => b.raise)
       fa.join + fb.join
 
     val value: String | Int = run(structured(x))
@@ -43,11 +43,11 @@ object StructuredTests extends Properties("Structured Concurrency Tests"):
     List(a, b).contains(value)
   }
 
-  property("concurrent shift on fork that doesn't join does not propagate") = forAll {
+  property("concurrent raise on fork that doesn't join does not propagate") = forAll {
     (a: Int, b: Int, c: String) =>
-      val x: Control[Int] ?=> Structured ?=> String =
-        val fa = fork[Nothing](() => a.shift)
-        val fb = fork[Nothing](() => b.shift)
+      val x: Raise[Int] ?=> Structured ?=> String =
+        val fa = fork[Nothing](() => a.raise)
+        val fb = fork[Nothing](() => b.raise)
         c
 
       c == run(structured(x))

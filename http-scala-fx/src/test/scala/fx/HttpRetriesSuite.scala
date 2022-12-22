@@ -12,7 +12,7 @@ class HttpRetriesSuite extends ScalaCheckSuite:
       (i >= 0) ==> {
         @nowarn
         val result = run(HttpRetries.of(i)) match
-          case ex: HttpExecutionException => fail(s"unexpected shift to error: $ex.getMessage")
+          case ex: HttpExecutionException => fail(s"unexpected raise to error: $ex.getMessage")
           case x: HttpRetries => x.value == i
         result
       }

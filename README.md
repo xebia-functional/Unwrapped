@@ -15,13 +15,13 @@ val program: Int =
 ```
 
 Using Scala3 features such as context functions we can encode pure programs in terms of capabilities with minimal overhead.
-Capabilities can be introduced a la carte and will be carried as given contextual evidences through call sites until you proof you can get rid of them.
+Capabilities can be introduced à la carte and will be carried as given contextual evidences through call sites until you proof you can get rid of them.
 
 ```scala
 import fx.*
 
 def runProgram: Int | String =
-    val program: Errors[String] ?=> Int =
+    val program: Raise[String] ?=> Int =
       Right(1).bind + Right(2).bind + "oops".raise[Int]
 
     run(program)
@@ -34,10 +34,10 @@ Users and library authors may define their own Capabilities. Here is how `Bind` 
 
 ```scala
 /** Brings the capability to perform Monad bind in place. Types may
-  * access [[Control]] to short-circuit as necessary
+  * access [[Raise]] to short-circuit as necessary
   */
 extension [R, A](fa: Either[R, A])
-  def bind: Errors[R] ?=> A = fa.fold(_.shift, identity)
+  def bind: Raise[R] ?=> A = fa.fold(_.raise, identity)
 ```
 
 Scala Fx supports a structured concurrency model backed by the non-blocking [StructuredExecutorTask](https://openjdk.java.net/jeps/428)

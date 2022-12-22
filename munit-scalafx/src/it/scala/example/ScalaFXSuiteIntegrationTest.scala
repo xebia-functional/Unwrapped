@@ -6,7 +6,7 @@ import munit.fx.ScalaFXSuite
 class ScalaFXSuiteIntegrationSuite extends ScalaFXSuite:
   def myFunction(
       value1: Either[String, Int],
-      value2: Option[Int]): Errors[String | None.type] ?=> Int =
+      value2: Option[Int]): Raise[String | None.type] ?=> Int =
     value1.bind + value2.bind
 
   testFX("The computation's result satisfies the assertion") {

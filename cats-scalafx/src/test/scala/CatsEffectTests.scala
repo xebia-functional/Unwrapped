@@ -20,12 +20,12 @@ import scala.concurrent.duration._
 
 object CatsEffectTests extends Properties("Cats Effect Tests"):
   property("fx happy programs to IO") = forAll { (a: Int) =>
-    val effect: Control[Throwable] ?=> Int = a
+    val effect: Raise[Throwable] ?=> Int = a
     toEffect[IO, Throwable, Int](effect).unsafeRunSync() == a
   }
 
   property("fx failing programs to ApplicativeError effects") = forAll { (b: String) =>
-    val effect: Control[String] ?=> Int = b.shift
+    val effect: Raise[String] ?=> Int = b.raise
     implicit val ae: ApplicativeError[[a] =>> Either[String, a], String] =
       catsStdInstancesForEither
     toEffect[[a] =>> Either[String, a], String, Int](effect) == Left(b)
@@ -34,7 +34,7 @@ object CatsEffectTests extends Properties("Cats Effect Tests"):
 
   property("fx failing throwable programs to IO effects") = forAll { (b: String) =>
     val expectedException = RuntimeException(b)
-    val effect: Control[Throwable] ?=> Int = expectedException.shift
+    val effect: Raise[Throwable] ?=> Int = expectedException.raise
 
     toEffect[IO, Throwable, Int](effect).attempt.unsafeRunSync() == Left(expectedException)
 
@@ -59,19 +59,19 @@ object CatsEffectTests extends Properties("Cats Effect Tests"):
   }
 
   property("fx happy programs to IO") = forAll { (a: Int) =>
-    val effect: Control[String] ?=> Int = a
+    val effect: Raise[String] ?=> Int = a
     toCatsEffect[IO, String, Int](effect).unsafeRunSync() == a
   }
 
-  property("fx failing programs with Control[Throwable] to IO") = forAll { (b: String) =>
-    val effect: Control[Throwable] ?=> Int = new RuntimeException(b).shift
+  property("fx failing programs with Raise[Throwable] to IO") = forAll { (b: String) =>
+    val effect: Raise[Throwable] ?=> Int = new RuntimeException(b).raise
     toCatsEffect[IO, Throwable, Int](effect).attempt.unsafeRunSync().leftMap { e =>
       e.getMessage
     } == Left(b)
   }
 
   property("fx failing programs to IO") = forAll { (b: String) =>
-    val effect: Control[String] ?=> Int = b.shift
+    val effect: Raise[String] ?=> Int = b.raise
     toCatsEffect[IO, String, Int](effect).attempt.unsafeRunSync() == Left(
       NonThrowableFXToCatsException(b))
 
