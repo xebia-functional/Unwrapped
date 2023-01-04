@@ -18,10 +18,10 @@ val testJson: String =
 case class TestEncoder(x: Int, y: String)
 object TestEncoder:
 
-  given d:Decoder[TestEncoder] = new Decoder[TestEncoder] {
+  given d: Decoder[TestEncoder] = new Decoder[TestEncoder] {
 
-    override def apply(c: HCursor): Result[TestEncoder] = (c.downField("x").as[Int], c.downField("y").as[String]).mapN(TestEncoder(_, _))
-
+    override def apply(c: HCursor): Result[TestEncoder] =
+      (c.downField("x").as[Int], c.downField("y").as[String]).mapN(TestEncoder(_, _))
 
   }
 
@@ -55,5 +55,6 @@ trait CirceFixtures { self: ScalaFXSuite =>
     teardown = _ => ()
   )
 
-  val testEncoderInstanceAndDecoderDerived = FunFixture.map2(testEncoderInstance, decodingDerived)
+  val testEncoderInstanceAndDecoderDerived =
+    FunFixture.map2(testEncoderInstance, decodingDerived)
 }
