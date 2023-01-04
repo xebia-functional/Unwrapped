@@ -443,18 +443,8 @@ object DefDefTransforms extends TreesChecks:
           List(
             continuationStateMachineResult,
             continuationStateMachineLabel,
-            tpd.DefDef(
-              continuationStateMachineResultSetter,
-              tpd.Assign(
-                continuationsStateMachineThis.select(continuationsStateMachineResultName),
-                ref(continuationStateMachineResultSetter.paramSymss.head.head))
-            ),
-            tpd.DefDef(
-              continuationStateMachineLabelSetter,
-              tpd.Assign(
-                continuationsStateMachineThis.select(continuationsStateMachineLabelParam),
-                ref(continuationStateMachineLabelSetter.paramSymss.head.head))
-            ),
+            tpd.DefDef(continuationStateMachineResultSetter, tpd.unitLiteral),
+            tpd.DefDef(continuationStateMachineLabelSetter, tpd.unitLiteral),
             invokeSuspendMethod
           )
         )
@@ -491,7 +481,7 @@ object DefDefTransforms extends TreesChecks:
               .select(integerAND)
               .appliedTo(integerMin)
               .select(integerNE)
-              .appliedTo(tpd.Literal(Constant("0x0"))),
+              .appliedTo(tpd.Literal(Constant(0x0))),
             tpd.Block(
               List(tpd.Assign(ref($continuation.symbol), ref(case11Param.symbol))),
               tpd.Assign(
@@ -688,13 +678,13 @@ object DefDefTransforms extends TreesChecks:
           }
         )
 
+        val run = ref(transformedMethod.symbol).appliedTo(tpd.nullLiteral)
+
         val transformedTree =
-          tpd.Block(
-            List(continuationStateMachineClass),
-            cpy.DefDef(transformedMethod)(
-              rhs = substituteContinuation.transform(tree.rhs)
-            )
-          )
+          tpd.Thicket(
+            continuationStateMachineClass ::
+              cpy.DefDef(transformedMethod)(rhs =
+                substituteContinuation.transform(tree.rhs)) :: run :: Nil)
 
 //        println(transformedTree.show)
 
