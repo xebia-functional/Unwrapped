@@ -143,6 +143,15 @@ trait ScalaFxAssertions:
   ): Location ?=> (Errors[AssertionError], Errors[R]) ?=> Unit = liftToFX(
     assertEqualsFloat(obtained, expected, delta, clue))
 
+  def assertsShiftsToException[R, A](
+      obtained: Errors[R] ?=> A,
+      expected: Throwable): (Location, Errors[R | AssertionError]) ?=> Unit =
+    val obtainedRun: R | A = run(obtained)
+    obtainedRun match
+      case obtainedException: Throwable =>
+        assertEquals(obtainedException.getMessage, expected.getMessage)
+      case _ => AssertionError(s"Expected ${expected}, got $obtained")
+
   def assertsShiftsToFX[R, T, A](
       obtained: Errors[R] ?=> A,
       expected: T): (Location, Errors[R | AssertionError]) ?=> Unit =
