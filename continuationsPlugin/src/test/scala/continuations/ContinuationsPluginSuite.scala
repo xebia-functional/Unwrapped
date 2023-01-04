@@ -82,19 +82,24 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       }
   }
 
-  compilerContext.test("debug".ignore) {
+  compilerContext.test("debug") {
     case given Context =>
       val source =
         """|package continuations
            |
-           |def foo()(using Suspend): Int = {
-           |  val x = 5
-           |  println("HI")
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |def foo(): Int = {
+           |  class C {
+           |    var $y: Int = _
+           |    def invoke(y: Int) = this.$y = y
+           |  }
+           |  def too(x: Int) = x
+           |  def coo(c: Continuation[Int]) = c
+           |  too(2)
            |}
            |""".stripMargin
-      checkCompile("pickleQuotes", source) {
+      checkCompile("lambdaLift", source) {
         case (tree, _) =>
+          println(tree.show)
           assertEquals(tree.toString, """|""".stripMargin)
       }
   }
@@ -1015,7 +1020,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |""".stripMargin
       // format: on
 
-      checkContinuations(source) {
+      checkCompile("lambdaLift", source) {
         case (tree, _) =>
           assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
       }
