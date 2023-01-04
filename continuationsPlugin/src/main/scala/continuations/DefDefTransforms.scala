@@ -11,11 +11,11 @@ import dotty.tools.dotc.core.{Flags, Names, Scopes, Symbols, Types}
 import dotty.tools.dotc.core.NullOpsDecorator.stripNull
 import dotty.tools.dotc.core.Flags.*
 import dotty.tools.dotc.core.Names.{termName, typeName}
+import dotty.tools.dotc.core.NameOps._
 import dotty.tools.dotc.core.StdNames.nme
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Types.{MethodType, OrType, Type}
 import dotty.tools.dotc.report
-import dotty.tools.dotc.transform.Getters
 
 import scala.annotation.tailrec
 import scala.collection.immutable.List
@@ -304,7 +304,7 @@ object DefDefTransforms extends TreesChecks:
           Flags.Synthetic,
           List(continuationsStateMachineConstructorMethodCompletionParamName),
           List(continuationClassRef.appliedTo(anyOrNullType))
-        ).entered.asTerm // .enteredAfter(new Getters).asTerm
+        ).entered.asTerm
 
         val continuationsStateMachineConstructor =
           tpd.DefDef(continuationsStateMachineConstructorMethodSymbol)
@@ -409,6 +409,26 @@ object DefDefTransforms extends TreesChecks:
 
         val $completion = continuationsStateMachineConstructor.paramss.flatten.head.symbol
 
+        val continuationStateMachineResultSetter =
+          newSymbol(
+            continuationsStateMachineSymbol,
+            continuationStateMachineResult.symbol.asTerm.name.setterName,
+            Method | Flags.Accessor,
+            info = MethodType(
+              continuationStateMachineResult.symbol.asTerm.info.widenExpr :: Nil,
+              defn.UnitType)
+          ).entered.asTerm
+
+        val continuationStateMachineLabelSetter =
+          newSymbol(
+            continuationsStateMachineSymbol,
+            continuationStateMachineLabel.symbol.asTerm.name.setterName,
+            Method | Flags.Accessor,
+            info = MethodType(
+              continuationStateMachineLabel.symbol.asTerm.info.widenExpr :: Nil,
+              defn.UnitType)
+          ).entered.asTerm
+
         val continuationStateMachineClass = ClassDefWithParents(
           continuationsStateMachineSymbol,
           continuationsStateMachineConstructor,
@@ -423,7 +443,20 @@ object DefDefTransforms extends TreesChecks:
           List(
             continuationStateMachineResult,
             continuationStateMachineLabel,
-            invokeSuspendMethod)
+            tpd.DefDef(
+              continuationStateMachineResultSetter,
+              tpd.Assign(
+                continuationsStateMachineThis.select(continuationsStateMachineResultName),
+                ref(continuationStateMachineResultSetter.paramSymss.head.head))
+            ),
+            tpd.DefDef(
+              continuationStateMachineLabelSetter,
+              tpd.Assign(
+                continuationsStateMachineThis.select(continuationsStateMachineLabelParam),
+                ref(continuationStateMachineLabelSetter.paramSymss.head.head))
+            ),
+            invokeSuspendMethod
+          )
         )
 
         // the existing (foo) method
