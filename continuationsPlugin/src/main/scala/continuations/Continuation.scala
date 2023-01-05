@@ -13,6 +13,15 @@ object Continuation:
   enum State:
     case Suspended, Undecided, Resumed
 
+  def cont: Continuation[Int] = new Continuation[Int] {
+    type Ctx = (Int, Int)
+
+    def resume(value: Either[Throwable, Int]): Unit =
+      println("YES")
+
+    override def context: Ctx = (1, 2)
+  }
+
 abstract class RestrictedContinuation(
     completion: Continuation[Any | Null] | Null
 ) extends BaseContinuationImpl(completion):
