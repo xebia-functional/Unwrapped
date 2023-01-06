@@ -397,22 +397,23 @@ object DefDefTransforms extends TreesChecks:
         // override protected def invokeSuspend
         val invokeSuspendMethod = tpd.DefDef(
           invokeSuspendSymbol,
-          tpd.Block(
-            List(
-              tpd.Assign(
-                continuationsStateMachineThis.select(continuationsStateMachineResultName),
-                ref(invokeSuspendSymbol.paramSymss.head.head)),
-              tpd.Assign(
-                continuationsStateMachineLabelSelect,
-                continuationsStateMachineLabelSelect.select(integerOR).appliedTo(integerMin)
+          paramss =>
+            tpd.Block(
+              List(
+                tpd.Assign(
+                  continuationsStateMachineThis.select(continuationsStateMachineResultName),
+                  paramss.head.head),
+                tpd.Assign(
+                  continuationsStateMachineLabelSelect,
+                  continuationsStateMachineLabelSelect.select(integerOR).appliedTo(integerMin)
+                )
+              ),
+              ref(transformedMethod.symbol).appliedTo(
+                continuationsStateMachineThis
+                  .select(nme.asInstanceOf_)
+                  .appliedToType(continuationClassRef.appliedTo(returnType))
               )
-            ),
-            ref(transformedMethod.symbol).appliedTo(
-              continuationsStateMachineThis
-                .select(nme.asInstanceOf_)
-                .appliedToType(continuationClassRef.appliedTo(returnType))
             )
-          )
         )
 
         val $completion = continuationsStateMachineConstructor.paramss.flatten.head.symbol
