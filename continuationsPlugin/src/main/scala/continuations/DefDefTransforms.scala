@@ -541,19 +541,6 @@ object DefDefTransforms extends TreesChecks:
               continuationAsStateMachineClass.select(continuationsStateMachineResultName)
             )
 
-          // $result.fold(t => throw t, _ => ())
-          val $resultFold = ref($result.symbol)
-            .select(termName("fold"))
-            .appliedToType(defn.UnitType)
-            .appliedTo(
-              tpd.Lambda(
-                MethodType.apply(List(defn.ThrowableType))(_ => defn.NothingType),
-                trees => tpd.Throw(trees.head)),
-              tpd.Lambda(
-                MethodType(List(eitherThrowableAnyNullSuspendedType))(_ => defn.UnitType),
-                _ => unitLiteral)
-            )
-
           // val safeContinuation ...
           val undecidedState =
             ref(continuationModule).select(termName("State")).select(termName("Undecided"))
@@ -632,7 +619,18 @@ object DefDefTransforms extends TreesChecks:
             tpd.EmptyTree,
             tpd.Block(
               List(
-                $resultFold,
+                // $result.fold(t => throw t, _ => ())
+                ref($result.symbol)
+                  .select(termName("fold"))
+                  .appliedToType(defn.UnitType)
+                  .appliedTo(
+                    tpd.Lambda(
+                      MethodType.apply(List(defn.ThrowableType))(_ => defn.NothingType),
+                      trees => tpd.Throw(trees.head)),
+                    tpd.Lambda(
+                      MethodType(List(eitherThrowableAnyNullSuspendedType))(_ => defn.UnitType),
+                      _ => unitLiteral)
+                  ),
                 tpd.Assign(
                   continuationAsStateMachineClass.select(continuationsStateMachineLabelParam),
                   tpd.Literal(Constant(1))),
@@ -648,7 +646,18 @@ object DefDefTransforms extends TreesChecks:
           val case22 = tpd.CaseDef(
             tpd.Literal(Constant(1)),
             tpd.EmptyTree,
-            $resultFold
+            // $result.fold(t => throw t, _ => ())
+            ref($result.symbol)
+              .select(termName("fold"))
+              .appliedToType(defn.UnitType)
+              .appliedTo(
+                tpd.Lambda(
+                  MethodType.apply(List(defn.ThrowableType))(_ => defn.NothingType),
+                  trees => tpd.Throw(trees.head)),
+                tpd.Lambda(
+                  MethodType(List(eitherThrowableAnyNullSuspendedType))(_ => defn.UnitType),
+                  _ => unitLiteral)
+              )
           )
 
           // case _
