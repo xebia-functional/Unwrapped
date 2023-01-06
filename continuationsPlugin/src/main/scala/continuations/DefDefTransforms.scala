@@ -458,7 +458,7 @@ object DefDefTransforms extends TreesChecks:
         )
 
         // the existing (foo) method
-        def transformSuspendTree(suspendTree: tpd.Tree) = {
+        def transformSuspendTree(suspendTree: tpd.Tree, parent: Symbol) = {
           // var $continuation: Continuation[Any] | Null = null
           val $continuation = tpd.ValDef(
             newSymbol(
@@ -691,24 +691,14 @@ object DefDefTransforms extends TreesChecks:
         val substituteContinuation = new TreeTypeMap(
           treeMap = {
             case tree @ Trees.Inlined(call, _, _) if treeCallsSuspend(tree) =>
-              transformSuspendTree(call)
+              transformSuspendTree(call, transformedMethod.symbol)
             case tree => tree
           }
         )
 
-        val run = ref(transformedMethod.symbol).appliedTo(
-          ref(requiredModule("continuations.Continuation").requiredMethod("cont"))
-            .select(termName("resume"))
-            .appliedTo(
-              tpd.Apply(
-                tpd.TypeApply(
-                  ref(requiredMethod("scala.util.Right.apply")),
-                  List(ref(ctx.definitions.ThrowableType), ref(ctx.definitions.IntType))
-                ),
-                List(tpd.Literal(Constant(1)))
-              )
-            )
-        )
+        // TODO: delete, only for testing
+        val run = ref(transformedMethod.symbol)
+          .appliedTo(ref(requiredModule("continuations.Continuation").requiredMethod("cont")))
 
         val transformedTree =
           tpd.Thicket(
