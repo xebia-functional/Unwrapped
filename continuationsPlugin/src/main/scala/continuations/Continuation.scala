@@ -1,6 +1,6 @@
 package continuations
 
-import continuations.jvm.internal.BaseContinuationImpl
+import continuations.jvm.internal.{BaseContinuationImpl, ContinuationImpl}
 
 trait Continuation[-A]:
   type Ctx <: Tuple
@@ -13,15 +13,6 @@ object Continuation:
   enum State:
     case Suspended, Undecided, Resumed
 
-  def cont: Continuation[Int] = new Continuation[Int] {
-    type Ctx = (Int, Int)
-
-    def resume(value: Either[Throwable, Int]): Unit =
-      println("YES")
-
-    override def context: Ctx = (1, 2)
-  }
-
 abstract class RestrictedContinuation(
     completion: Continuation[Any | Null] | Null
 ) extends BaseContinuationImpl(completion):
@@ -31,3 +22,24 @@ abstract class RestrictedContinuation(
 
   override type Ctx = EmptyTuple
   override val context: EmptyTuple = EmptyTuple
+
+object TestContinuation:
+  private def ci: ContinuationInterceptor = new ContinuationInterceptor {
+    def interceptContinuation[T](continuation: Continuation[T]): Continuation[T] =
+      continuation
+  }
+
+  private def c: Continuation[Any | Null] = new Continuation[Any | Null] {
+    type Ctx = (ContinuationInterceptor, ContinuationInterceptor)
+
+    def resume(value: Either[Throwable, Any | Null]): Unit =
+      println("YES")
+
+    override def context: Ctx = (ci, ci)
+  }
+
+  def contImpl: ContinuationImpl = new ContinuationImpl(c, (ci, ci)) {
+    protected def invokeSuspend(
+        result: Either[Throwable, Any | Null | Continuation.State.Suspended.type]): Any | Null =
+      result.fold(t => throw t, or => or)
+  }

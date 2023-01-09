@@ -381,10 +381,7 @@ object DefDefTransforms extends TreesChecks:
         treeOwner.unforcedDecls.openForMutations.replace(parent, transformedMethodSymbol)
 
         val transformedMethod: tpd.DefDef =
-          tpd.DefDef(
-            sym = transformedMethodSymbol,
-            rhs = tree.rhs
-          )
+          tpd.DefDef(sym = transformedMethodSymbol)
 
         val transformedMethodCompletionParam = ref(
           transformedMethod
@@ -619,18 +616,22 @@ object DefDefTransforms extends TreesChecks:
             tpd.EmptyTree,
             tpd.Block(
               List(
-                // $result.fold(t => throw t, _ => ())
-                ref($result.symbol)
-                  .select(termName("fold"))
-                  .appliedToType(defn.UnitType)
-                  .appliedTo(
-                    tpd.Lambda(
-                      MethodType.apply(List(defn.ThrowableType))(_ => defn.NothingType),
-                      trees => tpd.Throw(trees.head)),
-                    tpd.Lambda(
-                      MethodType(List(eitherThrowableAnyNullSuspendedType))(_ => defn.UnitType),
-                      _ => unitLiteral)
-                  ),
+                // if ($result != null) $result.fold(t => throw t, _ => ())
+                tpd.If(
+                  ref($result.symbol).select(nme.NotEquals).appliedTo(nullLiteral),
+                  ref($result.symbol)
+                    .select(termName("fold"))
+                    .appliedToType(defn.UnitType)
+                    .appliedTo(
+                      tpd.Lambda(
+                        MethodType.apply(List(defn.ThrowableType))(_ => defn.NothingType),
+                        trees => tpd.Throw(trees.head)),
+                      tpd.Lambda(
+                        MethodType(List(anyNullSuspendedType))(_ => defn.UnitType),
+                        _ => unitLiteral)
+                    ),
+                  unitLiteral
+                ),
                 tpd.Assign(
                   continuationAsStateMachineClass.select(continuationsStateMachineLabelParam),
                   tpd.Literal(Constant(1))),
@@ -646,18 +647,22 @@ object DefDefTransforms extends TreesChecks:
           val case22 = tpd.CaseDef(
             tpd.Literal(Constant(1)),
             tpd.EmptyTree,
-            // $result.fold(t => throw t, _ => ())
-            ref($result.symbol)
-              .select(termName("fold"))
-              .appliedToType(defn.UnitType)
-              .appliedTo(
-                tpd.Lambda(
-                  MethodType.apply(List(defn.ThrowableType))(_ => defn.NothingType),
-                  trees => tpd.Throw(trees.head)),
-                tpd.Lambda(
-                  MethodType(List(eitherThrowableAnyNullSuspendedType))(_ => defn.UnitType),
-                  _ => unitLiteral)
-              )
+            // if ($result != null) $result.fold(t => throw t, _ => ())
+            tpd.If(
+              ref($result.symbol).select(nme.NotEquals).appliedTo(nullLiteral),
+              ref($result.symbol)
+                .select(termName("fold"))
+                .appliedToType(defn.UnitType)
+                .appliedTo(
+                  tpd.Lambda(
+                    MethodType.apply(List(defn.ThrowableType))(_ => defn.NothingType),
+                    trees => tpd.Throw(trees.head)),
+                  tpd.Lambda(
+                    MethodType(List(anyNullSuspendedType))(_ => defn.UnitType),
+                    _ => unitLiteral)
+                ),
+              unitLiteral
+            )
           )
 
           // case _
@@ -707,8 +712,8 @@ object DefDefTransforms extends TreesChecks:
         )
 
         // TODO: delete, only for testing
-        val run = ref(transformedMethod.symbol)
-          .appliedTo(ref(requiredModule("continuations.Continuation").requiredMethod("cont")))
+        val run = ref(transformedMethod.symbol).appliedTo(
+          ref(requiredModule("continuations.TestContinuation").requiredMethod("contImpl")))
 
         val transformedTree =
           tpd.Thicket(
