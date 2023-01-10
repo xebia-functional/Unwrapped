@@ -127,8 +127,18 @@ def programSuspendContinuationNoParamNoSuspendContinuation: Int =
   def fooTest()(using s: Suspend): Int = 1
   fooTest()
 
-def programSuspendContinuationNoParamResume: Int =
+//def programSuspendContinuationNoParamResume: Int =
+//  def fooTest()(using s: Suspend): Int =
+//    s.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+//
+//  fooTest()
+
+def programSuspendContinuationNoParamResumeIgnoreResult: Int =
   def fooTest()(using s: Suspend): Int =
-    s.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+    s.suspendContinuation[Unit] { _.resume(Right { println("Hello") }) }
+//    s.suspendContinuation[Int] { continuation =>
+//      continuation.resume(Left(new Exception("error")))
+//    }
+    10
 
   fooTest()

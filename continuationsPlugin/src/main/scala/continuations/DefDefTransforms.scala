@@ -711,15 +711,11 @@ object DefDefTransforms extends TreesChecks:
           }
         )
 
-        // TODO: delete, only for testing
-        val run = ref(transformedMethod.symbol).appliedTo(
-          ref(requiredModule("continuations.TestContinuation").requiredMethod("contImpl")))
-
         val transformedTree =
           tpd.Thicket(
             continuationStateMachineClass ::
               cpy.DefDef(transformedMethod)(rhs =
-                substituteContinuation.transform(tree.rhs)) :: run :: Nil)
+                substituteContinuation.transform(tree.rhs)) :: Nil)
 
 //        println(transformedTree.show)
 
