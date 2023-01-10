@@ -200,7 +200,6 @@ object DefDefTransforms extends TreesChecks:
     defdef match
       case ReturnsContextFunctionWithSuspendType(_) | HasSuspendParameter(_) =>
         defdef match
-          // need to make sure it calls continuation.resume?? see CallsContinuationResumeWith
           case HasSuspensionWithDependency(_) =>
             SuspensionPoints.unapplySeq(defdef).fold(0)(_.size + 6 + oldCount)
           case _ => oldCount

@@ -23,7 +23,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   compilerContextWithContinuationsPlugin.test(
     """|it should transform a 0-arity suspended definition returning a
        |non-blocking value into a definition accepting a continuation
-       |returning the non-blocking value""".stripMargin.ignore) {
+       |returning the non-blocking value""".stripMargin) {
     case given Context =>
       val source =
         """| import continuations.*
@@ -54,7 +54,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "It should work when there are no continuations".ignore) {
+    "It should work when there are no continuations") {
     case given Context =>
       val source = """|class A""".stripMargin
       // format: off
@@ -70,7 +70,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "It should work when there are no continuations".fail.ignore) {
+    "It should work when there are no continuations".fail) {
     case given Context =>
       val source = """|class A""".stripMargin
       val expected = """|package <empty> {
@@ -100,7 +100,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "It should convert a suspended def with a single constant and a non suspended body to CPS".ignore
+    "It should convert a suspended def with a single constant and a non suspended body to CPS"
   ) {
     case given Context =>
       val source =
@@ -135,7 +135,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "It should convert a suspended def with a single constant and a non suspended body to CPS".ignore
+    "It should convert a suspended def with a single constant and a non suspended body to CPS"
   ) {
     case given Context =>
       val source =
@@ -172,7 +172,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       }
   }
 
-  compilerContext.test("It should run the compiler".ignore) {
+  compilerContext.test("It should run the compiler") {
     case given Context =>
       val source = """
                      |class A
@@ -205,7 +205,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with no parameters with a Right input".ignore) {
+    "it should convert simple suspended def with no parameters with a Right input") {
     case given Context =>
       val source =
         """|
@@ -249,7 +249,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with no parameters with a Right input using braces".ignore) {
+    "it should convert simple suspended def with no parameters with a Right input using braces") {
     case given Context =>
       val source =
         """|
@@ -293,7 +293,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with no parameters with a Right input but no inner var".ignore) {
+    "it should convert simple suspended def with no parameters with a Right input but no inner var") {
     case given Context =>
       val source =
         """|
@@ -337,7 +337,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with no parameters with a Right input but no inner var using braces".ignore) {
+    "it should convert simple suspended def with no parameters with a Right input but no inner var using braces") {
     case given Context =>
       val source =
         """|
@@ -381,7 +381,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with no parameters with a Left input".ignore) {
+    "it should convert simple suspended def with no parameters with a Left input") {
     case given Context =>
       val source =
         """|
@@ -425,7 +425,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with a named implicit Suspend".ignore) {
+    "it should convert simple suspended def with a named implicit Suspend") {
     case given Context =>
       val source =
         """|
@@ -469,7 +469,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with no parameters keeping the rows before the suspend call".ignore) {
+    "it should convert simple suspended def with no parameters keeping the rows before the suspend call") {
     case given Context =>
       val source =
         """|
@@ -518,57 +518,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with no parameters ignoring any rows after the suspend call".ignore) {
-    case given Context =>
-      val source =
-        """|
-           |package continuations
-           |
-           |def foo()(using Suspend): Int = {
-           |  val x = 5
-           |  println("HI")
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
-           |  10
-           |}
-           |""".stripMargin
-
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
-           |      {
-           |        val x: Int = 5
-           |        println("HI")
-           |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] = 
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |        safeContinuation.getOrThrow()
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
-      checkContinuations(source) {
-        case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
-      }
-  }
-
-  compilerContextWithContinuationsPlugin.test(
-    "it should not convert suspended def with no parameters that doesn't call resume".ignore) {
+    "it should not convert suspended def with no parameters that doesn't call resume") {
     case given Context =>
       val source =
         """|
@@ -607,7 +557,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should not convert simple suspended def with no parameters with multiple `suspendContinuation`".ignore) {
+    "it should not convert simple suspended def with no parameters with multiple `suspendContinuation`") {
     case given Context =>
       val source =
         """|
@@ -654,7 +604,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with a single constant parameter with a Right input".ignore) {
+    "it should convert simple suspended def with a single constant parameter with a Right input") {
     implicit givenContext =>
 
       val source =

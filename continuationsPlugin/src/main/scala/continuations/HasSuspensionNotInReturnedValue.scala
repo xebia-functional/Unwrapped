@@ -23,24 +23,16 @@ private[continuations] object HasSuspensionNotInReturnedValue extends TreesCheck
    *   otherwise
    */
   def unapply(tree: DefDef)(using Context): Option[Tree] =
-    val callsSuspendAndResume =
-      tree.filterSubTrees { treeCallsSuspend }
-//        .filter { //test, if it works then keep it commented out, else add it back and remove resumeArgs.isEmpty
-//        case Inlined(call, _, _) => subtreesCallsResume(call)
-//        case _ => false
-//      }
-
-    val lastRowsSuspends =
+    def lastRowsSuspends =
       (tree.rhs match {
         case Trees.Block(_, tree) => tree
         case tree => tree
       }) match {
         case Trees.Return(expr, _) => treeCallsSuspend(expr)
-        case Trees.Inlined(fun, _, _) => treeCallsSuspend(fun)
-        case _ => false
+        case t => treeCallsSuspend(t)
       }
 
-    if (callsSuspendAndResume.nonEmpty && !lastRowsSuspends)
+    if (CallsContinuationResumeWith.unapply(tree).nonEmpty && !lastRowsSuspends)
       Option(tree)
     else
       Option.empty
