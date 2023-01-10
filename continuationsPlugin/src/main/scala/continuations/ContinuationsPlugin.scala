@@ -121,16 +121,17 @@ class ContinuationsCallsPhase extends PluginPhase:
     val updatedMethodsList: List[Symbol] = updatedMethods.toList
 
     tree match
-      case Apply(Apply(_, _), List(arg))
+      case Apply(Apply(_, _), List(_))
           if updatedMethodsList.exists(_.name == tree.symbol.name) &&
-            arg.symbol.name.toString == "given_Suspend" =>
-        val sym = updatedMethodsList.find(_.name == tree.symbol.name).get
-
-        ref(sym).appliedTo(
-          ref(
-            requiredModule("continuations.jvm.internal.ContinuationStub").requiredMethod(
-              "contImpl")))
-      case t => t
+            CallsSuspendParameter.unapply(tree).nonEmpty =>
+        updatedMethodsList.find(_.name == tree.symbol.name) match
+          case Some(sym) =>
+            ref(sym).appliedTo(
+              ref(
+                requiredModule("continuations.jvm.internal.ContinuationStub").requiredMethod(
+                  "contImpl")))
+          case _ => tree
+      case _ => tree
 
 end ContinuationsCallsPhase
 
