@@ -1,0 +1,20 @@
+package continuations
+
+import dotty.tools.dotc.ast.Trees.{Block, DefDef, Inlined}
+import dotty.tools.dotc.core.Contexts.Context
+import munit.FunSuite
+
+class HasSuspensionNotInReturnedValueSuite extends FunSuite, CompilerFixtures {
+
+  continuationsContextAndZeroAritySuspendSuspendingNotInLastRowDefDef.test(
+    "should return Some(tree) when the tree has a continuation but not in the last row") {
+    case (given Context, tree) =>
+      assertNoDiff(HasSuspensionNotInReturnedValue.unapply(tree).get.show, tree.show)
+  }
+
+  continuationsContextAndZeroAritySuspendSuspendingDefDef.test(
+    "should return None when the tree has a continuation in the last row") {
+    case (given Context, tree) =>
+      assertEquals(HasSuspensionNotInReturnedValue.unapply(tree), None)
+  }
+}

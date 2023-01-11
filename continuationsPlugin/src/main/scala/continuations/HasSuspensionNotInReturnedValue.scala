@@ -1,12 +1,8 @@
 package continuations
 
-import continuations.BodyHasSuspensionPoint.subtreeCallsSuspend
-import continuations.CallsContinuationResumeWith.treeCallsResume
 import dotty.tools.dotc.ast.Trees
 import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Contexts.Context
-import dotty.tools.dotc.core.Names.*
-import dotty.tools.dotc.core.Symbols.*
 
 /**
  * Matcher for detecting methods that calls/returns

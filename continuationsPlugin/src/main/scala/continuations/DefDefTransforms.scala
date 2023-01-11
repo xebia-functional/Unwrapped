@@ -172,8 +172,10 @@ object DefDefTransforms extends TreesChecks:
   private def transformContinuationWithSuspend(tree: tpd.DefDef)(using Context): tpd.Tree =
     val newTree =
       tree match
-        case HasSuspensionWithDependency(_) | HasSuspensionNotInReturnedValue(_) =>
-          transformSuspendingStateMachine(tree)
+        case HasSuspensionWithDependency(_) =>
+          ???
+        case HasSuspensionNotInReturnedValue(_) =>
+          transformUnusedSuspensionsSuspendingStateMachine(tree)
         case CallsContinuationResumeWith(resumeArg) =>
           transformSuspendOneContinuationResume(tree, resumeArg)
         case BodyHasSuspensionPoint(_) =>
@@ -201,7 +203,7 @@ object DefDefTransforms extends TreesChecks:
       case ReturnsContextFunctionWithSuspendType(_) | HasSuspendParameter(_) =>
         defdef match
           case HasSuspensionWithDependency(_) =>
-            SuspensionPoints.unapplySeq(defdef).fold(0)(_.size + 6 + oldCount)
+            SuspensionPoints.unapplySeq(defdef).fold(0)(_.totalSize + 6 + oldCount)
           case _ => oldCount
       case _ => oldCount
 
@@ -231,8 +233,11 @@ object DefDefTransforms extends TreesChecks:
       case Nil =>
         names
 
-  private def transformSuspendingStateMachine(tree: tpd.DefDef)(using ctx: Context) =
-    SuspensionPoints.unapplySeq(report.logWith("tree has no suspension points:")(tree)) match
+  private def transformUnusedSuspensionsSuspendingStateMachine(tree: tpd.DefDef)(
+      using ctx: Context) =
+    SuspensionPoints
+      .unapplySeq(report.logWith("tree has no suspension points:")(tree))
+      .flatMap(_.nonVal) match
       case None | Some(Nil) => tree
       case Some(suspensionPoint :: Nil) =>
         val continuationClassRef = requiredClassRef(continuationFullName)

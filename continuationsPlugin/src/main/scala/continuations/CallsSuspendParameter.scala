@@ -12,7 +12,7 @@ import dotty.tools.dotc.core.Flags
 private[continuations] object CallsSuspendParameter:
 
   /**
-   * Matches trees with given [continuations.Suspend] parameters
+   * Matches trees with `given [continuations.Suspend]` parameters
    *
    * @param tree
    *   The tree to match upon
