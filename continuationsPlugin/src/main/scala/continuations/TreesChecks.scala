@@ -46,17 +46,4 @@ trait TreesChecks extends Trees {
    */
   private[continuations] def treeCallsResume[A](tree: TTree[A])(using Context): Boolean =
     tree.denot.matches(continuationResumeMethod.symbol)
-
-  /**
-   * @param tree
-   *   A [[dotty.tools.dotc.ast.tpd.Tree]] to check if its subtrees call
-   *   [[continuations.Continuation.resume]]
-   * @return
-   *   True if the subtrees call the method [[continuations.Continuation.resume]]
-   */
-  private[continuations] def subtreesCallsResume(tree: Tree)(using Context): Boolean =
-    tree.existsSubTree {
-      case Inlined(call, _, _) => treeCallsResume(call)
-      case t => treeCallsResume(t)
-    }
 }
