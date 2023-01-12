@@ -498,13 +498,15 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |      {
            |        val x: Int = 5
            |        println("HI")
-           |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] = 
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |        safeContinuation.getOrThrow()
+           |        {
+           |          val continuation1: continuations.Continuation[Int] = completion
+           |          val safeContinuation: continuations.SafeContinuation[Int] = 
+           |            new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |              continuations.Continuation.State.Undecided
+           |            )
+           |          safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |          safeContinuation.getOrThrow()
+           |        }
            |      }
            |  }
            |}
@@ -757,6 +759,68 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |            10
            |          }
            |        foo(continuations.jvm.internal.ContinuationStub.contImpl)
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert simple nested suspended def with a single parameter keeping the rest of the rows untouched".ignore) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo(x: Int)(using Suspend): Int = {
+           |  val y = 5
+           |  println("HI")
+           |  if (x < y) then {
+           |    x
+           |  } else {
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  }
+           |}
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo(x: Int, completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        val y: Int = 5
+           |        println("HI")
+           |        if x.<(y) then 
+           |          {
+           |            x
+           |          }
+           |         else 
+           |          {
+           |            {
+           |              val continuation1: continuations.Continuation[Int] = completion
+           |              val safeContinuation: continuations.SafeContinuation[Int] = 
+           |                new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |                  continuations.Continuation.State.Undecided
+           |                )
+           |              safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |              safeContinuation.getOrThrow()
+           |            }
+           |          }
            |      }
            |  }
            |}

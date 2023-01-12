@@ -4,7 +4,6 @@ import continuations.DefDefTransforms.*
 import dotty.tools.dotc.ast.{tpd, TreeTypeMap, Trees}
 import dotty.tools.dotc.ast.Trees.*
 import dotty.tools.dotc.ast.tpd.*
-import dotty.tools.dotc.core.Annotations.ConcreteAnnotation
 import dotty.tools.dotc.core.Constants.Constant
 import dotty.tools.dotc.core.Contexts.{ctx, Context}
 import dotty.tools.dotc.core.{Flags, Names, Scopes, Symbols, Types}
@@ -81,16 +80,6 @@ object DefDefTransforms extends TreesChecks:
     val returnType: Type =
       tree.rhs.find { treeCallsSuspend }.map(_.tpe).get
 
-    val rowsBeforeSuspend =
-      tree
-        .rhs
-        .toList
-        .flatMap {
-          case Trees.Block(trees, tree) => trees :+ tree
-          case tree => List(tree)
-        }
-        .takeWhile { t => !treeCallsSuspend(t) }
-
     val continuationTyped: Type =
       continuationTraitSym.typeRef.appliedTo(returnType)
 
@@ -135,9 +124,8 @@ object DefDefTransforms extends TreesChecks:
     val suspendContinuationGetThrow =
       safeContinuationRef.select(termName("getOrThrow")).appliedToNone
 
-    val body = tpd.Block(
-      rowsBeforeSuspend ++
-        (continuation1 :: safeContinuation :: suspendContinuationResume :: Nil),
+    val continuationBlock = tpd.Block(
+      continuation1 :: safeContinuation :: suspendContinuationResume :: Nil,
       suspendContinuationGetThrow
     )
 
@@ -152,10 +140,20 @@ object DefDefTransforms extends TreesChecks:
           soft = false)
       )
 
+    val substituteContinuation = new TreeTypeMap(
+      treeMap = {
+        case Trees.Inlined(call, _, _)
+            if call.denot.matches(suspendContinuationMethod.symbol) =>
+          continuationBlock
+        case tree =>
+          tree
+      }
+    )
+
     cpy.DefDef(tree)(
       paramss = params(tree, completion),
       tpt = finalMethodReturnType,
-      rhs = body
+      rhs = substituteContinuation.transform(tree.rhs)
     )
 
   private def transformContinuationWithSuspend(tree: tpd.DefDef)(using Context): tpd.Tree =

@@ -4,12 +4,20 @@ import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Contexts.Context
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Names.*
+import dotty.tools.dotc.report
 
 /**
  * Matcher for detecting methods that call [[continuations.Suspend#suspendContinuation]] and
  * [[continuations.Continuation#resume]]
  */
 private[continuations] object CallsContinuationResumeWith extends TreesChecks:
+
+  private def hasNestedContinuation(tree: Tree)(using Context): Boolean =
+    tree.existsSubTree {
+      case Inlined(call, _, _) =>
+        call.denot.matches(suspendContinuationMethod.symbol)
+      case _ => false
+    }
 
   /**
    * @param tree
@@ -23,7 +31,16 @@ private[continuations] object CallsContinuationResumeWith extends TreesChecks:
     val args =
       tree
         .rhs
-        .filterSubTrees { treeCallsSuspend }
+        .filterSubTrees {
+          case Inlined(call, _, _) =>
+            val isSuspendContinuation = call.denot.matches(suspendContinuationMethod.symbol)
+            if isSuspendContinuation && hasNestedContinuation(call) then
+              report.error(
+                "Suspension functions can be called only within coroutine body",
+                call.srcPos)
+            isSuspendContinuation
+          case _ => false
+        }
         .flatMap {
           case Inlined(
                 Apply(_, List(Block(Nil, Block(List(DefDef(_, _, _, suspendBody)), _)))),
