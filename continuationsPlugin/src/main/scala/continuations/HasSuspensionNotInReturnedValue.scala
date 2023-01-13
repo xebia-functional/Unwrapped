@@ -19,16 +19,33 @@ private[continuations] object HasSuspensionNotInReturnedValue extends TreesCheck
    *   otherwise
    */
   def unapply(tree: DefDef)(using Context): Option[Tree] =
-    def lastRowsSuspends =
-      (tree.rhs match {
-        case Trees.Block(_, tree) => tree
-        case tree => tree
-      }) match {
-        case Trees.Return(expr, _) => treeCallsSuspend(expr)
-        case t => treeCallsSuspend(t)
-      }
+    val returnsSuspend =
+      (tree.rhs.toList.filter(treeCallsSuspend) ++
+        tree
+          .rhs
+          .filterSubTrees(t => subtreeCallsSuspend(t) && !treeCallsSuspend(t))
+          .takeRight(tree.rhs.filterSubTrees(treeCallsSuspend).size))
+        .map {
+          case Trees.Block(_, expr) =>
+            treeCallsSuspend(expr)
+          case Trees.Return(expr, _) =>
+            treeCallsSuspend(expr)
+          case Trees.If(_, thenp, elsep) =>
+            treeCallsSuspend(thenp) || treeCallsSuspend(elsep)
+          case Trees.Closure(_, meth, _) =>
+            treeCallsSuspend(meth)
+          case Trees.CaseDef(_, _, body) =>
+            treeCallsSuspend(body)
+          case Trees.WhileDo(_, body) =>
+            treeCallsSuspend(body)
+          case Trees.TermLambdaTypeTree(_, body) =>
+            treeCallsSuspend(body)
+          case tree =>
+            treeCallsSuspend(tree)
+        }
+        .foldLeft(false)(_ || _)
 
-    if (CallsContinuationResumeWith.unapply(tree).nonEmpty && !lastRowsSuspends)
+    if (CallsContinuationResumeWith.unapply(tree).nonEmpty && !returnsSuspend)
       Option(tree)
     else
       Option.empty

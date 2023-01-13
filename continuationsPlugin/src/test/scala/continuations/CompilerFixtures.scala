@@ -341,6 +341,36 @@ trait CompilerFixtures { self: FunSuite =>
     teardown = _ => ()
   )
 
+  val zeroAritySuspendSuspendingNotInLastRowIfDefDef = FunFixture[Context ?=> DefDef](
+    setup = _ => {
+      DefDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, intType).asTerm,
+        List(List(), List(usingSuspend)),
+        intType,
+        If(
+          Literal(Constant(true)),
+          Block(List(inlinedCallToContinuationsSuspendOfInt), Literal(Constant(9))),
+          Literal(Constant(10)))
+      )
+    },
+    teardown = _ => ()
+  )
+
+  val zeroAritySuspendSuspendingInLastRowIfDefDef = FunFixture[Context ?=> DefDef](
+    setup = _ => {
+      DefDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, intType).asTerm,
+        List(List(), List(usingSuspend)),
+        intType,
+        If(
+          Literal(Constant(true)),
+          inlinedCallToContinuationsSuspendOfInt,
+          Literal(Constant(10)))
+      )
+    },
+    teardown = _ => ()
+  )
+
   val zeroAritySuspendNonSuspendingDefDef = FunFixture[Context ?=> DefDef](
     setup = _ => {
       val c = summon[Context]
@@ -578,6 +608,16 @@ trait CompilerFixtures { self: FunSuite =>
     FunFixture.map2(
       compilerContextWithContinuationsPlugin,
       zeroAritySuspendSuspendingNotInLastRowDefDef)
+
+  val continuationsContextAndZeroAritySuspendSuspendingNotInLastRowIfDefDef =
+    FunFixture.map2(
+      compilerContextWithContinuationsPlugin,
+      zeroAritySuspendSuspendingNotInLastRowIfDefDef)
+
+  val continuationsContextAndZeroAritySuspendSuspendingInLastRowIfDefDef =
+    FunFixture.map2(
+      compilerContextWithContinuationsPlugin,
+      zeroAritySuspendSuspendingInLastRowIfDefDef)
 
   val continuationsContextAndZeroAritySuspendNonSuspendingDefDef =
     FunFixture.map2(compilerContextWithContinuationsPlugin, zeroAritySuspendNonSuspendingDefDef)

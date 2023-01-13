@@ -17,4 +17,16 @@ class HasSuspensionNotInReturnedValueSuite extends FunSuite, CompilerFixtures {
     case (given Context, tree) =>
       assertEquals(HasSuspensionNotInReturnedValue.unapply(tree), None)
   }
+
+  continuationsContextAndZeroAritySuspendSuspendingNotInLastRowIfDefDef.test(
+    "should return Some(tree) when the tree has a continuation but not in the last row for structures like `if`") {
+    case (given Context, tree) =>
+      assertNoDiff(HasSuspensionNotInReturnedValue.unapply(tree).get.show, tree.show)
+  }
+
+  continuationsContextAndZeroAritySuspendSuspendingInLastRowIfDefDef.test(
+    "should return None when the tree has a continuation in the last row for structures like `if`") {
+    case (given Context, tree) =>
+      assertEquals(HasSuspensionNotInReturnedValue.unapply(tree), None)
+  }
 }

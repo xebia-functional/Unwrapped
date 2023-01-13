@@ -772,7 +772,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple nested suspended def with a single parameter keeping the rest of the rows untouched".ignore) {
+    "it should convert simple nested suspended def with a single parameter keeping the rest of the rows untouched") {
     case given Context =>
       val source =
         """|
