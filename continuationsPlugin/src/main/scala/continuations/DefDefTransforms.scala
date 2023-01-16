@@ -590,40 +590,7 @@ object DefDefTransforms extends TreesChecks:
               tpd.EmptyTree
             )
 
-          val case21 = tpd.CaseDef(
-            tpd.Literal(Constant(0)),
-            tpd.EmptyTree,
-            tpd.Block(
-              List(
-                tpd.If(
-                  ref($result.symbol).select(nme.NotEquals).appliedTo(nullLiteral),
-                  ref($result.symbol)
-                    .select(termName("fold"))
-                    .appliedToType(defn.UnitType)
-                    .appliedTo(
-                      tpd.Lambda(
-                        MethodType.apply(List(defn.ThrowableType))(_ => defn.NothingType),
-                        trees => tpd.Throw(trees.head)),
-                      tpd.Lambda(
-                        MethodType(List(anyNullSuspendedType))(_ => defn.UnitType),
-                        _ => unitLiteral)
-                    ),
-                  unitLiteral
-                ),
-                tpd.Assign(
-                  continuationAsStateMachineClass.select(continuationsStateMachineLabelParam),
-                  tpd.Literal(Constant(1))),
-                safeContinuation,
-                suspendContinuationResume,
-                suspendContinuationGetThrow
-              ),
-              ifOrThrowReturn
-            )
-          )
-
-          val case22 = tpd.CaseDef(
-            tpd.Literal(Constant(1)),
-            tpd.EmptyTree,
+          def throwOnFailure =
             tpd.If(
               ref($result.symbol).select(nme.NotEquals).appliedTo(nullLiteral),
               ref($result.symbol)
@@ -639,6 +606,28 @@ object DefDefTransforms extends TreesChecks:
                 ),
               unitLiteral
             )
+
+          val case21 = tpd.CaseDef(
+            tpd.Literal(Constant(0)),
+            tpd.EmptyTree,
+            tpd.Block(
+              List(
+                throwOnFailure,
+                tpd.Assign(
+                  continuationAsStateMachineClass.select(continuationsStateMachineLabelParam),
+                  tpd.Literal(Constant(1))),
+                safeContinuation,
+                suspendContinuationResume,
+                suspendContinuationGetThrow
+              ),
+              ifOrThrowReturn
+            )
+          )
+
+          val case22 = tpd.CaseDef(
+            tpd.Literal(Constant(1)),
+            tpd.EmptyTree,
+            throwOnFailure
           )
 
           // like defn.ClassCastExceptionClass_stringConstructor

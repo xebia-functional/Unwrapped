@@ -31,8 +31,6 @@ class ContinuationsPhase extends PluginPhase:
   override val runsAfter = Set(Staging.name)
   override val runsBefore = Set(ContinuationsCallsPhase.name)
 
-  // prepare for compilation unit
-  // what is a situation that we will have the same method name in the same compilation unit that will cause a duplicate?
   override def prepareForUnit(tree: Tree)(using ctx: Context): Context = {
     val newContext = ctx.fresh
 
