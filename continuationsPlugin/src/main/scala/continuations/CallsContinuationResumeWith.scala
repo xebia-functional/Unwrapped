@@ -27,7 +27,7 @@ private[continuations] object CallsContinuationResumeWith extends TreesChecks:
    *   [[continuations.Suspend#suspendContinuation]] and [[continuations.Continuation#resume]],
    *   [[scala.None]] otherwise
    */
-  def unapply(tree: DefDef)(using Context): Option[Tree] =
+  def unapply(tree: DefDef)(using Context): Option[List[Tree]] =
     val args =
       tree
         .rhs
@@ -61,4 +61,4 @@ private[continuations] object CallsContinuationResumeWith extends TreesChecks:
             None
         }
 
-    Option.when(args.size == 1)(args.head)
+    Option.when(args.nonEmpty)(args)
