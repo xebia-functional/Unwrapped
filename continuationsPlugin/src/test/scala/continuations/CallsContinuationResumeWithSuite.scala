@@ -22,9 +22,9 @@ class CallsContinuationResumeWithSuite extends FunSuite, CompilerFixtures:
       // reference equality. We can use NoDiff on the printed returend
       // tree, however, since we know we do not modify the inner tree in
       // the extractor.
-      assertNoDiff(
-        CallsContinuationResumeWith.unapply(defdef).map(_.toString).get,
-        Some(rightOne).map(_.toString).get)
+      assertEquals(
+        CallsContinuationResumeWith.unapply(defdef).get.map(_.toString),
+        List(rightOne).map(_.toString))
   }
 
   compilerContextWithContinuationsPlugin.test(
