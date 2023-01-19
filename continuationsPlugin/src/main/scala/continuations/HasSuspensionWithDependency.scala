@@ -16,7 +16,7 @@ object HasSuspensionWithDependency:
    *   calculation. None
    */
   def unapply(tree: DefDef)(using Context): Option[Tree] =
-    if (CallsContinuationResumeWith.unapply(tree).nonEmpty &&
+    if (CallsSuspendContinuation.unapply(tree).nonEmpty &&
       tree
         .filterSubTrees {
           case Inlined(call, _, _) => subtreeCallsSuspend(call)
