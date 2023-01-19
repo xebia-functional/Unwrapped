@@ -61,12 +61,43 @@ object DefDefTransforms extends TreesChecks:
         }
         .filterNot(_.isEmpty)
 
+  private def transformSuspendContinuationBody(
+      callSuspensionPoint: tpd.Tree,
+      safeContinuationRef: tpd.Tree)(using Context): List[tpd.Tree] = {
+    val resumeMethod = safeContinuationRef.select(termName("resume"))
+
+    val suspendContinuationResume = new TreeTypeMap(
+      treeMap = {
+        case tree @ Trees.Apply(_, List(resumeArg)) if treeCallsResume(tree) =>
+          resumeMethod.appliedTo(resumeArg)
+        case tree =>
+          tree
+      }
+    )
+
+    val suspendContinuationBody: List[tpd.Tree] =
+      callSuspensionPoint
+        .filterSubTrees {
+          case Trees.DefDef(_, _, _, _) => true
+          case _ => false
+        }
+        .flatMap {
+          case Trees.DefDef(_, _, _, Trees.Block(stats, expr)) =>
+            stats.map(s => s.withType(s.typeOpt)) :+ expr.withType(expr.typeOpt)
+          case tree =>
+            tree.asInstanceOf[tpd.DefDef].rhs :: Nil
+        }
+
+    suspendContinuationResume.transformDefs(suspendContinuationBody) match
+      case (_, transforms) => transforms
+  }
   /*
    * It works with only one top level `suspendContinuation` that just calls `resume`
    * and it replaces the parent method body keeping any rows before the `suspendContinuation` (but not ones after).
    */
-  private def transformSuspendOneContinuationResume(tree: tpd.DefDef, resumeArg: tpd.Tree)(
-      using Context): tpd.DefDef =
+  private def transformSuspendOneContinuationResume(
+      tree: tpd.DefDef,
+      suspensionPoint: tpd.Tree)(using Context): tpd.DefDef =
     val continuationTraitSym: ClassSymbol =
       requiredClass("continuations.Continuation")
     val continuationObjectSym: Symbol =
@@ -118,14 +149,19 @@ object DefDefTransforms extends TreesChecks:
     val safeContinuationRef =
       ref(safeContinuation.symbol)
 
-    val suspendContinuationResume =
-      safeContinuationRef.select(termName("resume")).appliedTo(resumeArg)
+    val callSuspensionPoint: tpd.Tree =
+      suspensionPoint match
+        case tpd.Inlined(call, _, _) => call
+        case _ => tpd.EmptyTree
+
+    val suspendContinuationBody =
+      transformSuspendContinuationBody(callSuspensionPoint, safeContinuationRef)
 
     val suspendContinuationGetThrow =
       safeContinuationRef.select(termName("getOrThrow")).appliedToNone
 
     val continuationBlock = tpd.Block(
-      continuation1 :: safeContinuation :: suspendContinuationResume :: Nil,
+      List(continuation1, safeContinuation) ++ suspendContinuationBody,
       suspendContinuationGetThrow
     )
 
@@ -165,12 +201,14 @@ object DefDefTransforms extends TreesChecks:
           transformUnusedSuspensionsSuspendingStateMachine(
             tree,
             suspensionInReturnedValue = false)
-        case CallsContinuationResumeWith(resumeArgs) if resumeArgs.size > 1 =>
-          transformUnusedSuspensionsSuspendingStateMachine(
-            tree,
-            suspensionInReturnedValue = true)
-        case CallsContinuationResumeWith(resumeArgs) if resumeArgs.size == 1 =>
-          transformSuspendOneContinuationResume(tree, resumeArgs.head)
+        case CallsSuspendContinuation(_) =>
+          SuspensionPoints.unapplySeq(tree).flatMap(_.nonVal) match
+            case Some(suspensionPoint :: Nil) =>
+              transformSuspendOneContinuationResume(tree, suspensionPoint)
+            case _ =>
+              transformUnusedSuspensionsSuspendingStateMachine(
+                tree,
+                suspensionInReturnedValue = true)
         case BodyHasSuspensionPoint(_) =>
           cpy.DefDef(tree)() // any suspension that still needs a transformation
         case _ => transformNonSuspending(tree, cpy)
@@ -522,11 +560,11 @@ object DefDefTransforms extends TreesChecks:
                 else
                   tpd.EmptyTree
 
-              val specificSuspendTree: tpd.Tree = suspensionPoints(i) match
+              val callSuspensionPoint: tpd.Tree = suspensionPoints(i) match
                 case tpd.Inlined(call, _, _) => call
                 case _ => tpd.EmptyTree
 
-              val suspendContinuationType = specificSuspendTree.tpe
+              val suspendContinuationType = callSuspensionPoint.tpe
               val interceptedCall =
                 ref(interceptedMethod)
                   .appliedToType(suspendContinuationType)
@@ -552,30 +590,8 @@ object DefDefTransforms extends TreesChecks:
               val safeContinuationRef =
                 ref(safeContinuation.symbol)
 
-              val resumeArgs: List[tpd.Tree] =
-                specificSuspendTree.filterSubTrees(treeCallsResume).flatMap {
-                  case Trees.Apply(_, List(arg)) => Option(arg)
-                  case _ => Option.empty
-                }
-
-              val suspendContinuationResume =
-                if (resumeArgs.isEmpty)
-                  specificSuspendTree
-                    .filterSubTrees {
-                      case Trees.DefDef(_, _, _, _) => true
-                      case _ => false
-                    }
-                    .flatMap {
-                      case d @ Trees.DefDef(_, _, _, _) => Option(d.rhs)
-                      case _ => Option.empty
-                    }
-                    .headOption
-                    .getOrElse(tpd.EmptyTree)
-                else if (resumeArgs.size == 1)
-                  safeContinuationRef.select(termName("resume")).appliedTo(resumeArgs.head)
-                else
-                  report.error("NotSupported: Can't have more than 1 resume()")
-                  tpd.EmptyTree
+              val suspendContinuationBody =
+                transformSuspendContinuationBody(callSuspensionPoint, safeContinuationRef)
 
               val suspendContinuationGetThrow =
                 tpd.ValDef(
@@ -608,12 +624,10 @@ object DefDefTransforms extends TreesChecks:
                       continuationAsStateMachineClass.select(
                         continuationsStateMachineLabelParam),
                       tpd.Literal(Constant(i + 1))),
-                    safeContinuation,
-                    suspendContinuationResume,
-                    suspendContinuationGetThrow,
-                    ifOrThrowReturn,
-                    returnToLabel
-                  ),
+                    safeContinuation
+                  ) ++
+                    suspendContinuationBody ++
+                    List(suspendContinuationGetThrow, ifOrThrowReturn, returnToLabel),
                   resultValue
                 )
               )

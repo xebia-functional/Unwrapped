@@ -598,12 +598,6 @@ trait CompilerFixtures { self: FunSuite =>
   val continuationsContextAndZeroAritySuspendSuspendingDefDef =
     FunFixture.map2(compilerContextWithContinuationsPlugin, zeroAritySuspendSuspendingDefDef)
 
-  val continuationsContextAndZeroAritySuspendSuspendingDefDefAndRightOne =
-    FunFixture.map3(
-      compilerContextWithContinuationsPlugin,
-      zeroAritySuspendSuspendingDefDef,
-      rightOneApply)
-
   val continuationsContextAndZeroAritySuspendSuspendingNotInLastRowDefDef =
     FunFixture.map2(
       compilerContextWithContinuationsPlugin,

@@ -7,10 +7,9 @@ import dotty.tools.dotc.core.Names.*
 import dotty.tools.dotc.report
 
 /**
- * Matcher for detecting methods that call [[continuations.Suspend#suspendContinuation]] and
- * [[continuations.Continuation#resume]]
+ * Matcher for detecting methods that call [[continuations.Suspend#suspendContinuation]]
  */
-private[continuations] object CallsContinuationResumeWith extends TreesChecks:
+private[continuations] object CallsSuspendContinuation extends TreesChecks:
 
   private def hasNestedContinuation(tree: Tree)(using Context): Boolean =
     tree.existsSubTree {
@@ -24,10 +23,9 @@ private[continuations] object CallsContinuationResumeWith extends TreesChecks:
    *   the [[dotty.tools.dotc.ast.tpd.Tree]] to match upon
    * @return
    *   [[scala.Some]] if the tree contains a subtree call to
-   *   [[continuations.Suspend#suspendContinuation]] and [[continuations.Continuation#resume]],
-   *   [[scala.None]] otherwise
+   *   [[continuations.Suspend#suspendContinuation]], [[scala.None]] otherwise
    */
-  def unapply(tree: DefDef)(using Context): Option[List[Tree]] =
+  def unapply(tree: DefDef)(using Context): Option[Tree] =
     val args =
       tree
         .rhs
@@ -52,13 +50,5 @@ private[continuations] object CallsContinuationResumeWith extends TreesChecks:
           case _ =>
             None
         }
-        .flatMap {
-          case Block(Nil, Apply(fun, List(arg))) if treeCallsResume(fun) =>
-            Option(arg.withType(arg.tpe))
-          case Apply(fun, List(arg)) if treeCallsResume(fun) =>
-            Option(arg.withType(arg.tpe))
-          case _ =>
-            None
-        }
 
-    Option.when(args.nonEmpty)(args)
+    Option.when(args.nonEmpty)(tree)

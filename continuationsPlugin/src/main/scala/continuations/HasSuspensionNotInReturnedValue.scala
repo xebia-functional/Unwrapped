@@ -45,7 +45,7 @@ private[continuations] object HasSuspensionNotInReturnedValue extends TreesCheck
         }
         .foldLeft(false)(_ || _)
 
-    if (CallsContinuationResumeWith.unapply(tree).nonEmpty && !returnsSuspend)
+    if (CallsSuspendContinuation.unapply(tree).nonEmpty && !returnsSuspend)
       Option(tree)
     else
       Option.empty
