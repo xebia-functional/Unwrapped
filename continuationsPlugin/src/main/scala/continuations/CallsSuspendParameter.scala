@@ -24,7 +24,7 @@ private[continuations] object CallsSuspendParameter:
    */
   def unapply(tree: tpd.Tree)(using c: Context): Option[tpd.Tree] =
     tree match
-      case tpd.Apply(_, _) if tree.symbol.paramSymss.flatten.exists { s =>
+      case tpd.Apply(_, args) if args.map(_.symbol).exists { s =>
             s.is(Flags.Given) &&
             s.info.classSymbol.info.hasClassSymbol(requiredClass(suspendFullName))
           } =>

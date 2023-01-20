@@ -545,7 +545,8 @@ trait CompilerFixtures { self: FunSuite =>
               intType,
               Literal(Constant(10))
             )),
-          ref(methodSymbol).appliedToNone)
+          ref(methodSymbol).appliedToNone.appliedTo(ref(usingSuspend))
+        )
       },
       teardown = _ => ()
     )
