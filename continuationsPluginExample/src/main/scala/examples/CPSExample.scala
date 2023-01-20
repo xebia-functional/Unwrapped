@@ -129,7 +129,6 @@ def programSuspendContinuationNoParamNoSuspendContinuation: Int =
 
 def programSuspendContinuationNoParamResume: Int =
   def fooTest()(using s: Suspend): Int =
-    s.suspendContinuation[Unit] { continuation => continuation.resume(Right { println("Hi") }) }
     s.suspendContinuation[Int] { continuation =>
       println("Hello")
       continuation.resume(Right(1))
@@ -150,7 +149,10 @@ def programNestedContinuationCompilationError: Int =
 
 def programSuspendContinuationNoParamResumeIgnoreResult: Int =
   def fooTest()(using s: Suspend): Int =
+    println("Start")
     s.suspendContinuation[Unit] { _.resume(Right { println("Hello") }) }
+    println("World")
+    val x = 1
     s.suspendContinuation[Boolean] { continuation =>
       println("Hi")
       continuation.resume(Right { println("World"); false })

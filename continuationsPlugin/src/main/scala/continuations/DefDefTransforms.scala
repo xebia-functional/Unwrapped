@@ -18,7 +18,6 @@ import dotty.tools.dotc.report
 
 import scala.annotation.tailrec
 import scala.collection.immutable.List
-import scala.collection.mutable.ListBuffer
 
 object DefDefTransforms extends TreesChecks:
 
@@ -91,6 +90,7 @@ object DefDefTransforms extends TreesChecks:
     suspendContinuationResume.transformDefs(suspendContinuationBody) match
       case (_, transforms) => transforms
   }
+
   /*
    * It works with only one top level `suspendContinuation` that just calls `resume`
    * and it replaces the parent method body keeping any rows before the `suspendContinuation` (but not ones after).
@@ -444,6 +444,30 @@ object DefDefTransforms extends TreesChecks:
           )
         )
 
+        val rowsBeforeSuspensionPoints: Map[Int, List[tpd.Tree]] =
+          tree
+            .rhs
+            .toList
+            .flatMap {
+              case Trees.Block(trees, tree) => trees :+ tree
+              case tree => List(tree)
+            }
+            .foldLeft(0 -> Map.empty[Int, List[tpd.Tree]]) {
+              case ((suspensionPointsCounter, rowsBefore), row) =>
+                if (treeCallsSuspend(row))
+                  (suspensionPointsCounter + 1, rowsBefore)
+                else if (suspensionPointsCounter < suspensionPointsSize)
+                  (
+                    suspensionPointsCounter,
+                    rowsBefore.updatedWith(suspensionPointsCounter) {
+                      case Some(ll) => Option(ll :+ row)
+                      case None => Option(row :: Nil)
+                    })
+                else
+                  (suspensionPointsCounter, rowsBefore)
+            }
+            ._2
+
         def transformSuspendTree(parent: Symbol) = {
           val $continuation = tpd.ValDef(
             newSymbol(
@@ -617,15 +641,14 @@ object DefDefTransforms extends TreesChecks:
                 tpd.Literal(Constant(i)),
                 tpd.EmptyTree,
                 tpd.Block(
-                  List(
-                    throwOnFailure,
-                    label,
-                    tpd.Assign(
-                      continuationAsStateMachineClass.select(
-                        continuationsStateMachineLabelParam),
-                      tpd.Literal(Constant(i + 1))),
-                    safeContinuation
-                  ) ++
+                  List(throwOnFailure, label) ++
+                    rowsBeforeSuspensionPoints.get(i).toList.flatten ++
+                    List(
+                      tpd.Assign(
+                        continuationAsStateMachineClass.select(
+                          continuationsStateMachineLabelParam),
+                        tpd.Literal(Constant(i + 1))),
+                      safeContinuation) ++
                     suspendContinuationBody ++
                     List(suspendContinuationGetThrow, ifOrThrowReturn, returnToLabel),
                   resultValue
@@ -677,18 +700,28 @@ object DefDefTransforms extends TreesChecks:
 
         /**
          * If there are more that one Suspension points we create the whole state machine for
-         * all the points and replace the last occurrence of `suspend`. The other occurrences
-         * are not needed and must be removed.
+         * all the points and replace the last occurrence of `suspendContinuation`. The other
+         * occurrences are not needed and are being removed.
+         *
+         * We also don't need to keep the rest of the lines before the last
+         * `suspendContinuation` as they are embedded in the state machine.
          */
         var c = 0
+        var rowsToRemove = rowsBeforeSuspensionPoints.values.toList.flatten.map(_.symbol.coord)
         val substituteContinuation = new TreeTypeMap(
           treeMap = {
             case tree @ Trees.Inlined(_, _, _)
+                if treeCallsSuspend(tree) && c < suspensionPointsSize - 1 =>
+              c += 1
+              tpd.EmptyTree
+            case tree @ Trees.Inlined(_, _, _)
                 if treeCallsSuspend(tree) && c == suspensionPointsSize - 1 =>
               transformSuspendTree(transformedMethod.symbol)
-            case tree @ Trees.Inlined(_, _, _)
-                if treeCallsSuspend(tree) && c < suspensionPointsSize =>
-              c += 1
+            case tree if c < suspensionPointsSize && rowsToRemove.contains(tree.symbol.coord) =>
+              rowsToRemove = rowsToRemove.zipWithIndex.collect {
+                case (coord, index) if index != rowsToRemove.indexOf(tree.symbol.coord) =>
+                  coord
+              }
               tpd.EmptyTree
             case tree => tree
           }
