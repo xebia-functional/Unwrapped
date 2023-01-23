@@ -567,7 +567,7 @@ object DefDefTransforms extends TreesChecks:
 
           val labels: List[Symbol] =
             suspensionPoints.indices.toList.map { i =>
-              newSymbol(parent, termName(s"label$i"), Flags.Label, defn.UnitType).entered
+              newSymbol(parent, termName(s"label$i"), Flags.Label, defn.UnitType)
             }
 
           val cases =
@@ -724,7 +724,11 @@ object DefDefTransforms extends TreesChecks:
               }
               tpd.EmptyTree
             case tree => tree
-          }
+          },
+          substFrom = List(parent),
+          substTo = List(transformedMethod.symbol),
+          oldOwners = List(parent),
+          newOwners = List(transformedMethod.symbol)
         )
 
         val transformedTree =

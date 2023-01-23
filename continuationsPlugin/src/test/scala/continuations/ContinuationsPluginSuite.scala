@@ -1232,9 +1232,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  def foo()(using Suspend): Int = {
            |    println("Start")
            |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
-           |    val x = 1
+           |    val x = "World"
            |    println("Hello")
-           |    println("World")
+           |    println(x)
            |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(2)) }
            |    println("End")
            |    10
@@ -1333,9 +1333,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                      )
            |                     else ()
            |                    label1[Unit]: <empty>
-           |                    val x: Int = 1
+           |                    val x: String = "World"
            |                    println("Hello")
-           |                    println("World")
+           |                    println(x)
            |                    $continuation.asInstanceOf[program$foo$1].$label = 2
            |                    val safeContinuation: continuations.SafeContinuation[Int] = 
            |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
