@@ -195,8 +195,6 @@ object DefDefTransforms extends TreesChecks:
   private def transformContinuationWithSuspend(tree: tpd.DefDef)(using Context): tpd.Tree =
     val newTree =
       tree match
-        case HasSuspensionWithDependency(_) =>
-          ???
         case HasSuspensionNotInReturnedValue(_) =>
           transformUnusedSuspensionsSuspendingStateMachine(
             tree,
@@ -217,7 +215,9 @@ object DefDefTransforms extends TreesChecks:
 
   def transformSuspendContinuation(tree: tpd.DefDef)(using Context): tpd.Tree =
     tree match
-      case ReturnsContextFunctionWithSuspendType(_) | HasSuspendParameter(_) =>
+      case ReturnsContextFunctionWithSuspendType(_) =>
+        transformContinuationWithSuspend(tree)
+      case HasSuspendParameter(_) if IsSuspendContextualMethod.unapply(tree).isEmpty =>
         transformContinuationWithSuspend(tree)
       case _ => report.logWith(s"oldTree:")(tree)
 
@@ -249,7 +249,27 @@ object DefDefTransforms extends TreesChecks:
         val parent = tree.symbol
         val treeOwner = parent.owner
         val defName = parent.name
-        val returnType = tree.tpt.tpe
+
+        val (returnType, rhs, contextFunctionOwner) =
+          if (ReturnsContextFunctionWithSuspendType.unapply(tree).nonEmpty)
+            val contextFunctionArgTypes: List[Type] = defn
+              .asContextFunctionType(tree.tpt.tpe)
+              .argTypes
+              .filterNot(_.hasClassSymbol(requiredClass(suspendFullName)))
+
+            val returnType =
+              if (contextFunctionArgTypes.size > 1)
+                Types.AppliedType(contextFunctionArgTypes.head, contextFunctionArgTypes.tail)
+              else contextFunctionArgTypes.head
+
+            val (rhs, contextFunctionOwner) = tree.rhs match
+              case tpd.Block(List(d @ tpd.DefDef(_, _, _, _)), _)
+                  if d.symbol.isAnonymousFunction =>
+                (d.rhs, Option(d.symbol))
+              case rhs => (rhs, Option.empty)
+
+            (returnType, rhs, contextFunctionOwner)
+          else (tree.tpt.tpe, tree.rhs, Option.empty)
 
         val suspendedState =
           ref(continuationModule).select(termName("State")).select(termName("Suspended"))
@@ -274,7 +294,7 @@ object DefDefTransforms extends TreesChecks:
           Types.OrType(Types.OrNull(defn.AnyType), suspendedState.symbol.namedType, false)
 
         val stateMachineContinuationClassName =
-          s"${ctx.owner.name.show}$$$defName$$1"
+          s"${treeOwner.name.show}$$$defName$$1"
 
         val continuationsStateMachineSymbol = newCompleteClassSymbol(
           treeOwner,
@@ -347,7 +367,7 @@ object DefDefTransforms extends TreesChecks:
         val transformedMethodSymbol =
           newSymbol(
             treeOwner,
-            tree.name,
+            parent.name.asTermName,
             parent.flags,
             MethodType(
               transformedMethodParams.flatMap {
@@ -445,8 +465,7 @@ object DefDefTransforms extends TreesChecks:
         )
 
         val rowsBeforeSuspensionPoints: Map[Int, List[tpd.Tree]] =
-          tree
-            .rhs
+          rhs
             .toList
             .flatMap {
               case Trees.Block(trees, tree) => trees :+ tree
@@ -725,16 +744,15 @@ object DefDefTransforms extends TreesChecks:
               tpd.EmptyTree
             case tree => tree
           },
-          substFrom = List(parent),
-          substTo = List(transformedMethod.symbol),
-          oldOwners = List(parent),
-          newOwners = List(transformedMethod.symbol)
+          substFrom = List(parent) ++ contextFunctionOwner.toList,
+          substTo = List(transformedMethod.symbol, transformedMethod.symbol),
+          oldOwners = List(parent) ++ contextFunctionOwner.toList,
+          newOwners = List(transformedMethod.symbol, transformedMethod.symbol)
         )
 
         val transformedTree =
           tpd.Thicket(
             continuationStateMachineClass ::
-              cpy.DefDef(transformedMethod)(rhs =
-                substituteContinuation.transform(tree.rhs)) :: Nil)
+              cpy.DefDef(transformedMethod)(rhs = substituteContinuation.transform(rhs)) :: Nil)
 
         report.logWith("state machine and new defdef:")(transformedTree)

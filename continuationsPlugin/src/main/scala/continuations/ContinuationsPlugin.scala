@@ -69,19 +69,25 @@ class ContinuationsCallsPhase extends PluginPhase:
   override def transformApply(tree: Apply)(using ctx: Context): Tree =
     val updatedMethodsList: List[Symbol] = updatedMethods.toList
 
-    lazy val findTree =
+    def findTree(tree: Tree): Option[Symbol] =
       updatedMethodsList.find(s => s.name == tree.symbol.name && s.coord == tree.symbol.coord)
 
+    def addContinuation(sym: Symbol) =
+      ref(sym).appliedTo(
+        ref(
+          requiredModule("continuations.jvm.internal.ContinuationStub").requiredMethod(
+            "contImpl")))
+
     tree match
-      case Apply(Apply(_, _), List(_))
-          if findTree.nonEmpty && CallsSuspendParameter.unapply(tree).nonEmpty =>
-        findTree match
-          case Some(sym) =>
-            ref(sym).appliedTo(
-              ref(
-                requiredModule("continuations.jvm.internal.ContinuationStub").requiredMethod(
-                  "contImpl")))
-          case _ => tree
+      case Apply(Apply(_, _), _)
+          if findTree(tree).nonEmpty && CallsSuspendParameter.unapply(tree).nonEmpty =>
+        addContinuation(findTree(tree).get)
+      // method apply when it is a context function
+      case Apply(Select(Apply(fn, _), selected), _)
+          if findTree(fn).nonEmpty &&
+            selected.asTermName.toString == "apply" &&
+            CallsSuspendParameter.unapply(tree).nonEmpty =>
+        addContinuation(findTree(fn).get)
       case _ => tree
 
 end ContinuationsCallsPhase

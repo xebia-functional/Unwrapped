@@ -526,6 +526,54 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
+    "it should convert simple suspended def with a context function that has Suspend") {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo(): Suspend ?=> Int =
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    @ContextResultCount(1) def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        def $anonfun(using evidence$1: continuations.Suspend): Int = 
+           |          {
+           |            val continuation1: continuations.Continuation[Int] = completion
+           |            val safeContinuation: continuations.SafeContinuation[Int] = 
+           |              new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |                continuations.Continuation.State.Undecided
+           |              )
+           |            safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |            safeContinuation.getOrThrow()
+           |          }
+           |        closure($anonfun)
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
     "it should convert simple suspended def with no parameters keeping the rows before the suspend call") {
     case given Context =>
       val source =
@@ -683,6 +731,19 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |}
            |""".stripMargin
 
+      val sourceContextFunction =
+        """|
+           |package continuations
+           |
+           |def program: Int = {
+           |  def foo():Suspend ?=> Int = {
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |    10
+           |  }
+           |  foo()
+           |}
+           |""".stripMargin
+
       // format: off
       val expected =
         """|
@@ -783,6 +844,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       // format: on
 
       checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+
+      checkContinuations(sourceContextFunction) {
         case (tree, _) =>
           assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
       }
@@ -1243,6 +1309,25 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |}
            |""".stripMargin
 
+      val sourceContextFunction =
+        """|
+           |package continuations
+           |
+           |def program: Int = {
+           |  def foo(): Suspend ?=> Int = {
+           |    println("Start")
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |    val x = "World"
+           |    println("Hello")
+           |    println(x)
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(2)) }
+           |    println("End")
+           |    10
+           |  }
+           |  foo()
+           |}
+           |""".stripMargin
+
       // format: off
       val expected =
         """|
@@ -1374,6 +1459,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       // format: on
 
       checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+
+      checkContinuations(sourceContextFunction) {
         case (tree, _) =>
           assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
       }

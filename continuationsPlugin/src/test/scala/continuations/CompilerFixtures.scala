@@ -280,6 +280,53 @@ trait CompilerFixtures { self: FunSuite =>
     teardown = _ => ()
   )
 
+  val suspendContextualMethod: Context ?=> DefDef = DefDef(
+    newAnonFun(owner, ContextualMethodType(List(suspendType), intType)),
+    List(List(usingSuspend)),
+    intType,
+    inlinedCallToContinuationsSuspendOfIntNotInLastRow
+  )
+
+  val suspendContextualMethodDefDef =
+    FunFixture[Context ?=> DefDef](
+      setup = _ => suspendContextualMethod,
+      teardown = _ => ()
+    )
+
+  val notSuspendContextualMethodDefDef =
+    FunFixture[Context ?=> DefDef](
+      setup = _ =>
+        DefDef(
+          newAnonFun(owner, ContextualMethodType(List(defn.StringType), intType)),
+          List(List(usingSuspend)),
+          intType,
+          inlinedCallToContinuationsSuspendOfIntNotInLastRow
+        ),
+      teardown = _ => ()
+    )
+
+  val zeroArityContextFunctionWithSuspensionNotInLastRowDefDef = FunFixture[Context ?=> DefDef](
+    setup = _ => {
+      DefDef(
+        newSymbol(
+          owner,
+          mySuspendName,
+          EmptyFlags,
+          ctxFunctionTpe
+        ).asTerm,
+        List.empty,
+        ctxFunctionTpe,
+        Block(
+          List(
+            suspendContextualMethod
+          ),
+          EmptyTree
+        )
+      )
+    },
+    teardown = _ => ()
+  )
+
   val nonSuspendingContextFunctionValDef = FunFixture[Context ?=> ValDef](
     setup = _ => {
       ValDef(
@@ -638,6 +685,12 @@ trait CompilerFixtures { self: FunSuite =>
     zeroArityContextFunctionDefDef
   )
 
+  val continuationsContextAndZeroArityContextFunctionWithSuspensionNotInLastRowDefDef =
+    FunFixture.map2(
+      compilerContextWithContinuationsPlugin,
+      zeroArityContextFunctionWithSuspensionNotInLastRowDefDef
+    )
+
   val continuationsContextAndSuspendingContextFunctionValDef = FunFixture.map2(
     compilerContextWithContinuationsPlugin,
     suspendingContextFunctionValDef
@@ -647,6 +700,12 @@ trait CompilerFixtures { self: FunSuite =>
     compilerContextWithContinuationsPlugin,
     nonSuspendingContextFunctionValDef
   )
+
+  val continuationsContextAndSuspendContextualMethodDefDef =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, suspendContextualMethodDefDef)
+
+  val continuationsContextAndNotSuspendContextualMethodDefDef =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, notSuspendContextualMethodDefDef)
 
   val continutationsContextAndSuspendingSingleArityWithDependentNonSuspendingCalculation =
     FunFixture.map2(

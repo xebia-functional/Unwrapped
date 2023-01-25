@@ -19,31 +19,36 @@ private[continuations] object HasSuspensionNotInReturnedValue extends TreesCheck
    *   otherwise
    */
   def unapply(tree: DefDef)(using Context): Option[Tree] =
+    val rhs =
+      if (ReturnsContextFunctionWithSuspendType.unapply(tree).nonEmpty)
+        tree.rhs match
+          case Block(List(d @ DefDef(_, _, _, _)), _) if d.symbol.isAnonymousFunction => d.rhs
+          case rhs => rhs
+      else
+        tree.rhs
+
     val returnsSuspend =
-      (tree.rhs.toList.filter(treeCallsSuspend) ++
-        tree
-          .rhs
+      (rhs.toList.filter(treeCallsSuspend) ++
+        rhs
           .filterSubTrees(t => subtreeCallsSuspend(t) && !treeCallsSuspend(t))
-          .takeRight(tree.rhs.filterSubTrees(treeCallsSuspend).size))
-        .map {
-          case Trees.Block(_, expr) =>
-            treeCallsSuspend(expr)
-          case Trees.Return(expr, _) =>
-            treeCallsSuspend(expr)
-          case Trees.If(_, thenp, elsep) =>
-            treeCallsSuspend(thenp) || treeCallsSuspend(elsep)
-          case Trees.Closure(_, meth, _) =>
-            treeCallsSuspend(meth)
-          case Trees.CaseDef(_, _, body) =>
-            treeCallsSuspend(body)
-          case Trees.WhileDo(_, body) =>
-            treeCallsSuspend(body)
-          case Trees.TermLambdaTypeTree(_, body) =>
-            treeCallsSuspend(body)
-          case tree =>
-            treeCallsSuspend(tree)
-        }
-        .foldLeft(false)(_ || _)
+          .takeRight(rhs.filterSubTrees(treeCallsSuspend).size)).exists {
+        case Trees.Block(_, expr) =>
+          treeCallsSuspend(expr)
+        case Trees.Return(expr, _) =>
+          treeCallsSuspend(expr)
+        case Trees.If(_, thenp, elsep) =>
+          treeCallsSuspend(thenp) || treeCallsSuspend(elsep)
+        case Trees.Closure(_, meth, _) =>
+          treeCallsSuspend(meth)
+        case Trees.CaseDef(_, _, body) =>
+          treeCallsSuspend(body)
+        case Trees.WhileDo(_, body) =>
+          treeCallsSuspend(body)
+        case Trees.TermLambdaTypeTree(_, body) =>
+          treeCallsSuspend(body)
+        case tree =>
+          treeCallsSuspend(tree)
+      }
 
     if (CallsSuspendContinuation.unapply(tree).nonEmpty && !returnsSuspend)
       Option(tree)
