@@ -189,12 +189,7 @@ object DefDefTransforms extends TreesChecks:
       tpd.DefDef(sym = transformedMethodSymbol)
 
     val transformedMethodCompletionParam = ref(
-      transformedMethod
-        .termParamss
-        .flatten
-        .find(_.symbol.denot.matches(completion))
-        .head
-        .symbol)
+      transformedMethod.termParamss.flatten.find(_.symbol.denot.matches(completion)).get.symbol)
 
     val continuation1: tpd.ValDef =
       tpd.ValDef(
@@ -482,7 +477,7 @@ object DefDefTransforms extends TreesChecks:
             .termParamss
             .flatten
             .find(_.symbol.denot.matches(completion))
-            .head
+            .get
             .symbol)
 
         val invokeSuspendMethod = tpd.DefDef(
@@ -506,7 +501,14 @@ object DefDefTransforms extends TreesChecks:
             )
         )
 
-        val $completion = continuationsStateMachineConstructor.paramss.flatten.head.symbol
+        val $completion = continuationsStateMachineConstructor
+          .termParamss
+          .flatten
+          .find(
+            _.name.matchesTargetName(
+              continuationsStateMachineConstructorMethodCompletionParamName))
+          .get
+          .symbol
 
         val continuationStateMachineResultSetter =
           newSymbol(
