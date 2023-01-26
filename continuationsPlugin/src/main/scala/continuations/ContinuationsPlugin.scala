@@ -2,7 +2,14 @@ package continuations
 
 import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Contexts.{ctx, Context}
-import dotty.tools.dotc.core.Symbols.{requiredClassRef, requiredMethod, requiredModule, Symbol}
+import dotty.tools.dotc.core.Flags
+import dotty.tools.dotc.core.Symbols.{
+  requiredClass,
+  requiredClassRef,
+  requiredMethod,
+  requiredModule,
+  Symbol
+}
 import dotty.tools.dotc.plugins.PluginPhase
 import dotty.tools.dotc.plugins.StandardPlugin
 import dotty.tools.dotc.transform.PickleQuotes
@@ -54,40 +61,51 @@ class ContinuationsCallsPhase extends PluginPhase:
 
   private val updatedMethods: mutable.ListBuffer[Symbol] = mutable.ListBuffer.empty
 
-  override def prepareForApply(tree: Apply)(using Context): Context =
-    tree match
-      case Apply(_, args) if args.nonEmpty =>
-        args.lastOption.foreach {
-          case TypeApply(_, List(tt))
-              if tt.tpe.typeSymbol == requiredClassRef(continuationFullName).typeSymbol =>
-            updatedMethods.addOne(tree.symbol)
-          case _ => ()
-        }
-      case _ => ()
+  override def prepareForDefDef(tree: DefDef)(using Context): Context =
+    val hasContinuationParam =
+      tree.termParamss.flatten.exists { p =>
+        !p.symbol.is(Flags.Given) &&
+        p.tpt.tpe.matches(requiredClassRef(continuationFullName)) &&
+        p.name.toString == completionParamName
+      }
+
+    if (hasContinuationParam) updatedMethods.addOne(tree.symbol)
+
     ctx
 
   override def transformApply(tree: Apply)(using ctx: Context): Tree =
-    val updatedMethodsList: List[Symbol] = updatedMethods.toList
-
     def findTree(tree: Tree): Option[Symbol] =
-      updatedMethodsList.find(s => s.name == tree.symbol.name && s.coord == tree.symbol.coord)
+      updatedMethods
+        .toList
+        .find(s => s.name == tree.symbol.name && s.coord == tree.symbol.coord)
 
-    def addContinuation(sym: Symbol) =
-      ref(sym).appliedTo(
-        ref(
-          requiredModule("continuations.jvm.internal.ContinuationStub").requiredMethod(
-            "contImpl")))
+    val continuation: Tree = ref(
+      requiredModule("continuations.jvm.internal.ContinuationStub").requiredMethod("contImpl"))
+
+    val applyArgsWithContinuation: List[Tree] =
+      tree
+        .filterSubTrees {
+          case Apply(_, _) => true
+          case _ => false
+        }
+        .map {
+          case Apply(_, args) =>
+            args.filterNot(_.tpe.hasClassSymbol(requiredClass(suspendFullName)))
+        }
+        .reverse
+        .splitAt(1) match
+        case (init, tail) => (init.flatten :+ continuation) ++ tail.flatten
 
     tree match
       case Apply(Apply(_, _), _)
           if findTree(tree).nonEmpty && CallsSuspendParameter.unapply(tree).nonEmpty =>
-        addContinuation(findTree(tree).get)
+        ref(findTree(tree).get).appliedToTermArgs(applyArgsWithContinuation)
       // method apply when it is a context function
       case Apply(Select(Apply(fn, _), selected), _)
           if findTree(fn).nonEmpty &&
             selected.asTermName.toString == "apply" &&
             CallsSuspendParameter.unapply(tree).nonEmpty =>
-        addContinuation(findTree(fn).get)
+        ref(findTree(fn).get).appliedToTermArgs(applyArgsWithContinuation)
       case _ => tree
 
 end ContinuationsCallsPhase
