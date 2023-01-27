@@ -93,8 +93,7 @@ class ContinuationsCallsPhase extends PluginPhase:
             args.filterNot(_.tpe.hasClassSymbol(requiredClass(suspendFullName)))
         }
         .reverse
-        .splitAt(1) match
-        case (init, tail) => (init.flatten :+ continuation) ++ tail.flatten
+        .flatten :+ continuation
 
     tree match
       case Apply(Apply(_, _), _)

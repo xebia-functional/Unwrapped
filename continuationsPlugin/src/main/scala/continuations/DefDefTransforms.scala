@@ -40,25 +40,17 @@ object DefDefTransforms extends TreesChecks:
     if (tree.paramss.isEmpty) {
       List(List(completion))
     } else
-      tree
-        .paramss
-        .zipWithIndex
-        .map { (pc, i) =>
-          val newPc: tpd.ParamClause = pc
-            .filterNot {
-              case p: Trees.ValDef[Type] =>
-                p.typeOpt
-                  .hasClassSymbol(suspendClazz) && p.symbol.flags.isOneOf(Flags.GivenOrImplicit)
-              case t: Trees.TypeDef[Type] =>
-                t.typeOpt
-                  .hasClassSymbol(suspendClazz) && t.symbol.flags.isOneOf(Flags.GivenOrImplicit)
-            }
-            .asInstanceOf[tpd.ParamClause]
-          if (i == 0) {
-            newPc.appended(completion).asInstanceOf[tpd.ParamClause]
-          } else newPc
-        }
-        .filterNot(_.isEmpty)
+      (tree.paramss.map {
+        _.filterNot {
+          case p: Trees.ValDef[Type] =>
+            p.typeOpt
+              .hasClassSymbol(suspendClazz) && p.symbol.flags.isOneOf(Flags.GivenOrImplicit)
+          case t: Trees.TypeDef[Type] =>
+            t.typeOpt
+              .hasClassSymbol(suspendClazz) && t.symbol.flags.isOneOf(Flags.GivenOrImplicit)
+        }.asInstanceOf[tpd.ParamClause]
+      }
+        ++ List(List(completion).asInstanceOf[tpd.ParamClause])).filterNot(_.isEmpty)
 
   private def transformSuspendContinuationBody(
       callSuspensionPoint: tpd.Tree,
@@ -118,15 +110,15 @@ object DefDefTransforms extends TreesChecks:
       parent.flags,
       MethodType(
         transformedMethodParams.flatMap {
-          _.map {
-            case p: tpd.ValDef => p.name
-            case t: tpd.TypeDef => t.name.toTermName
+          _.flatMap {
+            case p: tpd.ValDef => List(p.name)
+            case _: tpd.TypeDef => List.empty
           }
         },
         transformedMethodParams.flatMap {
-          _.map {
-            case p: tpd.ValDef => p.tpt.tpe
-            case t: tpd.TypeDef => t.tpe
+          _.flatMap {
+            case p: tpd.ValDef => List(p.tpt.tpe)
+            case _: tpd.TypeDef => List.empty
           }
         },
         returnType
@@ -269,11 +261,9 @@ object DefDefTransforms extends TreesChecks:
         .filterNot(_.info.hasClassSymbol(requiredClass(continuationFullName)))
 
     val oldMethodParamSymbols: List[Symbol] =
-      tree
-        .symbol
-        .paramSymss
-        .flatten
-        .filterNot(_.info.hasClassSymbol(requiredClass(suspendFullName)))
+      tree.symbol.paramSymss.flatten.filterNot { s =>
+        s.info.hasClassSymbol(requiredClass(suspendFullName)) || s.isTypeParam
+      }
 
     val substituteContinuation = new TreeTypeMap(
       treeMap = {
@@ -347,7 +337,9 @@ object DefDefTransforms extends TreesChecks:
         .filterNot(_.info.hasClassSymbol(requiredClass(continuationFullName)))
 
     val oldMethodParamSymbols: List[Symbol] =
-      parent.paramSymss.flatten.filterNot(_.info.hasClassSymbol(requiredClass(suspendFullName)))
+      parent.paramSymss.flatten.filterNot { s =>
+        s.info.hasClassSymbol(requiredClass(suspendFullName)) || s.isTypeParam
+      }
 
     val substituteContinuation = new TreeTypeMap(
       substFrom = List(parent) ++ oldMethodParamSymbols ++ contextFunctionOwner.toList,
@@ -831,11 +823,9 @@ object DefDefTransforms extends TreesChecks:
             .filterNot(_.info.hasClassSymbol(requiredClass(continuationFullName)))
 
         val oldMethodParamSymbols: List[Symbol] =
-          tree
-            .symbol
-            .paramSymss
-            .flatten
-            .filterNot(_.info.hasClassSymbol(requiredClass(suspendFullName)))
+          tree.symbol.paramSymss.flatten.filterNot { s =>
+            s.info.hasClassSymbol(requiredClass(suspendFullName)) || s.isTypeParam
+          }
 
         /**
          * If there are more that one Suspension points we create the whole state machine for

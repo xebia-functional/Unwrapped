@@ -159,7 +159,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  () extends Object() { this: compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
-           |    def foo(x: Int, z: Seq[String] @Repeated, completion: continuations.Continuation[Int | Any], ec: concurrent.ExecutionContext): Any = x.+(1)
+           |    def foo(x: Int, z: Seq[String] @Repeated, ec: concurrent.ExecutionContext, completion: continuations.Continuation[Int | Any]): Any = x.+(1)
            |  }
            |}
            |""".stripMargin
@@ -2011,9 +2011,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
         """|
            |package continuations
            |
+           |import scala.concurrent.ExecutionContext
+           |import concurrent.ExecutionContext.Implicits.global
+           |
            |def program: Int = {
-           |  def foo(x: Int, y: Int)(z: Int)(using Suspend): Int = x + y + z
-           |  foo(1,2)(3)
+           |  def foo[A, B](x: A, y: B)(z: String)(using s: Suspend, ec: ExecutionContext): A = x
+           |  foo(1,2)("A")
            |}
            |""".stripMargin
 
@@ -2021,10 +2024,13 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
         """|
            |package continuations
            |
+           |import scala.concurrent.ExecutionContext
+           |import concurrent.ExecutionContext.Implicits.global
+           |
            |def program: Int = {
-           |  def foo(x: Int, y: Int)(z: Int)(using Suspend): Int =
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(x + y + z)) }
-           |  foo(1,2)(3)
+           |  def foo[A, B](x: A, y: B)(z: String)(using s: Suspend, ec: ExecutionContext): A =
+           |    summon[Suspend].suspendContinuation[A] { continuation => continuation.resume(Right(x)) }
+           |  foo(1,2)("A")
            |}
            |""".stripMargin
 
@@ -2032,6 +2038,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       val expectedNoSuspend =
         """|
            |package continuations {
+           |  import scala.concurrent.ExecutionContext
+           |  import concurrent.ExecutionContext.Implicits.global
            |  final lazy module val compileFromString$package: 
            |    continuations.compileFromString$package
            |   = new continuations.compileFromString$package()
@@ -2042,8 +2050,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
            |    def program: Int = 
            |      {
-           |        def foo(x: Int, y: Int, completion: continuations.Continuation[Int | Any], z: Int): Any = x.+(y).+(z)
-           |        foo(1, 2, continuations.jvm.internal.ContinuationStub.contImpl, 3)
+           |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A | Any]): Any = x
+           |        foo(1, 2, "A", concurrent.ExecutionContext.Implicits.global, continuations.jvm.internal.ContinuationStub.contImpl)
            |      }
            |  }
            |}
@@ -2052,6 +2060,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       val expectedSuspend =
         """|
            |package continuations {
+           |  import scala.concurrent.ExecutionContext
+           |  import concurrent.ExecutionContext.Implicits.global
            |  final lazy module val compileFromString$package: 
            |    continuations.compileFromString$package
            |   = new continuations.compileFromString$package()
@@ -2062,17 +2072,19 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
            |    def program: Int = 
            |      {
-           |        def foo(x: Int, y: Int, completion: continuations.Continuation[Int], z: Int): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A]): 
+           |          Any | Null | continuations.Continuation.State.Suspended.type
+           |         = 
            |          {
-           |            val continuation1: continuations.Continuation[Int] = completion
-           |            val safeContinuation: continuations.SafeContinuation[Int] = 
-           |              new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |            val continuation1: continuations.Continuation[A] = completion
+           |            val safeContinuation: continuations.SafeContinuation[A] = 
+           |              new continuations.SafeContinuation[A](continuations.intrinsics.IntrinsicsJvm$package.intercepted[A](continuation1)(), 
            |                continuations.Continuation.State.Undecided
            |              )
-           |            safeContinuation.resume(Right.apply[Nothing, Int](x.+(y).+(z)))
+           |            safeContinuation.resume(Right.apply[Nothing, A](x))
            |            safeContinuation.getOrThrow()
            |          }
-           |        foo(1, 2, continuations.jvm.internal.ContinuationStub.contImpl, 3)
+           |        foo(1, 2, "A", concurrent.ExecutionContext.Implicits.global, continuations.jvm.internal.ContinuationStub.contImpl)
            |      }
            |  }
            |}
