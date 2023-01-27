@@ -154,8 +154,9 @@ def programSuspendContinuationNoParamResumeIgnoreResult: Int =
     println("World")
     val x = 1
     s.suspendContinuation[Boolean] { continuation =>
+      val q = "World"
       println("Hi")
-      continuation.resume(Right { println("World"); false })
+      continuation.resume(Right { println(q); false })
     }
 //    s.suspendContinuation[Int] { continuation =>
 //      continuation.resume(Left(new Exception("error")))

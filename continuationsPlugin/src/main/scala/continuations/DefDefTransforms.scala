@@ -66,19 +66,6 @@ object DefDefTransforms extends TreesChecks:
       oldMethod: Symbol)(using Context): List[tpd.Tree] = {
     val resumeMethod = safeContinuationRef.select(termName("resume"))
 
-    val suspendContinuationResume = new TreeTypeMap(
-      treeMap = {
-        case tree @ Trees.Apply(_, List(resumeArg)) if treeCallsResume(tree) =>
-          resumeMethod.appliedTo(resumeArg)
-        case tree =>
-          tree
-      },
-      oldOwners = List(oldMethod),
-      newOwners = List(safeContinuationRef.symbol.owner),
-      substFrom = List(oldMethod),
-      substTo = List(safeContinuationRef.symbol.owner)
-    )
-
     val suspendContinuationBody: List[tpd.Tree] =
       callSuspensionPoint
         .filterSubTrees {
@@ -91,6 +78,31 @@ object DefDefTransforms extends TreesChecks:
           case tree =>
             tree.asInstanceOf[tpd.DefDef].rhs :: Nil
         }
+
+    val removedAnonFunc: List[Symbol] = suspendContinuationBody
+      .filter(t =>
+        t.symbol.exists &&
+          t.symbol.owner.isAnonymousFunction &&
+          t.symbol
+            .owner
+            .paramSymss
+            .flatten
+            .exists(_.info.hasClassSymbol(requiredClass(continuationFullName))))
+      .map(_.symbol.owner)
+      .distinct
+
+    val suspendContinuationResume = new TreeTypeMap(
+      treeMap = {
+        case tree @ Trees.Apply(_, List(resumeArg)) if treeCallsResume(tree) =>
+          resumeMethod.appliedTo(resumeArg)
+        case tree =>
+          tree
+      },
+      oldOwners = List(oldMethod) ++ removedAnonFunc,
+      newOwners = List.fill(1 + removedAnonFunc.size)(safeContinuationRef.symbol.owner),
+      substFrom = List(oldMethod) ++ removedAnonFunc,
+      substTo = List.fill(1 + removedAnonFunc.size)(safeContinuationRef.symbol.owner)
+    )
 
     suspendContinuationResume.transformDefs(suspendContinuationBody) match
       case (_, transforms) => transforms
