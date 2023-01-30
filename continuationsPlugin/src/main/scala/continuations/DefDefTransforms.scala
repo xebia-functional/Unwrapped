@@ -484,6 +484,9 @@ object DefDefTransforms extends TreesChecks:
             .get
             .symbol)
 
+        val transformedMethodOriginalParams =
+          transformedMethod.termParamss.flatten.init
+
         val invokeSuspendMethod = tpd.DefDef(
           invokeSuspendSymbol,
           paramss =>
@@ -497,10 +500,11 @@ object DefDefTransforms extends TreesChecks:
                   continuationsStateMachineLabelSelect.select(integerOR).appliedTo(integerMin)
                 )
               ),
-              ref(transformedMethod.symbol).appliedTo(
-                continuationsStateMachineThis
-                  .select(nme.asInstanceOf_)
-                  .appliedToType(continuationClassRef.appliedTo(returnType))
+              ref(transformedMethod.symbol).appliedToTermArgs(
+                List.fill(transformedMethodOriginalParams.size)(nullLiteral) :+
+                  continuationsStateMachineThis
+                    .select(nme.asInstanceOf_)
+                    .appliedToType(continuationClassRef.appliedTo(returnType))
               )
             )
         )
