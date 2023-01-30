@@ -3,13 +3,7 @@ package continuations
 import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Contexts.{ctx, Context}
 import dotty.tools.dotc.core.Flags
-import dotty.tools.dotc.core.Symbols.{
-  requiredClass,
-  requiredClassRef,
-  requiredMethod,
-  requiredModule,
-  Symbol
-}
+import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.plugins.PluginPhase
 import dotty.tools.dotc.plugins.StandardPlugin
 import dotty.tools.dotc.transform.PickleQuotes
