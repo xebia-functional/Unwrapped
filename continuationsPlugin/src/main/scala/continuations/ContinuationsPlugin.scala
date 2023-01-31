@@ -83,8 +83,10 @@ class ContinuationsCallsPhase extends PluginPhase:
           case _ => false
         }
         .map {
-          case Apply(_, args) =>
+          case Apply(fun, args) if !fun.isInstanceOf[Select] =>
             args.filterNot(_.tpe.hasClassSymbol(requiredClass(suspendFullName)))
+          case _ =>
+            List.empty
         }
         .reverse
         .flatten :+ continuation
