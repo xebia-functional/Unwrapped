@@ -46,4 +46,9 @@ trait TreesChecks extends Trees {
    */
   private[continuations] def treeCallsResume[A](tree: TTree[A])(using Context): Boolean =
     tree.denot.matches(continuationResumeMethod.symbol)
+
+  private[continuations] def valDefTreeCallsSuspend(tree: Tree)(using Context): Boolean =
+    tree match
+      case vd @ ValDef(_, _, _) => treeCallsSuspend(vd.rhs)
+      case _ => false
 }

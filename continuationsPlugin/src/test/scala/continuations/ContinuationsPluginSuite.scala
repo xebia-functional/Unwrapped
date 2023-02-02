@@ -826,6 +826,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    ()
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -883,6 +884,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |        class program$foo$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion, 
            |          $completion.context
            |        ) {
+           |          var I$0: Any = _
+           |          def I$0_=(x$0: Any): Unit = ()
            |          var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
            |          var $label: Int = _
            |          def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit
@@ -902,6 +905,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
            |         = 
            |          {
+           |            var x##1: Int = x
            |            {
            |              var $continuation: continuations.Continuation[Any] | Null = null
            |              completion match 
@@ -929,17 +933,19 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    $continuation.asInstanceOf[program$foo$1].I$0 = x##1
            |                    $continuation.asInstanceOf[program$foo$1].$label = 1
            |                    val safeContinuation: continuations.SafeContinuation[Int] = 
            |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
            |                        continuations.Continuation.State.Undecided
            |                      )
-           |                    safeContinuation.resume(Right.apply[Nothing, Int](x))
+           |                    safeContinuation.resume(Right.apply[Nothing, Int](x##1))
            |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
            |                      safeContinuation.getOrThrow()
            |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
            |                    ()
            |                  case 1 => 
+           |                    x##1 = $continuation.asInstanceOf[program$foo$1].I$0
            |                    if $result.!=(null) then 
            |                      $result.fold[Unit](
            |                        {
@@ -953,6 +959,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    ()
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -1192,6 +1199,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    ()
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -1385,6 +1393,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    ()
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -1562,6 +1571,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    ()
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -1744,6 +1754,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    ()
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -1927,6 +1938,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    ()
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -2108,6 +2120,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    ()
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -2221,6 +2234,52 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
       checkContinuations(sourceSuspend) {
         case (tree, _) =>
           assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expectedSuspend)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should transform a dependent suspendContinuation with param") {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo(qq: Int)(using Suspend): Int = {
+           |  val y = summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  qq + y
+           |}
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package:
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef =
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type =
+           |      {
+           |        val continuation1: continuations.Continuation[Int] = completion
+           |        val safeContinuation: continuations.SafeContinuation[Int] =
+           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(),
+           |            continuations.Continuation.State.Undecided
+           |          )
+           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |        safeContinuation.getOrThrow()
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
       }
   }
 }

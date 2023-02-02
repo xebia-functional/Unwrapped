@@ -439,7 +439,7 @@ trait CompilerFixtures { self: FunSuite =>
   val oneTree: FunFixture[Context ?=> Literal] =
     FunFixture(setup = _ => one, teardown = _ => ())
 
-  val suspendingSingleArityWithDependentNonSuspendingCalculation =
+  val suspendingSingleArityWithDependentNonSuspendingAndNonDependentCalculation =
     FunFixture[Context ?=> DefDef](
       setup = _ => {
         val c = summon[Context]
@@ -492,7 +492,8 @@ trait CompilerFixtures { self: FunSuite =>
                         )
                     )
                   )
-              )
+              ),
+              inlinedCallToContinuationsSuspendOfInt
             ),
             ref(x).select(defn.Int_+).appliedTo(ref(y))
           )
@@ -707,10 +708,10 @@ trait CompilerFixtures { self: FunSuite =>
   val continuationsContextAndNotSuspendContextualMethodDefDef =
     FunFixture.map2(compilerContextWithContinuationsPlugin, notSuspendContextualMethodDefDef)
 
-  val continutationsContextAndSuspendingSingleArityWithDependentNonSuspendingCalculation =
+  val continutationsContextAndSuspendingSingleArityWithDependentNonSuspendingAndNonDependentCalculation =
     FunFixture.map2(
       compilerContextWithContinuationsPlugin,
-      suspendingSingleArityWithDependentNonSuspendingCalculation)
+      suspendingSingleArityWithDependentNonSuspendingAndNonDependentCalculation)
 
   val continutationsContextAndInlinedSuspendingSingleArityWithDependentNonSuspendingCalculation =
     FunFixture.map2(
