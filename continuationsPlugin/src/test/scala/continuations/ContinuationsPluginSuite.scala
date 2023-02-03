@@ -2183,7 +2183,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int = 
+           |    def program: Int =
            |      {
            |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A | Any]): Any = x
            |        foo(1, 2, "A", concurrent.ExecutionContext.Implicits.global, continuations.jvm.internal.ContinuationStub.contImpl)
@@ -2205,7 +2205,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int = 
+           |    def program: Int =
            |      {
            |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A]): 
            |          Any | Null | continuations.Continuation.State.Suspended.type
@@ -2228,12 +2228,16 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
       checkContinuations(sourceNoSuspend) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expectedNoSuspend)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedNoSuspend))
       }
 
       checkContinuations(sourceSuspend) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expectedSuspend)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedSuspend))
       }
   }
 

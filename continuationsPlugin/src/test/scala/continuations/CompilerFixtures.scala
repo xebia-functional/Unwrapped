@@ -125,6 +125,9 @@ import dotty.tools.dotc.core.StdNames.nme
 
 trait CompilerFixtures { self: FunSuite =>
 
+  def removeLineTrailingSpaces(s: String): String =
+    s.lines.map(_.stripTrailing).reduce(_ ++ "\n" ++ _).get
+
   private def usingSuspend(owner: Symbol)(using c: Context): Symbol =
     Symbols.newSymbol(
       owner,
