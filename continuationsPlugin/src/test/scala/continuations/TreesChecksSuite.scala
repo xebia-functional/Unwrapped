@@ -2,6 +2,7 @@ package continuations
 
 import dotty.tools.dotc.ast.Trees.{Apply, Block, DefDef, Inlined}
 import dotty.tools.dotc.ast.tpd
+import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Contexts.Context
 import munit.FunSuite
 
@@ -60,5 +61,27 @@ class TreesChecksSuite extends FunSuite, CompilerFixtures, TreesChecks {
       |""".stripMargin) {
     case (given Context, inlinedSuspend) =>
       assert(!treeCallsResume(inlinedSuspend))
+  }
+
+  continutationsContextAndInlinedSuspendingSingleArityWithDependentNonSuspendingCalculation
+    .test("""|valDefTreeCallsSuspend(val y = Suspend#suspendContinuation[Int] {continuation =>
+             |  continuation.resume(Right(x+1))
+             |})
+             | should be true""".stripMargin) {
+      case (given Context, tree) =>
+        val suspendVal = tree.filterSubTrees {
+          case vd: tpd.ValDef if vd.name.show == "y" => true
+          case _ => false
+        }.head
+        assert(valDefTreeCallsSuspend(suspendVal))
+    }
+
+  continuationsContextAndInlinedSuspendingTree.test(
+    """|valDefTreeCallsSuspend(Suspend#suspendContinuation[Int] {continuation =>
+       |  continuation.resume(Right(1))
+       |})
+       | should be false""".stripMargin) {
+    case (given Context, tree) =>
+      assert(!valDefTreeCallsSuspend(tree))
   }
 }
