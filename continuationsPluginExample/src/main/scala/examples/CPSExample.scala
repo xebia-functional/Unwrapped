@@ -60,7 +60,7 @@ def program: Suspend ?=> Int =
 
 def programSuspendContinuationNoParamResume: Int =
   def fooTest()(using s: Suspend): Int =
-    Continuation.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+    s.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
 
   fooTest()
 
@@ -133,7 +133,7 @@ def programSuspendContinuationNoParamNoSuspendContinuation: Int =
   def fooTest()(using s: Suspend): Int = 1
   fooTest()
 
-def programSuspendContinuationNoParamResume: Int =
+def programSuspendContinuationNoParamResumeProoveCalled: Int =
   def fooTest()(using s: Suspend): Int =
     s.suspendContinuation[Int] { continuation =>
       println("Hello")
