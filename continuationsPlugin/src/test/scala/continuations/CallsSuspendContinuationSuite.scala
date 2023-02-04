@@ -9,27 +9,23 @@ import dotty.tools.dotc.core.Names.*
 import dotty.tools.dotc.core.Symbols.*
 import munit.FunSuite
 
-class CallsContinuationResumeWithSuite extends FunSuite, CompilerFixtures:
+class CallsSuspendContinuationSuite extends FunSuite, CompilerFixtures:
 
-  continuationsContextAndZeroAritySuspendSuspendingDefDefAndRightOne.test(
+  continuationsContextAndZeroAritySuspendSuspendingDefDef.test(
     "CallsContinuationResumeWith#unapply(defDefTree): def mySuspend()(using Suspend): Int = " +
-      "summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) } should be Some(tree) " +
-      "where true == Right(1)") {
-    case (given Context, defdef, rightOne) =>
+      "summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) } should be Some(mySuspend)") {
+    case (given Context, defdef) =>
       // because this is a subtree projection, we cannot use tree
       // equality on the returned trees, as the rightOne fixture and
       // rightOne instance in the embedded tree are not the same tree by
-      // reference equality. We can use NoDiff on the printed returend
+      // reference equality. We can use NoDiff on the printed returned
       // tree, however, since we know we do not modify the inner tree in
       // the extractor.
-      assertNoDiff(
-        CallsContinuationResumeWith.unapply(defdef).map(_.toString).get,
-        Some(rightOne).map(_.toString).get)
+      assertNoDiff(CallsSuspendContinuation.unapply(defdef).get.toString, defdef.toString)
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "CallsContinuationResumeWith#unapply(defDefTree): def mySuspend()(using Suspend): Int = " +
-      "summon[Suspend].suspendContinuation[Int] { continuation => () } should be None") {
+    "CallsContinuationResumeWith#unapply(defDefTree): def mySuspend()(using Suspend): Int = 10 should be None") {
     case given Context =>
       import tpd.*
 
@@ -83,8 +79,8 @@ class CallsContinuationResumeWithSuite extends FunSuite, CompilerFixtures:
         newSymbol(ctx.owner, termName("mySuspend"), EmptyFlags, intType).asTerm,
         List(List(), List(usingSuspend)),
         intType,
-        rhs
+        tpd.Literal(Constant(10))
       )
 
-      assertEquals(CallsContinuationResumeWith.unapply(d), None)
+      assertEquals(CallsSuspendContinuation.unapply(d), None)
   }

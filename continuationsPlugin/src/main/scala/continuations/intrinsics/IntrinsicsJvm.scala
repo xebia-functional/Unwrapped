@@ -6,7 +6,7 @@ import continuations.{Continuation, RestrictedContinuation, Suspend}
 extension [A](continuation: Continuation[A])
   def intercepted(): Continuation[A] =
     if (continuation.isInstanceOf[ContinuationImpl])
-      continuation.asInstanceOf[ContinuationImpl].intercepted().asInstanceOf
+      continuation.asInstanceOf[ContinuationImpl].intercepted().asInstanceOf[Continuation[A]]
     else continuation
 
 extension [A](suspendedFn: Suspend ?=> A)

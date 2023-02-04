@@ -106,14 +106,12 @@ import dotty.tools.dotc.Compiler
 import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Comments.ContextDoc
 import dotty.tools.dotc.core.Comments.ContextDocstrings
-import dotty.tools.dotc.core.Contexts.Context
-import dotty.tools.dotc.core.Contexts.ContextBase
+import dotty.tools.dotc.core.Contexts.{ctx, Context, ContextBase}
 import dotty.tools.dotc.core.Decorators.*
 import dotty.tools.dotc.core.Phases.Phase
 import dotty.tools.dotc.core.Symbols
 import dotty.tools.dotc.core.Symbols.*
-import dotty.tools.dotc.core.Types.MethodType
-import dotty.tools.dotc.core.Types.Type
+import dotty.tools.dotc.core.Types.{ContextualMethodType, MethodType, Type, TypeRef}
 import munit.FunSuite
 import scala.util.Properties
 import dotty.tools.dotc.core.Names
@@ -121,12 +119,22 @@ import dotty.tools.dotc.core.Flags
 import dotty.tools.dotc.core.Flags.EmptyFlags
 import dotty.tools.dotc.core.Constants.Constant
 import dotty.tools.dotc.core.Types
-import dotty.tools.dotc.core.Types.NoPrefix
 import dotty.tools.dotc.ast.Trees
 import dotty.tools.dotc.core.Definitions
-import dotty.tools.dotc.core.Types.TypeRef
+import dotty.tools.dotc.core.StdNames.nme
 
 trait CompilerFixtures { self: FunSuite =>
+
+  private def usingSuspend(owner: Symbol)(using c: Context): Symbol =
+    Symbols.newSymbol(
+      owner,
+      nme.x_1,
+      Flags.union(Flags.GivenOrImplicit, Flags.Param),
+      suspendType
+    )
+
+  private def suspendIntMethod(owner: Symbol)(using c: Context): Symbol =
+    Symbols.newSymbol(owner, mySuspendName, EmptyFlags, intType)
 
   val compileSourceIdentifier =
     """-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.""".r
@@ -272,6 +280,53 @@ trait CompilerFixtures { self: FunSuite =>
     teardown = _ => ()
   )
 
+  val suspendContextualMethod: Context ?=> DefDef = DefDef(
+    newAnonFun(owner, ContextualMethodType(List(suspendType), intType)),
+    List(List(usingSuspend)),
+    intType,
+    inlinedCallToContinuationsSuspendOfIntNotInLastRow
+  )
+
+  val suspendContextualMethodDefDef =
+    FunFixture[Context ?=> DefDef](
+      setup = _ => suspendContextualMethod,
+      teardown = _ => ()
+    )
+
+  val notSuspendContextualMethodDefDef =
+    FunFixture[Context ?=> DefDef](
+      setup = _ =>
+        DefDef(
+          newAnonFun(owner, ContextualMethodType(List(defn.StringType), intType)),
+          List(List(usingSuspend)),
+          intType,
+          inlinedCallToContinuationsSuspendOfIntNotInLastRow
+        ),
+      teardown = _ => ()
+    )
+
+  val zeroArityContextFunctionWithSuspensionNotInLastRowDefDef = FunFixture[Context ?=> DefDef](
+    setup = _ => {
+      DefDef(
+        newSymbol(
+          owner,
+          mySuspendName,
+          EmptyFlags,
+          ctxFunctionTpe
+        ).asTerm,
+        List.empty,
+        ctxFunctionTpe,
+        Block(
+          List(
+            suspendContextualMethod
+          ),
+          EmptyTree
+        )
+      )
+    },
+    teardown = _ => ()
+  )
+
   val nonSuspendingContextFunctionValDef = FunFixture[Context ?=> ValDef](
     setup = _ => {
       ValDef(
@@ -321,6 +376,48 @@ trait CompilerFixtures { self: FunSuite =>
     teardown = _ => ()
   )
 
+  val zeroAritySuspendSuspendingNotInLastRowDefDef = FunFixture[Context ?=> DefDef](
+    setup = _ => {
+      DefDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, intType).asTerm,
+        List(List(), List(usingSuspend)),
+        intType,
+        inlinedCallToContinuationsSuspendOfIntNotInLastRow
+      )
+    },
+    teardown = _ => ()
+  )
+
+  val zeroAritySuspendSuspendingNotInLastRowIfDefDef = FunFixture[Context ?=> DefDef](
+    setup = _ => {
+      DefDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, intType).asTerm,
+        List(List(), List(usingSuspend)),
+        intType,
+        If(
+          Literal(Constant(true)),
+          Block(List(inlinedCallToContinuationsSuspendOfInt), Literal(Constant(9))),
+          Literal(Constant(10)))
+      )
+    },
+    teardown = _ => ()
+  )
+
+  val zeroAritySuspendSuspendingInLastRowIfDefDef = FunFixture[Context ?=> DefDef](
+    setup = _ => {
+      DefDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, intType).asTerm,
+        List(List(), List(usingSuspend)),
+        intType,
+        If(
+          Literal(Constant(true)),
+          inlinedCallToContinuationsSuspendOfInt,
+          Literal(Constant(10)))
+      )
+    },
+    teardown = _ => ()
+  )
+
   val zeroAritySuspendNonSuspendingDefDef = FunFixture[Context ?=> DefDef](
     setup = _ => {
       val c = summon[Context]
@@ -342,6 +439,199 @@ trait CompilerFixtures { self: FunSuite =>
   val oneTree: FunFixture[Context ?=> Literal] =
     FunFixture(setup = _ => one, teardown = _ => ())
 
+  val suspendingSingleArityWithDependentNonSuspendingCalculation =
+    FunFixture[Context ?=> DefDef](
+      setup = _ => {
+        val c = summon[Context]
+        val mySuspend = suspendIntMethod(c.owner)
+        val x = Symbols.newSymbol(mySuspend, Names.termName("x"), Flags.Param, intType)
+        val usingSuspendArg = usingSuspend(mySuspend)
+        val y =
+          Symbols.newSymbol(mySuspend, Names.termName("y"), Flags.EmptyFlags, intType)
+        val continuationName = Names.termName("continuation")
+        val closureMethodType = MethodType.apply(
+          List(
+            continuationName
+          ),
+          List(
+            continuationVal.info
+          ),
+          c.definitions.UnitType
+        )
+        DefDef(
+          mySuspend.asTerm,
+          List(List(x), List(usingSuspendArg)),
+          intType,
+          Block(
+            List(
+              ValDef(
+                y.asTerm,
+                ref(usingSuspendArg)
+                  .select(Names.termName(suspendContinuationName))
+                  .appliedTo(ref(usingSuspendArg))
+                  .appliedToType(intType)
+                  .appliedTo(
+                    Lambda(
+                      closureMethodType,
+                      (tss: List[Tree]) =>
+                        Block(
+                          List(
+                          ),
+                          ref(tss.head.symbol)
+                            .select(Names.termName(resumeName))
+                            .appliedTo(
+                              ref(right)
+                                .select(Names.termName("apply"))
+                                .appliedToTypes(
+                                  List(c.definitions.ThrowableType, intType)
+                                )
+                                .appliedTo(
+                                  ref(x).select(defn.Int_+).appliedTo(one)
+                                )
+                            )
+                        )
+                    )
+                  )
+              )
+            ),
+            ref(x).select(defn.Int_+).appliedTo(ref(y))
+          )
+        )
+      },
+      teardown = _ => ()
+    )
+
+  val inlinedSuspendingSingleArityWithDependentNonSuspendingCalculation =
+    FunFixture[Context ?=> DefDef](
+      setup = _ => {
+        val c = summon[Context]
+        val mySuspend = suspendIntMethod(c.owner)
+        val x = Symbols.newSymbol(mySuspend, Names.termName("x"), Flags.Param, intType)
+        val usingSuspendArg = usingSuspend(mySuspend)
+        val y =
+          Symbols.newSymbol(mySuspend, Names.termName("y"), Flags.EmptyFlags, intType)
+        val continuationName = Names.termName("continuation")
+        val closureMethodType = MethodType.apply(
+          List(
+            continuationName
+          ),
+          List(
+            continuationVal.info
+          ),
+          c.definitions.UnitType
+        )
+        DefDef(
+          mySuspend.asTerm,
+          List(List(x), List(usingSuspendArg)),
+          intType,
+          Block(
+            List(
+              ValDef(
+                y.asTerm,
+                Inlined(
+                  ref(usingSuspendArg)
+                    .select(Names.termName(suspendContinuationName))
+                    .appliedTo(ref(usingSuspendArg))
+                    .appliedToType(intType)
+                    .appliedTo(
+                      Lambda(
+                        closureMethodType,
+                        (tss: List[Tree]) =>
+                          Block(
+                            List(
+                            ),
+                            ref(tss.head.symbol)
+                              .select(Names.termName("resume"))
+                              .appliedTo(
+                                ref(right)
+                                  .select(Names.termName("apply"))
+                                  .appliedToTypes(
+                                    List(c.definitions.ThrowableType, intType)
+                                  )
+                                  .appliedTo(
+                                    ref(x).select(defn.Int_+).appliedTo(one)
+                                  )
+                              )
+                          )
+                      )
+                    ),
+                  List(),
+                  Typed(
+                    Ident(requiredMethod("scala.Predef.???").typeRef),
+                    TypeTree(c.definitions.IntType)
+                  )
+                )
+              )
+            ),
+            ref(x).select(defn.Int_+).appliedTo(ref(y))
+          )
+        )
+      },
+      teardown = _ => ()
+    )
+
+  val methodCallWithSuspend =
+    FunFixture[Context ?=> Block](
+      setup = _ => {
+        val methodSymbol =
+          Symbols.newSymbol(
+            owner,
+            mySuspendName,
+            Flags.Method,
+            MethodType(
+              List.empty,
+              List.empty,
+              ContextualMethodType(List(nme.x_1), List(suspendType), intType)
+            )
+          )
+        Block(
+          List(
+            DefDef(
+              methodSymbol.asTerm,
+              List(List(), List(usingSuspend)),
+              intType,
+              Literal(Constant(10))
+            )),
+          ref(methodSymbol).appliedToNone.appliedTo(ref(usingSuspend))
+        )
+      },
+      teardown = _ => ()
+    )
+
+  val methodCallWithoutSuspend =
+    FunFixture[Context ?=> Block](
+      setup = _ => {
+        val methodSymbol =
+          Symbols.newSymbol(
+            owner,
+            mySuspendName,
+            Flags.Method,
+            MethodType(
+              List.empty,
+              List.empty,
+              ContextualMethodType(List(nme.x_1), List(continuation.typeRef), intType)
+            )
+          )
+        val usingContinuation =
+          Symbols.newSymbol(
+            owner,
+            Names.termName("x$1"),
+            Flags.union(Flags.GivenOrImplicit, Flags.Param),
+            continuation.typeRef
+          )
+        Block(
+          List(
+            DefDef(
+              methodSymbol.asTerm,
+              List(List(), List(usingContinuation)),
+              intType,
+              Literal(Constant(10))
+            )),
+          ref(methodSymbol).appliedToNone)
+      },
+      teardown = _ => ()
+    )
+
   val continuationsContextAndInlinedSuspendingTree =
     FunFixture.map2(compilerContextWithContinuationsPlugin, suspendContinuation)
 
@@ -356,11 +646,20 @@ trait CompilerFixtures { self: FunSuite =>
   val continuationsContextAndZeroAritySuspendSuspendingDefDef =
     FunFixture.map2(compilerContextWithContinuationsPlugin, zeroAritySuspendSuspendingDefDef)
 
-  val continuationsContextAndZeroAritySuspendSuspendingDefDefAndRightOne =
-    FunFixture.map3(
+  val continuationsContextAndZeroAritySuspendSuspendingNotInLastRowDefDef =
+    FunFixture.map2(
       compilerContextWithContinuationsPlugin,
-      zeroAritySuspendSuspendingDefDef,
-      rightOneApply)
+      zeroAritySuspendSuspendingNotInLastRowDefDef)
+
+  val continuationsContextAndZeroAritySuspendSuspendingNotInLastRowIfDefDef =
+    FunFixture.map2(
+      compilerContextWithContinuationsPlugin,
+      zeroAritySuspendSuspendingNotInLastRowIfDefDef)
+
+  val continuationsContextAndZeroAritySuspendSuspendingInLastRowIfDefDef =
+    FunFixture.map2(
+      compilerContextWithContinuationsPlugin,
+      zeroAritySuspendSuspendingInLastRowIfDefDef)
 
   val continuationsContextAndZeroAritySuspendNonSuspendingDefDef =
     FunFixture.map2(compilerContextWithContinuationsPlugin, zeroAritySuspendNonSuspendingDefDef)
@@ -386,6 +685,12 @@ trait CompilerFixtures { self: FunSuite =>
     zeroArityContextFunctionDefDef
   )
 
+  val continuationsContextAndZeroArityContextFunctionWithSuspensionNotInLastRowDefDef =
+    FunFixture.map2(
+      compilerContextWithContinuationsPlugin,
+      zeroArityContextFunctionWithSuspensionNotInLastRowDefDef
+    )
+
   val continuationsContextAndSuspendingContextFunctionValDef = FunFixture.map2(
     compilerContextWithContinuationsPlugin,
     suspendingContextFunctionValDef
@@ -395,6 +700,28 @@ trait CompilerFixtures { self: FunSuite =>
     compilerContextWithContinuationsPlugin,
     nonSuspendingContextFunctionValDef
   )
+
+  val continuationsContextAndSuspendContextualMethodDefDef =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, suspendContextualMethodDefDef)
+
+  val continuationsContextAndNotSuspendContextualMethodDefDef =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, notSuspendContextualMethodDefDef)
+
+  val continutationsContextAndSuspendingSingleArityWithDependentNonSuspendingCalculation =
+    FunFixture.map2(
+      compilerContextWithContinuationsPlugin,
+      suspendingSingleArityWithDependentNonSuspendingCalculation)
+
+  val continutationsContextAndInlinedSuspendingSingleArityWithDependentNonSuspendingCalculation =
+    FunFixture.map2(
+      compilerContextWithContinuationsPlugin,
+      inlinedSuspendingSingleArityWithDependentNonSuspendingCalculation)
+
+  val continutationsContextAndMethodCallWithSuspend =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, methodCallWithSuspend)
+
+  val continutationsContextAndMethodCallWithoutSuspend =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, methodCallWithoutSuspend)
 
   def checkCompile(checkAfterPhase: String, source: String)(assertion: (Tree, Context) => Unit)(
       using Context): Context = {
@@ -472,7 +799,7 @@ trait CompilerFixtures { self: FunSuite =>
     Literal(Constant(1))
 
   private lazy val suspendType: Context ?=> Type =
-    suspend.info
+    suspend.typeRef
 
   private lazy val continuation: Context ?=> Symbol =
     Symbols.requiredClass("continuations.Continuation")
@@ -535,6 +862,9 @@ trait CompilerFixtures { self: FunSuite =>
         TypeTree(c.definitions.IntType)
       )
     )
+
+  lazy val inlinedCallToContinuationsSuspendOfIntNotInLastRow: Context ?=> Block =
+    Block(List(inlinedCallToContinuationsSuspendOfInt), Literal(Constant(10)))
 
   private lazy val suspend: Context ?=> Symbol =
     Symbols.requiredClass("continuations.Suspend")
