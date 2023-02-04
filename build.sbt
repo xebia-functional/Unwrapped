@@ -6,30 +6,51 @@ import scala.collection.JavaConverters._
 import com.fasterxml.jackson.dataformat.csv.CsvSchema
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.dataformat.csv.CsvParser
+import scala.util.Properties
+import scala.collection.JavaConverters._
+
+import com.fasterxml.jackson.dataformat.csv.CsvSchema
+import com.fasterxml.jackson.dataformat.csv.CsvMapper
+import com.fasterxml.jackson.dataformat.csv.CsvParser
 
 ThisBuild / scalaVersion := "3.1.2"
 ThisBuild / organization := "com.47deg"
 ThisBuild / versionScheme := Some("early-semver")
 
+addCommandAlias(
+  "plugin-example",
+  "reload; clean; publishLocal; continuationsPluginExample/compile")
 addCommandAlias("ci-test", "scalafmtCheckAll; scalafmtSbtCheck; github; mdoc; test")
 addCommandAlias("ci-docs", "github; mdoc")
 addCommandAlias("ci-publish", "github; ci-release")
 
 publish / skip := true
 
-lazy val root =
+lazy val root = // I
   (project in file("./")).aggregate(
-    `scala-fx`,
-    benchmarks,
-    `munit-scala-fx`,
-    `scalike-jdbc-scala-fx`,
-    `http-scala-fx`,
-    documentation,
-    `sttp-scala-fx`,
-    `java-net-multipart-body-publisher`
+    benchmarks, // A
+    continuationsPlugin, // C
+    continuationsPluginExample, // D
+    documentation, // E
+    `http-scala-fx`, // F
+    `java-net-multipart-body-publisher`, // G
+    `munit-scala-fx`, // H
+    `scala-fx`, // J
+    `scalike-jdbc-scala-fx`, // K
+    `sttp-scala-fx` // L
   )
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
+
+lazy val continuationsPlugin = project.settings(
+  continuationsPluginSettings: _*
+)
+
+lazy val continuationsPluginExample = project
+  .dependsOn(continuationsPlugin)
+  .settings(
+    continuationsPluginExampleSettings: _*
+  )
 
 lazy val benchmarks =
   project.dependsOn(`scala-fx`).settings(publish / skip := true).enablePlugins(JmhPlugin)
@@ -94,6 +115,50 @@ lazy val scalafxSettings: Seq[Def.Setting[_]] =
       scalacheck % Test
     )
   )
+
+lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
+  Seq(
+    exportJars := true,
+    autoAPIMappings := true,
+    Test / fork := true,
+    libraryDependencies ++= List(
+      "org.scala-lang" %% "scala3-compiler" % "3.1.2",
+      munit % Test
+    ),
+    Test / javaOptions += {
+      val `scala-compiler-classpath` =
+        (Compile / dependencyClasspath)
+          .value
+          .files
+          .map(_.toPath().toAbsolutePath().toString())
+          .mkString(":")
+      s"-Dscala-compiler-classpath=${`scala-compiler-classpath`}"
+    },
+    Test / javaOptions += {
+      s"""-Dcompiler-scalacOptions=\"${scalacOptions.value.mkString(" ")}\""""
+    },
+    Test / javaOptions += Def.taskDyn {
+      Def.task {
+        val _ = (Compile / Keys.`package`).value
+        val `scala-compiler-options` =
+          s"${(continuationsPlugin / Compile / packageBin).value}"
+        s"""-Dscala-compiler-plugin=${`scala-compiler-options`}"""
+      }
+    }.value
+  )
+
+lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
+  Seq(
+    publish / skip := true,
+    autoCompilerPlugins := true,
+    resolvers += Resolver.mavenLocal,
+    Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
+    Compile / scalacOptions += "-Xprint:continuations",
+    Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}",
+    Test / scalacOptions += "-Xprint:continuations"
+  )
+
+lazy val mySetting = taskKey[String]("example")
 
 lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
   libraryDependencies ++= Seq(
