@@ -990,6 +990,7 @@ object DefDefTransforms extends TreesChecks:
                       .get,
                     ref($result.symbol).select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
                   )
+                case Some(_) if suspensionInReturnedValue => ref($result.symbol)
                 case _ => unitLiteral
             )
           )
