@@ -777,7 +777,11 @@ object DefDefTransforms extends TreesChecks:
           val case2BeforeDefault = tpd.CaseDef(
             tpd.Literal(Constant(suspensionPointsSize)),
             tpd.EmptyTree,
-            throwOnFailure
+            tpd.Block(
+              List(throwOnFailure),
+              if suspensionInReturnedValue then ref($result.symbol)
+              else unitLiteral
+            )
           )
 
           // like defn.ClassCastExceptionClass_stringConstructor

@@ -826,6 +826,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    ()
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -953,6 +954,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    ()
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -1192,6 +1194,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    ()
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -1385,6 +1388,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    ()
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -1562,6 +1566,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    ()
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -1744,6 +1749,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    $result
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -1927,6 +1933,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    $result
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
@@ -2108,6 +2115,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |                        }
            |                      )
            |                     else ()
+           |                    $result
            |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
            |                }
            |            }
