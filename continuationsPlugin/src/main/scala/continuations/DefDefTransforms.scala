@@ -288,11 +288,8 @@ object DefDefTransforms extends TreesChecks:
             tree,
             suspensionInReturnedValue = false)
         case CallsSuspendContinuation(_) =>
-          SuspensionPoints.unapplySeq(tree).toList.flatMap(_.points).filter {
-            case _: tpd.ValDef => false
-            case _ => true
-          } match
-            case suspensionPoint :: Nil =>
+          SuspensionPoints.unapplySeq(tree).toList.flatMap(_.points) match
+            case suspensionPoint :: Nil if !suspensionPoint.isInstanceOf[tpd.ValDef] =>
               transformSuspendOneContinuationResume(tree, suspensionPoint)
             case _ =>
               transformUnusedSuspensionsSuspendingStateMachine(

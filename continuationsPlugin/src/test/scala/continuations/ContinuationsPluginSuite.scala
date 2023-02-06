@@ -18,7 +18,7 @@ import munit.FunSuite
  * @see
  *   [[https://stackoverflow.com/questions/4713031/how-to-use-scalatest-to-develop-a-compiler-plugin-in-scala]]
  */
-class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
+class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, ContinuationsPluginFixtures {
 
   compilerContextWithContinuationsPlugin.test(
     """|it should transform a 0-arity suspended definition returning a
@@ -2242,48 +2242,137 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should transform a dependent suspendContinuation with param") {
+    "it should transform a dependent suspendContinuation with one param into a state machine") {
     case given Context =>
       val source =
         """|
            |package continuations
            |
-           |def foo(qq: Int)(using Suspend): Int = {
+           |def foo(x: Int)(using Suspend): Int = {
            |  val y = summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
-           |  qq + y
+           |  x + y
            |}
            |""".stripMargin
-
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package:
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef =
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type =
-           |      {
-           |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] =
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(),
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |        safeContinuation.getOrThrow()
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
 
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineOneParamOneDependantContinuation)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should transform a suspend continuation with one parameter into a state machine"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo(qq: Int)(using s: Suspend): Int = {
+           |  summon[Suspend].suspendContinuation[Unit] { _.resume(Right { println(qq) }) }
+           |  10
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineOneParamOneNoDependantContinuation)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should transform a suspend continuation with no parameter and code before the continuation " +
+      "that is used afterwards into a state machine"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using s: Suspend): Int = {
+           |  val xx = 111
+           |  println(xx)
+           |  summon[Suspend].suspendContinuation[Int] { _.resume(Right( 10 )) }
+           |  xx
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineNoParamOneNoDependantContinuationCodeBeforeUsedAfter)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should transform a suspend continuation with many dependant continuations " +
+      "with code around them to a state machine"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def fooTest(qq: Int)(using s: Suspend): Int = {
+           |    val pp = 11
+           |    val xx = s.suspendContinuation[Int] { _.resume(Right { qq - 1 }) }
+           |    val ww = 13
+           |    val rr = "AAA"
+           |    val yy = s.suspendContinuation[String] { _.resume(Right { rr }) }
+           |    val tt = 100
+           |    val zz = s.suspendContinuation[Int] { _.resume(Right { ww - 1 }) }
+           |    println(xx)
+           |    xx + qq + yy.size + zz + pp + tt
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineManyDependantContinuations)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should transform a suspend continuation with many dependant and no dependant continuations " +
+      "with code around them to a state machine"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def fooTest(qq: Int)(using s: Suspend): Int = {
+           |    val pp = 11
+           |    val xx = s.suspendContinuation[Int] { _.resume(Right { qq - 1 }) }
+           |    val ww = 13
+           |    val rr = "AAA"
+           |    s.suspendContinuation[String] { _.resume(Right { rr }) }
+           |    val tt = 100
+           |    val zz = s.suspendContinuation[Int] { _.resume(Right { ww - 1 }) }
+           |    println(xx)
+           |    xx + qq + zz + pp + tt
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineManyDependantAndNoDependantContinuations)
+          )
       }
   }
 }
