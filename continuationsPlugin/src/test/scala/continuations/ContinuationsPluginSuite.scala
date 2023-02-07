@@ -18,7 +18,7 @@ import munit.FunSuite
  * @see
  *   [[https://stackoverflow.com/questions/4713031/how-to-use-scalatest-to-develop-a-compiler-plugin-in-scala]]
  */
-class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
+class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineFixtures {
 
   compilerContextWithContinuationsPlugin.test(
     """|it should transform a 0-arity suspended definition returning a
@@ -214,36 +214,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
-           |      {
-           |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] = 
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |        safeContinuation.getOrThrow()
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedOneSuspendContinuation)
       }
   }
 
@@ -258,36 +233,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  summon[Suspend].suspendContinuation[Int](continuation => continuation.resume(Right(1)))
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
-           |      {
-           |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] = 
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |        safeContinuation.getOrThrow()
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedOneSuspendContinuation)
       }
   }
 
@@ -302,36 +252,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  summon[Suspend].suspendContinuation[Int] { _.resume(Right(1)) }
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
-           |      {
-           |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] = 
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |        safeContinuation.getOrThrow()
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedOneSuspendContinuation)
       }
   }
 
@@ -346,36 +271,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  summon[Suspend].suspendContinuation[Int](_.resume(Right(1)))
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
-           |      {
-           |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] = 
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |        safeContinuation.getOrThrow()
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedOneSuspendContinuation)
       }
   }
 
@@ -491,36 +391,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  s.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
-           |      {
-           |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] = 
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |        safeContinuation.getOrThrow()
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedOneSuspendContinuation)
       }
   }
 
@@ -535,36 +410,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
-           |      {
-           |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] = 
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |        safeContinuation.getOrThrow()
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedOneSuspendContinuation)
       }
   }
 
@@ -739,114 +589,18 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |}
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int = 
-           |      {
-           |        class program$foo$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion, 
-           |          $completion.context
-           |        ) {
-           |          var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
-           |          var $label: Int = _
-           |          def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit
-           |             = 
-           |          ()
-           |          def $label_=(x$0: Int): Unit = ()
-           |          protected override def invokeSuspend(
-           |            result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]
-           |          ): Any | Null = 
-           |            {
-           |              this.$result = result
-           |              this.$label = this.$label.|(scala.Int.MinValue)
-           |              foo(this.asInstanceOf[continuations.Continuation[Int]])
-           |            }
-           |        }
-           |        def foo(completion: continuations.Continuation[Int]): 
-           |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
-           |         = 
-           |          {
-           |            {
-           |              var $continuation: continuations.Continuation[Any] | Null = null
-           |              completion match 
-           |                {
-           |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-           |                    $continuation = x$0.asInstanceOf[program$foo$1]
-           |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-           |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-           |                }
-           |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-           |                $continuation.asInstanceOf[program$foo$1].$result
-           |              $continuation.asInstanceOf[program$foo$1].$label match 
-           |                {
-           |                  case 0 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 1
-           |                    val safeContinuation: continuations.SafeContinuation[Int] = 
-           |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
-           |                        continuations.Continuation.State.Undecided
-           |                      )
-           |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    ()
-           |                  case 1 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    ()
-           |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
-           |                }
-           |            }
-           |            10
-           |          }
-           |        foo(continuations.jvm.internal.ContinuationStub.contImpl)
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedStateMachineForSuspendContinuationReturningANonSuspendingVal)
       }
 
       checkContinuations(sourceContextFunction) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedStateMachineForSuspendContinuationReturningANonSuspendingVal)
       }
   }
 
@@ -867,109 +621,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |}
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int = 
-           |      {
-           |        class program$foo$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion, 
-           |          $completion.context
-           |        ) {
-           |          var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
-           |          var $label: Int = _
-           |          def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit
-           |             = 
-           |          ()
-           |          def $label_=(x$0: Int): Unit = ()
-           |          protected override def invokeSuspend(
-           |            result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]
-           |          ): Any | Null = 
-           |            {
-           |              this.$result = result
-           |              this.$label = this.$label.|(scala.Int.MinValue)
-           |              foo(null, this.asInstanceOf[continuations.Continuation[Int]])
-           |            }
-           |        }
-           |        def foo(x: Int, completion: continuations.Continuation[Int]): 
-           |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
-           |         = 
-           |          {
-           |            {
-           |              var $continuation: continuations.Continuation[Any] | Null = null
-           |              completion match 
-           |                {
-           |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-           |                    $continuation = x$0.asInstanceOf[program$foo$1]
-           |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-           |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-           |                }
-           |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-           |                $continuation.asInstanceOf[program$foo$1].$result
-           |              $continuation.asInstanceOf[program$foo$1].$label match 
-           |                {
-           |                  case 0 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 1
-           |                    val safeContinuation: continuations.SafeContinuation[Int] = 
-           |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
-           |                        continuations.Continuation.State.Undecided
-           |                      )
-           |                    safeContinuation.resume(Right.apply[Nothing, Int](x))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    ()
-           |                  case 1 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    ()
-           |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
-           |                }
-           |            }
-           |            10
-           |          }
-           |        foo(11, continuations.jvm.internal.ContinuationStub.contImpl)
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedStateMachineWithSingleSuspendedContinuationReturningANonSuspendedVal)
       }
   }
 
@@ -1055,161 +711,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |}
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int = 
-           |      {
-           |        class program$foo$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion, 
-           |          $completion.context
-           |        ) {
-           |          var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
-           |          var $label: Int = _
-           |          def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit
-           |             = 
-           |          ()
-           |          def $label_=(x$0: Int): Unit = ()
-           |          protected override def invokeSuspend(
-           |            result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]
-           |          ): Any | Null = 
-           |            {
-           |              this.$result = result
-           |              this.$label = this.$label.|(scala.Int.MinValue)
-           |              foo(this.asInstanceOf[continuations.Continuation[Int]])
-           |            }
-           |        }
-           |        def foo(completion: continuations.Continuation[Int]): 
-           |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
-           |         = 
-           |          {
-           |            {
-           |              var $continuation: continuations.Continuation[Any] | Null = null
-           |              completion match 
-           |                {
-           |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-           |                    $continuation = x$0.asInstanceOf[program$foo$1]
-           |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-           |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-           |                }
-           |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-           |                $continuation.asInstanceOf[program$foo$1].$result
-           |              $continuation.asInstanceOf[program$foo$1].$label match 
-           |                {
-           |                  case 0 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 1
-           |                    val safeContinuation: continuations.SafeContinuation[Int] = 
-           |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
-           |                        continuations.Continuation.State.Undecided
-           |                      )
-           |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    return[label1] ()
-           |                    ()
-           |                  case 1 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    label1[Unit]: <empty>
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 2
-           |                    val safeContinuation: continuations.SafeContinuation[Boolean] = 
-           |                      new continuations.SafeContinuation[Boolean](
-           |                        continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
-           |                      , continuations.Continuation.State.Undecided)
-           |                    safeContinuation.resume(Right.apply[Nothing, Boolean](false))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    return[label2] ()
-           |                    ()
-           |                  case 2 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    label2[Unit]: <empty>
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 3
-           |                    val safeContinuation: continuations.SafeContinuation[String] = 
-           |                      new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)()
-           |                        , 
-           |                      continuations.Continuation.State.Undecided)
-           |                    safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    ()
-           |                  case 3 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    ()
-           |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
-           |                }
-           |            }
-           |            10
-           |          }
-           |        foo(continuations.jvm.internal.ContinuationStub.contImpl)
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedStateMachineMultipleSuspendedContinuationsReturningANonSuspendingVal)
       }
   }
 
@@ -1244,166 +750,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |}
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int = 
-           |      {
-           |        class program$foo$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion, 
-           |          $completion.context
-           |        ) {
-           |          var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
-           |          var $label: Int = _
-           |          def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit
-           |             = 
-           |          ()
-           |          def $label_=(x$0: Int): Unit = ()
-           |          protected override def invokeSuspend(
-           |            result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]
-           |          ): Any | Null = 
-           |            {
-           |              this.$result = result
-           |              this.$label = this.$label.|(scala.Int.MinValue)
-           |              foo(this.asInstanceOf[continuations.Continuation[Int]])
-           |            }
-           |        }
-           |        def foo(completion: continuations.Continuation[Int]): 
-           |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
-           |         = 
-           |          {
-           |            {
-           |              var $continuation: continuations.Continuation[Any] | Null = null
-           |              completion match 
-           |                {
-           |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-           |                    $continuation = x$0.asInstanceOf[program$foo$1]
-           |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-           |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-           |                }
-           |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-           |                $continuation.asInstanceOf[program$foo$1].$result
-           |              $continuation.asInstanceOf[program$foo$1].$label match 
-           |                {
-           |                  case 0 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 1
-           |                    val safeContinuation: continuations.SafeContinuation[Int] = 
-           |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
-           |                        continuations.Continuation.State.Undecided
-           |                      )
-           |                    println("Hello")
-           |                    println("World")
-           |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    return[label1] ()
-           |                    ()
-           |                  case 1 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    label1[Unit]: <empty>
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 2
-           |                    val safeContinuation: continuations.SafeContinuation[Boolean] = 
-           |                      new continuations.SafeContinuation[Boolean](
-           |                        continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
-           |                      , continuations.Continuation.State.Undecided)
-           |                    safeContinuation.resume(Right.apply[Nothing, Boolean](false))
-           |                    safeContinuation.resume(Right.apply[Nothing, Boolean](true))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    return[label2] ()
-           |                    ()
-           |                  case 2 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    label2[Unit]: <empty>
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 3
-           |                    val safeContinuation: continuations.SafeContinuation[String] = 
-           |                      new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)()
-           |                        , 
-           |                      continuations.Continuation.State.Undecided)
-           |                    safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
-           |                    val x: Int = 1
-           |                    ()
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    ()
-           |                  case 3 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    ()
-           |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
-           |                }
-           |            }
-           |            10
-           |          }
-           |        foo(continuations.jvm.internal.ContinuationStub.contImpl)
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedStateMachineWithMultipleResumeReturningANonSuspendedValue)
       }
   }
 
@@ -1449,145 +800,18 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |}
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int = 
-           |      {
-           |        class program$foo$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion, 
-           |          $completion.context
-           |        ) {
-           |          var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
-           |          var $label: Int = _
-           |          def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit
-           |             = 
-           |          ()
-           |          def $label_=(x$0: Int): Unit = ()
-           |          protected override def invokeSuspend(
-           |            result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]
-           |          ): Any | Null = 
-           |            {
-           |              this.$result = result
-           |              this.$label = this.$label.|(scala.Int.MinValue)
-           |              foo(this.asInstanceOf[continuations.Continuation[Int]])
-           |            }
-           |        }
-           |        def foo(completion: continuations.Continuation[Int]): 
-           |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
-           |         = 
-           |          {
-           |            {
-           |              var $continuation: continuations.Continuation[Any] | Null = null
-           |              completion match 
-           |                {
-           |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-           |                    $continuation = x$0.asInstanceOf[program$foo$1]
-           |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-           |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-           |                }
-           |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-           |                $continuation.asInstanceOf[program$foo$1].$result
-           |              $continuation.asInstanceOf[program$foo$1].$label match 
-           |                {
-           |                  case 0 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    println("Start")
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 1
-           |                    val safeContinuation: continuations.SafeContinuation[Int] = 
-           |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
-           |                        continuations.Continuation.State.Undecided
-           |                      )
-           |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    return[label1] ()
-           |                    ()
-           |                  case 1 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    label1[Unit]: <empty>
-           |                    val x: String = "World"
-           |                    println("Hello")
-           |                    println(x)
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 2
-           |                    val safeContinuation: continuations.SafeContinuation[Int] = 
-           |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
-           |                        continuations.Continuation.State.Undecided
-           |                      )
-           |                    safeContinuation.resume(Right.apply[Nothing, Int](2))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    ()
-           |                  case 2 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    ()
-           |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
-           |                }
-           |            }
-           |            println("End")
-           |            10
-           |          }
-           |        foo(continuations.jvm.internal.ContinuationStub.contImpl)
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedStateMachineReturningANonSuspendedValue)
       }
 
       checkContinuations(sourceContextFunction) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedStateMachineReturningANonSuspendedValue)
       }
   }
 
@@ -1610,160 +834,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |}
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int = 
-           |      {
-           |        class program$foo$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion, 
-           |          $completion.context
-           |        ) {
-           |          var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
-           |          var $label: Int = _
-           |          def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit
-           |             = 
-           |          ()
-           |          def $label_=(x$0: Int): Unit = ()
-           |          protected override def invokeSuspend(
-           |            result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]
-           |          ): Any | Null = 
-           |            {
-           |              this.$result = result
-           |              this.$label = this.$label.|(scala.Int.MinValue)
-           |              foo(this.asInstanceOf[continuations.Continuation[Int]])
-           |            }
-           |        }
-           |        def foo(completion: continuations.Continuation[Int]): 
-           |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
-           |         = 
-           |          {
-           |            {
-           |              var $continuation: continuations.Continuation[Any] | Null = null
-           |              completion match 
-           |                {
-           |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-           |                    $continuation = x$0.asInstanceOf[program$foo$1]
-           |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-           |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-           |                }
-           |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-           |                $continuation.asInstanceOf[program$foo$1].$result
-           |              $continuation.asInstanceOf[program$foo$1].$label match 
-           |                {
-           |                  case 0 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 1
-           |                    val safeContinuation: continuations.SafeContinuation[Boolean] = 
-           |                      new continuations.SafeContinuation[Boolean](
-           |                        continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
-           |                      , continuations.Continuation.State.Undecided)
-           |                    safeContinuation.resume(Right.apply[Nothing, Boolean](false))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    return[label1] ()
-           |                    ()
-           |                  case 1 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    label1[Unit]: <empty>
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 2
-           |                    val safeContinuation: continuations.SafeContinuation[String] = 
-           |                      new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)()
-           |                        , 
-           |                      continuations.Continuation.State.Undecided)
-           |                    safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    return[label2] ()
-           |                    ()
-           |                  case 2 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    label2[Unit]: <empty>
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 3
-           |                    val safeContinuation: continuations.SafeContinuation[Int] = 
-           |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
-           |                        continuations.Continuation.State.Undecided
-           |                      )
-           |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    orThrow
-           |                  case 3 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    $result
-           |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
-           |                }
-           |            }
-           |          }
-           |        foo(continuations.jvm.internal.ContinuationStub.contImpl)
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedStateMachineNoDependantSuspensions)
       }
   }
 
@@ -1792,162 +867,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |}
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int = 
-           |      {
-           |        class program$foo$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion, 
-           |          $completion.context
-           |        ) {
-           |          var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
-           |          var $label: Int = _
-           |          def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit
-           |             = 
-           |          ()
-           |          def $label_=(x$0: Int): Unit = ()
-           |          protected override def invokeSuspend(
-           |            result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]
-           |          ): Any | Null = 
-           |            {
-           |              this.$result = result
-           |              this.$label = this.$label.|(scala.Int.MinValue)
-           |              foo(this.asInstanceOf[continuations.Continuation[Int]])
-           |            }
-           |        }
-           |        def foo(completion: continuations.Continuation[Int]): 
-           |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
-           |         = 
-           |          {
-           |            {
-           |              var $continuation: continuations.Continuation[Any] | Null = null
-           |              completion match 
-           |                {
-           |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-           |                    $continuation = x$0.asInstanceOf[program$foo$1]
-           |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-           |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-           |                }
-           |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-           |                $continuation.asInstanceOf[program$foo$1].$result
-           |              $continuation.asInstanceOf[program$foo$1].$label match 
-           |                {
-           |                  case 0 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 1
-           |                    val safeContinuation: continuations.SafeContinuation[Boolean] = 
-           |                      new continuations.SafeContinuation[Boolean](
-           |                        continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
-           |                      , continuations.Continuation.State.Undecided)
-           |                    println("Hi")
-           |                    safeContinuation.resume(Right.apply[Nothing, Boolean](false))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    return[label1] ()
-           |                    ()
-           |                  case 1 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    label1[Unit]: <empty>
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 2
-           |                    val safeContinuation: continuations.SafeContinuation[String] = 
-           |                      new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)()
-           |                        , 
-           |                      continuations.Continuation.State.Undecided)
-           |                    safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
-           |                    println("World")
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    return[label2] ()
-           |                    ()
-           |                  case 2 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    label2[Unit]: <empty>
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 3
-           |                    val safeContinuation: continuations.SafeContinuation[Int] = 
-           |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
-           |                        continuations.Continuation.State.Undecided
-           |                      )
-           |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    orThrow
-           |                  case 3 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    $result
-           |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
-           |                }
-           |            }
-           |          }
-           |        foo(continuations.jvm.internal.ContinuationStub.contImpl)
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedStateMachineNoDependantSuspensionsWithCodeInside)
       }
   }
 
@@ -1973,163 +897,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |}
            |""".stripMargin
 
-      // format: off
-      val expected =
-        """|
-           |package continuations {
-           |  final lazy module val compileFromString$package: 
-           |    continuations.compileFromString$package
-           |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
-           |    compileFromString$package
-           |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
-           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int = 
-           |      {
-           |        class program$foo$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion, 
-           |          $completion.context
-           |        ) {
-           |          var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
-           |          var $label: Int = _
-           |          def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit
-           |             = 
-           |          ()
-           |          def $label_=(x$0: Int): Unit = ()
-           |          protected override def invokeSuspend(
-           |            result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]
-           |          ): Any | Null = 
-           |            {
-           |              this.$result = result
-           |              this.$label = this.$label.|(scala.Int.MinValue)
-           |              foo(this.asInstanceOf[continuations.Continuation[Int]])
-           |            }
-           |        }
-           |        def foo(completion: continuations.Continuation[Int]): 
-           |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
-           |         = 
-           |          {
-           |            {
-           |              var $continuation: continuations.Continuation[Any] | Null = null
-           |              completion match 
-           |                {
-           |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-           |                    $continuation = x$0.asInstanceOf[program$foo$1]
-           |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-           |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-           |                }
-           |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-           |                $continuation.asInstanceOf[program$foo$1].$result
-           |              $continuation.asInstanceOf[program$foo$1].$label match 
-           |                {
-           |                  case 0 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    println("Start")
-           |                    val x: Int = 1
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 1
-           |                    val safeContinuation: continuations.SafeContinuation[Boolean] = 
-           |                      new continuations.SafeContinuation[Boolean](
-           |                        continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
-           |                      , continuations.Continuation.State.Undecided)
-           |                    safeContinuation.resume(Right.apply[Nothing, Boolean](false))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    return[label1] ()
-           |                    ()
-           |                  case 1 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    label1[Unit]: <empty>
-           |                    println("Hello")
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 2
-           |                    val safeContinuation: continuations.SafeContinuation[String] = 
-           |                      new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)()
-           |                        , 
-           |                      continuations.Continuation.State.Undecided)
-           |                    safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    return[label2] ()
-           |                    ()
-           |                  case 2 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    label2[Unit]: <empty>
-           |                    $continuation.asInstanceOf[program$foo$1].$label = 3
-           |                    val safeContinuation: continuations.SafeContinuation[Int] = 
-           |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
-           |                        continuations.Continuation.State.Undecided
-           |                      )
-           |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-           |                      safeContinuation.getOrThrow()
-           |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-           |                    orThrow
-           |                  case 3 => 
-           |                    if $result.!=(null) then 
-           |                      $result.fold[Unit](
-           |                        {
-           |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-           |                          closure($anonfun)
-           |                        }
-           |                      , 
-           |                        {
-           |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-           |                          closure($anonfun)
-           |                        }
-           |                      )
-           |                     else ()
-           |                    $result
-           |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
-           |                }
-           |            }
-           |          }
-           |        foo(continuations.jvm.internal.ContinuationStub.contImpl)
-           |      }
-           |  }
-           |}
-           |""".stripMargin
-      // format: on
-
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            expectedStateMachineNoDependantSuspensionsWithCodeBetween)
       }
   }
 
@@ -2178,7 +950,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int = 
+           |    def program: Int =
            |      {
            |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A | Any]): Any = x
            |        foo(1, 2, "A", concurrent.ExecutionContext.Implicits.global, continuations.jvm.internal.ContinuationStub.contImpl)
@@ -2200,7 +972,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int = 
+           |    def program: Int =
            |      {
            |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A]): 
            |          Any | Null | continuations.Continuation.State.Suspended.type
@@ -2223,12 +995,238 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures {
 
       checkContinuations(sourceNoSuspend) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expectedNoSuspend)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedNoSuspend))
       }
 
       checkContinuations(sourceSuspend) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expectedSuspend)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedSuspend))
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should transform a dependent suspendContinuation with one param into a state machine") {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo(x: Int)(using Suspend): Int = {
+           |  val y = summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  x + y
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineOneParamOneDependantContinuation)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should transform a suspend continuation with one parameter into a state machine"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo(qq: Int)(using s: Suspend): Int = {
+           |  summon[Suspend].suspendContinuation[Unit] { _.resume(Right { println(qq) }) }
+           |  10
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineOneParamOneNoDependantContinuation)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should transform a suspend continuation with no parameter and code before the continuation " +
+      "that is used afterwards into a state machine"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def foo()(using s: Suspend): Int = {
+           |  val xx = 111
+           |  println(xx)
+           |  summon[Suspend].suspendContinuation[Int] { _.resume(Right( 10 )) }
+           |  xx
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineNoParamOneNoDependantContinuationCodeBeforeUsedAfter)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should transform a suspend continuation with many dependant continuations " +
+      "with code around them to a state machine"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def fooTest(qq: Int)(using s: Suspend): Int = {
+           |    val pp = 11
+           |    val xx = s.suspendContinuation[Int] { _.resume(Right { qq - 1 }) }
+           |    val ww = 13
+           |    val rr = "AAA"
+           |    val yy = s.suspendContinuation[String] { _.resume(Right { rr }) }
+           |    val tt = 100
+           |    val zz = s.suspendContinuation[Int] { _.resume(Right { ww - 1 }) }
+           |    println(xx)
+           |    xx + qq + yy.size + zz + pp + tt
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineManyDependantContinuations)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should transform a suspend continuation with many dependant and no dependant continuations " +
+      "with code around them to a state machine"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def fooTest(qq: Int)(using s: Suspend): Int = {
+           |    val pp = 11
+           |    val xx = s.suspendContinuation[Int] { _.resume(Right { qq - 1 }) }
+           |    val ww = 13
+           |    val rr = "AAA"
+           |    s.suspendContinuation[String] { _.resume(Right { rr }) }
+           |    val tt = 100
+           |    val zz = s.suspendContinuation[Int] { _.resume(Right { ww - 1 }) }
+           |    println(xx)
+           |    xx + qq + zz + pp + tt
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineManyDependantAndNoDependantContinuations)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should transform a suspend continuation with dependant and no dependant continuation at the end" +
+      "with code around them and inside to a state machine"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def fooTest(x: Int)(using s: Suspend): Int = {
+           |    println("Hello")
+           |    val y = s.suspendContinuation[Int] { _.resume(Right { println("World"); 1 }) }
+           |    val z = 1
+           |    s.suspendContinuation[Int] { continuation =>
+           |      val w = "World"
+           |      println("Hello")
+           |      continuation.resume(Right { println(z); x })
+           |    }
+           |    val tt = 2
+           |    x + y + tt
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineWithDependantAndNoDependantContinuationAtTheEnd)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert into a state machine for one chained suspend continuation"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def fooTest()(using s: Suspend): Int = {
+           |    val x = s.suspendContinuation[Int] { _.resume(Right { 1 }) }
+           |    s.suspendContinuation[Int] { _.resume(Right { x + 1 }) }
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineForOneChainedContinuation)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert into a state machine multiple chained continuations with" +
+      "code in between and returning a non suspended value"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def fooTest(q: Int)(using s: Suspend): Int = {
+           |    println("Hello")
+           |    val z = 100
+           |    val x = s.suspendContinuation[Int] { _.resume(Right { 1 + z}) }
+           |    val j = 9
+           |    val w = s.suspendContinuation[Int] { _.resume(Right { x + 1 + q}) }
+           |    println("World")
+           |    s.suspendContinuation[Int] { _.resume(Right { x + w + 1 + j}) }
+           |    10
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineMultipleChainedSuspendContinuationsReturningANonSuspendedVal)
+          )
       }
   }
 

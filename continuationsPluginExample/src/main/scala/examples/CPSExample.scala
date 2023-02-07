@@ -164,3 +164,17 @@ def programSuspendContinuationNoParamResumeIgnoreResult: Int =
     10
 
   fooTest()
+
+def programSuspendContinuationParamDependent: Int =
+  def fooTest(qq: Int)(using s: Suspend): Int =
+    val pp = 11
+    val xx = s.suspendContinuation[Int] { _.resume(Right { qq - 1 }) }
+    val ww = 13
+    val rr = "AAA"
+    val yy = s.suspendContinuation[String] { c => c.resume(Right { rr }) }
+    val tt = 100
+    val zz = s.suspendContinuation[Int] { _.resume(Right { ww - 1 + xx }) }
+    println(xx)
+    xx + qq + zz + pp + tt + yy.length
+
+  fooTest(12)
