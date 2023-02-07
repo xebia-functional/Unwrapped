@@ -18,7 +18,7 @@ import munit.FunSuite
  * @see
  *   [[https://stackoverflow.com/questions/4713031/how-to-use-scalatest-to-develop-a-compiler-plugin-in-scala]]
  */
-class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, ContinuationsPluginFixtures {
+class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineFixtures {
 
   compilerContextWithContinuationsPlugin.test(
     """|it should transform a 0-arity suspended definition returning a
@@ -2372,6 +2372,39 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, Continuations
             removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
             removeLineTrailingSpaces(
               expectedStateMachineManyDependantAndNoDependantContinuations)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should transform a suspend continuation with dependant and no dependant continuation at the end" +
+      "with code around them and inside to a state machine"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def fooTest(x: Int)(using s: Suspend): Int = {
+           |    println("Hello")
+           |    val y = s.suspendContinuation[Int] { _.resume(Right { println("World"); 1 }) }
+           |    val z = 1
+           |    s.suspendContinuation[Int] { continuation =>
+           |      val w = "World"
+           |      println("Hello")
+           |      continuation.resume(Right { println(z); x })
+           |    }
+           |    val tt = 2
+           |    x + y + tt
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineWithDependantAndNoDependantContinuationAtTheEnd)
           )
       }
   }
