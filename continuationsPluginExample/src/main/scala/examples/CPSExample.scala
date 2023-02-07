@@ -173,7 +173,7 @@ def programSuspendContinuationParamDependent: Int =
     val rr = "AAA"
     val yy = s.suspendContinuation[String] { c => c.resume(Right { rr }) }
     val tt = 100
-    val zz = s.suspendContinuation[Int] { _.resume(Right { ww - 1 }) }
+    val zz = s.suspendContinuation[Int] { _.resume(Right { ww - 1 + xx }) }
     println(xx)
     xx + qq + zz + pp + tt + yy.length
 

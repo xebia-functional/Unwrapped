@@ -1175,4 +1175,58 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
           )
       }
   }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert into a state machine for one chained suspend continuation"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def fooTest()(using s: Suspend): Int = {
+           |    val x = s.suspendContinuation[Int] { _.resume(Right { 1 }) }
+           |    s.suspendContinuation[Int] { _.resume(Right { x + 1 }) }
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineForOneChainedContinuation)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert into a state machine multiple chained continuations with" +
+      "code in between and returning a non suspended value"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def fooTest(q: Int)(using s: Suspend): Int = {
+           |    println("Hello")
+           |    val z = 100
+           |    val x = s.suspendContinuation[Int] { _.resume(Right { 1 + z}) }
+           |    val j = 9
+           |    val w = s.suspendContinuation[Int] { _.resume(Right { x + 1 + q}) }
+           |    println("World")
+           |    s.suspendContinuation[Int] { _.resume(Right { x + w + 1 + j}) }
+           |    10
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineMultipleChainedSuspendContinuationsReturningANonSuspendedVal)
+          )
+      }
+  }
 }
