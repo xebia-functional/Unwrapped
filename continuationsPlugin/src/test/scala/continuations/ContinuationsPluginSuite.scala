@@ -1376,4 +1376,65 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
           assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
       }
   }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert into a state machine chained continuations with an input parameter"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def fooTest(x: Int)(using Suspend): Int = {
+           |    val y = summon[Suspend].suspendContinuation[Int] { continuation =>
+           |      continuation.resume(Right(x + 1))
+           |    }
+           |    summon[Suspend].suspendContinuation[Int] { continuation =>
+           |      continuation.resume(Right(y + 1))
+           |    }
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineChainedSuspendContinuationsOneParameter)
+          )
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "it should convert into a state machine chained continuations with an input parameter and vals"
+  ) {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |def fooTest(x: Int)(using Suspend): Int = {
+           |    val q = 2
+           |    val w = 3
+           |    val y = summon[Suspend].suspendContinuation[Int] { continuation =>
+           |      continuation.resume(Right(x + w))
+           |    }
+           |    val p = 1
+           |    val t = 1
+           |    val z = summon[Suspend].suspendContinuation[Int] { continuation =>
+           |      continuation.resume(Right(y + q + x))
+           |    }
+           |    z + y + p
+           |}
+           |""".stripMargin
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineChainedSuspendContinuationsOneParameterAndVals)
+          )
+      }
+  }
 }
