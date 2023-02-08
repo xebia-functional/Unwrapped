@@ -381,6 +381,65 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
   }
 
   compilerContextWithContinuationsPlugin.test(
+    "it should convert simple suspended def with no parameters with vals inside resume") {
+    case given Context =>
+      val source =
+        """|
+           |package continuations
+           |
+           |
+           |def foo()(using Suspend): Int =
+           |  summon[Suspend].suspendContinuation[Int]{ c =>
+           |    c.resume{
+           |      println("Hello")
+           |      val x = 1
+           |      val y = 1
+           |      Right(x + y)
+           |    }
+           |  }
+           |""".stripMargin
+
+      // format: off
+      val expected =
+        """|
+           |package continuations {
+           |  final lazy module val compileFromString$package: 
+           |    continuations.compileFromString$package
+           |   = new continuations.compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class 
+           |    compileFromString$package
+           |  () extends Object() { this: continuations.compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef = 
+           |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |      {
+           |        val continuation1: continuations.Continuation[Int] = completion
+           |        val safeContinuation: continuations.SafeContinuation[Int] = 
+           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+           |            continuations.Continuation.State.Undecided
+           |          )
+           |        safeContinuation.resume(
+           |          {
+           |            println("Hello")
+           |            val x: Int = 1
+           |            val y: Int = 1
+           |            Right.apply[Nothing, Int](x.+(y))
+           |          }
+           |        )
+           |        safeContinuation.getOrThrow()
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
     "it should convert simple suspended def with a named implicit Suspend") {
     case given Context =>
       val source =

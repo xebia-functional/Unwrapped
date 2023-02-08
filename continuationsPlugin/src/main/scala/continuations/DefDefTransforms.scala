@@ -71,14 +71,15 @@ object DefDefTransforms extends TreesChecks:
         }
 
     val removedAnonFunc: List[Symbol] = suspendContinuationBody
-      .filter(t =>
-        t.symbol.exists &&
-          t.symbol.owner.isAnonymousFunction &&
-          t.symbol
-            .owner
-            .paramSymss
-            .flatten
-            .exists(_.info.hasClassSymbol(requiredClass(continuationFullName))))
+      .flatMap(
+        _.filterSubTrees(t =>
+          t.symbol.exists &&
+            t.symbol.owner.isAnonymousFunction &&
+            t.symbol
+              .owner
+              .paramSymss
+              .flatten
+              .exists(_.info.hasClassSymbol(requiredClass(continuationFullName)))))
       .map(_.symbol.owner)
       .distinct
 
