@@ -178,3 +178,16 @@ def programSuspendContinuationParamDependent: Int =
     xx + qq + zz + pp + tt + yy.length
 
   fooTest(12)
+
+def programSuspendContinuationResumeVals: Int =
+  def fooTest()(using Suspend): Int =
+    summon[Suspend].suspendContinuation[Int] { c =>
+      c.resume {
+        println("Hello")
+        val x = 1
+        val y = 1
+        Right(x + y)
+      }
+    }
+
+  fooTest()
