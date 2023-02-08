@@ -4,99 +4,76 @@ import continuations.Suspend
 
 import scala.util.Try
 
-//group 1
+//no continuation
+// case #1
 def zeroArgumentsZeroContinuations()(using Suspend): Int = 1
+
+// case #2
 def oneArgumentsZeroContinuations(x: Int)(using Suspend): Int = x + 1
+
+// case #3
 def twoArgumentsZeroContinuations(x: Int, y: Int)(using Suspend): Int = x + y + 1
-def genericArgumentsZeroContinuations[A](a: A)(using Suspend): A = a
+
+// case #5
 def twoCurriedArgumentsZeroContinuations(x: Int)(y: Int)(using Suspend): Int = x + y + 1
+
+// case #6
 def oneArgumentOneAdditionalGivenArgumentZeroContinuations(
     x: Int)(using Suspend, String): String = summon[String] + x
+
+// case #7
+def genericArgumentsZeroContinuations[A](a: A)(using Suspend): A = a
+
+// case #8
 def zeroArgumentsZeroContinuationsCF(): Suspend ?=> Int = 1
+
+// case #9
 def oneArgumentsZeroContinuationsCF(x: Int): Suspend ?=> Int = x + 1
+
+// case #10
 def twoArgumentsZeroContinuationsCF(x: Int, y: Int): Suspend ?=> Int = x + y + 1
 
-//group 2
+//1 continuation
+// case #11
 def zeroArgumentsSingleResumeContinuations()(using Suspend): Int =
   summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+
+// case #12
 def oneArgumentsSingleResumeContinuations(x: Int)(using Suspend): Int =
   summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(x + 1)) }
+
+// case #13
 def twoArgumentsSingleResumeContinuations(x: Int, y: Int)(using Suspend): Int =
   summon[Suspend].suspendContinuation[Int] { continuation =>
     continuation.resume(Right(x + y + 1))
   }
-def genericArgumentsSingleResumeContinuations[A](x: A)(using Suspend): A =
-  summon[Suspend].suspendContinuation[A] { continuation => continuation.resume(Right(x)) }
+
+// case #14
+def zeroArgumentsMultipleResume()(using s: Suspend): Int =
+  s.suspendContinuation[Int] { c =>
+    c.resume(Right { println("Resume1"); 1 })
+    c.resume(Right { println("Resume2"); 2 })
+  }
+
+// case #16
 def twoCurriedArgumentsOneContinuations(x: Int)(y: Int)(using Suspend): Int =
   summon[Suspend].suspendContinuation[Int] { continuation =>
     continuation.resume(Right(x + y + 1))
   }
+
+// case #17
 def oneArgumentOneAdditionalGivenArgumentOneContinuations(
     x: Int)(using Suspend, String): String =
   summon[Suspend].suspendContinuation[String] { continuation =>
     continuation.resume(Right(summon[String] + x))
   }
-def zeroArgumentsOneContinuationsCF(): Suspend ?=> Int =
-  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
-def oneArgumentsOneContinuationsCF(x: Int): Suspend ?=> Int =
-  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(x + 1)) }
-def twoArgumentsOneContinuationsCF(x: Int, y: Int): Suspend ?=> Int =
-  summon[Suspend].suspendContinuation[Int] { continuation =>
-    continuation.resume(Right(x + y + 1))
-  }
 
-//group 3
-def zeroArgumentsSingleResumeContinuationsBefore()(using Suspend): Int =
-  println("Hello")
-  val x = 1
-  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(x)) }
-def oneArgumentsSingleResumeContinuationsBefore(x: Int)(using Suspend): Int =
-  println("Hello")
-  val y = 1
-  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(x + y)) }
-def twoArgumentsSingleResumeContinuationsBefore(x: Int, y: Int)(using Suspend): Int =
-  println("Hello")
-  val z = 1
-  summon[Suspend].suspendContinuation[Int] { continuation =>
-    continuation.resume(Right(x + y + z))
-  }
-def genericArgumentsSingleResumeContinuationsBefore[A](x: A)(using Suspend): A =
-  println("Hello")
-  val y = 1
+// case #18
+def genericArgumentsSingleResumeContinuations[A](x: A)(using Suspend): A =
   summon[Suspend].suspendContinuation[A] { continuation => continuation.resume(Right(x)) }
-def twoCurriedArgumentsOneContinuationsBefore(x: Int)(y: Int)(using Suspend): Int =
-  println("Hello")
-  val z = 1
-  summon[Suspend].suspendContinuation[Int] { continuation =>
-    continuation.resume(Right(x + y + z))
-  }
-def oneArgumentOneAdditionalGivenArgumentOneContinuationsBefore(
-    x: Int)(using Suspend, String): String =
-  println("Hello")
-  val z = 1
-  summon[Suspend].suspendContinuation[String] { continuation =>
-    continuation.resume(Right(summon[String] + x + z))
-  }
-def zeroArgumentsOneContinuationsCFBefore(): Suspend ?=> Int =
-  println("Hello")
-  val x = 1
-  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(x)) }
-def oneArgumentsOneContinuationsCFBefore(x: Int): Suspend ?=> Int =
-  println("Hello")
-  val y = 1
-  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(x + y)) }
-def twoArgumentsOneContinuationsCFBefore(x: Int, y: Int): Suspend ?=> Int =
-  println("Hello")
-  val z = 1
-  summon[Suspend].suspendContinuation[Int] { continuation =>
-    continuation.resume(Right(x + y + z))
-  }
 
-//group 4
-def programOneContinuation: Int =
-  case class Bar(x: Int)
-  given String = "Output: "
-
+def programOneContinuationReturnValue: Int =
+  // case #19
   def zeroArgumentsSingleResumeContinuationsBeforeAfter()(using Suspend): Int =
     println("Hello")
     val x = 1
@@ -107,6 +84,7 @@ def programOneContinuation: Int =
     2
   zeroArgumentsSingleResumeContinuationsBeforeAfter()
 
+  // case #20
   def oneArgumentsSingleResumeContinuationsBeforeAfter(x: Int)(using Suspend): Int =
     println("Hello")
     val y = 1
@@ -116,6 +94,8 @@ def programOneContinuation: Int =
     println("World")
     2
   oneArgumentsSingleResumeContinuationsBeforeAfter(1)
+
+  // case #21
   def twoArgumentsSingleResumeContinuationsBeforeAfter(x: Int, y: Int)(using Suspend): Int =
     println("Hello")
     val z = 1
@@ -125,185 +105,230 @@ def programOneContinuation: Int =
     println("World")
     2
   twoArgumentsSingleResumeContinuationsBeforeAfter(1, 2)
-  def genericArgumentsSingleResumeContinuationsBeforeAfter[A](x: A)(using Suspend): A =
-    println("Hello")
-    val y = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(x)))
-    }
-    println("World")
-    x
-  genericArgumentsSingleResumeContinuationsBeforeAfter(Bar(1))
-  def twoCurriedArgumentsOneContinuationsBeforeAfter(x: Int)(y: Int)(using Suspend): Int =
-    println("Hello")
-    val z = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(x + y + z)))
-    }
-    println("World")
-    2
-  twoCurriedArgumentsOneContinuationsBeforeAfter(1)(2)
-  def oneArgumentOneAdditionalGivenArgumentOneContinuationsBeforeAfter(
-      x: Int)(using Suspend, String): String =
-    println("Hello")
-    val z = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(summon[String] + x + z)))
-    }
-    "World"
-  oneArgumentOneAdditionalGivenArgumentOneContinuationsBeforeAfter(1)(2)
-  def zeroArgumentsOneContinuationsCFBeforeAfter(): Suspend ?=> Int =
-    println("Hello")
+
+// case #23
+def useValsDefinedInsideContinuation()(using Suspend): Int =
+  summon[Suspend].suspendContinuation[Int] { continuation =>
     val x = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(x)))
-    }
-    println("World")
-    2
-  zeroArgumentsOneContinuationsCFBeforeAfter()
-  def oneArgumentsOneContinuationsCFBeforeAfter(x: Int): Suspend ?=> Int =
-    println("Hello")
-    val y = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(x + y)))
-    }
-    println("World")
-    2
-  oneArgumentsOneContinuationsCFBeforeAfter(1)
-  def twoArgumentsOneContinuationsCFBeforeAfter(x: Int, y: Int): Suspend ?=> Int =
-    println("Hello")
-    val z = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(x + y + z)))
-    }
-    println("World")
-    2
-  twoArgumentsOneContinuationsCFBeforeAfter(1, 2)
+    val y = 2
+    continuation.resume(Right(x + y))
+  }
+
+// case #24
+//def useValsDefinedInsideResume()(using Suspend): Int =
+//  summon[Suspend].suspendContinuation[Int] { continuation =>
+//    continuation.resume {
+//      val x = 1
+//      val y = 2
+//      Right(x + y)
+//    }
+//  }
+
+// case #25
+def zeroArgumentsSingleResumeContinuationsBefore()(using Suspend): Int =
+  println("Hello")
+  val x = 1
+  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+
+// case #26
+def oneArgumentsSingleResumeContinuationsBefore(x: Int)(using Suspend): Int =
+  println("Hello")
+  val y = x
+  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+
+// case #27
+def twoArgumentsSingleResumeContinuationsBefore(x: Int, y: Int)(using Suspend): Int =
+  println("Hello")
+  val z = x + y
+  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+
+// case #28
+def twoArgumentsSingleResumeContinuationsBeforeUsedInResume(x: Int, y: Int)(
+    using Suspend): Int =
+  println("Hello")
+  val z = 1
+  summon[Suspend].suspendContinuation[Int] { continuation =>
+    continuation.resume(Right(x + y + z))
+  }
+
+// case #31
+def zeroArgumentsOneContinuationsCF(): Suspend ?=> Int =
+  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+
+// case #32
+def oneArgumentsOneContinuationsCF(x: Int): Suspend ?=> Int =
+  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(x + 1)) }
+
+// case #33
+def twoArgumentsOneContinuationsCF(x: Int, y: Int): Suspend ?=> Int =
+  summon[Suspend].suspendContinuation[Int] { continuation =>
+    continuation.resume(Right(x + y + 1))
+  }
 
 //group 5
 def programTwoContinuations: Int =
-  case class Bar(x: Int)
   given String = "Output: "
 
-  def zeroArgumentsSingleResumeTwoContinuationsBeforeAfter()(using Suspend): Int =
+  // case #34
+  def zeroArgumentsTwoContinuations()(using Suspend): Int =
+    summon[Suspend].suspendContinuation[Unit] { continuation =>
+      continuation.resume(Right(println(1)))
+    }
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(2)) }
+  zeroArgumentsTwoContinuations()
+
+  // case #35
+  def oneArgumentsTwoContinuations(x: Int)(using Suspend): Int =
+    summon[Suspend].suspendContinuation[Unit] { continuation =>
+      continuation.resume(Right(println(x)))
+    }
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+
+  oneArgumentsTwoContinuations(1)
+
+  // case #36
+  def twoArgumentsTwoContinuations(x: Int, y: Int)(using Suspend): Int =
+    summon[Suspend].suspendContinuation[Unit] { continuation =>
+      continuation.resume(Right(println(x + y)))
+    }
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+  twoArgumentsTwoContinuations(1, 2)
+
+  // case #37
+  def zeroArgumentsTwoContinuationsMultipleResume()(using s: Suspend): Int =
+    s.suspendContinuation[Int] { c => c.resume(Right { println("Resume1"); 1 }) }
+    s.suspendContinuation[Int] { c =>
+      c.resume(Right {
+        println("Resume2"); 1
+      })
+      c.resume(Right {
+        println("Resume3"); 2
+      })
+    }
+  println(Try(zeroArgumentsTwoContinuationsMultipleResume()))
+
+  // case #39
+  def twoCurriedArgumentsTwoContinuations(x: Int)(y: Int)(using Suspend): Int =
+    summon[Suspend].suspendContinuation[Unit] { continuation =>
+      continuation.resume(Right(println(x + y)))
+    }
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(3)) }
+  twoCurriedArgumentsTwoContinuations(1)(2)
+
+  // case #40
+  def oneArgumentOneAdditionalGivenArgumentTwoContinuations(
+      x: Int)(using Suspend, String): Int =
+    summon[Suspend].suspendContinuation[Unit] { continuation =>
+      continuation.resume(Right(println(summon[String] + x)))
+    }
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(2)) }
+  oneArgumentOneAdditionalGivenArgumentTwoContinuations(1)
+
+  // case #41
+  def genericArgumentsContinuations[A](x: A)(using Suspend): Int =
+    summon[Suspend].suspendContinuation[Unit] { continuation =>
+      continuation.resume(Right(println(x)))
+    }
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(2)) }
+
+  genericArgumentsContinuations(1)
+
+  // case #42
+  def zeroArgumentsCodeAfter()(using Suspend): Int =
+    summon[Suspend].suspendContinuation[Unit] { continuation =>
+      continuation.resume(Right(println(1)))
+    }
+    summon[Suspend].suspendContinuation[Unit] { continuation =>
+      continuation.resume(Right(println(2)))
+    }
+    3
+  zeroArgumentsCodeAfter()
+
+  // case #43
+  def zeroArgumentsCodeBetween()(using Suspend): Int =
+    summon[Suspend].suspendContinuation[Unit] { continuation =>
+      continuation.resume(Right(println(1)))
+    }
+    println("Hello")
+    val x = 1
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(2)) }
+  zeroArgumentsCodeBetween()
+
+  // case #45
+  def zeroArgumentsValsDefinedInsideContinuation()(using Suspend): Int =
+    summon[Suspend].suspendContinuation[Unit] { continuation =>
+      val x = 1
+      continuation.resume(Right(println(x)))
+    }
+    val x = 1
+    summon[Suspend].suspendContinuation[Int] { continuation =>
+      val x = 2
+      continuation.resume(Right(x))
+    }
+  zeroArgumentsValsDefinedInsideContinuation()
+
+  // case #46
+//  def zeroArgumentsValsDefinedInsideResume()(using Suspend): Int =
+//    summon[Suspend].suspendContinuation[Unit] { continuation =>
+//      continuation.resume {
+//        val x = 1
+//        Right(println(x))
+//      }
+//    }
+//    summon[Suspend].suspendContinuation[Int] { continuation =>
+//      continuation.resume {
+//        val x = 2
+//        Right(x)
+//      }
+//    }
+//  zeroArgumentsValsDefinedInsideResume()
+
+  // case #47
+  def zeroArgumentsCodeBefore()(using Suspend): Int =
+    println("Hello")
+    val x = 1
+    summon[Suspend].suspendContinuation[Unit] { continuation =>
+      continuation.resume(Right(println(1)))
+    }
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(2)) }
+  zeroArgumentsCodeBefore()
+
+  // case #48
+  def zeroArgumentsValsDefinedAboveContinuation()(using Suspend): Int =
     println("Hello")
     val x = 1
     summon[Suspend].suspendContinuation[Unit] { continuation =>
       continuation.resume(Right(println(x)))
     }
-    println("World")
-    val y = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(y)))
-    }
-    2
-  zeroArgumentsSingleResumeTwoContinuationsBeforeAfter()
+    val y = 2
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(y)) }
+  zeroArgumentsValsDefinedAboveContinuation()
 
-  def oneArgumentsSingleResumeTwoContinuationsBeforeAfter(x: Int)(using Suspend): Int =
-    println("Hello")
-    val y = 1
+  // case #52
+  def zeroArgumentsTwoContinuationsCF(): Suspend ?=> Int =
     summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(x + y)))
+      continuation.resume(Right(println(1)))
     }
-    println("World")
-    val z = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(x + z)))
-    }
-    2
-  oneArgumentsSingleResumeTwoContinuationsBeforeAfter(1)
-  def twoArgumentsSingleResumeTwoContinuationsBeforeAfter(x: Int, y: Int)(using Suspend): Int =
-    println("Hello")
-    val z = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(x + y + z)))
-    }
-    println("World")
-    val q = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(q)))
-    }
-    2
-  twoArgumentsSingleResumeTwoContinuationsBeforeAfter(1, 2)
-  def genericArgumentsSingleResumeTwoContinuationsBeforeAfter[A](x: A)(using Suspend): A =
-    println("Hello")
-    val y = 1
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(2)) }
+  zeroArgumentsTwoContinuationsCF()
+
+  // case #53
+  def oneArgumentsTwoContinuationsCF(x: Int): Suspend ?=> Int =
     summon[Suspend].suspendContinuation[Unit] { continuation =>
       continuation.resume(Right(println(x)))
     }
-    println("World")
-    val q = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(q)))
-    }
-    x
-  genericArgumentsSingleResumeTwoContinuationsBeforeAfter(Bar(1))
-  def twoCurriedArgumentsTwoContinuationsBeforeAfter(x: Int)(y: Int)(using Suspend): Int =
-    println("Hello")
-    val z = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(x + y + z)))
-    }
-    println("World")
-    val q = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(q)))
-    }
-    2
-  twoCurriedArgumentsTwoContinuationsBeforeAfter(1)(2)
-  def oneArgumentOneAdditionalGivenArgumentTwoContinuationsBeforeAfter(
-      x: Int)(using Suspend, String): String =
-    println("Hello")
-    val z = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(summon[String] + x + z)))
-    }
-    val q = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(q)))
-    }
-    "World"
-  oneArgumentOneAdditionalGivenArgumentTwoContinuationsBeforeAfter(1)(2)
-  def zeroArgumentsTwoContinuationsCFBeforeAfter(): Suspend ?=> Int =
-    println("Hello")
-    val x = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(x)))
-    }
-    println("World")
-    val q = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(q)))
-    }
-    2
-  zeroArgumentsTwoContinuationsCFBeforeAfter()
-  def oneArgumentsTwoContinuationsCFBeforeAfter(x: Int): Suspend ?=> Int =
-    println("Hello")
-    val y = 1
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(2)) }
+  oneArgumentsTwoContinuationsCF(1)
+
+  // case #54
+  def twoArgumentsTwoContinuationsCF(x: Int, y: Int): Suspend ?=> Int =
     summon[Suspend].suspendContinuation[Unit] { continuation =>
       continuation.resume(Right(println(x + y)))
     }
-    println("World")
-    val q = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(q)))
-    }
-    2
-  oneArgumentsTwoContinuationsCFBeforeAfter(1)
-  def twoArgumentsTwoContinuationsCFBeforeAfter(x: Int, y: Int): Suspend ?=> Int =
-    println("Hello")
-    val z = 1
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(x + y + z)))
-    }
-    val q = 1
-    println("World")
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(q)))
-    }
-    2
-  twoArgumentsTwoContinuationsCFBeforeAfter(1, 2)
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(3)) }
+  twoArgumentsTwoContinuationsCF(1, 2)
 
+// extras
 def programMultipleSuspendWithExpressionsInBody: Int =
   def foo()(using s: Suspend): Int =
     println("Start")
@@ -318,12 +343,6 @@ def programMultipleSuspendWithExpressionsInBody: Int =
     10
 
   foo()
-
-def programMultipleResume()(using s: Suspend): Int =
-  s.suspendContinuation[Int] { c =>
-    c.resume(Right { println("Resume1"); 1 })
-    c.resume(Right { println("Resume2"); 2 })
-  }
 
 def left()(using s: Suspend): Int =
   s.suspendContinuation[Int] { continuation =>
@@ -343,36 +362,35 @@ def demoPrints =
   println(zeroArgumentsZeroContinuations())
   println(oneArgumentsZeroContinuations(1))
   println(twoArgumentsZeroContinuations(1, 2))
-  println(genericArgumentsZeroContinuations(Foo(1)))
   println(twoCurriedArgumentsZeroContinuations(1)(2))
   println(oneArgumentOneAdditionalGivenArgumentZeroContinuations(1))
+  println(genericArgumentsZeroContinuations(Foo(1)))
   println(zeroArgumentsZeroContinuationsCF())
   println(oneArgumentsZeroContinuationsCF(1))
-  println(twoArgumentsZeroContinuationsCF(1, 1))
+  println(twoArgumentsZeroContinuationsCF(1, 2))
 
   println(zeroArgumentsSingleResumeContinuations())
   println(oneArgumentsSingleResumeContinuations(1))
   println(twoArgumentsSingleResumeContinuations(1, 2))
-  println(genericArgumentsSingleResumeContinuations(Foo(1)))
+  println(Try(zeroArgumentsMultipleResume()))
   println(twoCurriedArgumentsOneContinuations(1)(2))
   println(oneArgumentOneAdditionalGivenArgumentOneContinuations(1))
+  println(genericArgumentsSingleResumeContinuations(Foo(1)))
+
+  programOneContinuationReturnValue
+
+  println(useValsDefinedInsideContinuation())
+//  println(useValsDefinedInsideResume())
+  println(zeroArgumentsSingleResumeContinuationsBefore())
+  println(oneArgumentsSingleResumeContinuationsBefore(1))
+  println(twoArgumentsSingleResumeContinuationsBefore(1, 2))
+  println(twoArgumentsSingleResumeContinuationsBeforeUsedInResume(1, 2))
   println(zeroArgumentsOneContinuationsCF())
   println(oneArgumentsOneContinuationsCF(1))
   println(twoArgumentsOneContinuationsCF(1, 1))
 
-  println(zeroArgumentsSingleResumeContinuationsBefore())
-  println(oneArgumentsSingleResumeContinuationsBefore(1))
-  println(twoArgumentsSingleResumeContinuationsBefore(1, 2))
-  println(genericArgumentsSingleResumeContinuationsBefore(Foo(1)))
-  println(twoCurriedArgumentsOneContinuationsBefore(1)(2))
-  println(oneArgumentOneAdditionalGivenArgumentOneContinuationsBefore(1))
-  println(zeroArgumentsOneContinuationsCFBefore())
-  println(oneArgumentsOneContinuationsCFBefore(1))
-  println(twoArgumentsOneContinuationsCFBefore(1, 1))
-
-  programOneContinuation
   programTwoContinuations
+
   println(programMultipleSuspendWithExpressionsInBody)
-  println(Try(programMultipleResume()))
   println(Try(left()))
   println(Try(programMultipleSuspendLeft))
