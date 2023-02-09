@@ -1,0 +1,78 @@
+Compiled from "ListMap.scala"
+public final class examples.ListMap$package$ implements java.io.Serializable {
+  public static final examples.ListMap$package$ MODULE$;
+
+  public static {};
+    Code:
+       0: new           #2                  // class examples/ListMap$package$
+       3: dup
+       4: invokespecial #24                 // Method "<init>":()V
+       7: putstatic     #26                 // Field MODULE$:Lexamples/ListMap$package$;
+      10: return
+
+  public void ListMap();
+    Code:
+       0: getstatic     #39                 // Field scala/package$.MODULE$:Lscala/package$;
+       3: invokevirtual #43                 // Method scala/package$.List:()Lscala/collection/immutable/List$;
+       6: getstatic     #48                 // Field scala/runtime/ScalaRunTime$.MODULE$:Lscala/runtime/ScalaRunTime$;
+       9: iconst_4
+      10: newarray       int
+      12: dup
+      13: iconst_0
+      14: iconst_1
+      15: iastore
+      16: dup
+      17: iconst_1
+      18: iconst_2
+      19: iastore
+      20: dup
+      21: iconst_2
+      22: iconst_3
+      23: iastore
+      24: dup
+      25: iconst_3
+      26: iconst_4
+      27: iastore
+      28: invokevirtual #52                 // Method scala/runtime/ScalaRunTime$.wrapIntArray:([I)Lscala/collection/immutable/ArraySeq;
+      31: invokevirtual #58                 // Method scala/collection/immutable/List$.apply:(Lscala/collection/immutable/Seq;)Ljava/lang/Object;
+      34: checkcast     #60                 // class scala/collection/immutable/List
+      37: aload_0
+      38: invokedynamic #78,  0             // InvokeDynamic #0:apply$mcII$sp:(Lexamples/ListMap$package$;)Lscala/runtime/java8/JFunction1$mcII$sp;
+      43: invokevirtual #82                 // Method scala/collection/immutable/List.map:(Lscala/Function1;)Lscala/collection/immutable/List;
+      46: astore_1
+      47: getstatic     #87                 // Field scala/Predef$.MODULE$:Lscala/Predef$;
+      50: aload_1
+      51: invokevirtual #91                 // Method scala/Predef$.println:(Ljava/lang/Object;)V
+      54: return
+}
+Compiled from "ListMap.scala"
+public final class examples.ListMap$package {
+  public static void ListMap();
+    Code:
+       0: getstatic     #13                 // Field examples/ListMap$package$.MODULE$:Lexamples/ListMap$package$;
+       3: invokevirtual #15                 // Method examples/ListMap$package$.ListMap:()V
+       6: return
+}
+Compiled from "ListMap.scala"
+public final class examples.ListMap {
+  public examples.ListMap();
+    Code:
+       0: aload_0
+       1: invokespecial #14                 // Method java/lang/Object."<init>":()V
+       4: return
+
+  public static void main(java.lang.String[]);
+    Code:
+       0: getstatic     #25                 // Field examples/ListMap$package$.MODULE$:Lexamples/ListMap$package$;
+       3: invokevirtual #28                 // Method examples/ListMap$package$.ListMap:()V
+       6: goto          20
+       9: astore_1
+      10: getstatic     #33                 // Field scala/util/CommandLineParser$.MODULE$:Lscala/util/CommandLineParser$;
+      13: aload_1
+      14: invokevirtual #37                 // Method scala/util/CommandLineParser$.showError:(Lscala/util/CommandLineParser$ParseError;)V
+      17: goto          20
+      20: return
+    Exception table:
+       from    to  target type
+           0     6     9   Class scala/util/CommandLineParser$ParseError
+}
