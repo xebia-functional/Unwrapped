@@ -20,4 +20,3 @@ def demoPrints =
   given String = "Output: "
 
   programOneContinuationReturnValue
-

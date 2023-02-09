@@ -49,15 +49,17 @@ lazy val `zero-arguments-no-continuation-treeview` =
     .settings(continuationsPluginExampleShowTreeSettings: _*)
     .dependsOn(continuationsPlugin)
 
-lazy val `zero-arguments-one-continuation-code-before-used-after` = (project in file("./zero-arguments-one-continuation-code-before-used-after"))
-    .settings(continuationsPluginExampleShowTreeSettings: _*)
-  .dependsOn(continuationsPlugin)
-
-lazy val `list-map` = (project in file("./list-map"))
+lazy val `zero-arguments-one-continuation-code-before-used-after` =
+  (project in file("./zero-arguments-one-continuation-code-before-used-after"))
     .settings(continuationsPluginExampleShowTreeSettings: _*)
     .dependsOn(continuationsPlugin)
 
-lazy val `two-arguments-two-continuations` = (project in file("./two-arguments-two-continuations"))
+lazy val `list-map` = (project in file("./list-map"))
+  .settings(continuationsPluginExampleShowTreeSettings: _*)
+  .dependsOn(continuationsPlugin)
+
+lazy val `two-arguments-two-continuations` =
+  (project in file("./two-arguments-two-continuations"))
     .settings(continuationsPluginExampleShowTreeSettings: _*)
     .dependsOn(continuationsPlugin)
 

@@ -7,4 +7,3 @@ import continuations.Suspend
     s.suspendContinuation(_.resume(Right(println(f(1)))))
     s.suspendContinuation(_.resume(Right(f(2))))
   println(oneFunctionArgumentTwoContinuationsTwoResumes(_ + 1))
-

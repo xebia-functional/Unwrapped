@@ -6,4 +6,4 @@ import continuations.Suspend
   def twoArgumentsSingleResumeContinuationsCodeAfter(x: Int, y: Int)(using s: Suspend): Int =
     s.suspendContinuation(_.resume(Right(println(x))))
     y
-  println(twoArgumentsSingleResumeContinuationsCodeAfter(1,2))
+  println(twoArgumentsSingleResumeContinuationsCodeAfter(1, 2))

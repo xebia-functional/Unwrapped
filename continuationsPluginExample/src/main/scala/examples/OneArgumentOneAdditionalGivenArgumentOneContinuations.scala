@@ -10,4 +10,3 @@ import continuations.Suspend
       continuation.resume(Right(summon[String] + x))
     }
   println(oneArgumentOneAdditionalGivenArgumentOneContinuations(1))
-
