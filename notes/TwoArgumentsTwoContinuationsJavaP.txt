@@ -1,0 +1,369 @@
+Compiled from "TwoArgumentsTwoContinuations.scala"
+public final class examples.TwoArgumentsTwoContinuations$package$ implements java.io.Serializable {
+  public static final examples.TwoArgumentsTwoContinuations$package$ MODULE$;
+
+  public static {};
+    Code:
+       0: new           #2                  // class examples/TwoArgumentsTwoContinuations$package$
+       3: dup
+       4: invokespecial #27                 // Method "<init>":()V
+       7: putstatic     #29                 // Field MODULE$:Lexamples/TwoArgumentsTwoContinuations$package$;
+      10: return
+
+  public void TwoArgumentsTwoContinuations();
+    Code:
+       0: getstatic     #42                 // Field scala/Predef$.MODULE$:Lscala/Predef$;
+       3: aload_0
+       4: iconst_1
+       5: iconst_2
+       6: getstatic     #47                 // Field continuations/jvm/internal/ContinuationStub$.MODULE$:Lcontinuations/jvm/internal/ContinuationStub$;
+       9: invokevirtual #51                 // Method continuations/jvm/internal/ContinuationStub$.contImpl:()Lcontinuations/jvm/internal/ContinuationImpl;
+      12: invokevirtual #55                 // Method examples$TwoArgumentsTwoContinuations$package$$$_$twoArgumentsTwoContinuations$1:(IILcontinuations/Continuation;)Ljava/lang/Object;
+      15: invokevirtual #59                 // Method scala/Predef$.println:(Ljava/lang/Object;)V
+      18: return
+
+  public final java.lang.Object examples$TwoArgumentsTwoContinuations$package$$$_$twoArgumentsTwoContinuations$1(int, int, continuations.Continuation);
+    Code:
+       0: iload_1
+       1: istore        4
+       3: iload_2
+       4: istore        5
+       6: aconst_null
+       7: astore        6
+       9: aload_3
+      10: astore        7
+      12: aload         7
+      14: astore        8
+      16: aload         8
+      18: instanceof    #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+      21: ifeq          68
+      24: aload         8
+      26: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+      29: invokevirtual #76                 // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.$label:()I
+      32: ldc           #77                 // int -2147483648
+      34: iand
+      35: iconst_0
+      36: if_icmpeq     68
+      39: aload         8
+      41: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+      44: astore        6
+      46: aload         6
+      48: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+      51: aload         6
+      53: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+      56: invokevirtual #76                 // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.$label:()I
+      59: ldc           #77                 // int -2147483648
+      61: isub
+      62: invokevirtual #81                 // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.$label_$eq:(I)V
+      65: goto          81
+      68: new           #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+      71: dup
+      72: aload_3
+      73: invokespecial #84                 // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1."<init>":(Lcontinuations/Continuation;)V
+      76: astore        6
+      78: goto          81
+      81: aload         6
+      83: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+      86: invokevirtual #88                 // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.$result:()Lscala/util/Either;
+      89: astore        9
+      91: aload         6
+      93: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+      96: invokevirtual #76                 // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.$label:()I
+      99: istore        10
+     101: iload         10
+     103: tableswitch   { // 0 to 2
+                     0: 128
+                     1: 288
+                     2: 457
+               default: 514
+          }
+     128: aload         9
+     130: ifnull        151
+     133: aload         9
+     135: aload_0
+     136: invokedynamic #107,  0            // InvokeDynamic #0:apply:(Lexamples/TwoArgumentsTwoContinuations$package$;)Lscala/Function1;
+     141: aload_0
+     142: invokedynamic #115,  0            // InvokeDynamic #1:applyVoid:(Lexamples/TwoArgumentsTwoContinuations$package$;)Lscala/runtime/function/JProcedure1;
+     147: invokevirtual #121                // Method scala/util/Either.fold:(Lscala/Function1;Lscala/Function1;)Ljava/lang/Object;
+     150: pop
+     151: aload         6
+     153: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+     156: iload         5
+     158: invokestatic  #127                // Method scala/runtime/BoxesRunTime.boxToInteger:(I)Ljava/lang/Integer;
+     161: invokevirtual #130                // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.I$0_$eq:(Ljava/lang/Object;)V
+     164: aload         6
+     166: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+     169: iload         4
+     171: invokestatic  #127                // Method scala/runtime/BoxesRunTime.boxToInteger:(I)Ljava/lang/Integer;
+     174: invokevirtual #133                // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.I$1_$eq:(Ljava/lang/Object;)V
+     177: aload         6
+     179: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+     182: iconst_1
+     183: invokevirtual #81                 // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.$label_$eq:(I)V
+     186: new           #135                // class continuations/SafeContinuation
+     189: dup
+     190: getstatic     #140                // Field continuations/intrinsics/IntrinsicsJvm$package$.MODULE$:Lcontinuations/intrinsics/IntrinsicsJvm$package$;
+     193: aload         6
+     195: invokevirtual #144                // Method continuations/intrinsics/IntrinsicsJvm$package$.intercepted:(Lcontinuations/Continuation;)Lcontinuations/Continuation;
+     198: getstatic     #148                // Field continuations/Continuation$State$.Undecided:Lcontinuations/Continuation$State;
+     201: invokespecial #151                // Method continuations/SafeContinuation."<init>":(Lcontinuations/Continuation;Ljava/lang/Object;)V
+     204: astore        11
+     206: aload         11
+     208: getstatic     #156                // Field scala/package$.MODULE$:Lscala/package$;
+     211: invokevirtual #160                // Method scala/package$.Right:()Lscala/util/Right$;
+     214: getstatic     #42                 // Field scala/Predef$.MODULE$:Lscala/Predef$;
+     217: iload         4
+     219: iload         5
+     221: iadd
+     222: invokestatic  #127                // Method scala/runtime/BoxesRunTime.boxToInteger:(I)Ljava/lang/Integer;
+     225: invokevirtual #59                 // Method scala/Predef$.println:(Ljava/lang/Object;)V
+     228: getstatic     #166                // Field scala/runtime/BoxedUnit.UNIT:Lscala/runtime/BoxedUnit;
+     231: invokevirtual #171                // Method scala/util/Right$.apply:(Ljava/lang/Object;)Lscala/util/Right;
+     234: invokevirtual #175                // Method continuations/SafeContinuation.resume:(Lscala/util/Either;)V
+     237: aload         11
+     239: invokevirtual #178                // Method continuations/SafeContinuation.getOrThrow:()Ljava/lang/Object;
+     242: astore        12
+     244: aload         12
+     246: getstatic     #181                // Field continuations/Continuation$State$.Suspended:Lcontinuations/Continuation$State;
+     249: astore        13
+     251: dup
+     252: ifnonnull     264
+     255: pop
+     256: aload         13
+     258: ifnull        272
+     261: goto          276
+     264: aload         13
+     266: invokevirtual #185                // Method java/lang/Object.equals:(Ljava/lang/Object;)Z
+     269: ifeq          276
+     272: getstatic     #181                // Field continuations/Continuation$State$.Suspended:Lcontinuations/Continuation$State;
+     275: areturn
+     276: goto          337
+     279: nop
+     280: nop
+     281: nop
+     282: nop
+     283: nop
+     284: athrow
+     285: nop
+     286: nop
+     287: athrow
+     288: aload         6
+     290: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+     293: invokevirtual #188                // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.I$0:()Ljava/lang/Object;
+     296: invokestatic  #192                // Method scala/runtime/BoxesRunTime.unboxToInt:(Ljava/lang/Object;)I
+     299: istore        5
+     301: aload         6
+     303: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+     306: invokevirtual #195                // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.I$1:()Ljava/lang/Object;
+     309: invokestatic  #192                // Method scala/runtime/BoxesRunTime.unboxToInt:(Ljava/lang/Object;)I
+     312: istore        4
+     314: aload         9
+     316: ifnull        337
+     319: aload         9
+     321: aload_0
+     322: invokedynamic #199,  0            // InvokeDynamic #2:apply:(Lexamples/TwoArgumentsTwoContinuations$package$;)Lscala/Function1;
+     327: aload_0
+     328: invokedynamic #203,  0            // InvokeDynamic #3:applyVoid:(Lexamples/TwoArgumentsTwoContinuations$package$;)Lscala/runtime/function/JProcedure1;
+     333: invokevirtual #121                // Method scala/util/Either.fold:(Lscala/Function1;Lscala/Function1;)Ljava/lang/Object;
+     336: pop
+     337: aload         6
+     339: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+     342: iload         5
+     344: invokestatic  #127                // Method scala/runtime/BoxesRunTime.boxToInteger:(I)Ljava/lang/Integer;
+     347: invokevirtual #130                // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.I$0_$eq:(Ljava/lang/Object;)V
+     350: aload         6
+     352: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+     355: iload         4
+     357: invokestatic  #127                // Method scala/runtime/BoxesRunTime.boxToInteger:(I)Ljava/lang/Integer;
+     360: invokevirtual #133                // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.I$1_$eq:(Ljava/lang/Object;)V                                                                                                                  
+     363: aload         6
+     365: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+     368: iconst_2
+     369: invokevirtual #81                 // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.$label_$eq:(I)V
+     372: new           #135                // class continuations/SafeContinuation
+     375: dup
+     376: getstatic     #140                // Field continuations/intrinsics/IntrinsicsJvm$package$.MODULE$:Lcontinuations/intrinsics/IntrinsicsJvm$package$;
+     379: aload         6
+     381: invokevirtual #144                // Method continuations/intrinsics/IntrinsicsJvm$package$.intercepted:(Lcontinuations/Continuation;)Lcontinuations/Continuation;
+     384: getstatic     #148                // Field continuations/Continuation$State$.Undecided:Lcontinuations/Continuation$State;
+     387: invokespecial #151                // Method continuations/SafeContinuation."<init>":(Lcontinuations/Continuation;Ljava/lang/Object;)V
+     390: astore        14
+     392: aload         14
+     394: getstatic     #156                // Field scala/package$.MODULE$:Lscala/package$;
+     397: invokevirtual #160                // Method scala/package$.Right:()Lscala/util/Right$;
+     400: iconst_1
+     401: invokestatic  #127                // Method scala/runtime/BoxesRunTime.boxToInteger:(I)Ljava/lang/Integer;
+     404: invokevirtual #171                // Method scala/util/Right$.apply:(Ljava/lang/Object;)Lscala/util/Right;
+     407: invokevirtual #175                // Method continuations/SafeContinuation.resume:(Lscala/util/Either;)V
+     410: aload         14
+     412: invokevirtual #178                // Method continuations/SafeContinuation.getOrThrow:()Ljava/lang/Object;
+     415: astore        15
+     417: aload         15
+     419: getstatic     #181                // Field continuations/Continuation$State$.Suspended:Lcontinuations/Continuation$State;
+     422: astore        16
+     424: dup
+     425: ifnonnull     437
+     428: pop
+     429: aload         16
+     431: ifnull        445
+     434: goto          449
+     437: aload         16
+     439: invokevirtual #185                // Method java/lang/Object.equals:(Ljava/lang/Object;)Z
+     442: ifeq          449
+     445: getstatic     #181                // Field continuations/Continuation$State$.Suspended:Lcontinuations/Continuation$State;
+     448: areturn
+     449: aload         15
+     451: goto          528
+     454: nop
+     455: nop
+     456: athrow
+     457: aload         6
+     459: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+     462: invokevirtual #188                // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.I$0:()Ljava/lang/Object;
+     465: invokestatic  #192                // Method scala/runtime/BoxesRunTime.unboxToInt:(Ljava/lang/Object;)I
+     468: istore        5
+     470: aload         6
+     472: checkcast     #17                 // class examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1
+     475: invokevirtual #195                // Method examples/TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1.I$1:()Ljava/lang/Object;
+     478: invokestatic  #192                // Method scala/runtime/BoxesRunTime.unboxToInt:(Ljava/lang/Object;)I
+     481: istore        4
+     483: aload         9
+     485: ifnull        506
+     488: aload         9
+     490: aload_0
+     491: invokedynamic #207,  0            // InvokeDynamic #4:apply:(Lexamples/TwoArgumentsTwoContinuations$package$;)Lscala/Function1;
+     496: aload_0
+     497: invokedynamic #211,  0            // InvokeDynamic #5:applyVoid:(Lexamples/TwoArgumentsTwoContinuations$package$;)Lscala/runtime/function/JProcedure1;
+     502: invokevirtual #121                // Method scala/util/Either.fold:(Lscala/Function1;Lscala/Function1;)Ljava/lang/Object;
+     505: pop
+     506: aload         9
+     508: goto          528
+     511: nop
+     512: nop
+     513: athrow
+     514: new           #213                // class java/lang/IllegalArgumentException
+     517: dup
+     518: ldc           #215                // String call to \'resume\' before \'invoke\' with coroutine
+     520: invokespecial #218                // Method java/lang/IllegalArgumentException."<init>":(Ljava/lang/String;)V
+     523: athrow
+     524: nop
+     525: nop
+     526: athrow
+     527: athrow
+     528: areturn
+}
+Compiled from "TwoArgumentsTwoContinuations.scala"
+class examples.TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1 extends continuations.jvm.internal.ContinuationImpl {
+  public examples.TwoArgumentsTwoContinuations$package$TwoArgumentsTwoContinuations$twoArgumentsTwoContinuations$1$1(continuations.Continuation);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: aload_1
+       3: invokeinterface #27,  1           // InterfaceMethod continuations/Continuation.context:()Lscala/Product;
+       8: invokespecial #30                 // Method continuations/jvm/internal/ContinuationImpl."<init>":(Lcontinuations/Continuation;Lscala/Product;)V
+      11: return
+
+  public java.lang.Object I$0();
+    Code:
+       0: aload_0
+       1: getfield      #36                 // Field I$0:Ljava/lang/Object;
+       4: areturn
+
+  public java.lang.Object I$1();
+    Code:
+       0: aload_0
+       1: getfield      #38                 // Field I$1:Ljava/lang/Object;
+       4: areturn
+
+  public void I$0_$eq(java.lang.Object);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #36                 // Field I$0:Ljava/lang/Object;
+       5: return
+
+  public void I$1_$eq(java.lang.Object);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #38                 // Field I$1:Ljava/lang/Object;
+       5: return
+
+  public scala.util.Either $result();
+    Code:
+       0: aload_0
+       1: getfield      #45                 // Field $result:Lscala/util/Either;
+       4: areturn
+
+  public int $label();
+    Code:
+       0: aload_0
+       1: getfield      #48                 // Field $label:I
+       4: ireturn
+
+  public void $result_$eq(scala.util.Either);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #45                 // Field $result:Lscala/util/Either;
+       5: return
+
+  public void $label_$eq(int);
+    Code:
+       0: aload_0
+       1: iload_1
+       2: putfield      #48                 // Field $label:I
+       5: return
+
+  public java.lang.Object invokeSuspend(scala.util.Either);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokevirtual #57                 // Method $result_$eq:(Lscala/util/Either;)V
+       5: aload_0
+       6: aload_0
+       7: invokevirtual #59                 // Method $label:()I
+      10: ldc           #60                 // int -2147483648
+      12: ior
+      13: invokevirtual #62                 // Method $label_$eq:(I)V
+      16: getstatic     #66                 // Field examples/TwoArgumentsTwoContinuations$package$.MODULE$:Lexamples/TwoArgumentsTwoContinuations$package$;
+      19: aconst_null
+      20: invokestatic  #72                 // Method scala/runtime/BoxesRunTime.unboxToInt:(Ljava/lang/Object;)I
+      23: aconst_null
+      24: invokestatic  #72                 // Method scala/runtime/BoxesRunTime.unboxToInt:(Ljava/lang/Object;)I
+      27: aload_0
+      28: checkcast     #23                 // class continuations/Continuation
+      31: invokevirtual #76                 // Method examples/TwoArgumentsTwoContinuations$package$.examples$TwoArgumentsTwoContinuations$package$$$_$twoArgumentsTwoContinuations$1:(IILcontinuations/Continuation;)Ljava/lang/Object;
+      34: areturn
+}
+Compiled from "TwoArgumentsTwoContinuations.scala"
+public final class examples.TwoArgumentsTwoContinuations$package {
+  public static void TwoArgumentsTwoContinuations();
+    Code:
+       0: getstatic     #13                 // Field examples/TwoArgumentsTwoContinuations$package$.MODULE$:Lexamples/TwoArgumentsTwoContinuations$package$;
+       3: invokevirtual #15                 // Method examples/TwoArgumentsTwoContinuations$package$.TwoArgumentsTwoContinuations:()V
+       6: return
+}
+Compiled from "TwoArgumentsTwoContinuations.scala"
+public final class examples.TwoArgumentsTwoContinuations {
+  public examples.TwoArgumentsTwoContinuations();
+    Code:
+       0: aload_0
+       1: invokespecial #14                 // Method java/lang/Object."<init>":()V
+       4: return
+
+  public static void main(java.lang.String[]);
+    Code:
+       0: getstatic     #25                 // Field examples/TwoArgumentsTwoContinuations$package$.MODULE$:Lexamples/TwoArgumentsTwoContinuations$package$;
+       3: invokevirtual #28                 // Method examples/TwoArgumentsTwoContinuations$package$.TwoArgumentsTwoContinuations:()V
+       6: goto          20
+       9: astore_1
+      10: getstatic     #33                 // Field scala/util/CommandLineParser$.MODULE$:Lscala/util/CommandLineParser$;
+      13: aload_1
+      14: invokevirtual #37                 // Method scala/util/CommandLineParser$.showError:(Lscala/util/CommandLineParser$ParseError;)V
+      17: goto          20
+      20: return
+    Exception table:
+       from    to  target type
+           0     6     9   Class scala/util/CommandLineParser$ParseError
+}

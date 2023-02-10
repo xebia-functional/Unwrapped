@@ -1,0 +1,97 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  continuations.Continuation
+ *  continuations.Continuation$State$
+ *  continuations.SafeContinuation
+ *  continuations.intrinsics.IntrinsicsJvm$package$
+ *  continuations.jvm.internal.ContinuationStub$
+ *  scala.Function1
+ *  scala.Predef$
+ *  scala.collection.immutable.List
+ *  scala.collection.immutable.Seq
+ *  scala.package$
+ *  scala.runtime.BoxesRunTime
+ *  scala.runtime.ModuleSerializationProxy
+ *  scala.runtime.ScalaRunTime$
+ *  scala.runtime.java8.JFunction1$mcII$sp
+ *  scala.util.Either
+ */
+package examples;
+
+import continuations.Continuation;
+import continuations.SafeContinuation;
+import continuations.intrinsics.IntrinsicsJvm$package$;
+import continuations.jvm.internal.ContinuationStub$;
+import java.io.Serializable;
+import scala.Function1;
+import scala.Predef$;
+import scala.collection.immutable.List;
+import scala.collection.immutable.Seq;
+import scala.package$;
+import scala.runtime.BoxesRunTime;
+import scala.runtime.ModuleSerializationProxy;
+import scala.runtime.ScalaRunTime$;
+import scala.runtime.java8.JFunction1;
+import scala.util.Either;
+
+public final class ListMap$package$
+implements Serializable {
+    public static final ListMap$package$ MODULE$ = new ListMap$package$();
+
+    private ListMap$package$() {
+    }
+
+    private Object writeReplace() {
+        return new ModuleSerializationProxy(ListMap$package$.class);
+    }
+
+    public void ListMap() {
+        List mappedContinuations = ((List)package$.MODULE$.List().apply((Seq)ScalaRunTime$.MODULE$.wrapIntArray(new int[]{1, 2, 3, 4}))).map((Function1)(JFunction1.mcII.sp & Serializable)_$1 -> BoxesRunTime.unboxToInt((Object)this.twoArgumentsOneContinuationsCFBefore$1(1, _$1, (Continuation)ContinuationStub$.MODULE$.contImpl())));
+        Predef$.MODULE$.println((Object)mappedContinuations);
+    }
+
+    private final Object twoArgumentsOneContinuationsCFBefore$1(int x, int y, Continuation completion) {
+        int z = 1;
+        Continuation continuation1 = completion;
+        SafeContinuation safeContinuation = new SafeContinuation(IntrinsicsJvm$package$.MODULE$.intercepted(continuation1), (Object)Continuation.State$.Undecided);
+        safeContinuation.resume((Either)package$.MODULE$.Right().apply((Object)BoxesRunTime.boxToInteger((int)(x + y + z))));
+        return safeContinuation.getOrThrow();
+    }
+}
+/*
+ * Decompiled with CFR 0.152.
+ */
+package examples;
+
+import examples.ListMap$package$;
+
+public final class ListMap$package {
+    public static void ListMap() {
+        ListMap$package$.MODULE$.ListMap();
+    }
+}
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  scala.util.CommandLineParser$
+ *  scala.util.CommandLineParser$ParseError
+ */
+package examples;
+
+import examples.ListMap$package$;
+import scala.util.CommandLineParser;
+import scala.util.CommandLineParser$;
+
+public final class ListMap {
+    public static void main(String[] args) {
+        try {
+            ListMap$package$.MODULE$.ListMap();
+        }
+        catch (CommandLineParser.ParseError error) {
+            CommandLineParser$.MODULE$.showError(error);
+        }
+    }
+}
