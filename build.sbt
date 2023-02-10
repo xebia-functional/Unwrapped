@@ -134,7 +134,8 @@ lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
     Test / fork := true,
     libraryDependencies ++= List(
       "org.scala-lang" %% "scala3-compiler" % "3.1.2",
-      munit % Test
+      munit % Test,
+      munitSnapshot.cross(CrossVersion.for3Use2_13) % Test exclude("org.scalameta", "munit_2.13")
     ),
     Test / javaOptions += {
       val `scala-compiler-classpath` =

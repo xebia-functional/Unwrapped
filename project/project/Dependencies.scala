@@ -16,6 +16,7 @@ object Dependencies {
     val sbtGithubMdoc = "0.11.2"
     val junitInterface = "0.7.29"
     val munitScalacheck = "0.7.29"
+    val munitSnapshot = "0.0.4"
     val jmhGeneratorBytecode = "1.35"
     val sbtDependencyUpdates = "1.2.1"
     val jmhGeneratorReflection = "1.35"
@@ -58,6 +59,8 @@ object Dependencies {
       "com.dimafeng" %% "testcontainers-scala-postgresql" % Versions.testContainers
     val flyway = "org.flywaydb" % "flyway-core" % Versions.flyway
     val hedgehog = "qa.hedgehog" %% "hedgehog-munit" % Versions.hedgehog
+    val munitSnapshot = "com.github.lolgab" %% "munit-snapshot" % Versions.munitSnapshot
+
   }
 
   object Plugins {
