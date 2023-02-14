@@ -13,9 +13,9 @@ class SuspensionPointsSuite extends FunSuite, CompilerFixtures, Trees {
       case (given Context, tree) =>
         val obtained = SuspensionPoints.unapplySeq(tree).get
         assert(
-          obtained.points.size == 2 &&
-            obtained.points.headOption.exists { case vd: ValDef => vd.name.show == "y" } &&
-            obtained.points.lastOption.exists {
+          obtained.size == 2 &&
+            obtained.headOption.exists { case vd: ValDef => vd.name.show == "y" } &&
+            obtained.lastOption.exists {
               case Inlined(call, _, _) => call.symbol.matches(suspendContinuationMethod.symbol)
             })
     }
@@ -25,7 +25,7 @@ class SuspensionPointsSuite extends FunSuite, CompilerFixtures, Trees {
       case (given Context, tree) =>
         val obtained = SuspensionPoints.unapplySeq(tree).get
         assert(
-          obtained.points.size == 1 &&
-            obtained.points.headOption.exists { case vd: ValDef => vd.name.show == "y" })
+          obtained.size == 1 &&
+            obtained.headOption.exists { case vd: ValDef => vd.name.show == "y" })
     }
 }

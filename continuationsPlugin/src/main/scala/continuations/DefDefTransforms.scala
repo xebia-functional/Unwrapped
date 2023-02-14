@@ -71,14 +71,15 @@ object DefDefTransforms extends TreesChecks:
         }
 
     val removedAnonFunc: List[Symbol] = suspendContinuationBody
-      .filter(t =>
-        t.symbol.exists &&
-          t.symbol.owner.isAnonymousFunction &&
-          t.symbol
-            .owner
-            .paramSymss
-            .flatten
-            .exists(_.info.hasClassSymbol(requiredClass(continuationFullName))))
+      .flatMap(
+        _.filterSubTrees(t =>
+          t.symbol.exists &&
+            t.symbol.owner.isAnonymousFunction &&
+            t.symbol
+              .owner
+              .paramSymss
+              .flatten
+              .exists(_.info.hasClassSymbol(requiredClass(continuationFullName)))))
       .map(_.symbol.owner)
       .distinct
 
@@ -284,16 +285,26 @@ object DefDefTransforms extends TreesChecks:
     val newTree =
       tree match
         case HasSuspensionNotInReturnedValue(_) =>
+          val suspensionPoints =
+            SuspensionPoints
+              .unapplySeq(report.logWith("tree has no suspension points:")(tree))
+              .toList
+              .flatten
           transformUnusedSuspensionsSuspendingStateMachine(
             tree,
+            suspensionPoints,
             suspensionInReturnedValue = false)
         case CallsSuspendContinuation(_) =>
-          SuspensionPoints.unapplySeq(tree).toList.flatMap(_.points) match
+          SuspensionPoints
+            .unapplySeq(report.logWith("tree has no suspension points:")(tree))
+            .toList
+            .flatten match
             case suspensionPoint :: Nil if !suspensionPoint.isInstanceOf[tpd.ValDef] =>
               transformSuspendOneContinuationResume(tree, suspensionPoint)
-            case _ =>
+            case suspensionPoints =>
               transformUnusedSuspensionsSuspendingStateMachine(
                 tree,
+                suspensionPoints,
                 suspensionInReturnedValue = true)
         case BodyHasSuspensionPoint(_) =>
           cpy.DefDef(tree)() // any suspension that still needs a transformation
@@ -352,13 +363,11 @@ object DefDefTransforms extends TreesChecks:
 
   private def transformUnusedSuspensionsSuspendingStateMachine(
       tree: tpd.DefDef,
+      suspensionPoints: List[tpd.Tree],
       suspensionInReturnedValue: Boolean)(using ctx: Context) =
-    SuspensionPoints
-      .unapplySeq(report.logWith("tree has no suspension points:")(tree))
-      .toList
-      .flatMap(_.points) match
+    suspensionPoints match
       case Nil => tree
-      case suspensionPoints =>
+      case _ =>
         val suspensionPointsVal: List[tpd.Tree] =
           suspensionPoints.collect { case vd: tpd.ValDef => vd }
         val suspensionPointsSize = suspensionPoints.size
@@ -543,7 +552,7 @@ object DefDefTransforms extends TreesChecks:
               defn.UnitType)
           ).entered.asTerm
 
-        val (rowsBeforeSuspensionPoints, rowsAfterLastSuspend)
+        val (rowsBeforeSuspensionPoint, rowsAfterLastSuspensionPoint)
             : (Map[tpd.Tree, List[tpd.Tree]], List[tpd.Tree]) =
           rhs
             .toList
@@ -574,15 +583,15 @@ object DefDefTransforms extends TreesChecks:
             .drop(1)
 
         val treesBeforeSuspendUsedAfterwards: List[tpd.Tree] =
-          rowsBeforeSuspensionPoints
+          rowsBeforeSuspensionPoint
             .toList
             .zipWithIndex
             .flatMap {
               case ((suspend, rows), i) =>
                 val rowsAfter =
-                  rowsBeforeSuspensionPoints.drop(i + 1).values.toList.flatten ++
-                    rowsBeforeSuspensionPoints.drop(i + 1).keySet ++ // maybe + 2
-                    rowsAfterLastSuspend
+                  rowsBeforeSuspensionPoint.drop(i + 1).values.toList.flatten ++
+                    rowsBeforeSuspensionPoint.drop(i + 1).keySet ++
+                    rowsAfterLastSuspensionPoint
 
                 (rows :+ suspend).collect { case vd: tpd.ValDef => vd }.flatMap { vd =>
                   rowsAfter.flatMap(_.shallowFold(List.empty[tpd.Tree]) {
@@ -766,13 +775,13 @@ object DefDefTransforms extends TreesChecks:
             )
 
           val labels: List[Symbol] =
-            rowsBeforeSuspensionPoints.keySet.toList.indices.toList.map { i =>
+            rowsBeforeSuspensionPoint.keySet.toList.indices.toList.map { i =>
               newSymbol(newParent, termName(s"label$i"), Flags.Label, defn.UnitType)
             }
 
-          def paramsAndRowsBeforeIncludingSuspend(index: Int) =
+          def paramsAndRowsBeforeSuspendIncludingSuspend(index: Int) =
             transformedMethodParamsAsVals ++
-              rowsBeforeSuspensionPoints
+              rowsBeforeSuspensionPoint
                 .take(index + 1)
                 .transform { (suspend, rowsBefore) => rowsBefore :+ suspend }
                 .values
@@ -780,20 +789,20 @@ object DefDefTransforms extends TreesChecks:
                 .flatten
 
           def treesToAssignToI$Ns(
-              paramsAndRowsBeforeIncludingSuspend: List[tpd.Tree]): List[tpd.Tree] =
+              paramsAndRowsBeforeSuspendIncludingSuspend: List[tpd.Tree]): List[tpd.Tree] =
             (transformedMethodParamsAsVals ++ globalVars)
               .filter { v =>
-                paramsAndRowsBeforeIncludingSuspend
+                paramsAndRowsBeforeSuspendIncludingSuspend
                   .dropRight(1)
                   .exists(_.symbol.denot.matches(v.symbol))
               }
               .sortWith { (t1, t2) =>
-                paramsAndRowsBeforeIncludingSuspend.indexOf(t1) >
-                  paramsAndRowsBeforeIncludingSuspend.indexOf(t2)
+                paramsAndRowsBeforeSuspendIncludingSuspend.indexOf(t1) >
+                  paramsAndRowsBeforeSuspendIncludingSuspend.indexOf(t2)
               }
 
           val cases =
-            rowsBeforeSuspensionPoints.zipWithIndex.toList.map {
+            rowsBeforeSuspensionPoint.zipWithIndex.toList.map {
               case ((suspension, rowsBefore), i) =>
                 val label =
                   if (i > 0)
@@ -863,14 +872,12 @@ object DefDefTransforms extends TreesChecks:
                     safeContinuationRef.select(termName("getOrThrow")).appliedToNone)
 
                 val assignGetOrThrowToGlobalVar =
-                  rowsBeforeSuspensionPoints.keySet.toList(i) match
+                  rowsBeforeSuspensionPoint.keySet.toList(i) match
                     case vd: tpd.ValDef =>
                       tpd.Assign(
-                        globalVars
-                          .find(v =>
-                            v.symbol
-                              .name == vd.symbol.name && v.symbol.coord == vd.symbol.coord)
-                          .get,
+                        globalVars.find { v =>
+                          v.symbol.name == vd.symbol.name && v.symbol.coord == vd.symbol.coord
+                        }.get,
                         ref(suspendContinuationGetThrow.symbol)
                           .select(nme.asInstanceOf_)
                           .appliedToType(vd.symbol.info)
@@ -879,14 +886,12 @@ object DefDefTransforms extends TreesChecks:
                       tpd.EmptyTree
 
                 val assignResultToGlobalVar =
-                  rowsBeforeSuspensionPoints.keySet.toList.lift(i - 1) match
+                  rowsBeforeSuspensionPoint.keySet.toList.lift(i - 1) match
                     case Some(vd: tpd.ValDef) =>
                       tpd.Assign(
-                        globalVars
-                          .find(v =>
-                            v.symbol
-                              .name == vd.symbol.name && v.symbol.coord == vd.symbol.coord)
-                          .get,
+                        globalVars.find { v =>
+                          v.symbol.name == vd.symbol.name && v.symbol.coord == vd.symbol.coord
+                        }.get,
                         ref($result.symbol)
                           .select(nme.asInstanceOf_)
                           .appliedToType(vd.symbol.info)
@@ -908,11 +913,11 @@ object DefDefTransforms extends TreesChecks:
                     ref(suspendContinuationGetThrow.symbol)
                   else unitLiteral
 
-                val paramsAndRowsBeforeIncludingSuspendCurrent =
-                  paramsAndRowsBeforeIncludingSuspend(i)
+                val paramsAndRowsBeforeSuspendIncludingSuspendCurrent =
+                  paramsAndRowsBeforeSuspendIncludingSuspend(i)
 
                 val treesToAssignToI$NsCurrent: List[tpd.Tree] =
-                  treesToAssignToI$Ns(paramsAndRowsBeforeIncludingSuspendCurrent)
+                  treesToAssignToI$Ns(paramsAndRowsBeforeSuspendIncludingSuspendCurrent)
 
                 val assignToI$Ns =
                   treesToAssignToI$NsCurrent.zipWithIndex.map { (tree, i) =>
@@ -926,7 +931,7 @@ object DefDefTransforms extends TreesChecks:
                   assignToI$Ns
                     .map { assign => tpd.Assign(assign.rhs, assign.lhs) }
                     .filter { assign =>
-                      paramsAndRowsBeforeIncludingSuspendCurrent
+                      paramsAndRowsBeforeSuspendIncludingSuspendCurrent
                         .reverse
                         .drop(1)
                         .dropWhile(r => !treeCallsSuspend(r) && !valDefTreeCallsSuspend(r))
@@ -934,7 +939,7 @@ object DefDefTransforms extends TreesChecks:
                         .exists(_.symbol.denot.matches(assign.lhs.symbol))
                     }
 
-                val rowsBeforeUpdatedForGlobalVars: List[tpd.Tree] =
+                val rowsBeforeSuspendUpdatedForGlobalVars: List[tpd.Tree] =
                   rowsBefore.map { tree =>
                     tree match
                       case vd: tpd.ValDef =>
@@ -950,7 +955,7 @@ object DefDefTransforms extends TreesChecks:
                   tpd.Block(
                     assignFromI$Ns ++
                       List(throwOnFailure, assignResultToGlobalVar, label) ++
-                      rowsBeforeUpdatedForGlobalVars ++
+                      rowsBeforeSuspendUpdatedForGlobalVars ++
                       assignToI$Ns ++
                       List(
                         tpd.Assign(
@@ -973,8 +978,9 @@ object DefDefTransforms extends TreesChecks:
             tpd.Literal(Constant(suspensionPointsSize)),
             tpd.EmptyTree,
             tpd.Block(
-              treesToAssignToI$Ns(paramsAndRowsBeforeIncludingSuspend(
-                suspensionPoints.size - 1)).zipWithIndex.map { (tree, i) =>
+              treesToAssignToI$Ns {
+                paramsAndRowsBeforeSuspendIncludingSuspend(suspensionPoints.size - 1)
+              }.zipWithIndex.map { (tree, i) =>
                 tpd.Assign(
                   ref(tree.symbol),
                   continuationAsStateMachineClass.select(continuationStateMachineI$Ns(i).symbol)
@@ -984,10 +990,9 @@ object DefDefTransforms extends TreesChecks:
               suspensionPoints.lastOption match
                 case Some(vd: tpd.ValDef) =>
                   tpd.Assign(
-                    globalVars
-                      .find(v =>
-                        v.symbol.name == vd.symbol.name && v.symbol.coord == vd.symbol.coord)
-                      .get,
+                    globalVars.find { v =>
+                      v.symbol.name == vd.symbol.name && v.symbol.coord == vd.symbol.coord
+                    }.get,
                     ref($result.symbol).select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
                   )
                 case Some(_) if suspensionInReturnedValue => ref($result.symbol)
@@ -1051,24 +1056,18 @@ object DefDefTransforms extends TreesChecks:
          * `suspendContinuation` as they are embedded in the state machine.
          */
         var c = 0
-        var rowsToRemove = rowsBeforeSuspensionPoints.values.toList.flatten.map(_.symbol.coord)
+        var rowsToRemove = rowsBeforeSuspensionPoint.values.toList.flatten.map(_.symbol.coord)
         val substituteContinuation = new TreeTypeMap(
           treeMap = {
-            case vd: tpd.ValDef
-                if vd.rhs.isInstanceOf[tpd.Inlined] &&
-                  treeCallsSuspend(vd.rhs) && c < suspensionPointsSize - 1 =>
+            case tree if valDefTreeCallsSuspend(tree) && c < suspensionPointsSize - 1 =>
               c += 1
               tpd.EmptyTree
-            case vd: tpd.ValDef
-                if vd.rhs.isInstanceOf[tpd.Inlined] &&
-                  treeCallsSuspend(vd.rhs) && c == suspensionPointsSize - 1 =>
+            case tree if valDefTreeCallsSuspend(tree) && c == suspensionPointsSize - 1 =>
               transformSuspendTree(transformedMethod.symbol)
-            case tree @ Trees.Inlined(_, _, _)
-                if treeCallsSuspend(tree) && c < suspensionPointsSize - 1 =>
+            case tree if treeCallsSuspend(tree) && c < suspensionPointsSize - 1 =>
               c += 1
               tpd.EmptyTree
-            case tree @ Trees.Inlined(_, _, _)
-                if treeCallsSuspend(tree) && c == suspensionPointsSize - 1 =>
+            case tree if treeCallsSuspend(tree) && c == suspensionPointsSize - 1 =>
               transformSuspendTree(transformedMethod.symbol)
             case tree if c < suspensionPointsSize && rowsToRemove.contains(tree.symbol.coord) =>
               rowsToRemove = rowsToRemove.zipWithIndex.collect {
@@ -1091,12 +1090,11 @@ object DefDefTransforms extends TreesChecks:
                   tt.symbol.owner.denot.matches(tree.symbol) &&
                   transformedMethodParamsWithoutCompletion.exists(
                     _.symbol.denot.matches(tt.symbol)) &&
-                  transformedMethodParamsAsVals.exists { t =>
-                    t.symbol.name.show.dropRight(3) == tt.symbol.name.show
-                  } =>
+                  transformedMethodParamsAsVals.exists(
+                    _.symbol.name.show.dropRight(3) == tt.symbol.name.show) =>
               ref(
                 transformedMethodParamsAsVals
-                  .find { t => t.symbol.name.show.dropRight(3) == tt.symbol.name.show }
+                  .find(_.symbol.name.show.dropRight(3) == tt.symbol.name.show)
                   .get
                   .symbol)
             case tree =>

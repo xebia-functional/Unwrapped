@@ -1,18 +1,6 @@
 import Dependencies.Compile._
 import Dependencies.Test._
 
-import scala.collection.JavaConverters._
-
-import com.fasterxml.jackson.dataformat.csv.CsvSchema
-import com.fasterxml.jackson.dataformat.csv.CsvMapper
-import com.fasterxml.jackson.dataformat.csv.CsvParser
-import scala.util.Properties
-import scala.collection.JavaConverters._
-
-import com.fasterxml.jackson.dataformat.csv.CsvSchema
-import com.fasterxml.jackson.dataformat.csv.CsvMapper
-import com.fasterxml.jackson.dataformat.csv.CsvParser
-
 ThisBuild / scalaVersion := "3.1.2"
 ThisBuild / organization := "com.47deg"
 ThisBuild / versionScheme := Some("early-semver")
@@ -37,7 +25,11 @@ lazy val root = // I
     `munit-scala-fx`, // H
     `scala-fx`, // J
     `scalike-jdbc-scala-fx`, // K
-    `sttp-scala-fx` // L
+    `sttp-scala-fx`, // L
+    `zero-arguments-no-continuation-treeview`,
+    `zero-arguments-one-continuation-code-before-used-after`,
+    `list-map`,
+    `two-arguments-two-continuations`
   )
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
@@ -51,6 +43,25 @@ lazy val continuationsPluginExample = project
   .settings(
     continuationsPluginExampleSettings: _*
   )
+
+lazy val `zero-arguments-no-continuation-treeview` =
+  (project in file("./zero-arguments-no-continuation-treeview"))
+    .settings(continuationsPluginExampleShowTreeSettings: _*)
+    .dependsOn(continuationsPlugin)
+
+lazy val `zero-arguments-one-continuation-code-before-used-after` =
+  (project in file("./zero-arguments-one-continuation-code-before-used-after"))
+    .settings(continuationsPluginExampleShowTreeSettings: _*)
+    .dependsOn(continuationsPlugin)
+
+lazy val `list-map` = (project in file("./list-map"))
+  .settings(continuationsPluginExampleShowTreeSettings: _*)
+  .dependsOn(continuationsPlugin)
+
+lazy val `two-arguments-two-continuations` =
+  (project in file("./two-arguments-two-continuations"))
+    .settings(continuationsPluginExampleShowTreeSettings: _*)
+    .dependsOn(continuationsPlugin)
 
 lazy val benchmarks =
   project.dependsOn(`scala-fx`).settings(publish / skip := true).enablePlugins(JmhPlugin)
@@ -147,7 +158,7 @@ lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
     }.value
   )
 
-lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
+lazy val continuationsPluginExampleShowTreeSettings: Seq[Def.Setting[_]] =
   Seq(
     publish / skip := true,
     autoCompilerPlugins := true,
@@ -158,7 +169,14 @@ lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
     Test / scalacOptions += "-Xprint:continuations"
   )
 
-lazy val mySetting = taskKey[String]("example")
+lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
+  Seq(
+    publish / skip := true,
+    autoCompilerPlugins := true,
+    resolvers += Resolver.mavenLocal,
+    Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
+    Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}"
+  )
 
 lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
   libraryDependencies ++= Seq(

@@ -1,0 +1,184 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  continuations.Continuation
+ *  continuations.Continuation$State$
+ *  continuations.SafeContinuation
+ *  continuations.intrinsics.IntrinsicsJvm$package$
+ *  continuations.jvm.internal.ContinuationStub$
+ *  scala.Function1
+ *  scala.Predef$
+ *  scala.package$
+ *  scala.runtime.BoxedUnit
+ *  scala.runtime.BoxesRunTime
+ *  scala.runtime.ModuleSerializationProxy
+ *  scala.runtime.Nothing$
+ *  scala.runtime.function.JProcedure1
+ *  scala.util.Either
+ */
+package examples;
+
+import continuations.Continuation;
+import continuations.SafeContinuation;
+import continuations.intrinsics.IntrinsicsJvm$package$;
+import continuations.jvm.internal.ContinuationStub$;
+import examples.TwoArgumentsTwoContinuations;
+import java.io.Serializable;
+import java.lang.invoke.LambdaMetafactory;
+import scala.Function1;
+import scala.Predef$;
+import scala.package$;
+import scala.runtime.BoxedUnit;
+import scala.runtime.BoxesRunTime;
+import scala.runtime.ModuleSerializationProxy;
+import scala.runtime.Nothing$;
+import scala.runtime.function.JProcedure1;
+import scala.util.Either;
+
+public final class TwoArgumentsTwoContinuations$package$
+implements Serializable {
+    public static final TwoArgumentsTwoContinuations$package$ MODULE$ = new TwoArgumentsTwoContinuations$package$();
+
+    private TwoArgumentsTwoContinuations$package$() {
+    }
+
+    private Object writeReplace() {
+        return new ModuleSerializationProxy(TwoArgumentsTwoContinuations$package$.class);
+    }
+
+    public void TwoArgumentsTwoContinuations() {
+        Predef$.MODULE$.println(this.examples$TwoArgumentsTwoContinuations$package$$$_$twoArgumentsTwoContinuations$1(1, 2, (Continuation)ContinuationStub$.MODULE$.contImpl()));
+    }
+
+    private final Nothing$ TwoArgumentsTwoContinuations$$anonfun$1(Throwable x$0) {
+        throw x$0;
+    }
+
+    private final void TwoArgumentsTwoContinuations$$anonfun$2(Object x$0) {
+    }
+
+    private final Nothing$ TwoArgumentsTwoContinuations$$anonfun$3(Throwable x$0) {
+        throw x$0;
+    }
+
+    private final void TwoArgumentsTwoContinuations$$anonfun$4(Object x$0) {
+    }
+
+    private final Nothing$ TwoArgumentsTwoContinuations$$anonfun$5(Throwable x$0) {
+        throw x$0;
+    }
+
+    private final void TwoArgumentsTwoContinuations$$anonfun$6(Object x$0) {
+    }
+
+    /*
+     * Unable to fully structure code
+     * Could not resolve type clashes
+     */
+    public final Object examples$TwoArgumentsTwoContinuations$package$$$_$twoArgumentsTwoContinuations$1(int x, int y, Continuation completion) {
+        block12: {
+            var4_4 = x;
+            var5_5 = y;
+            var6_6 = null;
+            var7_7 = completion;
+            x$0 = var7_7;
+            if (x$0 instanceof TwoArgumentsTwoContinuations.package.TwoArgumentsTwoContinuations.twoArgumentsTwoContinuations.1.1 && (((TwoArgumentsTwoContinuations.package.TwoArgumentsTwoContinuations.twoArgumentsTwoContinuations.1.1)x$0).$label() & -2147483648) != 0) {
+                var6_6 = (TwoArgumentsTwoContinuations.package.TwoArgumentsTwoContinuations.twoArgumentsTwoContinuations.1.1)x$0;
+                var6_6.$label_$eq(var6_6.$label() - -2147483648);
+            } else {
+                var6_6 = new TwoArgumentsTwoContinuations.package.TwoArgumentsTwoContinuations.twoArgumentsTwoContinuations.1.1(completion);
+            }
+            $result = var6_6.$result();
+            var10_10 = var6_6.$label();
+            switch (var10_10) {
+                case 0: {
+                    if ($result != null) {
+                        $result.fold((Function1)(Function1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, TwoArgumentsTwoContinuations$$anonfun$1(java.lang.Throwable ), (Ljava/lang/Throwable;)Lscala/runtime/Nothing$;)((TwoArgumentsTwoContinuations$package$)this), (Function1)(JProcedure1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)V, TwoArgumentsTwoContinuations$$anonfun$2(java.lang.Object ), (Ljava/lang/Object;)V)((TwoArgumentsTwoContinuations$package$)this));                                                
+                    }
+                    var6_6.I$0_$eq(BoxesRunTime.boxToInteger((int)var5_5));
+                    var6_6.I$1_$eq(BoxesRunTime.boxToInteger((int)var4_4));
+                    var6_6.$label_$eq(1);
+                    safeContinuation = new SafeContinuation(IntrinsicsJvm$package$.MODULE$.intercepted((Continuation)var6_6), (Object)Continuation.State$.Undecided);
+                    v0 = package$.MODULE$.Right();
+                    Predef$.MODULE$.println((Object)BoxesRunTime.boxToInteger((int)(var4_4 + var5_5)));
+                    safeContinuation.resume((Either)v0.apply((Object)BoxedUnit.UNIT));
+                    v1 = orThrow = safeContinuation.getOrThrow();
+                    var13_13 = Continuation.State$.Suspended;
+                    if (!(v1 != null ? v1.equals(var13_13) == false : var13_13 != null)) {
+                        return Continuation.State$.Suspended;
+                    }
+                    ** GOTO lbl36
+                }
+                case 1: {
+                    var5_5 = BoxesRunTime.unboxToInt((Object)var6_6.I$0());
+                    var4_4 = BoxesRunTime.unboxToInt((Object)var6_6.I$1());
+                    if ($result != null) {
+                        $result.fold((Function1)(Function1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, TwoArgumentsTwoContinuations$$anonfun$3(java.lang.Throwable ), (Ljava/lang/Throwable;)Lscala/runtime/Nothing$;)((TwoArgumentsTwoContinuations$package$)this), (Function1)(JProcedure1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)V, TwoArgumentsTwoContinuations$$anonfun$4(java.lang.Object ), (Ljava/lang/Object;)V)((TwoArgumentsTwoContinuations$package$)this));
+                    }
+lbl36:
+                    // 4 sources
+
+                    var6_6.I$0_$eq(BoxesRunTime.boxToInteger((int)var5_5));
+                    var6_6.I$1_$eq(BoxesRunTime.boxToInteger((int)var4_4));
+                    var6_6.$label_$eq(2);
+                    safeContinuation = new SafeContinuation(IntrinsicsJvm$package$.MODULE$.intercepted((Continuation)var6_6), (Object)Continuation.State$.Undecided);
+                    safeContinuation.resume((Either)package$.MODULE$.Right().apply((Object)BoxesRunTime.boxToInteger((int)1)));
+                    v2 = orThrow = safeContinuation.getOrThrow();
+                    var16_16 = Continuation.State$.Suspended;
+                    if (!(v2 != null ? v2.equals(var16_16) == false : var16_16 != null)) {
+                        return Continuation.State$.Suspended;
+                    }
+                    v3 /* !! */  = orThrow;
+                    break block12;
+                }
+                case 2: {
+                    var5_5 = BoxesRunTime.unboxToInt((Object)var6_6.I$0());
+                    var4_4 = BoxesRunTime.unboxToInt((Object)var6_6.I$1());
+                    if ($result != null) {
+                        $result.fold((Function1)(Function1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, TwoArgumentsTwoContinuations$$anonfun$5(java.lang.Throwable ), (Ljava/lang/Throwable;)Lscala/runtime/Nothing$;)((TwoArgumentsTwoContinuations$package$)this), (Function1)(JProcedure1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)V, TwoArgumentsTwoContinuations$$anonfun$6(java.lang.Object ), (Ljava/lang/Object;)V)((TwoArgumentsTwoContinuations$package$)this));
+                    }
+                    v3 /* !! */  = $result;
+                    break block12;
+                }
+            }
+            throw new IllegalArgumentException("call to 'resume' before 'invoke' with coroutine");
+        }
+        return v3 /* !! */ ;
+    }
+}
+/*
+ * Decompiled with CFR 0.152.
+ */
+package examples;
+
+import examples.TwoArgumentsTwoContinuations$package$;
+
+public final class TwoArgumentsTwoContinuations$package {
+    public static void TwoArgumentsTwoContinuations() {
+        TwoArgumentsTwoContinuations$package$.MODULE$.TwoArgumentsTwoContinuations();
+    }
+}
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  scala.util.CommandLineParser$
+ *  scala.util.CommandLineParser$ParseError
+ */
+package examples;
+
+import examples.TwoArgumentsTwoContinuations$package$;
+import scala.util.CommandLineParser;
+import scala.util.CommandLineParser$;
+
+public final class TwoArgumentsTwoContinuations {
+    public static void main(String[] args) {
+        try {
+            TwoArgumentsTwoContinuations$package$.MODULE$.TwoArgumentsTwoContinuations();
+        }
+        catch (CommandLineParser.ParseError error) {
+            CommandLineParser$.MODULE$.showError(error);
+        }
+    }
+}
