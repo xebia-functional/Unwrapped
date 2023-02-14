@@ -6,13 +6,8 @@ import continuations.jvm.internal.ContinuationImpl
 @main def main =
 //  val result: Int = program
 //  println(result)
-  val result2 = programSuspendContinuationNoParamResume
-  println(result2)
-  val result3 = programSuspendContinuationNoParamNoSuspendContinuation
-  println(result3)
-  val result4 = programSuspendContinuationNoParamResumeIgnoreResult
-  println(result4)
-  println(programSuspendContinuationParamDependent)
+
+  println(programSuspendContinuationTwoParamsDependent)
   demoPrints
 
 object main$handler extends (Continuation[Any | Null] => Any):

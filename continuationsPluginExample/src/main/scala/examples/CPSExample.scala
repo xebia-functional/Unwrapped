@@ -191,3 +191,19 @@ def programSuspendContinuationResumeVals: Int =
     }
 
   fooTest()
+
+def programSuspendContinuationTwoParamsDependent: Int =
+  def foo(x: Int, y: Int)(using s: Suspend): Int = {
+    val z = s.suspendContinuation[Int] {
+      _.resume(Right {
+        x + y + 1
+      })
+    }
+    s.suspendContinuation[Int] {
+      _.resume(Right {
+        z + 1
+      })
+    }
+  }
+
+  foo(1, 1)
