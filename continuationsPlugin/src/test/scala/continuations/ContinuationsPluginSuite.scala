@@ -640,7 +640,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def program: Int = {
-           |  def foo():Suspend ?=> Int = {
+           |  def foo(): Suspend ?=> Int = {
            |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
            |    10
            |  }
