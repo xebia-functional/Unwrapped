@@ -193,39 +193,74 @@ def programSuspendContinuationResumeVals: Int =
   fooTest()
 
 def programTest: Int =
-  def foo1: Suspend ?=> Int = 1
-  def foo2: Suspend ?=> (String, Int) => Int = (w, x) => x + w.length
-  def foo3: Suspend ?=> (Int, String) => Int => Int = (x, w) => y => y + x + w.length
-  def foo4: Suspend ?=> (Int, String) => Int ?=> Int = (x, w) => x + w.length + summon[Int]
-  def foo5: Int => Suspend ?=> Int = x => x
-  def foo6: Int => Suspend ?=> Int => Int = x => y => x + y
-  def foo7: Int ?=> Suspend ?=> Int = summon[Int]
-  def foo8: (Int, Suspend) ?=> Int => Int = x => x + summon[Int]
-  def foo9: Int => Int => Suspend ?=> Int => String => Int => Int = x =>
+  // defs
+  def fooD1: Suspend ?=> Int = 1
+  def fooD2: Suspend ?=> (String, Int) => Int = (w, x) => x + w.length
+  def fooD3: Suspend ?=> (Int, String) => Int => Int = (x, w) => y => y + x + w.length
+  def fooD4: Suspend ?=> (Int, String) => Int ?=> Int = (x, w) => x + w.length + summon[Int]
+  def fooD5: Int => Suspend ?=> Int = x => x
+  def fooD6: Int => Suspend ?=> Int => Int = x => y => x + y
+  def fooD7: Int ?=> Suspend ?=> Int = summon[Int]
+  def fooD8: (Int, Suspend) ?=> Int => Int = x => x + summon[Int]
+  def fooD9: Int => Int => Suspend ?=> Int => String => Int => Int = x =>
     y => z => w => q => x + y + z + w.length + q
-  def foo10: Int => Int => Suspend ?=> (String, Boolean) => Int => Int = x =>
+  def fooD10: Int => Int => Suspend ?=> (String, Boolean) => Int => Int = x =>
     z => (w, b) => y => x + y + z + w.length + b.toString.length
-  def foo11: (Suspend, Int) ?=> Int => Int => Int = x => y => x + summon[Int] + y
-  def foo12: Int => (String, Boolean) => Int => Suspend ?=> Int => Int = x =>
+  def fooD11: (Suspend, Int) ?=> Int => Int => Int = x => y => x + summon[Int] + y
+  def fooD12: Int => (String, Boolean) => Int => Suspend ?=> Int => Int = x =>
     (w, b) => z => y => x + y + z + w.length + b.toString.length
-  def foo13(x: Int, y: Int)(z: Int, k: Int): Suspend ?=> Int ?=> (Int, Int) => Int =
+  def fooD13(x: Int, y: Int)(z: Int, k: Int): Suspend ?=> Int ?=> (Int, Int) => Int =
     (m, n) => x + y + z + k + m + n + summon[Int]
-  def foo14: List[Int] => Suspend ?=> Int = l => l.size
-  def foo15[A]: List[A] => Suspend ?=> Int = l => l.size
-  def foo16: List[String] ?=> Suspend ?=> Int = summon[List[String]].size
-  def foo17: Int ?=> Suspend ?=> String ?=> List[String] ?=> Int =
+  def fooD14: List[Int] => Suspend ?=> Int = l => l.size
+  def fooD15[A]: List[A] => Suspend ?=> Int = l => l.size
+  def fooD16: List[String] ?=> Suspend ?=> Int = summon[List[String]].size
+  def fooD17: Int ?=> Suspend ?=> String ?=> List[String] ?=> Int =
     summon[Int] + summon[String].length + summon[List[String]].size
-  def foo18: Suspend ?=> Int ?=> String ?=> List[String] ?=> Int =
+  def fooD18: Suspend ?=> Int ?=> String ?=> List[String] ?=> Int =
     summon[Int] + summon[String].length + summon[List[String]].size
-  def foo19(using Suspend, Int): String ?=> List[String] ?=> Int =
+  def fooD19(using Suspend, Int): String ?=> List[String] ?=> Int =
     summon[Int] + summon[String].length + summon[List[String]].size
-  def foo20: (Int, Suspend) ?=> String ?=> Int => Int =
+  def fooD20: (Int, Suspend) ?=> String ?=> Int => Int =
     x => x + summon[Int] + summon[String].length
-  def foo21: Suspend ?=> Int =
+  def fooD21: Suspend ?=> Int =
     println("Hello")
     val x = 3
     1 + x
-  def foo22: Suspend ?=> Int => Int ?=> Int = y =>
+  def fooD22: Suspend ?=> Int => Int ?=> Int = y =>
+    val x = 3
+    println("Hello")
+    1 + x + y + summon[Int]
+
+  // vals
+  val fooV1: Suspend ?=> Int = 1
+  val fooV2: Suspend ?=> (String, Int) => Int = (w, x) => x + w.length
+  val fooV3: Suspend ?=> (Int, String) => Int => Int = (x, w) => y => y + x + w.length
+  val fooV4: Suspend ?=> (Int, String) => Int ?=> Int = (x, w) => x + w.length + summon[Int]
+  val fooV5: Int => Suspend ?=> Int = x => x
+  val fooV6: Int => Suspend ?=> Int => Int = x => y => x + y
+  val fooV7: Int ?=> Suspend ?=> Int = summon[Int]
+  val fooV8: (Int, Suspend) ?=> Int => Int = x => x + summon[Int]
+  val fooV9: Int => Int => Suspend ?=> Int => String => Int => Int = x =>
+    y => z => w => q => x + y + z + w.length + q
+  val fooV10: Int => Int => Suspend ?=> (String, Boolean) => Int => Int = x =>
+    z => (w, b) => y => x + y + z + w.length + b.toString.length
+  val fooV11: (Suspend, Int) ?=> Int => Int => Int = x => y => x + summon[Int] + y
+  val fooV12: Int => (String, Boolean) => Int => Suspend ?=> Int => Int = x =>
+    (w, b) => z => y => x + y + z + w.length + b.toString.length
+  val fooV14: List[Int] => Suspend ?=> Int = l => l.size
+  val fooV15: Suspend ?=> [A] => List[A] => Int = [A] => (list: List[A]) => list.size
+  val fooV16: List[String] ?=> Suspend ?=> Int = summon[List[String]].size
+  val fooV17: Int ?=> Suspend ?=> String ?=> List[String] ?=> Int =
+    summon[Int] + summon[String].length + summon[List[String]].size
+  val fooV18: Suspend ?=> Int ?=> String ?=> List[String] ?=> Int =
+    summon[Int] + summon[String].length + summon[List[String]].size
+  val fooV20: (Int, Suspend) ?=> String ?=> Int => Int =
+    x => x + summon[Int] + summon[String].length
+  val fooV21: Suspend ?=> Int =
+    println("Hello")
+    val x = 3
+    1 + x
+  val fooV22: Suspend ?=> Int => Int ?=> Int = y =>
     val x = 3
     println("Hello")
     1 + x + y + summon[Int]
@@ -235,28 +270,50 @@ def programTest: Int =
   given List[String] = List("AA", "Q")
 
   println("CF START")
-  println(foo1)
-  println(foo2("AA", 1))
-  println(foo3(1, "AA")(3))
-  println(foo4(1, "AA"))
-  println(foo5(1))
-  println(foo6(1)(2))
-  println(foo7)
-  println(foo8(1))
-  println(foo9(1)(2)(3)("AAAA")(5))
-  println(foo10(1)(2)("AAA", false)(4))
-  println(foo11(1)(2))
-  println(foo12(1)("AA", true)(3)(4))
-  println(foo13(1, 2)(3, 4)(5, 6))
-  println(foo14(List(1, 2)))
-  println(foo15(List("AA", "AA")))
-  println(foo16)
-  println(foo17)
-  println(foo18)
-  println(foo19)
-  println(foo20(1))
-  println(foo21)
-  println(foo22(1))
+  println(fooD1)
+  println(fooD2("AA", 1))
+  println(fooD3(1, "AA")(3))
+  println(fooD4(1, "AA"))
+  println(fooD5(1))
+  println(fooD6(1)(2))
+  println(fooD7)
+  println(fooD8(1))
+  println(fooD9(1)(2)(3)("AAAA")(5))
+  println(fooD10(1)(2)("AAA", false)(4))
+  println(fooD11(1)(2))
+  println(fooD12(1)("AA", true)(3)(4))
+  println(fooD13(1, 2)(3, 4)(5, 6))
+  println(fooD14(List(1, 2)))
+  println(fooD15(List("AA", "AA")))
+  println(fooD16)
+  println(fooD17)
+  println(fooD18)
+  println(fooD19)
+  println(fooD20(1))
+  println(fooD21)
+  println(fooD22(1))
   println("CF END")
 
+  println("CF VALS START")
+  println(fooV1)
+  println(fooV2("AA", 1))
+  println(fooV3(1, "AA")(3))
+  println(fooV4(1, "AA"))
+  println(fooV5(1))
+  println(fooV6(1)(2))
+  println(fooV7)
+  println(fooV8(1))
+  println(fooV9(1)(2)(3)("AAAA")(5))
+  println(fooV10(1)(2)("AAA", false)(4))
+  println(fooV11(1)(2))
+  println(fooV12(1)("AA", true)(3)(4))
+  println(fooV14(List(1, 2)))
+  println(fooV15(List("AA", "AA")))
+  println(fooV16)
+  println(fooV17)
+  println(fooV18)
+  println(fooV20(1))
+  println(fooV21)
+  println(fooV22(1))
+  println("CF VALS END")
   2

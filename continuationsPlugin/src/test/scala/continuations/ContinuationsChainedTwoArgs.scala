@@ -150,7 +150,7 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "5- it should convert context function into a state machine two continuations chained with" +
+    "5- it should convert context function into a state machine two continuations chained with " +
       "one extra given parameter"
   ) {
     case given Context =>

@@ -32,6 +32,9 @@ class ContinuationsPhase extends PluginPhase:
   override val runsAfter = Set(Staging.name)
   override val runsBefore = Set(ContinuationsCallsPhase.name)
 
+  override def transformValDef(tree: ValDef)(using Context): Tree =
+    DefDefTransforms.transformSuspendContinuation(tree)
+
   override def transformDefDef(tree: DefDef)(using ctx: Context): Tree =
     DefDefTransforms.transformSuspendContinuation(tree)
 
@@ -82,7 +85,7 @@ class ContinuationsCallsPhase extends PluginPhase:
 
   override def prepareForApply(tree: Apply)(using Context): Context =
     tree match
-      case Apply(Apply(_, _), _) | Apply(Select(_, _), _)
+      case Apply(Apply(_, _), _) | Apply(Select(_, _), _) | Apply(TypeApply(Select(_, _), _), _)
           if existsTree(tree).nonEmpty &&
             tree.filterSubTrees(CallsSuspendParameter.unapply(_).nonEmpty).nonEmpty &&
             !applyToChange.exists(_.filterSubTrees(_.sameTree(tree)).nonEmpty) =>
@@ -98,9 +101,22 @@ class ContinuationsCallsPhase extends PluginPhase:
     if (applyToChange.exists(_.sameTree(tree)))
       val (paramsNonCF, paramsCF) =
         tree.deepFold((List(List.empty[Tree]), List(List.empty[Tree]))) {
+          case (
+                (accNonCF, accCF),
+                Apply(TypeApply(Select(qualifier, selected), argsType), args))
+              if selected.asTermName == nme.apply &&
+                existsTree(qualifier).nonEmpty &&
+                (qualifier.symbol.is(Flags.Method) || findTree(qualifier).nonEmpty) =>
+            (
+              accNonCF,
+              accCF
+                .prepended(args.filterNot(_.tpe.hasClassSymbol(requiredClass(suspendFullName))))
+                .prepended(
+                  argsType.filterNot(_.tpe.hasClassSymbol(requiredClass(suspendFullName)))))
           case ((accNonCF, accCF), Apply(Select(qualifier, selected), args))
               if selected.asTermName == nme.apply &&
-                qualifier.symbol.is(Flags.Method) =>
+                existsTree(qualifier).nonEmpty &&
+                (qualifier.symbol.is(Flags.Method) || findTree(qualifier).nonEmpty) =>
             (
               accNonCF,
               accCF.prepended(
@@ -115,9 +131,17 @@ class ContinuationsCallsPhase extends PluginPhase:
 
       paramsCF
         .filterNot(_.isEmpty)
-        .foldLeft(
-          ref(existsTree(tree).get).appliedToTermArgs(paramsNonCF.flatten :+ continuation)) {
-          (parent, value) => parent.select(nme.apply).appliedToTermArgs(value)
+        .foldLeft(ref(existsTree(tree).get)
+          .appliedToTermArgs(paramsNonCF.flatten :+ continuation): Tree) { (parent, value) =>
+          if (value.exists {
+              case _: TypeTree => true
+              case _ => false
+            })
+            parent.select(nme.apply).appliedToTypeTrees(value)
+          else
+            parent match
+              case _: TypeApply => parent.appliedToTermArgs(value)
+              case _ => parent.select(nme.apply).appliedToTermArgs(value)
         }
     else tree
 

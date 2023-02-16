@@ -4307,12 +4307,12 @@ trait StateMachineFixtures {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
       |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[concurrent.ExecutionContext[Int]]]
+      |            this.asInstanceOf[continuations.Continuation[(concurrent.ExecutionContext) ?=> Int]]
       |          )
       |        }
       |    }
-      |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[concurrent.ExecutionContext[Int]]):
-      |      concurrent.ExecutionContext[Int] | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
+      |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[(concurrent.ExecutionContext) ?=> Int]):
+      |      ((concurrent.ExecutionContext) ?=> Int) | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
       |     =
       |      {
       |        var x##1: Int = x
