@@ -4,6 +4,7 @@ import continuations.DefDefTransforms.*
 import dotty.tools.dotc.ast.{tpd, TreeTypeMap, Trees}
 import dotty.tools.dotc.ast.Trees.*
 import dotty.tools.dotc.ast.tpd.*
+import dotty.tools.dotc.core.Annotations.Annotation
 import dotty.tools.dotc.core.Constants.Constant
 import dotty.tools.dotc.core.Contexts.{ctx, Context}
 import dotty.tools.dotc.core.{Flags, Names, Scopes, Symbols, Types}
@@ -15,11 +16,13 @@ import dotty.tools.dotc.core.StdNames.nme
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Types.{MethodType, OrType, Type}
 import dotty.tools.dotc.report
+import dotty.tools.dotc.transform.ContextFunctionResults
 
 import scala.annotation.tailrec
 import scala.collection.immutable.List
+import scala.collection.mutable.ListBuffer
 
-object DefDefTransforms extends TreesChecks:
+object DefDefTransforms extends TreesChecks with Types:
 
   private def generateCompletion(owner: Symbol, returnType: Type)(using Context): Symbol =
     newSymbol(
@@ -103,21 +106,16 @@ object DefDefTransforms extends TreesChecks:
   private def createTransformedMethodSymbol(
       parent: Symbol,
       transformedMethodParams: List[tpd.ParamClause],
-      returnType: Type)(using Context) =
+      returnType: Type,
+      owner: Option[Symbol] = None)(using Context) =
     newSymbol(
-      parent.owner,
+      owner.getOrElse(parent.owner),
       parent.name.asTermName,
       parent.flags,
-      MethodType(
+      MethodType.fromSymbols(
         transformedMethodParams.flatMap {
           _.flatMap {
-            case p: tpd.ValDef => List(p.name)
-            case _: tpd.TypeDef => List.empty
-          }
-        },
-        transformedMethodParams.flatMap {
-          _.flatMap {
-            case p: tpd.ValDef => List(p.tpt.tpe)
+            case p: tpd.ValDef => List(p.symbol)
             case _: tpd.TypeDef => List.empty
           }
         },
@@ -127,19 +125,31 @@ object DefDefTransforms extends TreesChecks:
       parent.coord
     )
 
+  private def updateReturnTypeWithoutSuspendWithAny(typ: Type, updateWithAny: Boolean)(
+      using Context): Type =
+    flattenTypes(typ).foldRight(ref(defn.AnyType).tpe) {
+      case (defn.FunctionOf(args, _, ic, ie), inner) =>
+        val argsWithoutSuspend =
+          args.filterNot(_.hasClassSymbol(requiredClass(suspendFullName)))
+
+        if (argsWithoutSuspend.nonEmpty)
+          defn.FunctionOf(
+            args = argsWithoutSuspend,
+            resultType = inner,
+            isContextual = ic,
+            isErased = ie)
+        else
+          inner
+      case (t, inner) =>
+        if (updateWithAny) inner
+        else t
+    }
+
   private def getReturnTypeBodyContextFunctionOwner(tree: tpd.DefDef)(
       using Context): (Type, tpd.Tree, Option[Symbol]) =
     if (ReturnsContextFunctionWithSuspendType.unapply(tree).nonEmpty)
-      val contextFunctionArgTypes: List[Type] =
-        defn
-          .asContextFunctionType(tree.tpt.tpe)
-          .argTypes
-          .filterNot(_.hasClassSymbol(requiredClass(suspendFullName)))
-
       val returnType =
-        if (contextFunctionArgTypes.size > 1)
-          Types.AppliedType(contextFunctionArgTypes.head, contextFunctionArgTypes.tail)
-        else contextFunctionArgTypes.head
+        updateReturnTypeWithoutSuspendWithAny(tree.tpt.tpe, updateWithAny = false)
 
       val (rhs, contextFunctionOwner) = tree.rhs match
         case tpd.Block(List(d @ tpd.DefDef(_, _, _, _)), _) if d.symbol.isAnonymousFunction =>
@@ -314,9 +324,11 @@ object DefDefTransforms extends TreesChecks:
 
   def transformSuspendContinuation(tree: tpd.DefDef)(using Context): tpd.Tree =
     tree match
-      case ReturnsContextFunctionWithSuspendType(_) =>
+      case ReturnsContextFunctionWithSuspendType(_) if !tree.symbol.isAnonymousFunction =>
         transformContinuationWithSuspend(tree)
-      case HasSuspendParameter(_) if IsSuspendContextualMethod.unapply(tree).isEmpty =>
+      case HasSuspendParameter(_)
+          if IsSuspendContextualMethod.unapply(tree).isEmpty &&
+            !tree.symbol.isAnonymousFunction =>
         transformContinuationWithSuspend(tree)
       case _ => report.logWith(s"oldTree:")(tree)
 
@@ -324,16 +336,20 @@ object DefDefTransforms extends TreesChecks:
       using ctx: Context): tpd.DefDef =
     val parent = tree.symbol
 
-    val returnType = Types.OrType(tree.tpt.tpe, ctx.definitions.AnyType, false)
-    val completion = generateCompletion(parent, returnType)
-
-    val (_, rhs, contextFunctionOwner) =
+    val (methodReturnType, _, _) =
       getReturnTypeBodyContextFunctionOwner(tree)
+
+    val completionType = Types.OrType(methodReturnType, ctx.definitions.AnyType, false)
+    val completion = generateCompletion(parent, completionType)
 
     val transformedMethodParams = params(tree, completion)
 
     val transformedMethodSymbol =
-      createTransformedMethodSymbol(parent, transformedMethodParams, defn.AnyType)
+      createTransformedMethodSymbol(
+        parent,
+        transformedMethodParams,
+        updateReturnTypeWithoutSuspendWithAny(methodReturnType, updateWithAny = true)
+      )
 
     parent.owner.unforcedDecls.openForMutations.replace(parent, transformedMethodSymbol)
 
@@ -351,15 +367,94 @@ object DefDefTransforms extends TreesChecks:
         s.info.hasClassSymbol(requiredClass(suspendFullName)) || s.isTypeParam
       }
 
+    val newAnonFunctions = ListBuffer(transformedMethod.symbol)
     val substituteContinuation = new TreeTypeMap(
-      substFrom = List(parent) ++ oldMethodParamSymbols ++ contextFunctionOwner.toList,
-      substTo = List(transformedMethod.symbol) ++ transformedMethodParamSymbols ++
-        List(transformedMethod.symbol),
-      oldOwners = List(parent) ++ contextFunctionOwner.toList,
-      newOwners = List(transformedMethod.symbol, transformedMethod.symbol)
+      treeMap = {
+        case defdef: tpd.DefDef if defdef.symbol.isAnonymousFunction =>
+          val tpt: Type =
+            updateReturnTypeWithoutSuspendWithAny(defdef.tpt.tpe, updateWithAny = true)
+
+          val params: List[tpd.ParamClause] =
+            defdef
+              .paramss
+              .flatMap(_.flatMap {
+                case p: tpd.ValDef
+                    if p.symbol.info.hasClassSymbol(requiredClass(suspendFullName)) =>
+                  List.empty
+                case p: tpd.ValDef => List(List(p))
+                case p: tpd.TypeDef => List(List(p))
+              })
+
+          val newMethodSymbol =
+            createTransformedMethodSymbol(
+              defdef.symbol,
+              params,
+              tpt,
+              newAnonFunctions.lastOption)
+
+          if (params.isEmpty) defdef.rhs
+          else
+            newAnonFunctions.append(newMethodSymbol)
+
+            val methodParams =
+              newMethodSymbol
+                .paramSymss
+                .map(_.map(s =>
+                  val existingFlags =
+                    params
+                      .flatten
+                      .find(_.name == s.name)
+                      .map(_.symbol.flags)
+                      .getOrElse(Flags.EmptyFlags)
+
+                  s.setFlag(existingFlags)
+                  s
+                ))
+
+            new TreeTypeMap(
+              oldOwners = List(defdef.symbol),
+              newOwners = List(newMethodSymbol),
+              substFrom = params.flatMap(_.map(_.symbol)),
+              substTo = methodParams.flatten
+            ).transform(
+              tpd.DefDef(
+                sym = newMethodSymbol.asTerm,
+                paramss = methodParams,
+                resultType = newMethodSymbol.info.resultType,
+                rhs = defdef.rhs
+              ))
+        case tpd.Block(List(defdef: tpd.DefDef), _)
+            if defdef.symbol.isAnonymousFunction &&
+              defdef
+                .paramss
+                .flatMap(
+                  _.filterNot(_.symbol.info.hasClassSymbol(requiredClass(suspendFullName))))
+                .isEmpty =>
+          new TreeTypeMap(
+            oldOwners = List(defdef.symbol),
+            newOwners = newAnonFunctions.lastOption.toList
+          ).transform(defdef.rhs)
+        case c: tpd.Closure =>
+          newAnonFunctions
+            .toList
+            .find(
+              _.paramSymss
+                .flatten
+                .exists(s => c.meth.symbol.paramSymss.flatten.exists(_.matches(s))))
+            .fold(c)(anon => tpd.Closure(c.env, ref(anon), c.tpt))
+        case t => t
+      },
+      substFrom = List(parent) ++ oldMethodParamSymbols,
+      substTo = List(transformedMethod.symbol) ++ transformedMethodParamSymbols,
+      oldOwners = List(parent),
+      newOwners = List(transformedMethod.symbol)
     )
 
-    cpy.DefDef(transformedMethod)(rhs = substituteContinuation.transform(rhs))
+    val transformedDefDef =
+      cpy.DefDef(transformedMethod)(rhs = substituteContinuation.transform(tree.rhs))
+
+    ContextFunctionResults.annotateContextResults(transformedDefDef)
+    transformedDefDef
 
   private def transformUnusedSuspensionsSuspendingStateMachine(
       tree: tpd.DefDef,

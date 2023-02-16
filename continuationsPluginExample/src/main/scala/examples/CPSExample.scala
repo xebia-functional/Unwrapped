@@ -191,3 +191,72 @@ def programSuspendContinuationResumeVals: Int =
     }
 
   fooTest()
+
+def programTest: Int =
+  def foo1: Suspend ?=> Int = 1
+  def foo2: Suspend ?=> (String, Int) => Int = (w, x) => x + w.length
+  def foo3: Suspend ?=> (Int, String) => Int => Int = (x, w) => y => y + x + w.length
+  def foo4: Suspend ?=> (Int, String) => Int ?=> Int = (x, w) => x + w.length + summon[Int]
+  def foo5: Int => Suspend ?=> Int = x => x
+  def foo6: Int => Suspend ?=> Int => Int = x => y => x + y
+  def foo7: Int ?=> Suspend ?=> Int = summon[Int]
+  def foo8: (Int, Suspend) ?=> Int => Int = x => x + summon[Int]
+  def foo9: Int => Int => Suspend ?=> Int => String => Int => Int = x =>
+    y => z => w => q => x + y + z + w.length + q
+  def foo10: Int => Int => Suspend ?=> (String, Boolean) => Int => Int = x =>
+    z => (w, b) => y => x + y + z + w.length + b.toString.length
+  def foo11: (Suspend, Int) ?=> Int => Int => Int = x => y => x + summon[Int] + y
+  def foo12: Int => (String, Boolean) => Int => Suspend ?=> Int => Int = x =>
+    (w, b) => z => y => x + y + z + w.length + b.toString.length
+  def foo13(x: Int, y: Int)(z: Int, k: Int): Suspend ?=> Int ?=> (Int, Int) => Int =
+    (m, n) => x + y + z + k + m + n + summon[Int]
+  def foo14: List[Int] => Suspend ?=> Int = l => l.size
+  def foo15[A]: List[A] => Suspend ?=> Int = l => l.size
+  def foo16: List[String] ?=> Suspend ?=> Int = summon[List[String]].size
+  def foo17: Int ?=> Suspend ?=> String ?=> List[String] ?=> Int =
+    summon[Int] + summon[String].length + summon[List[String]].size
+  def foo18: Suspend ?=> Int ?=> String ?=> List[String] ?=> Int =
+    summon[Int] + summon[String].length + summon[List[String]].size
+  def foo19(using Suspend, Int): String ?=> List[String] ?=> Int =
+    summon[Int] + summon[String].length + summon[List[String]].size
+  def foo20: (Int, Suspend) ?=> String ?=> Int => Int =
+    x => x + summon[Int] + summon[String].length
+  def foo21: Suspend ?=> Int =
+    println("Hello")
+    val x = 3
+    1 + x
+  def foo22: Suspend ?=> Int => Int ?=> Int = y =>
+    val x = 3
+    println("Hello")
+    1 + x + y + summon[Int]
+
+  given Int = 3
+  given String = "AA"
+  given List[String] = List("AA", "Q")
+
+  println("CF START")
+  println(foo1)
+  println(foo2("AA", 1))
+  println(foo3(1, "AA")(3))
+  println(foo4(1, "AA"))
+  println(foo5(1))
+  println(foo6(1)(2))
+  println(foo7)
+  println(foo8(1))
+  println(foo9(1)(2)(3)("AAAA")(5))
+  println(foo10(1)(2)("AAA", false)(4))
+  println(foo11(1)(2))
+  println(foo12(1)("AA", true)(3)(4))
+  println(foo13(1, 2)(3, 4)(5, 6))
+  println(foo14(List(1, 2)))
+  println(foo15(List("AA", "AA")))
+  println(foo16)
+  println(foo17)
+  println(foo18)
+  println(foo19)
+  println(foo20(1))
+  println(foo21)
+  println(foo22(1))
+  println("CF END")
+
+  2

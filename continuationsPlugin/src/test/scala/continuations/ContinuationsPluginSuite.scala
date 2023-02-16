@@ -100,6 +100,43 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
   }
 
   compilerContextWithContinuationsPlugin.test(
+    "It should convert a suspended context function def with a single constant and a non suspended body to CPS"
+  ) {
+    case given Context =>
+      val source =
+        """
+          |import continuations.*
+          |
+          |def foo(x: Int): Suspend ?=> Int = x + 1
+          |""".stripMargin
+
+      // format: off
+      val expected =
+        """|package <empty> {
+           |  import continuations.*
+           |  final lazy module val compileFromString$package:
+           |    compileFromString$package
+           |   = new compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class
+           |    compileFromString$package
+           |  () extends Object() { this: compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef =
+           |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
+           |    def foo(x: Int, completion: continuations.Continuation[Int | Any]): Any = x.+(1)
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expected))
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
     "It should convert a suspended def with a single constant and a non suspended body to CPS"
   ) {
     case given Context =>
@@ -159,7 +196,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
-           |    def foo(x: Int, z: Seq[String] @Repeated, ec: concurrent.ExecutionContext, completion: continuations.Continuation[Int | Any]): Any = x.+(1)
+           |    def foo(x: Int, z: String*, ec: concurrent.ExecutionContext, completion: continuations.Continuation[Int | Any]): Any = x.+(1)
            |  }
            |}
            |""".stripMargin
