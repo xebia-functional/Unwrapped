@@ -29,7 +29,8 @@ lazy val root = // I
     `zero-arguments-no-continuation-treeview`,
     `zero-arguments-one-continuation-code-before-used-after`,
     `list-map`,
-    `two-arguments-two-continuations`
+    `two-arguments-two-continuations`,
+    `munit-snap`
   )
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
@@ -111,6 +112,18 @@ lazy val `sttp-scala-fx` = (project in file("./sttp-scala-fx"))
     `http-scala-fx`,
     `munit-scala-fx` % "test -> compile")
 
+lazy val `munit-snap` = (project in file("./munit-snap")).settings(munitSnapSettings)
+
+lazy val munitSnapSettings = Seq(
+  name := "munit-snap",
+  autoAPIMappings := true,
+  Test / fork := true,
+  libraryDependencies += munit,
+  libraryDependencies += circe,
+  libraryDependencies += circeParser,
+  libraryDependencies += circeGeneric % Test
+)
+
 lazy val commonSettings = Seq(
   javaOptions ++= javaOptionsSettings,
   autoAPIMappings := true,
@@ -134,8 +147,7 @@ lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
     Test / fork := true,
     libraryDependencies ++= List(
       "org.scala-lang" %% "scala3-compiler" % "3.1.2",
-      munit % Test,
-      munitSnapshot.cross(CrossVersion.for3Use2_13) % Test exclude("org.scalameta", "munit_2.13")
+      munit % Test
     ),
     Test / javaOptions += {
       val `scala-compiler-classpath` =

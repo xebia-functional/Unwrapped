@@ -16,7 +16,6 @@ object Dependencies {
     val sbtGithubMdoc = "0.11.2"
     val junitInterface = "0.7.29"
     val munitScalacheck = "0.7.29"
-    val munitSnapshot = "0.0.4"
     val jmhGeneratorBytecode = "1.35"
     val sbtDependencyUpdates = "1.2.1"
     val jmhGeneratorReflection = "1.35"
@@ -31,6 +30,7 @@ object Dependencies {
     val sttp = "3.6.2"
     val httpCore5 = "5.1.4"
     val hedgehog = "0.9.0"
+    val circe = "0.14.3"
   }
 
   object Compile {
@@ -46,7 +46,9 @@ object Dependencies {
     val logback = "ch.qos.logback" % "logback-classic" % Versions.logback
     val sttp = "com.softwaremill.sttp.client3" %% "core" % Versions.sttp
     val httpCore5 = "org.apache.httpcomponents.core5" % "httpcore5" % Versions.httpCore5
-
+    val circe = "io.circe" %% "circe-core" % Versions.circe
+    val circeGeneric = "io.circe" %% "circe-generic" % Versions.circe
+    val circeParser = "io.circe" %% "circe-parser" % Versions.circe
   }
 
   object Test {
@@ -59,8 +61,6 @@ object Dependencies {
       "com.dimafeng" %% "testcontainers-scala-postgresql" % Versions.testContainers
     val flyway = "org.flywaydb" % "flyway-core" % Versions.flyway
     val hedgehog = "qa.hedgehog" %% "hedgehog-munit" % Versions.hedgehog
-    val munitSnapshot = "com.github.lolgab" %% "munit-snapshot" % Versions.munitSnapshot
-
   }
 
   object Plugins {
@@ -82,6 +82,9 @@ object Dependencies {
 
   lazy val dependencies = Seq(
     munitScalacheck,
+    circe,
+    circeGeneric,
+    circeParser,
     scalacheck,
     sbtExplicitDependencies,
     sbtDependencyUpdates,
