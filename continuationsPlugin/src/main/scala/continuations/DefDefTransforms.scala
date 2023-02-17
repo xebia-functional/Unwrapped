@@ -1,6 +1,7 @@
 package continuations
 
 import continuations.DefDefTransforms.*
+import continuations.Types.flattenTypes
 import dotty.tools.dotc.ast.{tpd, TreeTypeMap, Trees}
 import dotty.tools.dotc.ast.Trees.*
 import dotty.tools.dotc.ast.tpd.*
@@ -22,7 +23,7 @@ import scala.annotation.tailrec
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
 
-object DefDefTransforms extends TreesChecks with Types:
+object DefDefTransforms extends TreesChecks:
 
   private def generateCompletion(owner: Symbol, returnType: Type)(using Context): Symbol =
     newSymbol(

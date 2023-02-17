@@ -1,5 +1,6 @@
 package continuations
 
+import continuations.Types.flattenTypes
 import dotty.tools.dotc.core.Contexts.Context
 import dotty.tools.dotc.core.Symbols
 import dotty.tools.dotc.core.Types.Type
@@ -7,7 +8,7 @@ import dotty.tools.dotc.core.Types.Type
 /**
  * A matcher for detecting suspend context function parameters in a type.
  */
-object IsSuspendContextFunction extends Types:
+object IsSuspendContextFunction:
   /**
    * @param typ
    *   The [[dotty.tools.dotc.core.Types.Type]] to match upon

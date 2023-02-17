@@ -6,7 +6,7 @@ import dotty.tools.dotc.core.Types._
 
 import scala.annotation.tailrec
 
-trait Types {
+object Types {
   private[continuations] def flattenTypes(typ: Type)(using Context): List[Type] =
     @tailrec
     def recur(t: Type, acc: List[Type]): List[Type] =
