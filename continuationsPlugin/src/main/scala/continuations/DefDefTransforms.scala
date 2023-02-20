@@ -399,12 +399,23 @@ object DefDefTransforms extends TreesChecks:
                 case p: tpd.TypeDef => List(List(p))
               })
 
+          val newMethodOwner: Option[Symbol] =
+            if (defdef.symbol.owner.is(Method) &&
+              defdef.symbol.owner.name.matchesTargetName(nme.apply) &&
+              defdef.symbol.owner.owner.isAnonymousClass &&
+              defdef.symbol.owner.owner.info.parents.exists {
+                _.hasClassSymbol(defn.PolyFunctionClass)
+              })
+              Some(defdef.symbol.owner)
+            else newAnonFunctions.lastOption
+
           val newMethodSymbol =
             createTransformedMethodSymbol(
               defdef.symbol,
               params,
               tpt,
-              newAnonFunctions.lastOption)
+              newMethodOwner
+            )
 
           if (params.isEmpty) defdef.rhs
           else

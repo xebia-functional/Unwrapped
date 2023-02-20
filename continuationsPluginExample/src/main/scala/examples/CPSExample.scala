@@ -212,7 +212,7 @@ def programTest: Int =
   def fooD13(x: Int, y: Int)(z: Int, k: Int): Suspend ?=> Int ?=> (Int, Int) => Int =
     (m, n) => x + y + z + k + m + n + summon[Int]
   def fooD14: List[Int] => Suspend ?=> Int = l => l.size
-  def fooD15[A]: List[A] => Suspend ?=> Int = l => l.size
+  def fooD15: Suspend ?=> [A] => List[A] => Int = [A] => (l: List[A]) => l.size
   def fooD16: List[String] ?=> Suspend ?=> Int = summon[List[String]].size
   def fooD17: Int ?=> Suspend ?=> String ?=> List[String] ?=> Int =
     summon[Int] + summon[String].length + summon[List[String]].size
@@ -230,6 +230,15 @@ def programTest: Int =
     val x = 3
     println("Hello")
     1 + x + y + summon[Int]
+  def fooD23: Suspend ?=> [A] => List[A] => [B] => List[B] => List[A] => List[A] => Int =
+    [A] =>
+      (x: List[A]) =>
+        [B] =>
+          (y: List[B]) =>
+            (q: List[A]) =>
+              (p: List[A]) =>
+                val z = 1
+                x.size + y.size + q.size + p.size + z
 
   // vals
   val fooV1: Suspend ?=> Int = 1
@@ -264,6 +273,15 @@ def programTest: Int =
     val x = 3
     println("Hello")
     1 + x + y + summon[Int]
+  val fooV23: Suspend ?=> [A] => List[A] => [B] => List[B] => List[A] => List[A] => Int =
+    [A] =>
+      (x: List[A]) =>
+        [B] =>
+          (y: List[B]) =>
+            (q: List[A]) =>
+              (p: List[A]) =>
+                val z = 1
+                x.size + y.size + q.size + p.size + z
 
   given Int = 3
   given String = "AA"
@@ -292,6 +310,7 @@ def programTest: Int =
   println(fooD20(1))
   println(fooD21)
   println(fooD22(1))
+  println(fooD23(List(1))(List("A", "B"))(List(1, 1, 1))(List(1, 1, 1, 1)))
   println("CF END")
 
   println("CF VALS START")
@@ -315,5 +334,6 @@ def programTest: Int =
   println(fooV20(1))
   println(fooV21)
   println(fooV22(1))
+  println(fooV23(List(1))(List("A", "B"))(List(1, 1, 1))(List(1, 1, 1, 1)))
   println("CF VALS END")
   2
