@@ -66,6 +66,9 @@ class ContinuationsCallsPhase extends PluginPhase:
       tree.existsSubTree(t => s.name == t.symbol.name && s.coord == t.symbol.coord)
     }
 
+  private def findTree(tree: Tree)(using Context): Option[Symbol] =
+    updatedMethods.toList.find(s => s.name == tree.symbol.name && s.coord == tree.symbol.coord)
+
   override def prepareForDefDef(tree: DefDef)(using Context): Context =
     val hasContinuationParam =
       tree.termParamss.flatten.exists { p =>
@@ -94,6 +97,11 @@ class ContinuationsCallsPhase extends PluginPhase:
       case Apply(TypeApply(Select(_, selected), _), _)
           if existsTree(tree).nonEmpty &&
             selected.asTermName == nme.apply &&
+            tree.filterSubTrees(CallsSuspendParameter.unapply(_).nonEmpty).nonEmpty &&
+            !applyToChange.exists(_.filterSubTrees(_.sameTree(tree)).nonEmpty) =>
+        applyToChange.addOne(tree)
+      case Apply(Ident(_), _)
+          if findTree(tree).nonEmpty &&
             tree.filterSubTrees(CallsSuspendParameter.unapply(_).nonEmpty).nonEmpty &&
             !applyToChange.exists(_.filterSubTrees(_.sameTree(tree)).nonEmpty) =>
         applyToChange.addOne(tree)

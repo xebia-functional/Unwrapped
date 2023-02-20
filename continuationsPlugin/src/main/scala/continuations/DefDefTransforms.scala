@@ -341,9 +341,7 @@ object DefDefTransforms extends TreesChecks:
     tree match
       case ReturnsContextFunctionWithSuspendType(_) if !tree.symbol.isAnonymousFunction =>
         transformContinuationWithSuspend(tree)
-      case HasSuspendParameter(_)
-          if IsSuspendContextualMethod.unapply(tree).isEmpty &&
-            !tree.symbol.isAnonymousFunction =>
+      case HasSuspendParameter(_) if !tree.symbol.isAnonymousFunction =>
         transformContinuationWithSuspend(tree)
       case _ => report.logWith(s"oldTree:")(tree)
 
@@ -422,9 +420,8 @@ object DefDefTransforms extends TreesChecks:
             newAnonFunctions.append(newMethodSymbol)
 
             val methodParams =
-              newMethodSymbol
-                .paramSymss
-                .map(_.map(s =>
+              newMethodSymbol.paramSymss.map {
+                _.map { s =>
                   val existingFlags =
                     params
                       .flatten
@@ -434,7 +431,8 @@ object DefDefTransforms extends TreesChecks:
 
                   s.setFlag(existingFlags)
                   s
-                ))
+                }
+              }
 
             new TreeTypeMap(
               oldOwners = List(defdef.symbol),
