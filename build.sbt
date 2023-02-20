@@ -29,7 +29,8 @@ lazy val root = // I
     `zero-arguments-no-continuation-treeview`,
     `zero-arguments-one-continuation-code-before-used-after`,
     `list-map`,
-    `two-arguments-two-continuations`
+    `two-arguments-two-continuations`,
+    `munit-snap`
   )
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
@@ -110,6 +111,18 @@ lazy val `sttp-scala-fx` = (project in file("./sttp-scala-fx"))
     `scala-fx`,
     `http-scala-fx`,
     `munit-scala-fx` % "test -> compile")
+
+lazy val `munit-snap` = (project in file("./munit-snap")).settings(munitSnapSettings)
+
+lazy val munitSnapSettings = Seq(
+  name := "munit-snap",
+  autoAPIMappings := true,
+  Test / fork := true,
+  libraryDependencies += munit,
+  libraryDependencies += circe,
+  libraryDependencies += circeParser,
+  libraryDependencies += circeGeneric % Test
+)
 
 lazy val commonSettings = Seq(
   javaOptions ++= javaOptionsSettings,
