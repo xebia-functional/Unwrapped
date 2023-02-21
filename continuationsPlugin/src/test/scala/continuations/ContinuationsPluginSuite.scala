@@ -1527,4 +1527,88 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
           )
       }
   }
+
+  compilerContextWithContinuationsPlugin.test(
+    "It should convert a polymorphic function with suspended context and a non suspended body to CPS"
+  ) {
+    case given Context =>
+      val source =
+        """
+          |import continuations.*
+          |
+          |def foo: Suspend ?=> Int => Int = x => x + 1
+          |""".stripMargin
+
+      // format: off
+      val expected =
+        """|package <empty> {
+           |  import continuations.*
+           |  final lazy module val compileFromString$package:
+           |    compileFromString$package
+           |   = new compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class
+           |    compileFromString$package
+           |  () extends Object() { this: compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef =
+           |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[(Int => Int) | Any]): Int => Any =
+           |      {
+           |        def $anonfun(x: Int): Any = x.+(1)
+           |        closure($anonfun)
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expected))
+      }
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "It should convert a polymorphic function value with suspended context param a non suspended body to CPS"
+  ) {
+    case given Context =>
+      val source =
+        """
+          |import continuations.*
+          |
+          |val foo:  Suspend ?=> [A] => List[A] => Int = [A] => (list: List[A]) => list.size
+          |""".stripMargin
+
+      // format: off
+      val expected =
+        """|package <empty> {
+           |  import continuations.*
+           |  final lazy module val compileFromString$package:
+           |    compileFromString$package
+           |   = new compileFromString$package()
+           |  @SourceFile("compileFromString.scala") final module class
+           |    compileFromString$package
+           |  () extends Object() { this: compileFromString$package.type =>
+           |    private def writeReplace(): AnyRef =
+           |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
+           |    def foo(completion: continuations.Continuation[([A] => (List[A]) => Int) | Any]): [A] => (List[A]) => Any =
+           |      {
+           |        final class $anon() extends Object(), PolyFunction {
+           |          def apply[A >: Nothing <: Any](list: List[A]): Int = list.size
+           |        }
+           |        new $anon():([A] => (List[A]) => Int)
+           |      }
+           |  }
+           |}
+           |""".stripMargin
+      // format: on
+
+      checkContinuations(source) {
+        case (tree, _) =>
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expected))
+      }
+  }
 }

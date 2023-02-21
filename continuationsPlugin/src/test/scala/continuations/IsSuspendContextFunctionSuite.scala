@@ -2,6 +2,7 @@ package continuations
 
 import dotty.tools.dotc.core.Contexts.Context
 import dotty.tools.dotc.core.Symbols
+import dotty.tools.dotc.core.Symbols.defn
 import dotty.tools.dotc.core.Types.Type
 import munit.FunSuite
 
@@ -37,5 +38,19 @@ class IsSuspendContextFunctionSuite extends FunSuite, CompilerFixtures {
     case (c, nonSuspendContextFunction) =>
       given Context = c
       assertEquals(IsSuspendContextFunction.unapply(nonSuspendContextFunction), None)
+  }
+
+  compilerContextWithContinuationsPlugin.test(
+    "It should detect complicate context functions with Suspend as an implicit parameter") {
+    case given Context =>
+      val suspend = Symbols.requiredClassRef("continuations.Suspend")
+
+      val type1 = defn.FunctionOf(List(defn.IntType), defn.IntType)
+      val type2 = defn.FunctionOf(List(defn.BooleanType, suspend), type1, isContextual = true)
+      val type3 = defn.FunctionOf(List(defn.IntType), type2)
+      val type4 = defn.FunctionOf(List(defn.StringType), type3, isContextual = true)
+      val type5 = defn.FunctionOf(List(defn.IntType), type4)
+
+      assertEquals(IsSuspendContextFunction.unapply(type5), Some(type5))
   }
 }

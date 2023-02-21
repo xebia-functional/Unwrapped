@@ -436,6 +436,36 @@ trait CompilerFixtures { self: FunSuite =>
     teardown = _ => ()
   )
 
+  val zeroAritySuspendSuspendingValDef = FunFixture[Context ?=> ValDef](
+    setup = _ => {
+      ValDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, ctxFunctionTpe).asTerm,
+        inlinedCallToContinuationsSuspendOfInt
+      )
+    },
+    teardown = _ => ()
+  )
+
+  val zeroAritySuspendNonSuspendingValDef = FunFixture[Context ?=> ValDef](
+    setup = _ => {
+      ValDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, ctxFunctionTpe).asTerm,
+        Literal(Constant(10))
+      )
+    },
+    teardown = _ => ()
+  )
+
+  val zeroAritySuspendSuspendingNotInLastRowValDef = FunFixture[Context ?=> ValDef](
+    setup = _ => {
+      ValDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, ctxFunctionTpe).asTerm,
+        inlinedCallToContinuationsSuspendOfIntNotInLastRow
+      )
+    },
+    teardown = _ => ()
+  )
+
   val rightOneApply: FunFixture[Context ?=> Apply] =
     FunFixture(setup = _ => rightOne, teardown = _ => ())
 
@@ -726,6 +756,17 @@ trait CompilerFixtures { self: FunSuite =>
 
   val continutationsContextAndMethodCallWithoutSuspend =
     FunFixture.map2(compilerContextWithContinuationsPlugin, methodCallWithoutSuspend)
+
+  val continuationsContextAndZeroAritySuspendSuspendingValDef =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, zeroAritySuspendSuspendingValDef)
+
+  val continuationsContextAndZeroAritySuspendNonSuspendingValDef =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, zeroAritySuspendNonSuspendingValDef)
+
+  val continuationsContextAndZeroAritySuspendSuspendingNotInLastRowValDef =
+    FunFixture.map2(
+      compilerContextWithContinuationsPlugin,
+      zeroAritySuspendSuspendingNotInLastRowValDef)
 
   def checkCompile(checkAfterPhase: String, source: String)(assertion: (Tree, Context) => Unit)(
       using Context): Context = {

@@ -351,8 +351,8 @@ object DefDefTransforms extends TreesChecks:
     val (methodReturnType, _, _) =
       getReturnTypeBodyContextFunctionOwner(tree)
 
-    val completionType = Types.OrType(methodReturnType, ctx.definitions.AnyType, false)
-    val completion = generateCompletion(parent, completionType)
+    val completion =
+      generateCompletion(parent, Types.OrType(methodReturnType, ctx.definitions.AnyType, false))
 
     val transformedMethodParams = params(tree, completion)
 
