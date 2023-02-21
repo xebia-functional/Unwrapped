@@ -23,12 +23,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-2") {
@@ -43,12 +39,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-3") {
@@ -63,12 +55,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-4") {
@@ -84,12 +72,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-5") {
@@ -104,12 +88,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-6") {
@@ -124,12 +104,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-7") {
@@ -145,12 +121,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-8") {
@@ -166,12 +138,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-9") {
@@ -187,12 +155,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-10") {
@@ -208,12 +172,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-11") {
@@ -229,12 +189,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-12") {
@@ -250,12 +206,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-13") {
@@ -272,12 +224,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-14") {
@@ -292,12 +240,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-15") {
@@ -312,12 +256,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-16") {
@@ -333,12 +273,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-17") {
@@ -357,12 +293,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-18") {
@@ -381,12 +313,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-19") {
@@ -405,12 +333,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-20") {
@@ -428,12 +352,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-21") {
@@ -452,12 +372,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-22") {
@@ -477,12 +393,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function def-23") {
@@ -506,12 +418,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-1") {
@@ -526,12 +434,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-2") {
@@ -546,12 +450,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-3") {
@@ -566,12 +466,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-4") {
@@ -587,12 +483,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-5") {
@@ -607,12 +499,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-6") {
@@ -627,12 +515,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-7") {
@@ -648,12 +532,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-8") {
@@ -669,12 +549,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-9") {
@@ -690,12 +566,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-10") {
@@ -711,12 +583,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-11") {
@@ -732,12 +600,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-12") {
@@ -753,12 +617,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-13") {
@@ -773,12 +633,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-14") {
@@ -793,12 +649,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-15") {
@@ -814,12 +666,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-16") {
@@ -838,12 +686,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-17") {
@@ -862,12 +706,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-18") {
@@ -885,12 +725,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-19") {
@@ -909,12 +745,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-20") {
@@ -934,12 +766,8 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
 
   compilerContextWithContinuationsPlugin.snapshotTest("context function val-21") {
@@ -963,10 +791,6 @@ class ContextFunctionsSnapshotSuite extends SnapshotSuite, CompilerFixtures:
           |}
           |""".stripMargin
 
-      var resultTree: Option[Tree] = None
-      checkContinuations(source) {
-        case (tree, _) =>
-          resultTree = Some(tree)
-      }
-      snapshotValue(resultTree.get)
+      val (resultTree, _) = collectContinuationTree(source)
+      snapshotValue(resultTree)
   }
