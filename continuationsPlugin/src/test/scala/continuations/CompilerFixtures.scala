@@ -112,8 +112,6 @@ import dotty.tools.dotc.core.Phases.Phase
 import dotty.tools.dotc.core.Symbols
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Types.{ContextualMethodType, MethodType, Type, TypeRef}
-import munit.FunSuite
-import scala.util.Properties
 import dotty.tools.dotc.core.Names
 import dotty.tools.dotc.core.Flags
 import dotty.tools.dotc.core.Flags.EmptyFlags
@@ -122,6 +120,8 @@ import dotty.tools.dotc.core.Types
 import dotty.tools.dotc.ast.Trees
 import dotty.tools.dotc.core.Definitions
 import dotty.tools.dotc.core.StdNames.nme
+import munit.FunSuite
+import scala.util.Properties
 
 trait CompilerFixtures { self: FunSuite =>
 

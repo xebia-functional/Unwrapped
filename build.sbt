@@ -35,9 +35,11 @@ lazy val root = // I
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
-lazy val continuationsPlugin = project.settings(
-  continuationsPluginSettings: _*
-)
+lazy val continuationsPlugin = project
+  .settings(
+    continuationsPluginSettings: _*
+  )
+  .dependsOn(`munit-snap` % "test -> compile")
 
 lazy val continuationsPluginExample = project
   .dependsOn(continuationsPlugin)
