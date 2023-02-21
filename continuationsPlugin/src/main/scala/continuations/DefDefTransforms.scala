@@ -128,7 +128,7 @@ object DefDefTransforms extends TreesChecks:
       parent.coord
     )
 
-  private def updateReturnTypeWithoutSuspendWithAny(typ: Type, updateWithAny: Boolean)(
+  private def removeSuspendUpdateWithAny(typ: Type, updateWithAny: Boolean)(
       using Context): Type =
     flattenTypes(typ).foldRight(ref(defn.AnyType).tpe) {
       case (defn.FunctionOf(args, _, ic, ie), inner) =>
@@ -161,7 +161,7 @@ object DefDefTransforms extends TreesChecks:
       using Context): (Type, tpd.Tree, Option[Symbol]) =
     if (ReturnsContextFunctionWithSuspendType.unapply(tree).nonEmpty)
       val returnType =
-        updateReturnTypeWithoutSuspendWithAny(tree.tpt.tpe, updateWithAny = false)
+        removeSuspendUpdateWithAny(tree.tpt.tpe, updateWithAny = false)
 
       val (rhs, contextFunctionOwner) = tree.rhs match
         case tpd.Block(List(d @ tpd.DefDef(_, _, _, _)), _) if d.symbol.isAnonymousFunction =>
@@ -360,7 +360,7 @@ object DefDefTransforms extends TreesChecks:
       createTransformedMethodSymbol(
         parent,
         transformedMethodParams,
-        updateReturnTypeWithoutSuspendWithAny(methodReturnType, updateWithAny = true)
+        removeSuspendUpdateWithAny(methodReturnType, updateWithAny = true)
       )
 
     parent.owner.unforcedDecls.openForMutations.replace(parent, transformedMethodSymbol)
@@ -384,7 +384,7 @@ object DefDefTransforms extends TreesChecks:
       treeMap = {
         case defdef: tpd.DefDef if defdef.symbol.isAnonymousFunction =>
           val tpt: Type =
-            updateReturnTypeWithoutSuspendWithAny(defdef.tpt.tpe, updateWithAny = true)
+            removeSuspendUpdateWithAny(defdef.tpt.tpe, updateWithAny = true)
 
           val params: List[tpd.ParamClause] =
             defdef
