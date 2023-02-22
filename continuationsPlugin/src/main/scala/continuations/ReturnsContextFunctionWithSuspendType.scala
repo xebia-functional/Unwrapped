@@ -20,7 +20,6 @@ private[continuations] object ReturnsContextFunctionWithSuspendType:
   def unapply(tree: tpd.ValOrDefDef)(using c: Context): Option[tpd.Tree] =
     Option(tree).filter { t =>
       val tpe = t.tpt.tpe
-      IsSuspendContextFunction.unapply(tpe).isDefined || IsSuspendContextFunction
-        .unapply(tpe.underlyingIfProxy)
-        .isDefined
+      IsSuspendContextFunction.unapply(tpe).isDefined ||
+      IsSuspendContextFunction.unapply(tpe.underlyingIfProxy).isDefined
     }

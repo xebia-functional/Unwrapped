@@ -3,6 +3,8 @@ package continuations
 import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Contexts.{ctx, Context}
 import dotty.tools.dotc.core.Flags
+import dotty.tools.dotc.core.Names.Name
+import dotty.tools.dotc.core.StdNames.nme
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.plugins.PluginPhase
 import dotty.tools.dotc.plugins.StandardPlugin
@@ -10,6 +12,7 @@ import dotty.tools.dotc.transform.PickleQuotes
 import dotty.tools.dotc.transform.Staging
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 class ContinuationsPlugin extends StandardPlugin:
 
@@ -29,6 +32,9 @@ class ContinuationsPhase extends PluginPhase:
 
   override val runsAfter = Set(Staging.name)
   override val runsBefore = Set(ContinuationsCallsPhase.name)
+
+  override def transformValDef(tree: ValDef)(using Context): Tree =
+    DefDefTransforms.transformSuspendContinuation(tree)
 
   override def transformDefDef(tree: DefDef)(using ctx: Context): Tree =
     DefDefTransforms.transformSuspendContinuation(tree)
@@ -54,6 +60,35 @@ class ContinuationsCallsPhase extends PluginPhase:
   override val runsBefore = Set(PickleQuotes.name)
 
   private val updatedMethods: mutable.ListBuffer[Symbol] = mutable.ListBuffer.empty
+  private val applyToChange: mutable.ListBuffer[Tree] = ListBuffer.empty
+
+  private def existsTree(tree: Tree)(using Context): Option[Symbol] =
+    updatedMethods.toList.find { s =>
+      tree.existsSubTree(t => s.name == t.symbol.name && s.coord == t.symbol.coord)
+    }
+
+  private def findTree(tree: Tree)(using Context): Option[Symbol] =
+    updatedMethods.toList.find(s => s.name == tree.symbol.name && s.coord == tree.symbol.coord)
+
+  private def treeIsSuspendAndNotInApplyToChange(tree: Apply)(using Context): Boolean =
+    tree.filterSubTrees(CallsSuspendParameter.unapply(_).nonEmpty).nonEmpty &&
+      !applyToChange.exists(_.filterSubTrees(_.sameTree(tree)).nonEmpty)
+
+  private def treeExistsIsApplyAndIsNotInApplyToChange(tree: Apply, n: Name)(
+      using Context): Boolean =
+    existsTree(tree).nonEmpty &&
+      n.asTermName == nme.apply &&
+      treeIsSuspendAndNotInApplyToChange(tree)
+
+  private def removeSuspend(trees: List[Tree])(using Context): List[Tree] =
+    trees.filterNot(_.tpe.hasClassSymbol(requiredClass(suspendFullName)))
+
+  private def treeExistsAndIsMethod(tree: Tree)(using Context): Boolean =
+    existsTree(tree).exists(_.is(Flags.Method))
+
+  private def treeExistsIsApplyAndIsMethod(tree: Tree, n: Name)(using Context): Boolean =
+    n.asTermName == nme.apply &&
+      treeExistsAndIsMethod(tree)
 
   override def prepareForDefDef(tree: DefDef)(using Context): Context =
     val hasContinuationParam =
@@ -67,41 +102,61 @@ class ContinuationsCallsPhase extends PluginPhase:
 
     ctx
 
-  override def transformApply(tree: Apply)(using ctx: Context): Tree =
-    def findTree(tree: Tree): Option[Symbol] =
-      updatedMethods
-        .toList
-        .find(s => s.name == tree.symbol.name && s.coord == tree.symbol.coord)
+  override def prepareForApply(tree: Apply)(using Context): Context =
+    tree match
+      case Apply(Apply(_, _), _)
+          if existsTree(tree).nonEmpty && treeIsSuspendAndNotInApplyToChange(tree) =>
+        applyToChange.addOne(tree)
+      case Apply(Select(_, selected), _)
+          if treeExistsIsApplyAndIsNotInApplyToChange(tree, selected) =>
+        applyToChange.addOne(tree)
+      case Apply(TypeApply(Select(_, selected), _), _)
+          if treeExistsIsApplyAndIsNotInApplyToChange(tree, selected) =>
+        applyToChange.addOne(tree)
+      case Apply(Ident(_), _)
+          if findTree(tree).nonEmpty && treeIsSuspendAndNotInApplyToChange(tree) =>
+        applyToChange.addOne(tree)
+      case _ =>
+        ()
+    ctx
 
+  override def transformApply(tree: Apply)(using ctx: Context): Tree =
     val continuation: Tree = ref(
       requiredModule("continuations.jvm.internal.ContinuationStub").requiredMethod("contImpl"))
 
-    val applyArgsWithContinuation: List[Tree] =
-      tree
-        .filterSubTrees {
-          case Apply(_, _) => true
-          case _ => false
+    if (applyToChange.exists(_.sameTree(tree)))
+      val (paramsNonCF, paramsCF) =
+        tree.deepFold((List(List.empty[Tree]), List(List.empty[Tree]))) {
+          case (
+                (accNonCF, accCF),
+                Apply(TypeApply(Select(qualifier, selected), argsType), args))
+              if treeExistsIsApplyAndIsMethod(qualifier, selected) =>
+            (accNonCF, accCF.prepended(removeSuspend(args)).prepended(removeSuspend(argsType)))
+          case ((accNonCF, accCF), Apply(Select(qualifier, selected), args))
+              if treeExistsIsApplyAndIsMethod(qualifier, selected) =>
+            (accNonCF, accCF.prepended(removeSuspend(args)))
+          case ((accNonCF, accCF), Apply(fun, args)) if treeExistsAndIsMethod(fun) =>
+            (accNonCF.prepended(removeSuspend(args)), accCF)
+          case (acc, _) => acc
         }
-        .map {
-          case Apply(fun, args) if !fun.isInstanceOf[Select] =>
-            args.filterNot(_.tpe.hasClassSymbol(requiredClass(suspendFullName)))
-          case _ =>
-            List.empty
-        }
-        .reverse
-        .flatten :+ continuation
 
-    tree match
-      case Apply(Apply(_, _), _)
-          if findTree(tree).nonEmpty && CallsSuspendParameter.unapply(tree).nonEmpty =>
-        ref(findTree(tree).get).appliedToTermArgs(applyArgsWithContinuation)
-      // method apply when it is a context function
-      case Apply(Select(Apply(fn, _), selected), _)
-          if findTree(fn).nonEmpty &&
-            selected.asTermName.toString == "apply" &&
-            CallsSuspendParameter.unapply(tree).nonEmpty =>
-        ref(findTree(fn).get).appliedToTermArgs(applyArgsWithContinuation)
-      case _ => tree
+      paramsCF
+        .filterNot(_.isEmpty)
+        .foldLeft(ref(existsTree(tree).get)
+          .appliedToTermArgs(paramsNonCF.flatten :+ continuation): Tree) { (parent, value) =>
+          val hasTypeTree = value.exists {
+            case _: TypeTree => true
+            case _ => false
+          }
+
+          if (hasTypeTree)
+            parent.select(nme.apply).appliedToTypeTrees(value)
+          else
+            parent match
+              case _: TypeApply => parent.appliedToTermArgs(value)
+              case _ => parent.select(nme.apply).appliedToTermArgs(value)
+        }
+    else tree
 
 end ContinuationsCallsPhase
 

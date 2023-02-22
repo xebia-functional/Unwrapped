@@ -13,7 +13,9 @@ import continuations.jvm.internal.ContinuationImpl
   val result4 = programSuspendContinuationNoParamResumeIgnoreResult
   println(result4)
   println(programSuspendContinuationParamDependent)
-  demoPrints
+  println(programSuspendContinuationResumeVals)
+  println(programOneContinuationReturnValue)
+  println(programSuspendContinuationNoSuspendContinuationVal)
 
 object main$handler extends (Continuation[Any | Null] => Any):
   override def apply($completion: Continuation[Any | Null]): Any =

@@ -24,63 +24,21 @@ class CallsSuspendContinuationSuite extends FunSuite, CompilerFixtures:
       assertNoDiff(CallsSuspendContinuation.unapply(defdef).get.toString, defdef.toString)
   }
 
-  compilerContextWithContinuationsPlugin.test(
-    "CallsContinuationResumeWith#unapply(defDefTree): def mySuspend()(using Suspend): Int = 10 should be None") {
-    case given Context =>
-      import tpd.*
+  continuationsContextAndZeroAritySuspendNonSuspendingDefDef.test(
+    "CallsContinuationResumeWith#unapply(defDefTree): def mySuspend()(using Suspend): Int = 1 should be None") {
+    case (given Context, defdef) =>
+      assertEquals(CallsSuspendContinuation.unapply(defdef), None)
+  }
 
-      val suspend = requiredClass(suspendFullName)
-      val continuation = requiredModule(continuationFullName)
+  continuationsContextAndZeroAritySuspendSuspendingValDef.test(
+    "CallsContinuationResumeWith#unapply(valDefTree): val mySuspend: Suspend ?=> Int = " +
+      "summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) } should be Some(mySuspend)") {
+    case (given Context, valdef) =>
+      assertNoDiff(CallsSuspendContinuation.unapply(valdef).get.toString, valdef.toString)
+  }
 
-      val intType = ctx.definitions.IntType
-
-      val usingSuspend =
-        newSymbol(ctx.owner, termName("x$1"), union(GivenOrImplicit, Param), suspend.info)
-
-      val anonFunc =
-        newAnonFun(ctx.owner, continuation.companionClass.info)
-
-      val continuationVal = newSymbol(
-        ctx.owner,
-        termName("continuation"),
-        EmptyFlags,
-        continuation.companionClass.typeRef.appliedTo(intType)
-      )
-
-      val rhs =
-        Inlined(
-          Apply(
-            TypeApply(
-              Apply(
-                ref(suspend).select(termName("suspendContinuation")),
-                List(ref(suspend))
-              ),
-              List(TypeTree(intType))),
-            List(
-              Block(
-                Nil,
-                Block(
-                  List(
-                    DefDef(
-                      anonFunc,
-                      List(List(continuationVal)),
-                      ctx.definitions.UnitType,
-                      Block(Nil, ref(ctx.definitions.UnitClass))
-                    )),
-                  Closure(Nil, ref(anonFunc), TypeTree(ctx.definitions.UnitType))
-                )
-              ))
-          ),
-          List.empty,
-          EmptyTree
-        )
-
-      val d = DefDef(
-        newSymbol(ctx.owner, termName("mySuspend"), EmptyFlags, intType).asTerm,
-        List(List(), List(usingSuspend)),
-        intType,
-        tpd.Literal(Constant(10))
-      )
-
-      assertEquals(CallsSuspendContinuation.unapply(d), None)
+  continuationsContextAndZeroAritySuspendNonSuspendingValDef.test(
+    "CallsContinuationResumeWith#unapply(valDefTree): val mySuspend: Suspend ?=> Int = 10 should be None") {
+    case (given Context, valdef) =>
+      assertEquals(CallsSuspendContinuation.unapply(valdef), None)
   }

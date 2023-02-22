@@ -191,3 +191,27 @@ def programSuspendContinuationResumeVals: Int =
     }
 
   fooTest()
+
+def programOneContinuationReturnValue: Int =
+  def zeroArgumentsSingleResumeContinuationsBeforeAfter()(using Suspend): Int =
+    println("Hello")
+    val x = 1
+    summon[Suspend].suspendContinuation[Unit] { continuation =>
+      continuation.resume(Right(println(x)))
+    }
+    println("World")
+    2
+  zeroArgumentsSingleResumeContinuationsBeforeAfter()
+
+def programSuspendContinuationNoSuspendContinuationVal: Int =
+  val fooTest: Suspend ?=> [A] => List[A] => [B] => List[B] => List[A] => List[A] => Int =
+    [A] =>
+      (x: List[A]) =>
+        [B] =>
+          (y: List[B]) =>
+            (q: List[A]) =>
+              (p: List[A]) =>
+                val z = 1
+                x.size + y.size + q.size + p.size + z
+
+  fooTest(List(1))(List("A", "B"))(List(1, 1, 1))(List(1, 1, 1, 1))

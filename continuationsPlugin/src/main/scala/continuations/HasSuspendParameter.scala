@@ -22,16 +22,16 @@ private[continuations] object HasSuspendParameter:
    *   a [[scala.Some]] if the tree has a using [[continuations.Suspend]] parameter,
    *   [[scala.None]] otherwise
    */
-  def unapply(tree: tpd.Tree)(using c: Context): Option[tpd.Tree] =
-    if (tree.isDef && tree
-        .asInstanceOf[tpd.DefDef]
-        .paramss
-        .exists(_.exists { v =>
-          v.denot.symbol.is { Flags.Given } && v
-            .tpe
-            .classSymbol
-            .info
-            .hasClassSymbol(Symbols.requiredClass(suspendFullName))
-        })) {
-      Option(tree)
-    } else None
+  def unapply(tree: tpd.ValOrDefDef)(using c: Context): Option[tpd.Tree] =
+    tree match {
+      case defDef: tpd.DefDef
+          if defDef
+            .paramss
+            .exists(_.exists { v =>
+              v.denot.symbol.is {
+                Flags.Given
+              } && v.tpe.classSymbol.info.hasClassSymbol(Symbols.requiredClass(suspendFullName))
+            }) =>
+        Option(tree)
+      case _ => None
+    }

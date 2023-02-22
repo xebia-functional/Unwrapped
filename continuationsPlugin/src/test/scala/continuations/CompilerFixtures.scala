@@ -112,8 +112,6 @@ import dotty.tools.dotc.core.Phases.Phase
 import dotty.tools.dotc.core.Symbols
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Types.{ContextualMethodType, MethodType, Type, TypeRef}
-import munit.FunSuite
-import scala.util.Properties
 import dotty.tools.dotc.core.Names
 import dotty.tools.dotc.core.Flags
 import dotty.tools.dotc.core.Flags.EmptyFlags
@@ -122,6 +120,8 @@ import dotty.tools.dotc.core.Types
 import dotty.tools.dotc.ast.Trees
 import dotty.tools.dotc.core.Definitions
 import dotty.tools.dotc.core.StdNames.nme
+import munit.FunSuite
+import scala.util.Properties
 
 trait CompilerFixtures { self: FunSuite =>
 
@@ -436,6 +436,36 @@ trait CompilerFixtures { self: FunSuite =>
     teardown = _ => ()
   )
 
+  val zeroAritySuspendSuspendingValDef = FunFixture[Context ?=> ValDef](
+    setup = _ => {
+      ValDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, ctxFunctionTpe).asTerm,
+        inlinedCallToContinuationsSuspendOfInt
+      )
+    },
+    teardown = _ => ()
+  )
+
+  val zeroAritySuspendNonSuspendingValDef = FunFixture[Context ?=> ValDef](
+    setup = _ => {
+      ValDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, ctxFunctionTpe).asTerm,
+        Literal(Constant(10))
+      )
+    },
+    teardown = _ => ()
+  )
+
+  val zeroAritySuspendSuspendingNotInLastRowValDef = FunFixture[Context ?=> ValDef](
+    setup = _ => {
+      ValDef(
+        Symbols.newSymbol(owner, mySuspendName, EmptyFlags, ctxFunctionTpe).asTerm,
+        inlinedCallToContinuationsSuspendOfIntNotInLastRow
+      )
+    },
+    teardown = _ => ()
+  )
+
   val rightOneApply: FunFixture[Context ?=> Apply] =
     FunFixture(setup = _ => rightOne, teardown = _ => ())
 
@@ -726,6 +756,17 @@ trait CompilerFixtures { self: FunSuite =>
 
   val continutationsContextAndMethodCallWithoutSuspend =
     FunFixture.map2(compilerContextWithContinuationsPlugin, methodCallWithoutSuspend)
+
+  val continuationsContextAndZeroAritySuspendSuspendingValDef =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, zeroAritySuspendSuspendingValDef)
+
+  val continuationsContextAndZeroAritySuspendNonSuspendingValDef =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, zeroAritySuspendNonSuspendingValDef)
+
+  val continuationsContextAndZeroAritySuspendSuspendingNotInLastRowValDef =
+    FunFixture.map2(
+      compilerContextWithContinuationsPlugin,
+      zeroAritySuspendSuspendingNotInLastRowValDef)
 
   def checkCompile(checkAfterPhase: String, source: String)(assertion: (Tree, Context) => Unit)(
       using Context): Context = {
