@@ -128,9 +128,10 @@ object DefDefTransforms extends TreesChecks:
       parent.coord
     )
 
-  private def removeSuspendUpdateWithAny(typ: Type, updateWithAny: Boolean)(
-      using Context): Type =
-    flattenTypes(typ).foldRight(ref(defn.AnyType).tpe) {
+  private def removeSuspend(typ: Type, returnValue: Option[Type] = None)(using Context): Type =
+    val types = flattenTypes(typ)
+
+    types.foldRight(returnValue.getOrElse(types.last)) {
       case (defn.FunctionOf(args, _, ic, ie), inner) =>
         val argsWithoutSuspend =
           args.filterNot(_.hasClassSymbol(requiredClass(suspendFullName)))
@@ -152,16 +153,17 @@ object DefDefTransforms extends TreesChecks:
             resultType = MethodType(paramNames = mtp)(
               paramInfosExp = _ => mt.paramInfos,
               resultTypeExp = _ => inner)))
-      case (t, inner) =>
-        if (updateWithAny) inner
-        else t
+      case (_, inner) =>
+        inner
     }
+
+  private def removeSuspendReturnAny(typ: Type)(using Context): Type =
+    removeSuspend(typ, Some(ref(defn.AnyType).tpe))
 
   private def getReturnTypeBodyContextFunctionOwner(tree: tpd.ValOrDefDef)(
       using Context): (Type, tpd.Tree, Option[Symbol]) =
     if (ReturnsContextFunctionWithSuspendType.unapply(tree).nonEmpty)
-      val returnType =
-        removeSuspendUpdateWithAny(tree.tpt.tpe, updateWithAny = false)
+      val returnType = removeSuspend(tree.tpt.tpe)
 
       val (rhs, contextFunctionOwner) = tree.rhs match
         case tpd.Block(List(d @ tpd.DefDef(_, _, _, _)), _) if d.symbol.isAnonymousFunction =>
@@ -360,7 +362,7 @@ object DefDefTransforms extends TreesChecks:
       createTransformedMethodSymbol(
         parent,
         transformedMethodParams,
-        removeSuspendUpdateWithAny(methodReturnType, updateWithAny = true)
+        removeSuspendReturnAny(methodReturnType)
       )
 
     parent.owner.unforcedDecls.openForMutations.replace(parent, transformedMethodSymbol)
@@ -383,19 +385,14 @@ object DefDefTransforms extends TreesChecks:
     val substituteContinuation = new TreeTypeMap(
       treeMap = {
         case defdef: tpd.DefDef if defdef.symbol.isAnonymousFunction =>
-          val tpt: Type =
-            removeSuspendUpdateWithAny(defdef.tpt.tpe, updateWithAny = true)
+          val tpt: Type = removeSuspendReturnAny(defdef.tpt.tpe)
 
-          val params: List[tpd.ParamClause] =
-            defdef
-              .paramss
-              .flatMap(_.flatMap {
-                case p: tpd.ValDef
-                    if p.symbol.info.hasClassSymbol(requiredClass(suspendFullName)) =>
-                  List.empty
-                case p: tpd.ValDef => List(List(p))
-                case p: tpd.TypeDef => List(List(p))
-              })
+          val params: List[tpd.ParamClause] = new TreeTypeMap(treeMap = {
+            case p: tpd.ValDef
+                if p.symbol.info.hasClassSymbol(requiredClass(suspendFullName)) =>
+              tpd.EmptyTree
+            case t => t
+          }).transformParamss(defdef.paramss)
 
           val newMethodOwner: Option[Symbol] =
             if (defdef.symbol.owner.is(Method) &&
