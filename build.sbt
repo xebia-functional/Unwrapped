@@ -36,10 +36,11 @@ lazy val root = // I
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
 lazy val continuationsPlugin = project
+  .configs(IntegrationTest)
   .settings(
     continuationsPluginSettings: _*
   )
-  .dependsOn(`munit-snap` % "test -> compile")
+  .dependsOn(`munit-snap`)
 
 lazy val continuationsPluginExample = project
   .dependsOn(continuationsPlugin)
@@ -142,15 +143,18 @@ lazy val scalafxSettings: Seq[Def.Setting[_]] =
     )
   )
 
+def testAndIntegrationTest(m: ModuleID): List[ModuleID] = List(m).flatMap { m =>
+  List(m % Test, m % IntegrationTest)
+}
+
 lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
-  Seq(
+  Defaults.itSettings ++ Seq(
     exportJars := true,
     autoAPIMappings := true,
     Test / fork := true,
     libraryDependencies ++= List(
-      "org.scala-lang" %% "scala3-compiler" % "3.1.2",
-      munit % Test
-    ),
+      "org.scala-lang" %% "scala3-compiler" % "3.1.2"
+    ) ++ testAndIntegrationTest(munit),
     Test / javaOptions += {
       val `scala-compiler-classpath` =
         (Compile / dependencyClasspath)
@@ -170,7 +174,9 @@ lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
           s"${(continuationsPlugin / Compile / packageBin).value}"
         s"""-Dscala-compiler-plugin=${`scala-compiler-options`}"""
       }
-    }.value
+    }.value,
+    IntegrationTest / fork := true,
+    IntegrationTest / javaOptions := (Test / javaOptions).value
   )
 
 lazy val continuationsPluginExampleShowTreeSettings: Seq[Def.Setting[_]] =

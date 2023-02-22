@@ -121,7 +121,6 @@ import dotty.tools.dotc.ast.Trees
 import dotty.tools.dotc.core.Definitions
 import dotty.tools.dotc.core.StdNames.nme
 import munit.FunSuite
-import scala.concurrent.Promise
 import scala.util.Properties
 
 trait CompilerFixtures { self: FunSuite =>
@@ -780,15 +779,6 @@ trait CompilerFixtures { self: FunSuite =>
   def checkContinuations(source: String)(assertion: (Tree, Context) => Unit)(
       using Context): Context = {
     checkCompile("pickleQuotes", source)(assertion)
-  }
-
-  def collectContinuationTree(source: String)(using Context): (Tree, Context) = {
-    val promise: Promise[(Tree, Context)] = Promise[(Tree, Context)]
-    checkContinuations(source) {
-      case (tree, context) =>
-        promise.complete(scala.util.Try(tree, context))
-    }
-    promise.future.value.get.get
   }
 
   def checkTypes(source: String, typeStrings: String*)(
