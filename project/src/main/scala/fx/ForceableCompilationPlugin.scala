@@ -80,15 +80,12 @@ object ForceableCompilationPlugin extends AutoPlugin {
 
         sbt.io.IO.createDirectories(Seq(new java.io.File(classesDir)))
 
-        log.info(s"Compile scalacOptions: ${(Compile / scalacOptions).value}")
-
         val compileSources = (Compile / sources).value.map(_.getAbsolutePath)
 
         // format: off
         val compileCommand =
           s"cs launch scalac:${(Compile / scalaVersion).value} -- ${(Compile / scalacOptions).value.mkString(" ")} -classpath ${(Compile / dependencyClasspath).value.map(_.data.getAbsolutePath).mkString(":")} -d ${(Compile / classDirectory).value.getAbsolutePath} ${compileSources.mkString(" ")}"
         // format: on
-        log.info(s"compile command: $compileCommand")
 
         val compilerMessages = compileCommand.lineStream.mkString
 

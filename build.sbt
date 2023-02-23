@@ -33,6 +33,14 @@ lazy val root = // I
     `munit-snap`
   )
 
+lazy val bypassZinc = (project in file("./bypassZinc")).aggregate(
+  continuationsPluginExample,
+  `zero-arguments-no-continuation-treeview`,
+  `zero-arguments-one-continuation-code-before-used-after`,
+  `list-map`,
+  `two-arguments-two-continuations`
+)
+
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
 lazy val continuationsPlugin = project
@@ -191,9 +199,9 @@ lazy val continuationsPluginExampleShowTreeSettings: Seq[Def.Setting[_]] =
     resolvers += Resolver.mavenLocal,
     forceCompilation := true,
     Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
-    Compile / scalacOptions += "-Xprint:continuations",
-    Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}",
-    Test / scalacOptions += "-Xprint:continuations"
+    Compile / scalacOptions += "-Xprint:continuationsCallsPhase",
+    Test / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
+    Test / scalacOptions += "-Xprint:continuationsCallsPhase"
   )
 
 lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
