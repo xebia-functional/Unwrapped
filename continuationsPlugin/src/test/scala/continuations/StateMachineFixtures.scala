@@ -1200,12 +1200,12 @@ trait StateMachineFixtures {
        |                if $result.!=(null) then
        |                  $result.fold[Unit](
        |                    {
-       |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+       |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
        |                      closure($anonfun)
        |                    }
        |                  ,
        |                    {
-       |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+       |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
        |                      closure($anonfun)
        |                    }
        |                  )
@@ -1237,12 +1237,12 @@ trait StateMachineFixtures {
        |                if $result.!=(null) then
        |                  $result.fold[Unit](
        |                    {
-       |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+       |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
        |                      closure($anonfun)
        |                    }
        |                  ,
        |                    {
-       |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+       |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
        |                      closure($anonfun)
        |                    }
        |                  )
@@ -1340,12 +1340,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -1382,12 +1382,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -1485,12 +1485,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -1523,12 +1523,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -1646,12 +1646,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -1700,12 +1700,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -1775,12 +1775,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -1866,12 +1866,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -1987,12 +1987,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2041,12 +2041,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2115,12 +2115,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2196,12 +2196,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2305,12 +2305,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2351,12 +2351,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2408,12 +2408,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2512,12 +2512,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2547,12 +2547,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2591,12 +2591,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2704,12 +2704,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2750,12 +2750,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2815,12 +2815,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2887,12 +2887,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -2995,12 +2995,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -3033,12 +3033,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -3080,12 +3080,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -3196,12 +3196,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -3245,12 +3245,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -3313,12 +3313,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -3424,12 +3424,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -3477,12 +3477,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -3539,12 +3539,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -4122,12 +4122,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -4184,12 +4184,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -4255,12 +4255,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -4367,12 +4367,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -4420,12 +4420,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -4482,12 +4482,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -4592,12 +4592,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -4645,12 +4645,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -4707,12 +4707,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -4817,12 +4817,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -4871,12 +4871,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -4933,12 +4933,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -5043,12 +5043,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -5097,12 +5097,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -5159,12 +5159,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -5269,12 +5269,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -5324,12 +5324,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -5386,12 +5386,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -5496,12 +5496,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -5551,12 +5551,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -5613,12 +5613,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -5726,12 +5726,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -5790,12 +5790,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -5861,12 +5861,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -5974,12 +5974,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -6038,12 +6038,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -6110,12 +6110,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -6226,12 +6226,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -6299,12 +6299,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -6380,12 +6380,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -6493,12 +6493,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -6557,12 +6557,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -6630,12 +6630,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -6746,12 +6746,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -6819,12 +6819,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -6901,12 +6901,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -7017,12 +7017,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -7090,12 +7090,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -7172,12 +7172,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -7291,12 +7291,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -7364,12 +7364,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -7447,12 +7447,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -7567,12 +7567,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -7640,12 +7640,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -7723,12 +7723,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -7844,12 +7844,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -7917,12 +7917,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -8000,12 +8000,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -8121,12 +8121,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -8194,12 +8194,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -8277,12 +8277,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -8399,12 +8399,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -8472,12 +8472,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
@@ -8554,12 +8554,12 @@ trait StateMachineFixtures {
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
-      |                      def $anonfun(val x$0: Throwable): Nothing = throw x$0
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
       |                      closure($anonfun)
       |                    }
       |                  ,
       |                    {
-      |                      def $anonfun(val x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
       |                      closure($anonfun)
       |                    }
       |                  )
