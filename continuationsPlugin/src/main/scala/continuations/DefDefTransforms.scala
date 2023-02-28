@@ -25,6 +25,8 @@ import scala.collection.mutable.ListBuffer
 
 object DefDefTransforms extends TreesChecks:
 
+  def flattenBlock(b: tpd.Block): tpd.Block = ???
+
   private def generateCompletion(owner: Symbol, returnType: Type)(using Context): Symbol =
     newSymbol(
       owner,

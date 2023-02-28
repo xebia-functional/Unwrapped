@@ -174,7 +174,7 @@ trait CompilerFixtures { self: FunSuite =>
       }
     }
 
-  val compilerContextWithContinuationsPlugin = FunFixture(
+  lazy val compilerContextWithContinuationsPlugin = FunFixture(
     setup = _ => {
       val base = new ContextBase {}
       val compilerPlugin = Properties.propOrEmpty("scala-compiler-plugin")
@@ -910,6 +910,30 @@ trait CompilerFixtures { self: FunSuite =>
 
   lazy val inlinedCallToContinuationsSuspendOfIntNotInLastRow: Context ?=> Block =
     Block(List(inlinedCallToContinuationsSuspendOfInt), Literal(Constant(10)))
+
+  val flattenableNestedBlock = FunFixture[Context ?=> Block](
+    setup = _ => { Block(List(), Block(List(), Literal(Constant(1)))) },
+    teardown = _ => ())
+
+  val unflattenableNestedBlock = FunFixture[Context ?=> Block](
+    setup = _ => {
+      Block(
+        List(),
+        Block(
+          List(
+            Lambda(
+              MethodType.apply(List(defn.ThrowableType))(_ => defn.NothingType),
+              trees => Throw(trees.head))),
+          Literal(Constant(1))))
+    },
+    teardown = _ => ()
+  )
+
+  val continuationsContextAndFlattenableNestedBlock =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, flattenableNestedBlock)
+
+  val continuationsContextAndUnflattenableNestedBlock =
+    FunFixture.map2(compilerContextWithContinuationsPlugin, unflattenableNestedBlock)
 
   private lazy val suspend: Context ?=> Symbol =
     Symbols.requiredClass("continuations.Suspend")
