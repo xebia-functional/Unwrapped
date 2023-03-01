@@ -8578,4 +8578,214 @@ trait StateMachineFixtures {
       |  }
       |}
       |""".stripMargin
+
+  val expectedStateMachineContinuationsInNonCompanionObject =
+    """
+      |package continuations {
+      |  final lazy module val ExampleObject: continuations.ExampleObject = new continuations.ExampleObject()
+      |  @SourceFile("compileFromString.scala") final module class ExampleObject() extends Object() {
+      |    this: continuations.ExampleObject.type =>
+      |    private def writeReplace(): AnyRef = new scala.runtime.ModuleSerializationProxy(classOf[continuations.ExampleObject.type])
+      |    private[this] def method1(x: Int): Int = x.+(1)
+      |    protected val z1: Int = 1
+      |    class ExampleObject$continuations$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl(
+      |      $completion
+      |    , $completion.context) {
+      |      var I$0: Any = _
+      |      var I$1: Any = _
+      |      var I$2: Any = _
+      |      var I$3: Any = _
+      |      def I$0_=(x$0: Any): Unit = ()
+      |      def I$1_=(x$0: Any): Unit = ()
+      |      def I$2_=(x$0: Any): Unit = ()
+      |      def I$3_=(x$0: Any): Unit = ()
+      |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
+      |      var $label: Int = _
+      |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
+      |      def $label_=(x$0: Int): Unit = ()
+      |      protected override def invokeSuspend(
+      |        result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]
+      |      ): Any | Null =
+      |        {
+      |          this.$result = result
+      |          this.$label = this.$label.|(scala.Int.MinValue)
+      |          continuations.ExampleObject.continuations(null, null, this.asInstanceOf[continuations.Continuation[Int]])
+      |        }
+      |    }
+      |    def continuations(x: Int, y: Int, completion: continuations.Continuation[Int]):
+      |      Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
+      |     =
+      |      {
+      |        var x##1: Int = x
+      |        var y##1: Int = y
+      |        var suspension1: Int = null
+      |        var suspension2: Int = null
+      |        {
+      |          var $continuation: continuations.Continuation[Any] | Null = null
+      |          completion match
+      |            {
+      |              case x$0 @ <empty> if
+      |                x$0.isInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].&&(
+      |                  x$0.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label.&(scala.Int.MinValue).!=(0)
+      |                )
+      |               =>
+      |                $continuation = x$0.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1]
+      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label =
+      |                  $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label.-(scala.Int.MinValue)
+      |              case _ =>
+      |                $continuation =
+      |                  new continuations.ExampleObject.ExampleObject$continuations$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |            }
+      |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
+      |            $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$result
+      |          $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label match
+      |            {
+      |              case 0 =>
+      |                if $result.!=(null) then
+      |                  $result.fold[Unit](
+      |                    {
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
+      |                      closure($anonfun)
+      |                    }
+      |                  ,
+      |                    {
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      closure($anonfun)
+      |                    }
+      |                  )
+      |                 else ()
+      |                def method2(x: Int): Int = x.+(1)
+      |                val z2: Int = 1
+      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0 = y##1
+      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1 = x##1
+      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label = 1
+      |                val safeContinuation: continuations.SafeContinuation[Int] =
+      |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
+      |                    continuations.Continuation.State.Undecided
+      |                  )
+      |                def method3(x: Int): Int = 1
+      |                val z3: Int = 1
+      |                safeContinuation.resume(
+      |                  {
+      |                    val z4: Int = 1
+      |                    def method4(x: Int): Int = 1
+      |                    Right.apply[Nothing, Int](
+      |                      continuations.ExampleObject.method1(x##1).+(1).+(continuations.ExampleObject.z1).+(z2).+(method2(y##1)).+(z3).+(method3(x##1)).
+      |                        +
+      |                      (z4).+(method4(x##1))
+      |                    )
+      |                  }
+      |                )
+      |                1
+      |                1
+      |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
+      |                  safeContinuation.getOrThrow()
+      |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+      |                suspension1 = orThrow.asInstanceOf[Int]
+      |                return[label1] ()
+      |                ()
+      |              case 1 =>
+      |                y##1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0
+      |                x##1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1
+      |                if $result.!=(null) then
+      |                  $result.fold[Unit](
+      |                    {
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
+      |                      closure($anonfun)
+      |                    }
+      |                  ,
+      |                    {
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      closure($anonfun)
+      |                    }
+      |                  )
+      |                 else ()
+      |                suspension1 = $result.asInstanceOf[Int]
+      |                label1[Unit]: <empty>
+      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0 = y##1
+      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1 = x##1
+      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$2 = suspension1
+      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label = 2
+      |                val safeContinuation: continuations.SafeContinuation[Int] =
+      |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
+      |                    continuations.Continuation.State.Undecided
+      |                  )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](continuations.ExampleObject.method1(x##1).+(1)))
+      |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
+      |                  safeContinuation.getOrThrow()
+      |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+      |                return[label2] ()
+      |                ()
+      |              case 2 =>
+      |                y##1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0
+      |                x##1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1
+      |                suspension1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$2
+      |                if $result.!=(null) then
+      |                  $result.fold[Unit](
+      |                    {
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
+      |                      closure($anonfun)
+      |                    }
+      |                  ,
+      |                    {
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      closure($anonfun)
+      |                    }
+      |                  )
+      |                 else ()
+      |                label2[Unit]: <empty>
+      |                val z5: Int = suspension1
+      |                def method5(x: Int): Int = x
+      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0 = y##1
+      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1 = x##1
+      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$2 = suspension1
+      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label = 3
+      |                val safeContinuation: continuations.SafeContinuation[Int] =
+      |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
+      |                    continuations.Continuation.State.Undecided
+      |                  )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z5.+(suspension1).+(method5(y##1))))
+      |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
+      |                  safeContinuation.getOrThrow()
+      |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+      |                suspension2 = orThrow.asInstanceOf[Int]
+      |                ()
+      |              case 3 =>
+      |                y##1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0
+      |                x##1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1
+      |                suspension1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$2
+      |                if $result.!=(null) then
+      |                  $result.fold[Unit](
+      |                    {
+      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
+      |                      closure($anonfun)
+      |                    }
+      |                  ,
+      |                    {
+      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+      |                      closure($anonfun)
+      |                    }
+      |                  )
+      |                 else ()
+      |                suspension2 = $result.asInstanceOf[Int]
+      |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
+      |            }
+      |        }
+      |        val z6: Int = 1
+      |        def method6(x: Int): Int = x
+      |        1.+(suspension1).+(suspension2).+(z6).+(continuations.ExampleObject.method1(x##1)).+(method2(x##1)).+(method5(x##1)).+(method6(x##1))
+      |      }
+      |  }
+      |  final lazy module val compileFromString$package:
+      |    continuations.compileFromString$package
+      |   = new continuations.compileFromString$package()
+      |  @SourceFile("compileFromString.scala") final module class
+      |    compileFromString$package
+      |  () extends Object() { this: continuations.compileFromString$package.type =>
+      |    private def writeReplace(): AnyRef =
+      |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+      |    def foo: Int = continuations.ExampleObject.continuations(1, 2, continuations.jvm.internal.ContinuationStub.contImpl)
+      |  }
+      |}
+      |""".stripMargin
 }
