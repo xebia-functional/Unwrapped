@@ -459,7 +459,6 @@ object DefDefTransforms extends TreesChecks:
           ).transform(defdef.rhs)
         case c: tpd.Closure =>
           newAnonFunctions
-            .toList
             .find(
               _.paramSymss
                 .flatten
@@ -670,7 +669,7 @@ object DefDefTransforms extends TreesChecks:
               defn.UnitType)
           ).entered
 
-        val (rowsBeforeSuspensionPoint, rowsAfterLastSuspensionPoint)
+        val (nonDefDefRowsBeforeSuspensionPoint, rowsAfterLastSuspensionPoint)
             : (Map[tpd.Tree, List[tpd.Tree]], List[tpd.Tree]) =
           rhs
             .toList
@@ -679,36 +678,46 @@ object DefDefTransforms extends TreesChecks:
               case tree => List(tree)
             }
             .foldLeft((0, Map.empty[tpd.Tree, List[tpd.Tree]], List.empty[tpd.Tree])) {
-              case ((suspensionPointsCounter, rowsBefore, rowsAfterLast), row) =>
+              case ((suspensionPointsCounter, nonDefDefRowsBefore, rowsAfterLast), row) =>
                 if (treeCallsSuspend(row) || valDefTreeCallsSuspend(row))
-                  (
-                    suspensionPointsCounter + 1,
-                    rowsBefore.updatedWith(suspensionPoints(suspensionPointsCounter)) {
-                      case None => Option(List.empty)
-                      case rows => rows
-                    },
-                    rowsAfterLast)
+                  val rowsBefore =
+                    row match
+                      case _: tpd.DefDef =>
+                        nonDefDefRowsBefore
+                      case _ =>
+                        nonDefDefRowsBefore.updatedWith(
+                          suspensionPoints(suspensionPointsCounter)) {
+                          case None => Option(List.empty)
+                          case rows => rows
+                        }
+
+                  (suspensionPointsCounter + 1, rowsBefore, rowsAfterLast)
                 else if (suspensionPointsCounter < suspensionPointsSize)
-                  (
-                    suspensionPointsCounter,
-                    rowsBefore.updatedWith(suspensionPoints(suspensionPointsCounter)) {
-                      case Some(ll) => Option(ll :+ row)
-                      case None => Option(row :: Nil)
-                    },
-                    rowsAfterLast)
-                else (suspensionPointsCounter, rowsBefore, row :: rowsAfterLast)
+                  val rowsBefore =
+                    row match
+                      case _: tpd.DefDef =>
+                        nonDefDefRowsBefore
+                      case _ =>
+                        nonDefDefRowsBefore.updatedWith(
+                          suspensionPoints(suspensionPointsCounter)) {
+                          case Some(ll) => Option(ll :+ row)
+                          case None => Option(row :: Nil)
+                        }
+
+                  (suspensionPointsCounter, rowsBefore, rowsAfterLast)
+                else (suspensionPointsCounter, nonDefDefRowsBefore, row :: rowsAfterLast)
             }
             .drop(1)
 
         val treesBeforeSuspendUsedAfterwards: List[tpd.Tree] =
-          rowsBeforeSuspensionPoint
+          nonDefDefRowsBeforeSuspensionPoint
             .toList
             .zipWithIndex
             .flatMap {
               case ((suspend, rows), i) =>
                 val rowsAfter =
-                  rowsBeforeSuspensionPoint.drop(i + 1).values.toList.flatten ++
-                    rowsBeforeSuspensionPoint.drop(i + 1).keySet ++
+                  nonDefDefRowsBeforeSuspensionPoint.drop(i + 1).values.toList.flatten ++
+                    nonDefDefRowsBeforeSuspensionPoint.drop(i + 1).keySet ++
                     rowsAfterLastSuspensionPoint
 
                 (rows :+ suspend).collect { case vd: tpd.ValDef => vd }.flatMap { vd =>
@@ -900,13 +909,13 @@ object DefDefTransforms extends TreesChecks:
             )
 
           val labels: List[Symbol] =
-            rowsBeforeSuspensionPoint.keySet.toList.indices.toList.map { i =>
+            nonDefDefRowsBeforeSuspensionPoint.keySet.toList.indices.toList.map { i =>
               newSymbol(newParent, termName(s"label$i"), Flags.Label, defn.UnitType).entered
             }
 
           def paramsAndRowsBeforeSuspendIncludingSuspend(index: Int) =
             transformedMethodParamsAsVals ++
-              rowsBeforeSuspensionPoint
+              nonDefDefRowsBeforeSuspensionPoint
                 .take(index + 1)
                 .transform { (suspend, rowsBefore) => rowsBefore :+ suspend }
                 .values
@@ -927,7 +936,7 @@ object DefDefTransforms extends TreesChecks:
               }
 
           val cases =
-            rowsBeforeSuspensionPoint.zipWithIndex.toList.map {
+            nonDefDefRowsBeforeSuspensionPoint.zipWithIndex.toList.map {
               case ((suspension, rowsBefore), i) =>
                 val label =
                   if (i > 0)
@@ -997,7 +1006,7 @@ object DefDefTransforms extends TreesChecks:
                     safeContinuationRef.select(termName("getOrThrow")).appliedToNone)
 
                 val assignGetOrThrowToGlobalVar =
-                  rowsBeforeSuspensionPoint.keySet.toList(i) match
+                  nonDefDefRowsBeforeSuspensionPoint.keySet.toList(i) match
                     case vd: tpd.ValDef =>
                       tpd.Assign(
                         globalVars.find { v =>
@@ -1011,7 +1020,7 @@ object DefDefTransforms extends TreesChecks:
                       tpd.EmptyTree
 
                 val assignResultToGlobalVar =
-                  rowsBeforeSuspensionPoint.keySet.toList.lift(i - 1) match
+                  nonDefDefRowsBeforeSuspensionPoint.keySet.toList.lift(i - 1) match
                     case Some(vd: tpd.ValDef) =>
                       tpd.Assign(
                         globalVars.find { v =>
@@ -1181,7 +1190,8 @@ object DefDefTransforms extends TreesChecks:
          * `suspendContinuation` as they are embedded in the state machine.
          */
         var c = 0
-        var rowsToRemove = rowsBeforeSuspensionPoint.values.toList.flatten.map(_.symbol.coord)
+        var rowsToRemove =
+          nonDefDefRowsBeforeSuspensionPoint.values.toList.flatten.map(_.symbol.coord)
         val substituteContinuation = new TreeTypeMap(
           treeMap = {
             case tree if valDefTreeCallsSuspend(tree) && c < suspensionPointsSize - 1 =>

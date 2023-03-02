@@ -74,7 +74,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
       continuationsCompilerSnapshot(source)
   }
 
-  compilerContextWithContinuationsPlugin.snapshotTest("test-3".ignore) {
+  compilerContextWithContinuationsPlugin.snapshotTest("test-3") {
     case given Context =>
       val source =
         """
@@ -99,7 +99,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
           |    def method3(x: Int) = x + 1
           |    val z3 = 1
           |
-          |    method1(x) + method1(x) + z1 + z3 + 1
+          |    method1(x) + method3(x) + z1 + z3 + 1
           |  }
           |}
           |""".stripMargin
@@ -218,7 +218,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
       continuationsCompilerSnapshot(source)
   }
 
-  compilerContextWithContinuationsPlugin.snapshotTest("test-6".ignore) {
+  compilerContextWithContinuationsPlugin.snapshotTest("test-6") {
     case given Context =>
       val source =
         """
@@ -243,7 +243,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
           |    val z4 = 1
           |
           |    val result1 = s.suspendContinuation[Int] { continuation =>
-          |      def method5(x: Int) = x + 1
+          |      def method5(x: Int) = 1
           |      val z5 = 1
           |
           |      continuation.resume(
@@ -264,7 +264,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
           |    val z7 = 1
           |
           |    val result2 = s.suspendContinuation[Int] { continuation =>
-          |      def method8(x: Int) = x + 1
+          |      def method8(x: Int) = 1
           |      val z8 = 1
           |
           |      continuation.resume(
@@ -320,7 +320,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
       continuationsCompilerSnapshot(source)
   }
 
-  compilerContextWithContinuationsPlugin.snapshotTest("test-cf-8".ignore) {
+  compilerContextWithContinuationsPlugin.snapshotTest("test-cf-8") {
     case given Context =>
       val source =
         """
@@ -336,7 +336,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
           |    val z1 = 1
           |
           |    summon[Suspend].suspendContinuation[Int] { continuation =>
-          |      def method2(x: Int) = x
+          |      def method2(x: Int) = 1
           |      val z2 = 1
           |
           |      continuation.resume(Right(method1(x) + method2(x) + z1 + z2 + 1))

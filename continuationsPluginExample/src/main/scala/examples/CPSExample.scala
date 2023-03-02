@@ -248,4 +248,4 @@ object ExampleObject:
     val z6 = 1
     def method6(x: Int) = x
 
-    1 + suspension1 + suspension2 + z6 + method1(x) + method6(x) // + method2(x) + method5(x)
+    1 + suspension1 + suspension2 + z6 + method1(x) + method2(x) + method5(x) + method6(x) 

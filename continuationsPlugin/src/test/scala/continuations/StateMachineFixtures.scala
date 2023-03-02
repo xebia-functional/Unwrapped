@@ -8620,6 +8620,8 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var suspension1: Int = null
       |        var suspension2: Int = null
+      |        def method2(x: Int): Int = x.+(1)
+      |        def method5(x: Int): Int = x
       |        {
       |          var $continuation: continuations.Continuation[Any] | Null = null
       |          completion match
@@ -8654,7 +8656,6 @@ trait StateMachineFixtures {
       |                    }
       |                  )
       |                 else ()
-      |                def method2(x: Int): Int = x.+(1)
       |                val z2: Int = 1
       |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0 = y##1
       |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1 = x##1
@@ -8735,7 +8736,6 @@ trait StateMachineFixtures {
       |                 else ()
       |                label2[Unit]: <empty>
       |                val z5: Int = suspension1
-      |                def method5(x: Int): Int = x
       |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0 = y##1
       |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1 = x##1
       |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$2 = suspension1
