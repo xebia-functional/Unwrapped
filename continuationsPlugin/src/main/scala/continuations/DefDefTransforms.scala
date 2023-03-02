@@ -7,7 +7,7 @@ import dotty.tools.dotc.ast.Trees.*
 import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Annotations.Annotation
 import dotty.tools.dotc.core.Constants.Constant
-import dotty.tools.dotc.core.Contexts.{ctx, Context}
+import dotty.tools.dotc.core.Contexts.{ctx, inContext, Context}
 import dotty.tools.dotc.core.{Flags, Names, Scopes, Symbols, Types}
 import dotty.tools.dotc.core.NullOpsDecorator.stripNull
 import dotty.tools.dotc.core.Flags.*
@@ -24,6 +24,24 @@ import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
 
 object DefDefTransforms extends TreesChecks:
+
+  def flattenBlock(b: tpd.Block)(using Context): tpd.Block =
+    b match {
+      case bb @ Trees.Block(Nil, _: tpd.Closure) => bb
+      case Trees.Block(Nil, bb @ tpd.Block(_, _)) => flattenBlock(bb)
+      case b => b
+    }
+
+  private class BlockFlattener(using Context) extends TreeMap {
+    override def transform(tree: tpd.Tree)(using Context): tpd.Tree =
+      tree match {
+        case bb @ Trees.Block(Nil, Trees.Block(Nil, Trees.Closure(_, _, _))) =>
+          super.transform(bb)
+        case Trees.Block(Nil, bb) =>
+          super.transform(bb)
+        case t => super.transform(t)
+      }
+  }
 
   private def generateCompletion(owner: Symbol, returnType: Type)(using Context): Symbol =
     newSymbol(
@@ -99,8 +117,10 @@ object DefDefTransforms extends TreesChecks:
       substTo = List.fill(removedAnonFunc.size)(safeContinuationRef.symbol.owner)
     )
 
+    val blockFlattener = new BlockFlattener()
+
     suspendContinuationResume.transformDefs(suspendContinuationBody) match
-      case (_, transforms) => transforms
+      case (_, transforms) => transforms.map(blockFlattener.transform)
   }
 
   private def createTransformedMethodSymbol(
@@ -1210,7 +1230,8 @@ object DefDefTransforms extends TreesChecks:
         val transformedMethodBody =
           substituteContinuation.transform(rhs) match
             case Trees.Block(stats, expr) =>
-              tpd.Block(transformedMethodParamsAsVals ++ globalVars ++ stats, expr)
+              val allStats = transformedMethodParamsAsVals ++ globalVars ++ stats
+              flattenBlock(tpd.Block(allStats, expr))
             case tree => tree
 
         val transformedTree =
