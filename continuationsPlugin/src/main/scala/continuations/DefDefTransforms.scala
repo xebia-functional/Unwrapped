@@ -7,7 +7,7 @@ import dotty.tools.dotc.ast.Trees.*
 import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Annotations.Annotation
 import dotty.tools.dotc.core.Constants.Constant
-import dotty.tools.dotc.core.Contexts.{ctx, Context}
+import dotty.tools.dotc.core.Contexts.{ctx, inContext, Context}
 import dotty.tools.dotc.core.{Flags, Names, Scopes, Symbols, Types}
 import dotty.tools.dotc.core.NullOpsDecorator.stripNull
 import dotty.tools.dotc.core.Flags.*
@@ -58,6 +58,18 @@ object DefDefTransforms extends TreesChecks:
     )
       ++ List(List(completion).asInstanceOf[tpd.ParamClause])).filterNot(_.isEmpty)
 
+  // last Phase:
+  private class BlockFlattener(using Context) extends TreeMap {
+    override def transform(tree: tpd.Tree)(using Context): tpd.Tree =
+      tree match {
+        case bb @ Trees.Block(Nil, Trees.Block(Nil, Trees.Closure(_, _, _))) =>
+          super.transform(bb)
+        case Trees.Block(Nil, bb) =>
+          super.transform(bb)
+        case t => super.transform(t)
+      }
+  }
+
   private def transformSuspendContinuationBody(
       callSuspensionPoint: tpd.Tree,
       safeContinuationRef: tpd.Tree)(using Context): List[tpd.Tree] = {
@@ -99,8 +111,10 @@ object DefDefTransforms extends TreesChecks:
       substTo = List.fill(removedAnonFunc.size)(safeContinuationRef.symbol.owner)
     )
 
+    val blockFlattener = new BlockFlattener()
+
     suspendContinuationResume.transformDefs(suspendContinuationBody) match
-      case (_, transforms) => transforms
+      case (_, transforms) => transforms.map(blockFlattener.transform)
   }
 
   private def createTransformedMethodSymbol(
