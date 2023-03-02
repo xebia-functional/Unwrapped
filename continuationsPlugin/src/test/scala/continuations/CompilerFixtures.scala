@@ -915,6 +915,14 @@ trait CompilerFixtures { self: FunSuite =>
     setup = _ => { Block(List(), Block(List(), Literal(Constant(1)))) },
     teardown = _ => ())
 
+  val expectedFlattenedBlock = FunFixture[Context ?=> Block](
+    setup = _ => Block(List(), Literal(Constant(1))),
+    teardown = _ => ())
+
+  val recursiveNestedBlock = FunFixture[Context ?=> Block](
+    setup = _ => { Block(Nil, (Block(Nil, Block(Nil, Literal(Constant(1)))))) },
+    teardown = _ => ())
+
   val unflattenableNestedBlock = FunFixture[Context ?=> Block](
     setup = _ => {
       Block(
@@ -930,10 +938,19 @@ trait CompilerFixtures { self: FunSuite =>
   )
 
   val continuationsContextAndFlattenableNestedBlock =
-    FunFixture.map2(compilerContextWithContinuationsPlugin, flattenableNestedBlock)
+    FunFixture.map3(
+      compilerContextWithContinuationsPlugin,
+      flattenableNestedBlock,
+      expectedFlattenedBlock)
 
   val continuationsContextAndUnflattenableNestedBlock =
     FunFixture.map2(compilerContextWithContinuationsPlugin, unflattenableNestedBlock)
+
+  val continuationsContextAndFlattenableRecursiveBlock =
+    FunFixture.map3(
+      compilerContextWithContinuationsPlugin,
+      recursiveNestedBlock,
+      expectedFlattenedBlock)
 
   private lazy val suspend: Context ?=> Symbol =
     Symbols.requiredClass("continuations.Suspend")

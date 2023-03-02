@@ -11,11 +11,10 @@ import munit.FunSuite
 class FlattenBlockSuite extends FunSuite, CompilerFixtures {
 
   continuationsContextAndFlattenableNestedBlock.test("It should flatten nested blocks") {
-    case (given Context, sourceBlock) =>
+    case (given Context, sourceBlock, expectedTree) =>
       val sourceTree =
         DefDefTransforms.flattenBlock(sourceBlock).show
-      val expectedTree = Block(List(), Literal(Constant(1))).show
-      assertNoDiff(sourceTree, expectedTree)
+      assertNoDiff(sourceTree, expectedTree.show)
   }
 
   continuationsContextAndUnflattenableNestedBlock.test(
@@ -30,6 +29,15 @@ class FlattenBlockSuite extends FunSuite, CompilerFixtures {
       val sourceTree =
         DefDefTransforms.flattenBlock(sourceBlock).show
       assertNoDiff(sourceTree, expectedTree)
+  }
+
+  continuationsContextAndFlattenableRecursiveBlock.test(
+    "It should flatten blocks recursively") {
+    case (given Context, recursiveSourceBlock, expectedTree) =>
+      val sourceTree =
+        DefDefTransforms.flattenBlock(recursiveSourceBlock).show
+      assertNoDiff(sourceTree, expectedTree.show)
+
   }
 
 }

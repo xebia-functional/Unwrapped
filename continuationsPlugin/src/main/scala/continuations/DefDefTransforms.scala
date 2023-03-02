@@ -28,7 +28,7 @@ object DefDefTransforms extends TreesChecks:
   def flattenBlock(b: tpd.Block)(using Context): tpd.Block =
     b match {
       case bb @ Trees.Block(Nil, _: tpd.Closure) => bb
-      case Trees.Block(Nil, bb @ tpd.Block(_, _)) => bb
+      case Trees.Block(Nil, bb @ tpd.Block(_, _)) => flattenBlock(bb)
       case b => b
     }
 
