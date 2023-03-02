@@ -28,9 +28,20 @@ object DefDefTransforms extends TreesChecks:
   def flattenBlock(b: tpd.Block)(using Context): tpd.Block =
     b match {
       case bb @ Trees.Block(Nil, _: tpd.Closure) => bb
-      case Trees.Block(Nil, bb @ tpd.Block(_Nil, _)) => bb
+      case Trees.Block(Nil, bb @ tpd.Block(_, _)) => bb
       case b => b
     }
+
+  private class BlockFlattener(using Context) extends TreeMap {
+    override def transform(tree: tpd.Tree)(using Context): tpd.Tree =
+      tree match {
+        case bb @ Trees.Block(Nil, Trees.Block(Nil, Trees.Closure(_, _, _))) =>
+          super.transform(bb)
+        case Trees.Block(Nil, bb) =>
+          super.transform(bb)
+        case t => super.transform(t)
+      }
+  }
 
   private def generateCompletion(owner: Symbol, returnType: Type)(using Context): Symbol =
     newSymbol(
@@ -64,18 +75,6 @@ object DefDefTransforms extends TreesChecks:
         case _: tpd.ValDef => List.empty
     )
       ++ List(List(completion).asInstanceOf[tpd.ParamClause])).filterNot(_.isEmpty)
-
-  // last Phase:
-  private class BlockFlattener(using Context) extends TreeMap {
-    override def transform(tree: tpd.Tree)(using Context): tpd.Tree =
-      tree match {
-        case bb @ Trees.Block(Nil, Trees.Block(Nil, Trees.Closure(_, _, _))) =>
-          super.transform(bb)
-        case Trees.Block(Nil, bb) =>
-          super.transform(bb)
-        case t => super.transform(t)
-      }
-  }
 
   private def transformSuspendContinuationBody(
       callSuspensionPoint: tpd.Tree,
