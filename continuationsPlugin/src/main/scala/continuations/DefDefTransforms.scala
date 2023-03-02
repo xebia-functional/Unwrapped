@@ -25,7 +25,12 @@ import scala.collection.mutable.ListBuffer
 
 object DefDefTransforms extends TreesChecks:
 
-  def flattenBlock(b: tpd.Block): tpd.Block = ???
+  def flattenBlock(b: tpd.Block)(using Context): tpd.Block =
+    b match {
+      case bb @ Trees.Block(Nil, _: tpd.Closure) => bb
+      case Trees.Block(Nil, bb @ tpd.Block(_Nil, _)) => bb
+      case b => b
+    }
 
   private def generateCompletion(owner: Symbol, returnType: Type)(using Context): Symbol =
     newSymbol(
@@ -1226,7 +1231,8 @@ object DefDefTransforms extends TreesChecks:
         val transformedMethodBody =
           substituteContinuation.transform(rhs) match
             case Trees.Block(stats, expr) =>
-              tpd.Block(transformedMethodParamsAsVals ++ globalVars ++ stats, expr)
+              val allStats = transformedMethodParamsAsVals ++ globalVars ++ stats
+              flattenBlock(tpd.Block(allStats, expr))
             case tree => tree
 
         val transformedTree =
