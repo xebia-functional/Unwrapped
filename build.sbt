@@ -46,7 +46,7 @@ lazy val continuationsPluginExample = project
   .dependsOn(continuationsPlugin)
   .settings(
     continuationsPluginExampleSettings: _*
-  )
+  ).enablePlugins(ForceableCompilationPlugin)
 
 lazy val `zero-arguments-no-continuation-treeview` =
   (project in file("./zero-arguments-no-continuation-treeview"))
@@ -194,6 +194,7 @@ lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
   Seq(
     publish / skip := true,
     autoCompilerPlugins := true,
+    forceCompilation := true,
     resolvers += Resolver.mavenLocal,
     Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
     Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}"
