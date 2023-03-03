@@ -197,7 +197,7 @@ lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
     forceCompilation := true,
     resolvers += Resolver.mavenLocal,
     Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
-    Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}"
+    Test / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}"
   )
 
 lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
