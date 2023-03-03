@@ -915,39 +915,65 @@ object DefDefTransforms extends TreesChecks:
       val completionMatch =
         tpd.Match(transformedMethodCompletionParam, List(case11, case12))
 
-      val $result =
-        tpd.ValDef(
-          newSymbol(
-            newParent,
-            termName("$result"),
-            Local,
-            eitherThrowableAnyNullSuspendedType).entered,
-          continuationAsStateMachineClass.select(resultVarName)
-        )
+      val resultSym: TermSymbol =
+        newSymbol(
+          newParent,
+          termName("$result"),
+          Local,
+          eitherThrowableAnyNullSuspendedType).entered
+
+      val $result = tpd.ValDef(resultSym, continuationAsStateMachineClass.select(resultVarName))
 
       val undecidedState =
         ref(continuationModule).select(termName("State")).select(termName("Undecided"))
 
-      def throwOnFailure =
-        tpd.If(
-          ref($result.symbol).select(nme.NotEquals).appliedTo(nullLiteral),
-          ref($result.symbol)
-            .select(termName("fold"))
-            .appliedToType(defn.UnitType)
-            .appliedTo(
-              tpd.Closure(
-                newAnonFun(
-                  newParent,
-                  MethodType(List(defn.ThrowableType))(_ => defn.NothingType)),
-                trees => tpd.Throw(trees.head.head)),
-              tpd.Closure(
-                newAnonFun(
-                  newParent,
-                  MethodType(List(anyNullSuspendedType))(_ => defn.UnitType)),
-                _ => unitLiteral)
-            ),
-          unitLiteral
-        )
+      val checkResultSym: TermSymbol = newSymbol(
+        transformedMethodSymbol,
+        termName("checkResult"),
+        Local,
+        defn.UnitType).entered
+
+      /*
+       ```
+       def checkResult: Unit =
+         if $result.!=(null) then
+           $result.fold[Unit](
+             {
+               def $anonfun(x$0: Throwable): Nothing = throw x$0
+               closure($anonfun)
+             }
+           ,
+             {
+               def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
+               closure($anonfun)
+             }
+           )
+         else ()
+       ```
+       */
+      val checkResultDef: tpd.DefDef = {
+        val throwOnFailure =
+          tpd.If(
+            ref($result.symbol).select(nme.NotEquals).appliedTo(nullLiteral),
+            ref($result.symbol)
+              .select(termName("fold"))
+              .appliedToType(defn.UnitType)
+              .appliedTo(
+                tpd.Closure(
+                  newAnonFun(
+                    newParent,
+                    MethodType(List(defn.ThrowableType))(_ => defn.NothingType)),
+                  trees => tpd.Throw(trees.head.head)),
+                tpd.Closure(
+                  newAnonFun(
+                    newParent,
+                    MethodType(List(anyNullSuspendedType))(_ => defn.UnitType)),
+                  _ => unitLiteral)
+              ),
+            unitLiteral
+          )
+        tpd.DefDef(checkResultSym, Nil, defn.UnitType, throwOnFailure)
+      }
 
       val labels: List[Symbol] =
         rowsBeforeSuspensionPoint.keySet.toList.indices.toList.map { i =>
@@ -1121,7 +1147,7 @@ object DefDefTransforms extends TreesChecks:
 
         val stats: List[tpd.Tree] = List(
           assignFromI$Ns,
-          List(throwOnFailure),
+          List(ref(checkResultSym)),
           List(assignResultToGlobalVar),
           List(label),
           rowsBefore.map(updateForGlobalVars),
@@ -1165,7 +1191,7 @@ object DefDefTransforms extends TreesChecks:
               continuationAsStateMachineClass.select(continuationStateMachineI$Ns(i).symbol)
             )
           } ++
-            List(throwOnFailure),
+            List(ref(checkResultSym)),
           suspensionPoints.lastOption match
             case Some(vd: tpd.ValDef) =>
               tpd.Assign(
@@ -1184,7 +1210,7 @@ object DefDefTransforms extends TreesChecks:
         )
         .withType(anyNullSuspendedType)
 
-      tpd.Block(List($continuation, completionMatch, $result), labelMatch)
+      tpd.Block(List($continuation, completionMatch, $result, checkResultDef), labelMatch)
     end transformSuspendTree
 
     val transformedMethodParamSymbols: List[Symbol] =
