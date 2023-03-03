@@ -73,7 +73,7 @@ trait StateMachineFixtures {
        |                }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |                $continuation.asInstanceOf[program$foo$1].$result
-       |              def checkResult: Unit = 
+       |              def $checkResult: Unit = 
        |                if $result.!=(null) then 
        |                  $result.fold[Unit](
        |                    {
@@ -90,7 +90,7 @@ trait StateMachineFixtures {
        |              $continuation.asInstanceOf[program$foo$1].$label match 
        |                {
        |                  case 0 => 
-       |                    checkResult
+       |                    $checkResult
        |                    $continuation.asInstanceOf[program$foo$1].$label = 1
        |                    val safeContinuation: continuations.SafeContinuation[Int] = 
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
@@ -102,7 +102,7 @@ trait StateMachineFixtures {
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    ()
        |                  case 1 => 
-       |                    checkResult
+       |                    $checkResult
        |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
@@ -164,7 +164,7 @@ trait StateMachineFixtures {
        |                }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |                $continuation.asInstanceOf[program$foo$1].$result
-       |              def checkResult: Unit = 
+       |              def $checkResult: Unit = 
        |                if $result.!=(null) then 
        |                  $result.fold[Unit](
        |                    {
@@ -181,7 +181,7 @@ trait StateMachineFixtures {
        |              $continuation.asInstanceOf[program$foo$1].$label match 
        |                {
        |                  case 0 => 
-       |                    checkResult
+       |                    $checkResult
        |                    $continuation.asInstanceOf[program$foo$1].I$0 = x##1
        |                    $continuation.asInstanceOf[program$foo$1].$label = 1
        |                    val safeContinuation: continuations.SafeContinuation[Int] = 
@@ -195,7 +195,7 @@ trait StateMachineFixtures {
        |                    ()
        |                  case 1 => 
        |                    x##1 = $continuation.asInstanceOf[program$foo$1].I$0
-       |                    checkResult
+       |                    $checkResult
        |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
@@ -254,7 +254,7 @@ trait StateMachineFixtures {
        |                }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |                $continuation.asInstanceOf[program$foo$1].$result
-       |              def checkResult: Unit = 
+       |              def $checkResult: Unit = 
        |                if $result.!=(null) then 
        |                  $result.fold[Unit](
        |                    {
@@ -271,7 +271,7 @@ trait StateMachineFixtures {
        |              $continuation.asInstanceOf[program$foo$1].$label match 
        |                {
        |                  case 0 => 
-       |                    checkResult
+       |                    $checkResult
        |                    $continuation.asInstanceOf[program$foo$1].$label = 1
        |                    val safeContinuation: continuations.SafeContinuation[Int] = 
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
@@ -284,7 +284,7 @@ trait StateMachineFixtures {
        |                    return[label1] ()
        |                    ()
        |                  case 1 => 
-       |                    checkResult
+       |                    $checkResult
        |                    label1[Unit]: <empty>
        |                    $continuation.asInstanceOf[program$foo$1].$label = 2
        |                    val safeContinuation: continuations.SafeContinuation[Boolean] = 
@@ -298,7 +298,7 @@ trait StateMachineFixtures {
        |                    return[label2] ()
        |                    ()
        |                  case 2 => 
-       |                    checkResult
+       |                    $checkResult
        |                    label2[Unit]: <empty>
        |                    $continuation.asInstanceOf[program$foo$1].$label = 3
        |                    val safeContinuation: continuations.SafeContinuation[String] = 
@@ -311,7 +311,7 @@ trait StateMachineFixtures {
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    ()
        |                  case 3 => 
-       |                    checkResult
+       |                    $checkResult
        |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
@@ -370,7 +370,7 @@ trait StateMachineFixtures {
        |                }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |                $continuation.asInstanceOf[program$foo$1].$result
-       |              def checkResult: Unit = 
+       |              def $checkResult: Unit = 
        |                if $result.!=(null) then 
        |                  $result.fold[Unit](
        |                    {
@@ -387,7 +387,7 @@ trait StateMachineFixtures {
        |              $continuation.asInstanceOf[program$foo$1].$label match 
        |                {
        |                  case 0 => 
-       |                    checkResult
+       |                    $checkResult
        |                    $continuation.asInstanceOf[program$foo$1].$label = 1
        |                    val safeContinuation: continuations.SafeContinuation[Int] = 
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
@@ -402,7 +402,7 @@ trait StateMachineFixtures {
        |                    return[label1] ()
        |                    ()
        |                  case 1 => 
-       |                    checkResult
+       |                    $checkResult
        |                    label1[Unit]: <empty>
        |                    $continuation.asInstanceOf[program$foo$1].$label = 2
        |                    val safeContinuation: continuations.SafeContinuation[Boolean] = 
@@ -417,7 +417,7 @@ trait StateMachineFixtures {
        |                    return[label2] ()
        |                    ()
        |                  case 2 => 
-       |                    checkResult
+       |                    $checkResult
        |                    label2[Unit]: <empty>
        |                    $continuation.asInstanceOf[program$foo$1].$label = 3
        |                    val safeContinuation: continuations.SafeContinuation[String] = 
@@ -432,7 +432,7 @@ trait StateMachineFixtures {
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    ()
        |                  case 3 => 
-       |                    checkResult
+       |                    $checkResult
        |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
@@ -491,7 +491,7 @@ trait StateMachineFixtures {
        |                }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |                $continuation.asInstanceOf[program$foo$1].$result
-       |              def checkResult: Unit = 
+       |              def $checkResult: Unit = 
        |                if $result.!=(null) then 
        |                  $result.fold[Unit](
        |                    {
@@ -508,7 +508,7 @@ trait StateMachineFixtures {
        |              $continuation.asInstanceOf[program$foo$1].$label match 
        |                {
        |                  case 0 => 
-       |                    checkResult
+       |                    $checkResult
        |                    println("Start")
        |                    $continuation.asInstanceOf[program$foo$1].$label = 1
        |                    val safeContinuation: continuations.SafeContinuation[Int] = 
@@ -522,7 +522,7 @@ trait StateMachineFixtures {
        |                    return[label1] ()
        |                    ()
        |                  case 1 => 
-       |                    checkResult
+       |                    $checkResult
        |                    label1[Unit]: <empty>
        |                    val x: String = "World"
        |                    println("Hello")
@@ -538,7 +538,7 @@ trait StateMachineFixtures {
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    ()
        |                  case 2 => 
-       |                    checkResult
+       |                    $checkResult
        |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
@@ -597,7 +597,7 @@ trait StateMachineFixtures {
        |              }
        |            val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |              $continuation.asInstanceOf[program$foo$1].$result
-       |            def checkResult: Unit = 
+       |            def $checkResult: Unit = 
        |              if $result.!=(null) then 
        |                $result.fold[Unit](
        |                  {
@@ -614,7 +614,7 @@ trait StateMachineFixtures {
        |            $continuation.asInstanceOf[program$foo$1].$label match 
        |              {
        |                case 0 => 
-       |                  checkResult
+       |                  $checkResult
        |                  $continuation.asInstanceOf[program$foo$1].$label = 1
        |                  val safeContinuation: continuations.SafeContinuation[Boolean] = 
        |                    new continuations.SafeContinuation[Boolean](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
@@ -627,7 +627,7 @@ trait StateMachineFixtures {
        |                  return[label1] ()
        |                  ()
        |                case 1 => 
-       |                  checkResult
+       |                  $checkResult
        |                  label1[Unit]: <empty>
        |                  $continuation.asInstanceOf[program$foo$1].$label = 2
        |                  val safeContinuation: continuations.SafeContinuation[String] = 
@@ -641,7 +641,7 @@ trait StateMachineFixtures {
        |                  return[label2] ()
        |                  ()
        |                case 2 => 
-       |                  checkResult
+       |                  $checkResult
        |                  label2[Unit]: <empty>
        |                  $continuation.asInstanceOf[program$foo$1].$label = 3
        |                  val safeContinuation: continuations.SafeContinuation[Int] = 
@@ -654,7 +654,7 @@ trait StateMachineFixtures {
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                  orThrow
        |                case 3 => 
-       |                  checkResult
+       |                  $checkResult
        |                  $result
        |                case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |              }
@@ -710,7 +710,7 @@ trait StateMachineFixtures {
        |              }
        |            val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |              $continuation.asInstanceOf[program$foo$1].$result
-       |            def checkResult: Unit = 
+       |            def $checkResult: Unit = 
        |              if $result.!=(null) then 
        |                $result.fold[Unit](
        |                  {
@@ -727,7 +727,7 @@ trait StateMachineFixtures {
        |            $continuation.asInstanceOf[program$foo$1].$label match 
        |              {
        |                case 0 => 
-       |                  checkResult
+       |                  $checkResult
        |                  $continuation.asInstanceOf[program$foo$1].$label = 1
        |                  val safeContinuation: continuations.SafeContinuation[Boolean] = 
        |                    new continuations.SafeContinuation[Boolean](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
@@ -741,7 +741,7 @@ trait StateMachineFixtures {
        |                  return[label1] ()
        |                  ()
        |                case 1 => 
-       |                  checkResult
+       |                  $checkResult
        |                  label1[Unit]: <empty>
        |                  $continuation.asInstanceOf[program$foo$1].$label = 2
        |                  val safeContinuation: continuations.SafeContinuation[String] = 
@@ -756,7 +756,7 @@ trait StateMachineFixtures {
        |                  return[label2] ()
        |                  ()
        |                case 2 => 
-       |                  checkResult
+       |                  $checkResult
        |                  label2[Unit]: <empty>
        |                  $continuation.asInstanceOf[program$foo$1].$label = 3
        |                  val safeContinuation: continuations.SafeContinuation[Int] = 
@@ -769,7 +769,7 @@ trait StateMachineFixtures {
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                  orThrow
        |                case 3 => 
-       |                  checkResult
+       |                  $checkResult
        |                  $result
        |                case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |              }
@@ -825,7 +825,7 @@ trait StateMachineFixtures {
        |              }
        |            val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |              $continuation.asInstanceOf[program$foo$1].$result
-       |            def checkResult: Unit = 
+       |            def $checkResult: Unit = 
        |              if $result.!=(null) then 
        |                $result.fold[Unit](
        |                  {
@@ -842,7 +842,7 @@ trait StateMachineFixtures {
        |            $continuation.asInstanceOf[program$foo$1].$label match 
        |              {
        |                case 0 => 
-       |                  checkResult
+       |                  $checkResult
        |                  println("Start")
        |                  val x: Int = 1
        |                  $continuation.asInstanceOf[program$foo$1].$label = 1
@@ -857,7 +857,7 @@ trait StateMachineFixtures {
        |                  return[label1] ()
        |                  ()
        |                case 1 => 
-       |                  checkResult
+       |                  $checkResult
        |                  label1[Unit]: <empty>
        |                  println("Hello")
        |                  $continuation.asInstanceOf[program$foo$1].$label = 2
@@ -872,7 +872,7 @@ trait StateMachineFixtures {
        |                  return[label2] ()
        |                  ()
        |                case 2 => 
-       |                  checkResult
+       |                  $checkResult
        |                  label2[Unit]: <empty>
        |                  $continuation.asInstanceOf[program$foo$1].$label = 3
        |                  val safeContinuation: continuations.SafeContinuation[Int] = 
@@ -885,7 +885,7 @@ trait StateMachineFixtures {
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                  orThrow
        |                case 3 => 
-       |                  checkResult
+       |                  $checkResult
        |                  $result
        |                case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |              }
@@ -973,7 +973,7 @@ trait StateMachineFixtures {
        |              continuations.compileFromString$package.
        |                compileFromString$package$foo$1
        |            ].$result
-       |          def checkResult: Unit = 
+       |          def $checkResult: Unit = 
        |            if $result.!=(null) then
        |              $result.fold[Unit](
        |                {
@@ -993,7 +993,7 @@ trait StateMachineFixtures {
        |          ].$label match
        |            {
        |              case 0 =>
-       |                checkResult
+       |                $checkResult
        |                $continuation.asInstanceOf[
        |                  continuations.compileFromString$package.
        |                    compileFromString$package$foo$1
@@ -1018,7 +1018,7 @@ trait StateMachineFixtures {
        |                    continuations.compileFromString$package.
        |                      compileFromString$package$foo$1
        |                  ].I$0
-       |                checkResult
+       |                $checkResult
        |                y = $result.asInstanceOf[Int]
        |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |            }
@@ -1103,7 +1103,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$foo$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -1123,7 +1123,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$foo$1
@@ -1147,7 +1147,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$foo$1
       |                  ].I$0
-      |                checkResult
+      |                $checkResult
       |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -1232,7 +1232,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$foo$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -1252,7 +1252,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                xx = 111
       |                println(xx)
       |                $continuation.asInstanceOf[
@@ -1278,7 +1278,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$foo$1
       |                  ].I$0
-      |                checkResult
+      |                $checkResult
       |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -1383,7 +1383,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -1403,7 +1403,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                pp = 11
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
@@ -1439,7 +1439,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$1
-      |                checkResult
+      |                $checkResult
       |                xx = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                ww = 13
@@ -1496,7 +1496,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                yy = $result.asInstanceOf[String]
       |                label2[Unit]: <empty>
       |                tt = 100
@@ -1569,7 +1569,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$5
-      |                checkResult
+      |                $checkResult
       |                zz = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -1672,7 +1672,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -1692,7 +1692,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                pp = 11
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
@@ -1728,7 +1728,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$1
-      |                checkResult
+      |                $checkResult
       |                xx = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                ww = 13
@@ -1784,7 +1784,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                label2[Unit]: <empty>
       |                tt = 100
       |                $continuation.asInstanceOf[
@@ -1847,7 +1847,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$4
-      |                checkResult
+      |                $checkResult
       |                zz = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -1938,7 +1938,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -1958,7 +1958,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                println("Hello")
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
@@ -1992,7 +1992,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$0
-      |                checkResult
+      |                $checkResult
       |                y = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val z: Int = 1
@@ -2037,7 +2037,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$1
-      |                checkResult
+      |                $checkResult
       |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -2123,7 +2123,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -2143,7 +2143,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -2160,7 +2160,7 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                checkResult
+      |                $checkResult
       |                x = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                $continuation.asInstanceOf[
@@ -2186,7 +2186,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$0
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -2281,7 +2281,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -2301,7 +2301,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                println("Hello")
       |                val z: Int = 100
       |                $continuation.asInstanceOf[
@@ -2329,7 +2329,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$0
-      |                checkResult
+      |                $checkResult
       |                x = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                j = 9
@@ -2376,7 +2376,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$2
-      |                checkResult
+      |                $checkResult
       |                w = $result.asInstanceOf[Int]
       |                label2[Unit]: <empty>
       |                println("World")
@@ -2430,7 +2430,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -2520,7 +2520,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -2540,7 +2540,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -2566,7 +2566,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$0
-      |                checkResult
+      |                $checkResult
       |                y = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                $continuation.asInstanceOf[
@@ -2601,7 +2601,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$1
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -2699,7 +2699,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -2719,7 +2719,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                q = 2
       |                val w: Int = 3
       |                $continuation.asInstanceOf[
@@ -2756,7 +2756,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$1
-      |                checkResult
+      |                $checkResult
       |                y = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                p = 1
@@ -2812,7 +2812,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -2905,7 +2905,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -2925,7 +2925,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -2960,7 +2960,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$1
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                $continuation.asInstanceOf[
@@ -3004,7 +3004,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$2
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -3121,7 +3121,7 @@ trait StateMachineFixtures {
       |                }
       |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |                $continuation.asInstanceOf[program$fooTest$1].$result
-      |              def checkResult: Unit = 
+      |              def $checkResult: Unit = 
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
@@ -3138,7 +3138,7 @@ trait StateMachineFixtures {
       |              $continuation.asInstanceOf[program$fooTest$1].$label match
       |                {
       |                  case 0 =>
-      |                    checkResult
+      |                    $checkResult
       |                    $continuation.asInstanceOf[program$fooTest$1].I$0 = b##1
       |                    $continuation.asInstanceOf[program$fooTest$1].I$1 = a##1
       |                    $continuation.asInstanceOf[program$fooTest$1].$label = 1
@@ -3156,7 +3156,7 @@ trait StateMachineFixtures {
       |                  case 1 =>
       |                    b##1 = $continuation.asInstanceOf[program$fooTest$1].I$0
       |                    a##1 = $continuation.asInstanceOf[program$fooTest$1].I$1
-      |                    checkResult
+      |                    $checkResult
       |                    z = $result.asInstanceOf[A]
       |                    label1[Unit]: <empty>
       |                    $continuation.asInstanceOf[program$fooTest$1].I$0 = b##1
@@ -3183,7 +3183,7 @@ trait StateMachineFixtures {
       |                    b##1 = $continuation.asInstanceOf[program$fooTest$1].I$0
       |                    a##1 = $continuation.asInstanceOf[program$fooTest$1].I$1
       |                    z = $continuation.asInstanceOf[program$fooTest$1].I$2
-      |                    checkResult
+      |                    $checkResult
       |                    $result
       |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |                }
@@ -3352,7 +3352,7 @@ trait StateMachineFixtures {
       |                }
       |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |                $continuation.asInstanceOf[program$fooTest$1].$result
-      |              def checkResult: Unit = 
+      |              def $checkResult: Unit = 
       |                if $result.!=(null) then
       |                  $result.fold[Unit](
       |                    {
@@ -3369,7 +3369,7 @@ trait StateMachineFixtures {
       |              $continuation.asInstanceOf[program$fooTest$1].$label match
       |                {
       |                  case 0 =>
-      |                    checkResult
+      |                    $checkResult
       |                    $continuation.asInstanceOf[program$fooTest$1].I$0 = b##1
       |                    $continuation.asInstanceOf[program$fooTest$1].I$1 = a##1
       |                    $continuation.asInstanceOf[program$fooTest$1].$label = 1
@@ -3387,7 +3387,7 @@ trait StateMachineFixtures {
       |                  case 1 =>
       |                    b##1 = $continuation.asInstanceOf[program$fooTest$1].I$0
       |                    a##1 = $continuation.asInstanceOf[program$fooTest$1].I$1
-      |                    checkResult
+      |                    $checkResult
       |                    z = $result.asInstanceOf[A]
       |                    label1[Unit]: <empty>
       |                    $continuation.asInstanceOf[program$fooTest$1].I$0 = b##1
@@ -3414,7 +3414,7 @@ trait StateMachineFixtures {
       |                    b##1 = $continuation.asInstanceOf[program$fooTest$1].I$0
       |                    a##1 = $continuation.asInstanceOf[program$fooTest$1].I$1
       |                    z = $continuation.asInstanceOf[program$fooTest$1].I$2
-      |                    checkResult
+      |                    $checkResult
       |                    $result
       |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |                }
@@ -3513,7 +3513,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -3533,7 +3533,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -3577,7 +3577,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$2
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                $continuation.asInstanceOf[
@@ -3630,7 +3630,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -3724,7 +3724,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -3744,7 +3744,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -3779,7 +3779,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$1
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                $continuation.asInstanceOf[
@@ -3823,7 +3823,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$2
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -3915,7 +3915,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -3935,7 +3935,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -3970,7 +3970,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$1
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                $continuation.asInstanceOf[
@@ -4014,7 +4014,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$2
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -4106,7 +4106,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -4126,7 +4126,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                println("Hello")
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
@@ -4162,7 +4162,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$1
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                $continuation.asInstanceOf[
@@ -4206,7 +4206,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$2
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -4298,7 +4298,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -4318,7 +4318,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                val w: Int = 1
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
@@ -4354,7 +4354,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$1
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                $continuation.asInstanceOf[
@@ -4398,7 +4398,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$2
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -4490,7 +4490,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -4510,7 +4510,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                println("Hello")
       |                println("World")
       |                $continuation.asInstanceOf[
@@ -4547,7 +4547,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$1
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                $continuation.asInstanceOf[
@@ -4591,7 +4591,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$2
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -4683,7 +4683,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -4703,7 +4703,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                println("Hello")
       |                val w: Int = 1
       |                $continuation.asInstanceOf[
@@ -4740,7 +4740,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$1
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                $continuation.asInstanceOf[
@@ -4784,7 +4784,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$2
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -4879,7 +4879,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -4899,7 +4899,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                a = 1
       |                val w: Int = 1
       |                $continuation.asInstanceOf[
@@ -4945,7 +4945,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$2
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                $continuation.asInstanceOf[
@@ -4998,7 +4998,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -5093,7 +5093,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -5113,7 +5113,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                a = 1
       |                val w: Int = 1
       |                $continuation.asInstanceOf[
@@ -5159,7 +5159,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$2
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                println("Hello")
@@ -5213,7 +5213,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -5311,7 +5311,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -5331,7 +5331,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                a = 1
       |                b = 1
       |                $continuation.asInstanceOf[
@@ -5386,7 +5386,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(1)
@@ -5449,7 +5449,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$4
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -5544,7 +5544,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -5564,7 +5564,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                val a: Int = 1
       |                b = 1
       |                $continuation.asInstanceOf[
@@ -5610,7 +5610,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$2
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                println("Hello")
@@ -5665,7 +5665,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -5763,7 +5763,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -5783,7 +5783,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                a = 1
       |                b = 1
       |                $continuation.asInstanceOf[
@@ -5838,7 +5838,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                println("Hello")
@@ -5902,7 +5902,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$4
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -6000,7 +6000,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -6020,7 +6020,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                a = 1
       |                b = 1
       |                $continuation.asInstanceOf[
@@ -6075,7 +6075,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(b)
@@ -6139,7 +6139,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$4
-      |                checkResult
+      |                $checkResult
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -6240,7 +6240,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -6260,7 +6260,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                a = 1
       |                b = 1
       |                $continuation.asInstanceOf[
@@ -6315,7 +6315,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(b)
@@ -6380,7 +6380,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$4
-      |                checkResult
+      |                $checkResult
       |                w = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -6482,7 +6482,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -6502,7 +6502,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                a = 1
       |                b = 1
       |                $continuation.asInstanceOf[
@@ -6557,7 +6557,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(b)
@@ -6622,7 +6622,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$4
-      |                checkResult
+      |                $checkResult
       |                w = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -6725,7 +6725,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -6745,7 +6745,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                a = 1
       |                b = 1
       |                $continuation.asInstanceOf[
@@ -6800,7 +6800,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(b)
@@ -6865,7 +6865,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$4
-      |                checkResult
+      |                $checkResult
       |                w = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -6968,7 +6968,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -6988,7 +6988,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                a = 1
       |                b = 1
       |                $continuation.asInstanceOf[
@@ -7043,7 +7043,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(b)
@@ -7108,7 +7108,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$4
-      |                checkResult
+      |                $checkResult
       |                w = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -7212,7 +7212,7 @@ trait StateMachineFixtures {
       |              continuations.compileFromString$package.
       |                compileFromString$package$fooTest$1
       |            ].$result
-      |          def checkResult: Unit = 
+      |          def $checkResult: Unit = 
       |            if $result.!=(null) then
       |              $result.fold[Unit](
       |                {
@@ -7232,7 +7232,7 @@ trait StateMachineFixtures {
       |          ].$label match
       |            {
       |              case 0 =>
-      |                checkResult
+      |                $checkResult
       |                a = 1
       |                b = 1
       |                $continuation.asInstanceOf[
@@ -7287,7 +7287,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$3
-      |                checkResult
+      |                $checkResult
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(b)
@@ -7351,7 +7351,7 @@ trait StateMachineFixtures {
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  ].I$4
-      |                checkResult
+      |                $checkResult
       |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }

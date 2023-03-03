@@ -929,7 +929,7 @@ object DefDefTransforms extends TreesChecks:
 
       val checkResultSym: TermSymbol = newSymbol(
         transformedMethodSymbol,
-        termName("checkResult"),
+        termName("$checkResult"),
         Local,
         defn.UnitType).entered
 
