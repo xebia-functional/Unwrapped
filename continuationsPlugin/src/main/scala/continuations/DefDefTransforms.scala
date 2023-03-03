@@ -883,12 +883,7 @@ object DefDefTransforms extends TreesChecks:
               .select(integerNE)
               .appliedTo(tpd.Literal(Constant(0x0)))),
         tpd.Block(
-          List(
-            tpd.Assign(
-              ref($continuation.symbol),
-              ref(case11Param)
-                .select(nme.asInstanceOf_)
-                .appliedToType(continuationStateMachineClass.tpe))),
+          List(tpd.Assign(ref($continuation.symbol), ref(case11Param))),
           tpd.Assign(
             $continuationLabel,
             $continuationLabel.select(defn.Int_-).appliedTo(integerMin))
