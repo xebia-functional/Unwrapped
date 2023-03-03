@@ -67,7 +67,7 @@ trait StateMachineFixtures {
        |              completion match 
        |                {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                    $continuation = x$0.asInstanceOf[program$foo$1]
+       |                    $continuation = x$0
        |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
        |                }
@@ -144,7 +144,7 @@ trait StateMachineFixtures {
        |              completion match 
        |                {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                    $continuation = x$0.asInstanceOf[program$foo$1]
+       |                    $continuation = x$0
        |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
        |                }
@@ -220,7 +220,7 @@ trait StateMachineFixtures {
        |              completion match 
        |                {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                    $continuation = x$0.asInstanceOf[program$foo$1]
+       |                    $continuation = x$0
        |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
        |                }
@@ -322,7 +322,7 @@ trait StateMachineFixtures {
        |              completion match 
        |                {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                    $continuation = x$0.asInstanceOf[program$foo$1]
+       |                    $continuation = x$0
        |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
        |                }
@@ -429,7 +429,7 @@ trait StateMachineFixtures {
        |              completion match 
        |                {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                    $continuation = x$0.asInstanceOf[program$foo$1]
+       |                    $continuation = x$0
        |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
        |                }
@@ -521,7 +521,7 @@ trait StateMachineFixtures {
        |            completion match 
        |              {
        |                case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                  $continuation = x$0.asInstanceOf[program$foo$1]
+       |                  $continuation = x$0
        |                  $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
        |              }
@@ -620,7 +620,7 @@ trait StateMachineFixtures {
        |            completion match 
        |              {
        |                case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                  $continuation = x$0.asInstanceOf[program$foo$1]
+       |                  $continuation = x$0
        |                  $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
        |              }
@@ -721,7 +721,7 @@ trait StateMachineFixtures {
        |            completion match 
        |              {
        |                case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                  $continuation = x$0.asInstanceOf[program$foo$1]
+       |                  $continuation = x$0
        |                  $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
        |              }
@@ -836,11 +836,7 @@ trait StateMachineFixtures {
        |                  ].$label.&(scala.Int.MinValue).!=(0)
        |                )
        |               =>
-       |                $continuation =
-       |                  x$0.asInstanceOf[
-       |                    continuations.compileFromString$package.
-       |                      compileFromString$package$foo$1
-       |                  ]
+       |                $continuation = x$0
        |                $continuation.asInstanceOf[
        |                  continuations.compileFromString$package.
        |                    compileFromString$package$foo$1
@@ -952,11 +948,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$foo$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$foo$1
@@ -1067,11 +1059,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$foo$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$foo$1
@@ -1204,11 +1192,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -1479,11 +1463,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -1731,11 +1711,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -1902,11 +1878,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -2046,11 +2018,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -2271,11 +2239,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -2436,11 +2400,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -2628,11 +2588,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -2849,7 +2805,7 @@ trait StateMachineFixtures {
       |                  case x$0 @ <empty> if
       |                    x$0.isInstanceOf[program$fooTest$1].&&(x$0.asInstanceOf[program$fooTest$1].$label.&(scala.Int.MinValue).!=(0))
       |                   =>
-      |                    $continuation = x$0.asInstanceOf[program$fooTest$1]
+      |                    $continuation = x$0
       |                    $continuation.asInstanceOf[program$fooTest$1].$label = $continuation.asInstanceOf[program$fooTest$1].$label.-(scala.Int.MinValue)
       |                  case _ => $continuation = new program$fooTest$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
       |                }
@@ -3066,7 +3022,7 @@ trait StateMachineFixtures {
       |                  case x$0 @ <empty> if
       |                    x$0.isInstanceOf[program$fooTest$1].&&(x$0.asInstanceOf[program$fooTest$1].$label.&(scala.Int.MinValue).!=(0))
       |                   =>
-      |                    $continuation = x$0.asInstanceOf[program$fooTest$1]
+      |                    $continuation = x$0
       |                    $continuation.asInstanceOf[program$fooTest$1].$label = $continuation.asInstanceOf[program$fooTest$1].$label.-(scala.Int.MinValue)
       |                  case _ => $continuation = new program$fooTest$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
       |                }
@@ -3194,11 +3150,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -3391,11 +3343,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -3568,11 +3516,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -3745,11 +3689,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -3923,11 +3863,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -4101,11 +4037,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -4280,11 +4212,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -4462,11 +4390,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -4662,11 +4586,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -4866,11 +4786,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -5085,11 +5001,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -5290,11 +5202,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -5513,11 +5421,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -5739,11 +5643,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -5967,11 +5867,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -6196,11 +6092,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -6425,11 +6317,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
@@ -6655,11 +6543,7 @@ trait StateMachineFixtures {
       |                  ].$label.&(scala.Int.MinValue).!=(0)
       |                )
       |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
+      |                $continuation = x$0
       |                $continuation.asInstanceOf[
       |                  continuations.compileFromString$package.
       |                    compileFromString$package$fooTest$1
