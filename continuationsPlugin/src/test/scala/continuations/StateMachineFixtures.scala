@@ -118,7 +118,6 @@ trait StateMachineFixtures {
        |          $completion.context
        |        ) {
        |          var I$0: Any = _
-       |          def I$0_=(x$0: Any): Unit = ()
        |          var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
        |          var $label: Int = _
        |          def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit
@@ -800,8 +799,6 @@ trait StateMachineFixtures {
        |    ($completion, $completion.context) {
        |      var I$0: Any = _
        |      var I$1: Any = _
-       |      def I$0_=(x$0: Any): Unit = ()
-       |      def I$1_=(x$0: Any): Unit = ()
        |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
        |      var $label: Int = _
        |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -914,7 +911,6 @@ trait StateMachineFixtures {
       |      continuations.jvm.internal.ContinuationImpl
       |    ($completion, $completion.context) {
       |      var I$0: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -1025,7 +1021,6 @@ trait StateMachineFixtures {
       |      continuations.jvm.internal.ContinuationImpl
       |    ($completion, $completion.context) {
       |      var I$0: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -1144,13 +1139,6 @@ trait StateMachineFixtures {
       |      var I$4: Any = _
       |      var I$5: Any = _
       |      var I$6: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
-      |      def I$4_=(x$0: Any): Unit = ()
-      |      def I$5_=(x$0: Any): Unit = ()
-      |      def I$6_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -1417,12 +1405,6 @@ trait StateMachineFixtures {
       |      var I$3: Any = _
       |      var I$4: Any = _
       |      var I$5: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
-      |      def I$4_=(x$0: Any): Unit = ()
-      |      def I$5_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -1673,8 +1655,6 @@ trait StateMachineFixtures {
       |    ($completion, $completion.context) {
       |      var I$0: Any = _
       |      var I$1: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -1844,7 +1824,6 @@ trait StateMachineFixtures {
       |      continuations.jvm.internal.ContinuationImpl
       |    ($completion, $completion.context) {
       |      var I$0: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -1976,10 +1955,6 @@ trait StateMachineFixtures {
       |      var I$1: Any = _
       |      var I$2: Any = _
       |      var I$3: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -2201,8 +2176,6 @@ trait StateMachineFixtures {
       |    ($completion, $completion.context) {
       |      var I$0: Any = _
       |      var I$1: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -2356,11 +2329,6 @@ trait StateMachineFixtures {
       |      var I$2: Any = _
       |      var I$3: Any = _
       |      var I$4: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
-      |      def I$4_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -2548,9 +2516,6 @@ trait StateMachineFixtures {
       |      var I$0: Any = _
       |      var I$1: Any = _
       |      var I$2: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -2773,9 +2738,6 @@ trait StateMachineFixtures {
       |          var I$0: Any = _
       |          var I$1: Any = _
       |          var I$2: Any = _
-      |          def I$0_=(x$0: Any): Unit = ()
-      |          def I$1_=(x$0: Any): Unit = ()
-      |          def I$2_=(x$0: Any): Unit = ()
       |          var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |          var $label: Int = _
       |          def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit
@@ -2990,9 +2952,6 @@ trait StateMachineFixtures {
       |          var I$0: Any = _
       |          var I$1: Any = _
       |          var I$2: Any = _
-      |          def I$0_=(x$0: Any): Unit = ()
-      |          def I$1_=(x$0: Any): Unit = ()
-      |          def I$2_=(x$0: Any): Unit = ()
       |          var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |          var $label: Int = _
       |          def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit
@@ -3108,10 +3067,6 @@ trait StateMachineFixtures {
       |      var I$1: Any = _
       |      var I$2: Any = _
       |      var I$3: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -3303,9 +3258,6 @@ trait StateMachineFixtures {
       |      var I$0: Any = _
       |      var I$1: Any = _
       |      var I$2: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -3476,9 +3428,6 @@ trait StateMachineFixtures {
       |      var I$0: Any = _
       |      var I$1: Any = _
       |      var I$2: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -3649,9 +3598,6 @@ trait StateMachineFixtures {
       |      var I$0: Any = _
       |      var I$1: Any = _
       |      var I$2: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -3823,9 +3769,6 @@ trait StateMachineFixtures {
       |      var I$0: Any = _
       |      var I$1: Any = _
       |      var I$2: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -3997,9 +3940,6 @@ trait StateMachineFixtures {
       |      var I$0: Any = _
       |      var I$1: Any = _
       |      var I$2: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -4172,9 +4112,6 @@ trait StateMachineFixtures {
       |      var I$0: Any = _
       |      var I$1: Any = _
       |      var I$2: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -4348,10 +4285,6 @@ trait StateMachineFixtures {
       |      var I$1: Any = _
       |      var I$2: Any = _
       |      var I$3: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -4544,10 +4477,6 @@ trait StateMachineFixtures {
       |      var I$1: Any = _
       |      var I$2: Any = _
       |      var I$3: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -4742,11 +4671,6 @@ trait StateMachineFixtures {
       |      var I$2: Any = _
       |      var I$3: Any = _
       |      var I$4: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
-      |      def I$4_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -4959,10 +4883,6 @@ trait StateMachineFixtures {
       |      var I$1: Any = _
       |      var I$2: Any = _
       |      var I$3: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -5158,11 +5078,6 @@ trait StateMachineFixtures {
       |      var I$2: Any = _
       |      var I$3: Any = _
       |      var I$4: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
-      |      def I$4_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -5377,11 +5292,6 @@ trait StateMachineFixtures {
       |      var I$2: Any = _
       |      var I$3: Any = _
       |      var I$4: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
-      |      def I$4_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -5597,12 +5507,6 @@ trait StateMachineFixtures {
       |      var I$3: Any = _
       |      var I$4: Any = _
       |      var I$5: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
-      |      def I$4_=(x$0: Any): Unit = ()
-      |      def I$5_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -5821,12 +5725,6 @@ trait StateMachineFixtures {
       |      var I$3: Any = _
       |      var I$4: Any = _
       |      var I$5: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
-      |      def I$4_=(x$0: Any): Unit = ()
-      |      def I$5_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -6046,12 +5944,6 @@ trait StateMachineFixtures {
       |      var I$3: Any = _
       |      var I$4: Any = _
       |      var I$5: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
-      |      def I$4_=(x$0: Any): Unit = ()
-      |      def I$5_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -6271,12 +6163,6 @@ trait StateMachineFixtures {
       |      var I$3: Any = _
       |      var I$4: Any = _
       |      var I$5: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
-      |      def I$4_=(x$0: Any): Unit = ()
-      |      def I$5_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()
@@ -6499,11 +6385,6 @@ trait StateMachineFixtures {
       |      var I$2: Any = _
       |      var I$3: Any = _
       |      var I$4: Any = _
-      |      def I$0_=(x$0: Any): Unit = ()
-      |      def I$1_=(x$0: Any): Unit = ()
-      |      def I$2_=(x$0: Any): Unit = ()
-      |      def I$3_=(x$0: Any): Unit = ()
-      |      def I$4_=(x$0: Any): Unit = ()
       |      var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
       |      var $label: Int = _
       |      def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit = ()

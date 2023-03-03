@@ -780,16 +780,6 @@ object DefDefTransforms extends TreesChecks:
 
     val continuationStateMachineClass: tpd.TypeDef =
 
-      def toContFsmSetter(vd: tpd.ValDef): tpd.DefDef = {
-        val sym = newSymbol(
-          continuationsStateMachineSymbol,
-          vd.symbol.asTerm.name.setterName,
-          Method | Flags.Accessor,
-          info = MethodType(vd.symbol.asTerm.info.widenExpr :: Nil, defn.UnitType)
-        ).entered
-        tpd.DefDef(sym, tpd.unitLiteral)
-      }
-
       val invokeSuspendSymbol =
         newSymbol(
           continuationsStateMachineSymbol,
@@ -836,7 +826,6 @@ object DefDefTransforms extends TreesChecks:
             )),
         List(
           continuationStateMachineI$Ns,
-          continuationStateMachineI$Ns.map(toContFsmSetter),
           List(
             continuationStateMachineResult,
             continuationStateMachineLabel,
