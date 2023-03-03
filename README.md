@@ -1,5 +1,25 @@
 # scala-fx
 
+## BUILD NOTICE
+
+The following projects have been unaggregated and must be compiled seperately and run with runMain:
+
+* continuationsPluginExample
+* zero-arguments-no-continuation-treeview
+* zero-arguments-one-continuation-code-before-used-after
+* list-map
+* two-arguments-two-continuations
+
+To run these projects, you must use `runMain` with the fully qualified name of the main.
+
+```shell
+$ sbt
+root> continuationsPluginExample/runMain examples.ThreeDependentcontinuations
+```
+
+This is so that ci build will continue to work until
+https://github.com/sbt/zinc/pull/1174 is merged and resolved.
+
 ## Getting started
 
 Scala-fx is an effects library for Scala 3 that introduces structured concurrency and an abilities system to describe pure functions and programs. 

@@ -8,7 +8,7 @@ ThisBuild / versionScheme := Some("early-semver")
 addCommandAlias(
   "plugin-example",
   "reload; clean; publishLocal; continuationsPluginExample/compile")
-addCommandAlias("ci-test", "scalafmtCheckAll; scalafmtSbtCheck; github; mdoc; test")
+addCommandAlias("ci-test", "scalafmtCheckAll; scalafmtSbtCheck; github; mdoc; root / test")
 addCommandAlias("ci-docs", "github; mdoc")
 addCommandAlias("ci-publish", "github; ci-release")
 
@@ -18,7 +18,7 @@ lazy val root = // I
   (project in file("./")).aggregate(
     benchmarks, // A
     continuationsPlugin, // C
-    continuationsPluginExample, // D
+    // continuationsPluginExample, // D
     documentation, // E
     `http-scala-fx`, // F
     `java-net-multipart-body-publisher`, // G
@@ -26,10 +26,10 @@ lazy val root = // I
     `scala-fx`, // J
     `scalike-jdbc-scala-fx`, // K
     `sttp-scala-fx`, // L
-    `zero-arguments-no-continuation-treeview`,
-    `zero-arguments-one-continuation-code-before-used-after`,
-    `list-map`,
-    `two-arguments-two-continuations`,
+    // `zero-arguments-no-continuation-treeview`,
+    // `zero-arguments-one-continuation-code-before-used-after`,
+    // `list-map`,
+    // `two-arguments-two-continuations`,
     `munit-snap`
   )
 
@@ -47,25 +47,30 @@ lazy val continuationsPluginExample = project
   .settings(
     continuationsPluginExampleSettings: _*
   )
+  .enablePlugins(ForceableCompilationPlugin)
 
 lazy val `zero-arguments-no-continuation-treeview` =
   (project in file("./zero-arguments-no-continuation-treeview"))
     .settings(continuationsPluginExampleShowTreeSettings: _*)
     .dependsOn(continuationsPlugin)
+    .enablePlugins(ForceableCompilationPlugin)
 
 lazy val `zero-arguments-one-continuation-code-before-used-after` =
   (project in file("./zero-arguments-one-continuation-code-before-used-after"))
     .settings(continuationsPluginExampleShowTreeSettings: _*)
     .dependsOn(continuationsPlugin)
+    .enablePlugins(ForceableCompilationPlugin)
 
 lazy val `list-map` = (project in file("./list-map"))
   .settings(continuationsPluginExampleShowTreeSettings: _*)
   .dependsOn(continuationsPlugin)
+  .enablePlugins(ForceableCompilationPlugin)
 
 lazy val `two-arguments-two-continuations` =
   (project in file("./two-arguments-two-continuations"))
     .settings(continuationsPluginExampleShowTreeSettings: _*)
     .dependsOn(continuationsPlugin)
+    .enablePlugins(ForceableCompilationPlugin)
 
 lazy val benchmarks =
   project.dependsOn(`scala-fx`).settings(publish / skip := true).enablePlugins(JmhPlugin)
@@ -184,6 +189,7 @@ lazy val continuationsPluginExampleShowTreeSettings: Seq[Def.Setting[_]] =
     publish / skip := true,
     autoCompilerPlugins := true,
     resolvers += Resolver.mavenLocal,
+    forceCompilation := true,
     Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
     Compile / scalacOptions += "-Xprint:continuations",
     Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}",
@@ -194,9 +200,10 @@ lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
   Seq(
     publish / skip := true,
     autoCompilerPlugins := true,
+    forceCompilation := true,
     resolvers += Resolver.mavenLocal,
     Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
-    Test / scalacOptions += s"-Xplugin: ${(continuationsPlugin / Compile / packageBin).value}"
+    Test / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}"
   )
 
 lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
