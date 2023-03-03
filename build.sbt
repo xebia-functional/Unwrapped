@@ -1,7 +1,7 @@
 import Dependencies.Compile._
 import Dependencies.Test._
 
-ThisBuild / scalaVersion := "3.1.2"
+ThisBuild / scalaVersion := "3.2.0"
 ThisBuild / organization := "com.47deg"
 ThisBuild / versionScheme := Some("early-semver")
 
