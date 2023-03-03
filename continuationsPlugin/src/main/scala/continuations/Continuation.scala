@@ -13,6 +13,15 @@ object Continuation:
   enum State:
     case Suspended, Undecided, Resumed
 
+  type Result = Either[Throwable, Any | Null | State.Suspended.type]
+
+  def checkResult(result: Result): Unit =
+    result match {
+      case null => ()
+      case Left(ex) => throw ex
+      case Right(_) => ()
+    }
+
 abstract class RestrictedContinuation(
     completion: Continuation[Any | Null] | Null
 ) extends BaseContinuationImpl(completion):
