@@ -28,9 +28,9 @@ object DefDefTransforms extends TreesChecks:
   def transformSuspendContinuation(tree: tpd.ValOrDefDef)(using Context): tpd.Tree =
     tree match {
       case ReturnsContextFunctionWithSuspendType(_) if !tree.symbol.isAnonymousFunction =>
-        transformContinuationWithSuspend(tree)
+        report.logWith(s"new tree:")(transformContinuationWithSuspend(tree))
       case HasSuspendParameter(_) if !tree.symbol.isAnonymousFunction =>
-        transformContinuationWithSuspend(tree)
+        report.logWith(s"new tree:")(transformContinuationWithSuspend(tree))
       case _ => report.logWith(s"oldTree:")(tree)
     }
 
@@ -51,6 +51,29 @@ object DefDefTransforms extends TreesChecks:
         case t => super.transform(t)
       }
   }
+
+  private def transformContinuationWithSuspend(tree: tpd.ValOrDefDef)(using Context): tpd.Tree =
+    def fetchSuspensions =
+      SuspensionPoints
+        .unapplySeq(report.logWith("tree has no suspension points:")(tree))
+        .toList
+        .flatten
+
+    tree match
+      case HasSuspensionNotInReturnedValue(_) =>
+        transformSuspensionsSuspendingStateMachine(tree, fetchSuspensions, false)
+      case CallsSuspendContinuation(_) =>
+        fetchSuspensions match
+          case suspensionPoint :: Nil if !suspensionPoint.isInstanceOf[tpd.ValDef] =>
+            transformSuspendOneContinuationResume(tree, suspensionPoint)
+          case suspensionPoints =>
+            transformSuspensionsSuspendingStateMachine(tree, suspensionPoints, true)
+      case BodyHasSuspensionPoint(_) =>
+        // any suspension that still needs a transformation
+        tree match
+          case t: tpd.DefDef => cpy.DefDef(t)()
+          case t: tpd.ValDef => cpy.ValDef(t)()
+      case _ => transformNonSuspending(tree)
 
   private def generateCompletion(owner: Symbol, returnType: Type)(using Context): Symbol =
     newSymbol(
@@ -345,40 +368,6 @@ object DefDefTransforms extends TreesChecks:
     )
     cpy.DefDef(transformedMethod)(rhs = substituteContinuation.transform(rhs))
   end transformSuspendOneContinuationResume
-
-  private def transformContinuationWithSuspend(tree: tpd.ValOrDefDef)(using Context): tpd.Tree =
-    val newTree =
-      tree match
-        case HasSuspensionNotInReturnedValue(_) =>
-          val suspensionPoints =
-            SuspensionPoints
-              .unapplySeq(report.logWith("tree has no suspension points:")(tree))
-              .toList
-              .flatten
-          transformSuspensionsSuspendingStateMachine(
-            tree,
-            suspensionPoints,
-            suspensionInReturnedValue = false)
-        case CallsSuspendContinuation(_) =>
-          SuspensionPoints
-            .unapplySeq(report.logWith("tree has no suspension points:")(tree))
-            .toList
-            .flatten match
-            case suspensionPoint :: Nil if !suspensionPoint.isInstanceOf[tpd.ValDef] =>
-              transformSuspendOneContinuationResume(tree, suspensionPoint)
-            case suspensionPoints =>
-              transformSuspensionsSuspendingStateMachine(
-                tree,
-                suspensionPoints,
-                suspensionInReturnedValue = true)
-        case BodyHasSuspensionPoint(_) =>
-          // any suspension that still needs a transformation
-          tree match
-            case t: tpd.DefDef => cpy.DefDef(t)()
-            case t: tpd.ValDef => cpy.ValDef(t)()
-        case _ => transformNonSuspending(tree)
-
-    report.logWith(s"new tree:")(newTree)
 
   private def transformNonSuspending(tree: tpd.ValOrDefDef)(using ctx: Context): tpd.Tree =
     val parent = tree.symbol
