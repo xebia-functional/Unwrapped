@@ -895,12 +895,7 @@ object DefDefTransforms extends TreesChecks:
           tpd
             .New(tpd.TypeTree(continuationStateMachineClass.tpe))
             .select(nme.CONSTRUCTOR)
-            .appliedTo(
-              transformedMethodCompletionParam
-                .select(nme.asInstanceOf_)
-                .appliedToType(
-                  continuationClassRef.appliedTo(anyOrNullType)
-                ))
+            .appliedTo(transformedMethodCompletionParam)
         )
         tpd.Match(transformedMethodCompletionParam, List(case11, case12))
       }
