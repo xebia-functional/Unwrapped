@@ -956,7 +956,12 @@ object DefDefTransforms extends TreesChecks:
 
         val case11: tpd.CaseDef = {
           val param =
-            newSymbol(newParent, nme.x_0, Flags.Case | Flags.CaseAccessor, defn.AnyType).entered
+            newSymbol(
+              newParent,
+              nme.x_0,
+              Flags.Case | Flags.CaseAccessor,
+              continuationStateMachineClass.tpe
+            ).entered
 
           val paramLabel =
             ref(param)
@@ -965,17 +970,13 @@ object DefDefTransforms extends TreesChecks:
               .select(labelVarParam)
 
           tpd.CaseDef(
-            tpd.Bind(param, tpd.EmptyTree),
+            tpd.Typed(ref(param), ref(continuationsStateMachineSymbol)),
             ref(param)
-              .select(nme.isInstanceOf_)
-              .appliedToType(continuationStateMachineClass.tpe)
-              .select(defn.Boolean_&&)
-              .appliedTo(
-                paramLabel
-                  .select(integerAND)
-                  .appliedTo(integerMin)
-                  .select(integerNE)
-                  .appliedTo(tpd.Literal(Constant(0x0)))),
+              .select(labelVarParam)
+              .select(integerAND)
+              .appliedTo(integerMin)
+              .select(integerNE)
+              .appliedTo(tpd.Literal(Constant(0x0))),
             tpd.Block(
               List(
                 tpd.Assign(paramLabel, paramLabel.select(defn.Int_-).appliedTo(integerMin))
