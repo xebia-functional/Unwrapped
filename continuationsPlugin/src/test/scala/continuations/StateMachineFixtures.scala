@@ -86,10 +86,8 @@ trait StateMachineFixtures {
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    ()
        |                  case 1 => 
        |                    continuations.Continuation.checkResult($result)
-       |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
        |            }
@@ -164,11 +162,9 @@ trait StateMachineFixtures {
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    ()
        |                  case 1 => 
        |                    x##1 = $continuation.I$0
        |                    continuations.Continuation.checkResult($result)
-       |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
        |            }
@@ -240,7 +236,6 @@ trait StateMachineFixtures {
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    return[label1] ()
-       |                    ()
        |                  case 1 => 
        |                    continuations.Continuation.checkResult($result)
        |                    label1[Unit]: <empty>
@@ -254,7 +249,6 @@ trait StateMachineFixtures {
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    return[label2] ()
-       |                    ()
        |                  case 2 => 
        |                    continuations.Continuation.checkResult($result)
        |                    label2[Unit]: <empty>
@@ -267,10 +261,8 @@ trait StateMachineFixtures {
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    ()
        |                  case 3 => 
        |                    continuations.Continuation.checkResult($result)
-       |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
        |            }
@@ -344,7 +336,6 @@ trait StateMachineFixtures {
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    return[label1] ()
-       |                    ()
        |                  case 1 => 
        |                    continuations.Continuation.checkResult($result)
        |                    label1[Unit]: <empty>
@@ -359,7 +350,6 @@ trait StateMachineFixtures {
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    return[label2] ()
-       |                    ()
        |                  case 2 => 
        |                    continuations.Continuation.checkResult($result)
        |                    label2[Unit]: <empty>
@@ -374,10 +364,8 @@ trait StateMachineFixtures {
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    ()
        |                  case 3 => 
        |                    continuations.Continuation.checkResult($result)
-       |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
        |            }
@@ -450,7 +438,6 @@ trait StateMachineFixtures {
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    return[label1] ()
-       |                    ()
        |                  case 1 => 
        |                    continuations.Continuation.checkResult($result)
        |                    label1[Unit]: <empty>
@@ -466,10 +453,8 @@ trait StateMachineFixtures {
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    ()
        |                  case 2 => 
        |                    continuations.Continuation.checkResult($result)
-       |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
        |            }
@@ -541,7 +526,6 @@ trait StateMachineFixtures {
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                  return[label1] ()
-       |                  ()
        |                case 1 => 
        |                  continuations.Continuation.checkResult($result)
        |                  label1[Unit]: <empty>
@@ -555,7 +539,6 @@ trait StateMachineFixtures {
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                  return[label2] ()
-       |                  ()
        |                case 2 => 
        |                  continuations.Continuation.checkResult($result)
        |                  label2[Unit]: <empty>
@@ -641,7 +624,6 @@ trait StateMachineFixtures {
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                  return[label1] ()
-       |                  ()
        |                case 1 => 
        |                  continuations.Continuation.checkResult($result)
        |                  label1[Unit]: <empty>
@@ -656,7 +638,6 @@ trait StateMachineFixtures {
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                  return[label2] ()
-       |                  ()
        |                case 2 => 
        |                  continuations.Continuation.checkResult($result)
        |                  label2[Unit]: <empty>
@@ -743,7 +724,6 @@ trait StateMachineFixtures {
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                  return[label1] ()
-       |                  ()
        |                case 1 => 
        |                  continuations.Continuation.checkResult($result)
        |                  label1[Unit]: <empty>
@@ -758,7 +738,6 @@ trait StateMachineFixtures {
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                  return[label2] ()
-       |                  ()
        |                case 2 => 
        |                  continuations.Continuation.checkResult($result)
        |                  label2[Unit]: <empty>
@@ -871,7 +850,6 @@ trait StateMachineFixtures {
        |                  safeContinuation.getOrThrow()
        |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                y = orThrow.asInstanceOf[Int]
-       |                ()
        |              case 1 =>
        |                x##1 = $continuation.I$0
        |                continuations.Continuation.checkResult($result)
@@ -968,11 +946,9 @@ trait StateMachineFixtures {
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-      |                ()
       |              case 1 =>
       |                qq##1 = $continuation.I$0
       |                continuations.Continuation.checkResult($result)
-      |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
       |        }
@@ -1067,11 +1043,9 @@ trait StateMachineFixtures {
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-      |                ()
       |              case 1 =>
       |                xx = $continuation.I$0
       |                continuations.Continuation.checkResult($result)
-      |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
       |        }
@@ -1188,7 +1162,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                xx = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                qq##1 = $continuation.I$0
       |                pp = $continuation.I$1
@@ -1212,7 +1185,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                yy = orThrow.asInstanceOf[String]
       |                return[label2] ()
-      |                ()
       |              case 2 =>
       |                qq##1 = $continuation.I$0
       |                pp = $continuation.I$1
@@ -1238,7 +1210,6 @@ trait StateMachineFixtures {
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                zz = orThrow.asInstanceOf[Int]
-      |                ()
       |              case 3 =>
       |                qq##1 = $continuation.I$0
       |                pp = $continuation.I$1
@@ -1362,7 +1333,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                xx = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                qq##1 = $continuation.I$0
       |                pp = $continuation.I$1
@@ -1385,7 +1355,6 @@ trait StateMachineFixtures {
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                return[label2] ()
-      |                ()
       |              case 2 =>
       |                qq##1 = $continuation.I$0
       |                pp = $continuation.I$1
@@ -1409,7 +1378,6 @@ trait StateMachineFixtures {
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                zz = orThrow.asInstanceOf[Int]
-      |                ()
       |              case 3 =>
       |                qq##1 = $continuation.I$0
       |                pp = $continuation.I$1
@@ -1526,7 +1494,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                y = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                x##1 = $continuation.I$0
       |                continuations.Continuation.checkResult($result)
@@ -1553,12 +1520,10 @@ trait StateMachineFixtures {
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-      |                ()
       |              case 2 =>
       |                x##1 = $continuation.I$0
       |                y = $continuation.I$1
       |                continuations.Continuation.checkResult($result)
-      |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
       |        }
@@ -1653,7 +1618,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                x = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                continuations.Continuation.checkResult($result)
       |                x = $result.asInstanceOf[Int]
@@ -1779,7 +1743,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                x = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                q##1 = $continuation.I$0
       |                continuations.Continuation.checkResult($result)
@@ -1800,7 +1763,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                w = orThrow.asInstanceOf[Int]
       |                return[label2] ()
-      |                ()
       |              case 2 =>
       |                q##1 = $continuation.I$0
       |                x = $continuation.I$1
@@ -1822,14 +1784,12 @@ trait StateMachineFixtures {
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-      |                ()
       |              case 3 =>
       |                q##1 = $continuation.I$0
       |                x = $continuation.I$1
       |                j = $continuation.I$2
       |                w = $continuation.I$3
       |                continuations.Continuation.checkResult($result)
-      |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
       |        }
@@ -1929,7 +1889,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                y = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                x##1 = $continuation.I$0
       |                continuations.Continuation.checkResult($result)
@@ -2062,7 +2021,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                y = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                x##1 = $continuation.I$0
       |                q = $continuation.I$1
@@ -2085,7 +2043,6 @@ trait StateMachineFixtures {
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
-      |                ()
       |              case 2 =>
       |                x##1 = $continuation.I$0
       |                q = $continuation.I$1
@@ -2196,7 +2153,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -2354,7 +2310,6 @@ trait StateMachineFixtures {
       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                    z = orThrow.asInstanceOf[A]
       |                    return[label1] ()
-      |                    ()
       |                  case 1 =>
       |                    b##1 = $continuation.I$0
       |                    a##1 = $continuation.I$1
@@ -2571,7 +2526,6 @@ trait StateMachineFixtures {
       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                    z = orThrow.asInstanceOf[A]
       |                    return[label1] ()
-      |                    ()
       |                  case 1 =>
       |                    b##1 = $continuation.I$0
       |                    a##1 = $continuation.I$1
@@ -2714,7 +2668,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                ec##1 = $continuation.I$0
       |                y##1 = $continuation.I$1
@@ -2847,7 +2800,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -2975,7 +2927,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -3104,7 +3055,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -3233,7 +3183,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -3363,7 +3312,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -3493,7 +3441,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -3627,7 +3574,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -3764,7 +3710,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -3906,7 +3851,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -4047,7 +3991,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -4190,7 +4133,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -4336,7 +4278,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -4485,7 +4426,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -4511,7 +4451,6 @@ trait StateMachineFixtures {
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                w = orThrow.asInstanceOf[Int]
-      |                ()
       |              case 2 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -4636,7 +4575,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -4662,7 +4600,6 @@ trait StateMachineFixtures {
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                w = orThrow.asInstanceOf[Int]
-      |                ()
       |              case 2 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -4788,7 +4725,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -4814,7 +4750,6 @@ trait StateMachineFixtures {
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                w = orThrow.asInstanceOf[Int]
-      |                ()
       |              case 2 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -4940,7 +4875,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -4966,7 +4900,6 @@ trait StateMachineFixtures {
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                w = orThrow.asInstanceOf[Int]
-      |                ()
       |              case 2 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -5093,7 +5026,6 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                z = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -5118,7 +5050,6 @@ trait StateMachineFixtures {
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-      |                ()
       |              case 2 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -5126,7 +5057,6 @@ trait StateMachineFixtures {
       |                b = $continuation.I$3
       |                z = $continuation.I$4
       |                continuations.Continuation.checkResult($result)
-      |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
       |        }
