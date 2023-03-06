@@ -85,7 +85,7 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
           |      val z = s.suspendContinuation[A] { _.resume(Right { a }) }
           |      s.suspendContinuation[B] { _.resume(Right { println(z); b }) }
           |  }
-          |  
+          |
           |  fooTest(Foo(1), Bar(2))
           |}
           |""".stripMargin

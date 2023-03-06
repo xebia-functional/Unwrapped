@@ -63,33 +63,21 @@ trait StateMachineFixtures {
        |         = 
        |          {
        |            {
-       |              var $continuation: continuations.Continuation[Any] | Null = null
-       |              completion match 
-       |                {
-       |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                    $continuation = x$0.asInstanceOf[program$foo$1]
-       |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-       |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-       |                }
+       |              val $continuation: program$foo$1 = 
+       |                completion match 
+       |                  {
+       |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
+       |                      x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
+       |                      x$0
+       |                    case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                  }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-       |                $continuation.asInstanceOf[program$foo$1].$result
-       |              $continuation.asInstanceOf[program$foo$1].$label match 
+       |                $continuation.$result
+       |              $continuation.$label match 
        |                {
        |                  case 0 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 1
+       |                    continuations.Continuation.checkResult($result)
+       |                    $continuation.$label = 1
        |                    val safeContinuation: continuations.SafeContinuation[Int] = 
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                        continuations.Continuation.State.Undecided
@@ -100,19 +88,7 @@ trait StateMachineFixtures {
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    ()
        |                  case 1 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
+       |                    continuations.Continuation.checkResult($result)
        |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
@@ -164,34 +140,22 @@ trait StateMachineFixtures {
        |          {
        |            var x##1: Int = x
        |            {
-       |              var $continuation: continuations.Continuation[Any] | Null = null
-       |              completion match 
-       |                {
-       |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                    $continuation = x$0.asInstanceOf[program$foo$1]
-       |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-       |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-       |                }
+       |              val $continuation: program$foo$1 = 
+       |                completion match 
+       |                  {
+       |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
+       |                      x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
+       |                      x$0
+       |                    case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                  }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-       |                $continuation.asInstanceOf[program$foo$1].$result
-       |              $continuation.asInstanceOf[program$foo$1].$label match 
+       |                $continuation.$result
+       |              $continuation.$label match 
        |                {
        |                  case 0 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    $continuation.asInstanceOf[program$foo$1].I$0 = x##1
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 1
+       |                    continuations.Continuation.checkResult($result)
+       |                    $continuation.I$0 = x##1
+       |                    $continuation.$label = 1
        |                    val safeContinuation: continuations.SafeContinuation[Int] = 
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                        continuations.Continuation.State.Undecided
@@ -202,20 +166,8 @@ trait StateMachineFixtures {
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    ()
        |                  case 1 => 
-       |                    x##1 = $continuation.asInstanceOf[program$foo$1].I$0
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
+       |                    x##1 = $continuation.I$0
+       |                    continuations.Continuation.checkResult($result)
        |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
@@ -264,33 +216,21 @@ trait StateMachineFixtures {
        |         = 
        |          {
        |            {
-       |              var $continuation: continuations.Continuation[Any] | Null = null
-       |              completion match 
-       |                {
-       |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                    $continuation = x$0.asInstanceOf[program$foo$1]
-       |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-       |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-       |                }
+       |              val $continuation: program$foo$1 = 
+       |                completion match 
+       |                  {
+       |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
+       |                      x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
+       |                      x$0
+       |                    case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                  }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-       |                $continuation.asInstanceOf[program$foo$1].$result
-       |              $continuation.asInstanceOf[program$foo$1].$label match 
+       |                $continuation.$result
+       |              $continuation.$label match 
        |                {
        |                  case 0 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 1
+       |                    continuations.Continuation.checkResult($result)
+       |                    $continuation.$label = 1
        |                    val safeContinuation: continuations.SafeContinuation[Int] = 
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                        continuations.Continuation.State.Undecided
@@ -302,21 +242,9 @@ trait StateMachineFixtures {
        |                    return[label1] ()
        |                    ()
        |                  case 1 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
+       |                    continuations.Continuation.checkResult($result)
        |                    label1[Unit]: <empty>
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 2
+       |                    $continuation.$label = 2
        |                    val safeContinuation: continuations.SafeContinuation[Boolean] = 
        |                      new continuations.SafeContinuation[Boolean](
        |                        continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
@@ -328,21 +256,9 @@ trait StateMachineFixtures {
        |                    return[label2] ()
        |                    ()
        |                  case 2 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
+       |                    continuations.Continuation.checkResult($result)
        |                    label2[Unit]: <empty>
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 3
+       |                    $continuation.$label = 3
        |                    val safeContinuation: continuations.SafeContinuation[String] = 
        |                      new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)()
        |                        , 
@@ -353,19 +269,7 @@ trait StateMachineFixtures {
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    ()
        |                  case 3 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
+       |                    continuations.Continuation.checkResult($result)
        |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
@@ -414,33 +318,21 @@ trait StateMachineFixtures {
        |         = 
        |          {
        |            {
-       |              var $continuation: continuations.Continuation[Any] | Null = null
-       |              completion match 
-       |                {
-       |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                    $continuation = x$0.asInstanceOf[program$foo$1]
-       |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-       |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-       |                }
+       |              val $continuation: program$foo$1 = 
+       |                completion match 
+       |                  {
+       |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
+       |                      x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
+       |                      x$0
+       |                    case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                  }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-       |                $continuation.asInstanceOf[program$foo$1].$result
-       |              $continuation.asInstanceOf[program$foo$1].$label match 
+       |                $continuation.$result
+       |              $continuation.$label match 
        |                {
        |                  case 0 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 1
+       |                    continuations.Continuation.checkResult($result)
+       |                    $continuation.$label = 1
        |                    val safeContinuation: continuations.SafeContinuation[Int] = 
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                        continuations.Continuation.State.Undecided
@@ -454,21 +346,9 @@ trait StateMachineFixtures {
        |                    return[label1] ()
        |                    ()
        |                  case 1 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
+       |                    continuations.Continuation.checkResult($result)
        |                    label1[Unit]: <empty>
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 2
+       |                    $continuation.$label = 2
        |                    val safeContinuation: continuations.SafeContinuation[Boolean] = 
        |                      new continuations.SafeContinuation[Boolean](
        |                        continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
@@ -481,21 +361,9 @@ trait StateMachineFixtures {
        |                    return[label2] ()
        |                    ()
        |                  case 2 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
+       |                    continuations.Continuation.checkResult($result)
        |                    label2[Unit]: <empty>
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 3
+       |                    $continuation.$label = 3
        |                    val safeContinuation: continuations.SafeContinuation[String] = 
        |                      new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)()
        |                        , 
@@ -508,19 +376,7 @@ trait StateMachineFixtures {
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    ()
        |                  case 3 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
+       |                    continuations.Continuation.checkResult($result)
        |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
@@ -569,34 +425,22 @@ trait StateMachineFixtures {
        |         = 
        |          {
        |            {
-       |              var $continuation: continuations.Continuation[Any] | Null = null
-       |              completion match 
-       |                {
-       |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                    $continuation = x$0.asInstanceOf[program$foo$1]
-       |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-       |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-       |                }
+       |              val $continuation: program$foo$1 = 
+       |                completion match 
+       |                  {
+       |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
+       |                      x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
+       |                      x$0
+       |                    case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                  }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-       |                $continuation.asInstanceOf[program$foo$1].$result
-       |              $continuation.asInstanceOf[program$foo$1].$label match 
+       |                $continuation.$result
+       |              $continuation.$label match 
        |                {
        |                  case 0 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
+       |                    continuations.Continuation.checkResult($result)
        |                    println("Start")
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 1
+       |                    $continuation.$label = 1
        |                    val safeContinuation: continuations.SafeContinuation[Int] = 
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                        continuations.Continuation.State.Undecided
@@ -608,24 +452,12 @@ trait StateMachineFixtures {
        |                    return[label1] ()
        |                    ()
        |                  case 1 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
+       |                    continuations.Continuation.checkResult($result)
        |                    label1[Unit]: <empty>
        |                    val x: String = "World"
        |                    println("Hello")
        |                    println(x)
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 2
+       |                    $continuation.$label = 2
        |                    val safeContinuation: continuations.SafeContinuation[Int] = 
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                        continuations.Continuation.State.Undecided
@@ -636,19 +468,7 @@ trait StateMachineFixtures {
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
        |                    ()
        |                  case 2 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
+       |                    continuations.Continuation.checkResult($result)
        |                    ()
        |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |                }
@@ -697,113 +517,63 @@ trait StateMachineFixtures {
        |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
        |         = 
        |          {
-       |            {
-       |              var $continuation: continuations.Continuation[Any] | Null = null
+       |            val $continuation: program$foo$1 = 
        |              completion match 
        |                {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                    $continuation = x$0.asInstanceOf[program$foo$1]
-       |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-       |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                    x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
+       |                    x$0
+       |                  case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
        |                }
-       |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-       |                $continuation.asInstanceOf[program$foo$1].$result
-       |              $continuation.asInstanceOf[program$foo$1].$label match 
-       |                {
-       |                  case 0 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
+       |            val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
+       |              $continuation.$result
+       |            $continuation.$label match 
+       |              {
+       |                case 0 => 
+       |                  continuations.Continuation.checkResult($result)
+       |                  $continuation.$label = 1
+       |                  val safeContinuation: continuations.SafeContinuation[Boolean] = 
+       |                    new continuations.SafeContinuation[Boolean](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
        |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 1
-       |                    val safeContinuation: continuations.SafeContinuation[Boolean] = 
-       |                      new continuations.SafeContinuation[Boolean](
-       |                        continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
-       |                      , continuations.Continuation.State.Undecided)
-       |                    safeContinuation.resume(Right.apply[Nothing, Boolean](false))
-       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-       |                      safeContinuation.getOrThrow()
-       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    return[label1] ()
-       |                    ()
-       |                  case 1 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    label1[Unit]: <empty>
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 2
-       |                    val safeContinuation: continuations.SafeContinuation[String] = 
-       |                      new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)()
-       |                        , 
-       |                      continuations.Continuation.State.Undecided)
-       |                    safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
-       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-       |                      safeContinuation.getOrThrow()
-       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    return[label2] ()
-       |                    ()
-       |                  case 2 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    label2[Unit]: <empty>
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 3
-       |                    val safeContinuation: continuations.SafeContinuation[Int] = 
-       |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
-       |                        continuations.Continuation.State.Undecided
-       |                      )
-       |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
-       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-       |                      safeContinuation.getOrThrow()
-       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    orThrow
-       |                  case 3 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    $result
-       |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
-       |                }
-       |            }
+       |                    continuations.Continuation.State.Undecided)
+       |                  safeContinuation.resume(Right.apply[Nothing, Boolean](false))
+       |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
+       |                    safeContinuation.getOrThrow()
+       |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+       |                  return[label1] ()
+       |                  ()
+       |                case 1 => 
+       |                  continuations.Continuation.checkResult($result)
+       |                  label1[Unit]: <empty>
+       |                  $continuation.$label = 2
+       |                  val safeContinuation: continuations.SafeContinuation[String] = 
+       |                    new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)(), 
+       |                      continuations.Continuation.State.Undecided
+       |                    )
+       |                  safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
+       |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
+       |                    safeContinuation.getOrThrow()
+       |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+       |                  return[label2] ()
+       |                  ()
+       |                case 2 => 
+       |                  continuations.Continuation.checkResult($result)
+       |                  label2[Unit]: <empty>
+       |                  $continuation.$label = 3
+       |                  val safeContinuation: continuations.SafeContinuation[Int] = 
+       |                    new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
+       |                      continuations.Continuation.State.Undecided
+       |                    )
+       |                  safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
+       |                    safeContinuation.getOrThrow()
+       |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+       |                  orThrow
+       |                case 3 => 
+       |                  continuations.Continuation.checkResult($result)
+       |                  $result
+       |                case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
+       |              }
        |          }
        |        foo(continuations.jvm.internal.ContinuationStub.contImpl)
        |      }
@@ -846,115 +616,65 @@ trait StateMachineFixtures {
        |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
        |         = 
        |          {
-       |            {
-       |              var $continuation: continuations.Continuation[Any] | Null = null
+       |            val $continuation: program$foo$1 = 
        |              completion match 
        |                {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                    $continuation = x$0.asInstanceOf[program$foo$1]
-       |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-       |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                    x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
+       |                    x$0
+       |                  case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
        |                }
-       |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-       |                $continuation.asInstanceOf[program$foo$1].$result
-       |              $continuation.asInstanceOf[program$foo$1].$label match 
-       |                {
-       |                  case 0 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
+       |            val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
+       |              $continuation.$result
+       |            $continuation.$label match 
+       |              {
+       |                case 0 => 
+       |                  continuations.Continuation.checkResult($result)
+       |                  $continuation.$label = 1
+       |                  val safeContinuation: continuations.SafeContinuation[Boolean] = 
+       |                    new continuations.SafeContinuation[Boolean](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
        |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 1
-       |                    val safeContinuation: continuations.SafeContinuation[Boolean] = 
-       |                      new continuations.SafeContinuation[Boolean](
-       |                        continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
-       |                      , continuations.Continuation.State.Undecided)
-       |                    println("Hi")
-       |                    safeContinuation.resume(Right.apply[Nothing, Boolean](false))
-       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-       |                      safeContinuation.getOrThrow()
-       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    return[label1] ()
-       |                    ()
-       |                  case 1 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    label1[Unit]: <empty>
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 2
-       |                    val safeContinuation: continuations.SafeContinuation[String] = 
-       |                      new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)()
-       |                        , 
-       |                      continuations.Continuation.State.Undecided)
-       |                    safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
-       |                    println("World")
-       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-       |                      safeContinuation.getOrThrow()
-       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    return[label2] ()
-       |                    ()
-       |                  case 2 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    label2[Unit]: <empty>
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 3
-       |                    val safeContinuation: continuations.SafeContinuation[Int] = 
-       |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
-       |                        continuations.Continuation.State.Undecided
-       |                      )
-       |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
-       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-       |                      safeContinuation.getOrThrow()
-       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    orThrow
-       |                  case 3 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    $result
-       |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
-       |                }
-       |            }
+       |                    continuations.Continuation.State.Undecided)
+       |                  println("Hi")
+       |                  safeContinuation.resume(Right.apply[Nothing, Boolean](false))
+       |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
+       |                    safeContinuation.getOrThrow()
+       |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+       |                  return[label1] ()
+       |                  ()
+       |                case 1 => 
+       |                  continuations.Continuation.checkResult($result)
+       |                  label1[Unit]: <empty>
+       |                  $continuation.$label = 2
+       |                  val safeContinuation: continuations.SafeContinuation[String] = 
+       |                    new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)(), 
+       |                      continuations.Continuation.State.Undecided
+       |                    )
+       |                  safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
+       |                  println("World")
+       |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
+       |                    safeContinuation.getOrThrow()
+       |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+       |                  return[label2] ()
+       |                  ()
+       |                case 2 => 
+       |                  continuations.Continuation.checkResult($result)
+       |                  label2[Unit]: <empty>
+       |                  $continuation.$label = 3
+       |                  val safeContinuation: continuations.SafeContinuation[Int] = 
+       |                    new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
+       |                      continuations.Continuation.State.Undecided
+       |                    )
+       |                  safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
+       |                    safeContinuation.getOrThrow()
+       |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+       |                  orThrow
+       |                case 3 => 
+       |                  continuations.Continuation.checkResult($result)
+       |                  $result
+       |                case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
+       |              }
        |          }
        |        foo(continuations.jvm.internal.ContinuationStub.contImpl)
        |      }
@@ -997,116 +717,66 @@ trait StateMachineFixtures {
        |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
        |         = 
        |          {
-       |            {
-       |              var $continuation: continuations.Continuation[Any] | Null = null
+       |            val $continuation: program$foo$1 = 
        |              completion match 
        |                {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
-       |                    $continuation = x$0.asInstanceOf[program$foo$1]
-       |                    $continuation.asInstanceOf[program$foo$1].$label = $continuation.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
-       |                  case _ => $continuation = new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                    x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
+       |                    x$0
+       |                  case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
        |                }
-       |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-       |                $continuation.asInstanceOf[program$foo$1].$result
-       |              $continuation.asInstanceOf[program$foo$1].$label match 
-       |                {
-       |                  case 0 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
+       |            val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
+       |              $continuation.$result
+       |            $continuation.$label match 
+       |              {
+       |                case 0 => 
+       |                  continuations.Continuation.checkResult($result)
+       |                  println("Start")
+       |                  val x: Int = 1
+       |                  $continuation.$label = 1
+       |                  val safeContinuation: continuations.SafeContinuation[Boolean] = 
+       |                    new continuations.SafeContinuation[Boolean](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
        |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    println("Start")
-       |                    val x: Int = 1
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 1
-       |                    val safeContinuation: continuations.SafeContinuation[Boolean] = 
-       |                      new continuations.SafeContinuation[Boolean](
-       |                        continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
-       |                      , continuations.Continuation.State.Undecided)
-       |                    safeContinuation.resume(Right.apply[Nothing, Boolean](false))
-       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-       |                      safeContinuation.getOrThrow()
-       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    return[label1] ()
-       |                    ()
-       |                  case 1 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    label1[Unit]: <empty>
-       |                    println("Hello")
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 2
-       |                    val safeContinuation: continuations.SafeContinuation[String] = 
-       |                      new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)()
-       |                        , 
-       |                      continuations.Continuation.State.Undecided)
-       |                    safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
-       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-       |                      safeContinuation.getOrThrow()
-       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    return[label2] ()
-       |                    ()
-       |                  case 2 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    label2[Unit]: <empty>
-       |                    $continuation.asInstanceOf[program$foo$1].$label = 3
-       |                    val safeContinuation: continuations.SafeContinuation[Int] = 
-       |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
-       |                        continuations.Continuation.State.Undecided
-       |                      )
-       |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
-       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-       |                      safeContinuation.getOrThrow()
-       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-       |                    orThrow
-       |                  case 3 => 
-       |                    if $result.!=(null) then 
-       |                      $result.fold[Unit](
-       |                        {
-       |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                          closure($anonfun)
-       |                        }
-       |                      , 
-       |                        {
-       |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                          closure($anonfun)
-       |                        }
-       |                      )
-       |                     else ()
-       |                    $result
-       |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
-       |                }
-       |            }
+       |                    continuations.Continuation.State.Undecided)
+       |                  safeContinuation.resume(Right.apply[Nothing, Boolean](false))
+       |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
+       |                    safeContinuation.getOrThrow()
+       |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+       |                  return[label1] ()
+       |                  ()
+       |                case 1 => 
+       |                  continuations.Continuation.checkResult($result)
+       |                  label1[Unit]: <empty>
+       |                  println("Hello")
+       |                  $continuation.$label = 2
+       |                  val safeContinuation: continuations.SafeContinuation[String] = 
+       |                    new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)(), 
+       |                      continuations.Continuation.State.Undecided
+       |                    )
+       |                  safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
+       |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
+       |                    safeContinuation.getOrThrow()
+       |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+       |                  return[label2] ()
+       |                  ()
+       |                case 2 => 
+       |                  continuations.Continuation.checkResult($result)
+       |                  label2[Unit]: <empty>
+       |                  $continuation.$label = 3
+       |                  val safeContinuation: continuations.SafeContinuation[Int] = 
+       |                    new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
+       |                      continuations.Continuation.State.Undecided
+       |                    )
+       |                  safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
+       |                    safeContinuation.getOrThrow()
+       |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+       |                  orThrow
+       |                case 3 => 
+       |                  continuations.Continuation.checkResult($result)
+       |                  $result
+       |                case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
+       |              }
        |          }
        |        foo(continuations.jvm.internal.ContinuationStub.contImpl)
        |      }
@@ -1152,72 +822,46 @@ trait StateMachineFixtures {
        |        var x##1: Int = x
        |        var y: Int = null
        |        {
-       |          var $continuation: continuations.Continuation[Any] | Null = null
-       |          completion match
-       |            {
-       |              case x$0 @ <empty> if
-       |                x$0.isInstanceOf[
-       |                  continuations.compileFromString$package.
-       |                    compileFromString$package$foo$1
-       |                ].&&(
+       |          val $continuation:
+       |            continuations.compileFromString$package.
+       |              compileFromString$package$foo$1
+       |           =
+       |            completion match
+       |              {
+       |                case x$0 @ <empty> if
+       |                  x$0.isInstanceOf[
+       |                    continuations.compileFromString$package.
+       |                      compileFromString$package$foo$1
+       |                  ].&&(
+       |                    x$0.asInstanceOf[
+       |                      continuations.compileFromString$package.
+       |                        compileFromString$package$foo$1
+       |                    ].$label.&(scala.Int.MinValue).!=(0)
+       |                  )
+       |                 =>
        |                  x$0.asInstanceOf[
        |                    continuations.compileFromString$package.
        |                      compileFromString$package$foo$1
-       |                  ].$label.&(scala.Int.MinValue).!=(0)
-       |                )
-       |               =>
-       |                $continuation =
-       |                  x$0.asInstanceOf[
-       |                    continuations.compileFromString$package.
-       |                      compileFromString$package$foo$1
-       |                  ]
-       |                $continuation.asInstanceOf[
-       |                  continuations.compileFromString$package.
-       |                    compileFromString$package$foo$1
-       |                ].$label =
-       |                  $continuation.asInstanceOf[
-       |                    continuations.compileFromString$package.
-       |                      compileFromString$package$foo$1
-       |                  ].$label.-(scala.Int.MinValue)
-       |              case _ =>
-       |                $continuation =
+       |                  ].$label =
+       |                    x$0.asInstanceOf[
+       |                      continuations.compileFromString$package.
+       |                        compileFromString$package$foo$1
+       |                    ].$label.-(scala.Int.MinValue)
+       |                  x$0
+       |                case _ =>
        |                  new
        |                    continuations.compileFromString$package.
        |                      compileFromString$package$foo$1
        |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-       |            }
+       |              }
        |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-       |            $continuation.asInstanceOf[
-       |              continuations.compileFromString$package.
-       |                compileFromString$package$foo$1
-       |            ].$result
-       |          $continuation.asInstanceOf[
-       |            continuations.compileFromString$package.
-       |              compileFromString$package$foo$1
-       |          ].$label match
+       |            $continuation.$result
+       |          $continuation.$label match
        |            {
        |              case 0 =>
-       |                if $result.!=(null) then
-       |                  $result.fold[Unit](
-       |                    {
-       |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                      closure($anonfun)
-       |                    }
-       |                  ,
-       |                    {
-       |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                      closure($anonfun)
-       |                    }
-       |                  )
-       |                 else ()
-       |                $continuation.asInstanceOf[
-       |                  continuations.compileFromString$package.
-       |                    compileFromString$package$foo$1
-       |                ].I$0 = x##1
-       |                $continuation.asInstanceOf[
-       |                  continuations.compileFromString$package.
-       |                    compileFromString$package$foo$1
-       |                ].$label = 1
+       |                continuations.Continuation.checkResult($result)
+       |                $continuation.I$0 = x##1
+       |                $continuation.$label = 1
        |                val safeContinuation: continuations.SafeContinuation[Int] =
        |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
        |                    continuations.Continuation.State.Undecided
@@ -1229,24 +873,8 @@ trait StateMachineFixtures {
        |                y = orThrow.asInstanceOf[Int]
        |                ()
        |              case 1 =>
-       |                x##1 =
-       |                  $continuation.asInstanceOf[
-       |                    continuations.compileFromString$package.
-       |                      compileFromString$package$foo$1
-       |                  ].I$0
-       |                if $result.!=(null) then
-       |                  $result.fold[Unit](
-       |                    {
-       |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-       |                      closure($anonfun)
-       |                    }
-       |                  ,
-       |                    {
-       |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-       |                      closure($anonfun)
-       |                    }
-       |                  )
-       |                 else ()
+       |                x##1 = $continuation.I$0
+       |                continuations.Continuation.checkResult($result)
        |                y = $result.asInstanceOf[Int]
        |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
        |            }
@@ -1292,106 +920,58 @@ trait StateMachineFixtures {
       |      {
       |        var qq##1: Int = qq
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$foo$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$foo$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$foo$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$foo$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$foo$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$foo$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$foo$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$foo$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$foo$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$foo$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$foo$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$foo$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$foo$1
-      |                ].I$0 = qq##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$foo$1
-      |                ].$label = 1
+      |                continuations.Continuation.checkResult($result)
+      |                $continuation.I$0 = qq##1
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Unit] =
       |                  new continuations.SafeContinuation[Unit](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Unit]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Unit](
-      |                    {
-      |                      println(qq##1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Unit](println(qq##1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                ()
       |              case 1 =>
-      |                qq##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$foo$1
-      |                  ].I$0
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                qq##1 = $continuation.I$0
+      |                continuations.Continuation.checkResult($result)
       |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -1437,74 +1017,48 @@ trait StateMachineFixtures {
       |      {
       |        var xx: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$foo$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$foo$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$foo$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$foo$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$foo$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$foo$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$foo$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$foo$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$foo$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$foo$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$foo$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$foo$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                xx = 111
       |                println(xx)
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$foo$1
-      |                ].I$0 = xx
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$foo$1
-      |                ].$label = 1
+      |                $continuation.I$0 = xx
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
@@ -1515,24 +1069,8 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                ()
       |              case 1 =>
-      |                xx =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$foo$1
-      |                  ].I$0
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                xx = $continuation.I$0
+      |                continuations.Continuation.checkResult($result)
       |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -1598,88 +1136,53 @@ trait StateMachineFixtures {
       |        var tt: Int = null
       |        var zz: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                pp = 11
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = qq##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = pp
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = qq##1
+      |                $continuation.I$1 = pp
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      qq##1.-(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](qq##1.-(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1687,64 +1190,23 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                qq##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                pp =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                qq##1 = $continuation.I$0
+      |                pp = $continuation.I$1
+      |                continuations.Continuation.checkResult($result)
       |                xx = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                ww = 13
       |                val rr: String = "AAA"
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = qq##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = pp
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = xx
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = ww
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = qq##1
+      |                $continuation.I$1 = pp
+      |                $continuation.I$2 = xx
+      |                $continuation.I$3 = ww
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[String] =
       |                  new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, String](
-      |                    {
-      |                      rr
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, String](rr))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1752,130 +1214,39 @@ trait StateMachineFixtures {
       |                return[label2] ()
       |                ()
       |              case 2 =>
-      |                qq##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                pp =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                xx =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                ww =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                qq##1 = $continuation.I$0
+      |                pp = $continuation.I$1
+      |                xx = $continuation.I$2
+      |                ww = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                yy = $result.asInstanceOf[String]
       |                label2[Unit]: <empty>
       |                tt = 100
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = qq##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = pp
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = xx
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = ww
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$4 = yy
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$5 = tt
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 3
+      |                $continuation.I$0 = qq##1
+      |                $continuation.I$1 = pp
+      |                $continuation.I$2 = xx
+      |                $continuation.I$3 = ww
+      |                $continuation.I$4 = yy
+      |                $continuation.I$5 = tt
+      |                $continuation.$label = 3
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      ww.-(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](ww.-(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                zz = orThrow.asInstanceOf[Int]
       |                ()
       |              case 3 =>
-      |                qq##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                pp =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                xx =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                ww =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                yy =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$4
-      |                tt =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$5
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                qq##1 = $continuation.I$0
+      |                pp = $continuation.I$1
+      |                xx = $continuation.I$2
+      |                ww = $continuation.I$3
+      |                yy = $continuation.I$4
+      |                tt = $continuation.I$5
+      |                continuations.Continuation.checkResult($result)
       |                zz = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -1939,88 +1310,53 @@ trait StateMachineFixtures {
       |        var tt: Int = null
       |        var zz: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                pp = 11
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = qq##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = pp
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = qq##1
+      |                $continuation.I$1 = pp
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      qq##1.-(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](qq##1.-(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2028,184 +1364,59 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                qq##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                pp =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                qq##1 = $continuation.I$0
+      |                pp = $continuation.I$1
+      |                continuations.Continuation.checkResult($result)
       |                xx = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                ww = 13
       |                val rr: String = "AAA"
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = qq##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = pp
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = xx
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = ww
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = qq##1
+      |                $continuation.I$1 = pp
+      |                $continuation.I$2 = xx
+      |                $continuation.I$3 = ww
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[String] =
       |                  new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, String](
-      |                    {
-      |                      rr
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, String](rr))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                return[label2] ()
       |                ()
       |              case 2 =>
-      |                qq##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                pp =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                xx =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                ww =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                qq##1 = $continuation.I$0
+      |                pp = $continuation.I$1
+      |                xx = $continuation.I$2
+      |                ww = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                label2[Unit]: <empty>
       |                tt = 100
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = qq##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = pp
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = xx
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = ww
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$4 = tt
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 3
+      |                $continuation.I$0 = qq##1
+      |                $continuation.I$1 = pp
+      |                $continuation.I$2 = xx
+      |                $continuation.I$3 = ww
+      |                $continuation.I$4 = tt
+      |                $continuation.$label = 3
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      ww.-(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](ww.-(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                zz = orThrow.asInstanceOf[Int]
       |                ()
       |              case 3 =>
-      |                qq##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                pp =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                xx =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                ww =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                tt =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$4
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                qq##1 = $continuation.I$0
+      |                pp = $continuation.I$1
+      |                xx = $continuation.I$2
+      |                ww = $continuation.I$3
+      |                tt = $continuation.I$4
+      |                continuations.Continuation.checkResult($result)
       |                zz = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -2257,73 +1468,47 @@ trait StateMachineFixtures {
       |        var x##1: Int = x
       |        var y: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                println("Hello")
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = x##1
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
@@ -2343,39 +1528,14 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                x##1 = $continuation.I$0
+      |                continuations.Continuation.checkResult($result)
       |                y = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val z: Int = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = y
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = x##1
+      |                $continuation.I$1 = y
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
@@ -2395,29 +1555,9 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                ()
       |              case 2 =>
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                y =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                x##1 = $continuation.I$0
+      |                y = $continuation.I$1
+      |                continuations.Continuation.checkResult($result)
       |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -2464,79 +1604,50 @@ trait StateMachineFixtures {
       |      {
       |        var x: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                continuations.Continuation.checkResult($result)
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      1
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](1))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2544,63 +1655,23 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                x = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = x
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = x
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x.+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x.+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                x =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                x = $continuation.I$0
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -2656,85 +1727,53 @@ trait StateMachineFixtures {
       |        var j: Int = null
       |        var w: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                println("Hello")
       |                val z: Int = 100
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = q##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = q##1
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      1.+(z)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](1.+(z)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2742,54 +1781,20 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                q##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                q##1 = $continuation.I$0
+      |                continuations.Continuation.checkResult($result)
       |                x = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                j = 9
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = q##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = j
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = q##1
+      |                $continuation.I$1 = x
+      |                $continuation.I$2 = j
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x.+(1).+(q##1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x.+(1).+(q##1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2797,106 +1802,33 @@ trait StateMachineFixtures {
       |                return[label2] ()
       |                ()
       |              case 2 =>
-      |                q##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                j =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                q##1 = $continuation.I$0
+      |                x = $continuation.I$1
+      |                j = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                w = $result.asInstanceOf[Int]
       |                label2[Unit]: <empty>
       |                println("World")
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = q##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = j
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = w
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 3
+      |                $continuation.I$0 = q##1
+      |                $continuation.I$1 = x
+      |                $continuation.I$2 = j
+      |                $continuation.I$3 = w
+      |                $continuation.$label = 3
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x.+(w).+(1).+(j)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x.+(w).+(1).+(j)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                ()
       |              case 3 =>
-      |                q##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                j =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                w =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                q##1 = $continuation.I$0
+      |                x = $continuation.I$1
+      |                j = $continuation.I$2
+      |                w = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -2947,72 +1879,46 @@ trait StateMachineFixtures {
       |        var x##1: Int = x
       |        var y: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                continuations.Continuation.checkResult($result)
+      |                $continuation.I$0 = x##1
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
@@ -3025,38 +1931,13 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                x##1 = $continuation.I$0
+      |                continuations.Continuation.checkResult($result)
       |                y = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = y
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = x##1
+      |                $continuation.I$1 = y
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
@@ -3067,29 +1948,9 @@ trait StateMachineFixtures {
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                y =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                x##1 = $continuation.I$0
+      |                y = $continuation.I$1
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -3148,78 +2009,49 @@ trait StateMachineFixtures {
       |        var p: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                q = 2
       |                val w: Int = 3
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = q
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = x##1
+      |                $continuation.I$1 = q
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
@@ -3232,53 +2064,18 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                q =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                x##1 = $continuation.I$0
+      |                q = $continuation.I$1
+      |                continuations.Continuation.checkResult($result)
       |                y = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                p = 1
       |                val t: Int = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = q
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = y
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = p
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = x##1
+      |                $continuation.I$1 = q
+      |                $continuation.I$2 = y
+      |                $continuation.I$3 = p
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
@@ -3290,39 +2087,11 @@ trait StateMachineFixtures {
       |                z = orThrow.asInstanceOf[Int]
       |                ()
       |              case 2 =>
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                q =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                y =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                p =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                x##1 = $continuation.I$0
+      |                q = $continuation.I$1
+      |                y = $continuation.I$2
+      |                p = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -3376,87 +2145,52 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation: 
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                continuations.Continuation.checkResult($result)
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3464,91 +2198,29 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                z = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -3622,7 +2294,7 @@ trait StateMachineFixtures {
       |    def program: continuations.Foo =
       |      {
       |        class program$fooTest$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion
-      |          ,
+      |          , 
       |        $completion.context) {
       |          var I$0: Any = _
       |          var I$1: Any = _
@@ -3653,48 +2325,30 @@ trait StateMachineFixtures {
       |            var b##1: Int = b
       |            var z: A = null
       |            {
-      |              var $continuation: continuations.Continuation[Any] | Null = null
-      |              completion match
-      |                {
-      |                  case x$0 @ <empty> if
-      |                    x$0.isInstanceOf[program$fooTest$1].&&(x$0.asInstanceOf[program$fooTest$1].$label.&(scala.Int.MinValue).!=(0))
-      |                   =>
-      |                    $continuation = x$0.asInstanceOf[program$fooTest$1]
-      |                    $continuation.asInstanceOf[program$fooTest$1].$label = $continuation.asInstanceOf[program$fooTest$1].$label.-(scala.Int.MinValue)
-      |                  case _ => $continuation = new program$fooTest$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |                }
+      |              val $continuation: program$fooTest$1 = 
+      |                completion match
+      |                  {
+      |                    case x$0 @ <empty> if
+      |                      x$0.isInstanceOf[program$fooTest$1].&&(x$0.asInstanceOf[program$fooTest$1].$label.&(scala.Int.MinValue).!=(0))
+      |                     =>
+      |                      x$0.asInstanceOf[program$fooTest$1].$label = x$0.asInstanceOf[program$fooTest$1].$label.-(scala.Int.MinValue)
+      |                      x$0
+      |                    case _ => new program$fooTest$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  }
       |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |                $continuation.asInstanceOf[program$fooTest$1].$result
-      |              $continuation.asInstanceOf[program$fooTest$1].$label match
+      |                $continuation.$result
+      |              $continuation.$label match
       |                {
       |                  case 0 =>
-      |                    if $result.!=(null) then
-      |                      $result.fold[Unit](
-      |                        {
-      |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                          closure($anonfun)
-      |                        }
-      |                      ,
-      |                        {
-      |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                          closure($anonfun)
-      |                        }
-      |                      )
-      |                     else ()
-      |                    $continuation.asInstanceOf[program$fooTest$1].I$0 = b##1
-      |                    $continuation.asInstanceOf[program$fooTest$1].I$1 = a##1
-      |                    $continuation.asInstanceOf[program$fooTest$1].$label = 1
+      |                    continuations.Continuation.checkResult($result)
+      |                    $continuation.I$0 = b##1
+      |                    $continuation.I$1 = a##1
+      |                    $continuation.$label = 1
       |                    val safeContinuation: continuations.SafeContinuation[A] =
       |                      new continuations.SafeContinuation[A](continuations.intrinsics.IntrinsicsJvm$package.intercepted[A]($continuation)(),
       |                        continuations.Continuation.State.Undecided
       |                      )
-      |                    safeContinuation.resume(
-      |                      Right.apply[Nothing, A](
-      |                        {
-      |                          a##1
-      |                        }
-      |                      )
-      |                    )
+      |                    safeContinuation.resume(Right.apply[Nothing, A](a##1))
       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                      safeContinuation.getOrThrow()
       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3702,27 +2356,15 @@ trait StateMachineFixtures {
       |                    return[label1] ()
       |                    ()
       |                  case 1 =>
-      |                    b##1 = $continuation.asInstanceOf[program$fooTest$1].I$0
-      |                    a##1 = $continuation.asInstanceOf[program$fooTest$1].I$1
-      |                    if $result.!=(null) then
-      |                      $result.fold[Unit](
-      |                        {
-      |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                          closure($anonfun)
-      |                        }
-      |                      ,
-      |                        {
-      |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                          closure($anonfun)
-      |                        }
-      |                      )
-      |                     else ()
+      |                    b##1 = $continuation.I$0
+      |                    a##1 = $continuation.I$1
+      |                    continuations.Continuation.checkResult($result)
       |                    z = $result.asInstanceOf[A]
       |                    label1[Unit]: <empty>
-      |                    $continuation.asInstanceOf[program$fooTest$1].I$0 = b##1
-      |                    $continuation.asInstanceOf[program$fooTest$1].I$1 = a##1
-      |                    $continuation.asInstanceOf[program$fooTest$1].I$2 = z
-      |                    $continuation.asInstanceOf[program$fooTest$1].$label = 2
+      |                    $continuation.I$0 = b##1
+      |                    $continuation.I$1 = a##1
+      |                    $continuation.I$2 = z
+      |                    $continuation.$label = 2
       |                    val safeContinuation: continuations.SafeContinuation[A] =
       |                      new continuations.SafeContinuation[A](continuations.intrinsics.IntrinsicsJvm$package.intercepted[A]($continuation)(),
       |                        continuations.Continuation.State.Undecided
@@ -3740,22 +2382,10 @@ trait StateMachineFixtures {
       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                    orThrow
       |                  case 2 =>
-      |                    b##1 = $continuation.asInstanceOf[program$fooTest$1].I$0
-      |                    a##1 = $continuation.asInstanceOf[program$fooTest$1].I$1
-      |                    z = $continuation.asInstanceOf[program$fooTest$1].I$2
-      |                    if $result.!=(null) then
-      |                      $result.fold[Unit](
-      |                        {
-      |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                          closure($anonfun)
-      |                        }
-      |                      ,
-      |                        {
-      |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                          closure($anonfun)
-      |                        }
-      |                      )
-      |                     else ()
+      |                    b##1 = $continuation.I$0
+      |                    a##1 = $continuation.I$1
+      |                    z = $continuation.I$2
+      |                    continuations.Continuation.checkResult($result)
       |                    $result
       |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |                }
@@ -3881,7 +2511,7 @@ trait StateMachineFixtures {
       |    def program: continuations.Bar =
       |      {
       |        class program$fooTest$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion
-      |          ,
+      |          , 
       |        $completion.context) {
       |          var I$0: Any = _
       |          var I$1: Any = _
@@ -3912,48 +2542,30 @@ trait StateMachineFixtures {
       |            var b##1: B = b
       |            var z: A = null
       |            {
-      |              var $continuation: continuations.Continuation[Any] | Null = null
-      |              completion match
-      |                {
-      |                  case x$0 @ <empty> if
-      |                    x$0.isInstanceOf[program$fooTest$1].&&(x$0.asInstanceOf[program$fooTest$1].$label.&(scala.Int.MinValue).!=(0))
-      |                   =>
-      |                    $continuation = x$0.asInstanceOf[program$fooTest$1]
-      |                    $continuation.asInstanceOf[program$fooTest$1].$label = $continuation.asInstanceOf[program$fooTest$1].$label.-(scala.Int.MinValue)
-      |                  case _ => $continuation = new program$fooTest$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |                }
+      |              val $continuation: program$fooTest$1 =
+      |                completion match
+      |                  {
+      |                    case x$0 @ <empty> if
+      |                      x$0.isInstanceOf[program$fooTest$1].&&(x$0.asInstanceOf[program$fooTest$1].$label.&(scala.Int.MinValue).!=(0))
+      |                     =>
+      |                      x$0.asInstanceOf[program$fooTest$1].$label = x$0.asInstanceOf[program$fooTest$1].$label.-(scala.Int.MinValue)
+      |                      x$0
+      |                    case _ => new program$fooTest$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  }
       |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |                $continuation.asInstanceOf[program$fooTest$1].$result
-      |              $continuation.asInstanceOf[program$fooTest$1].$label match
+      |                $continuation.$result
+      |              $continuation.$label match
       |                {
       |                  case 0 =>
-      |                    if $result.!=(null) then
-      |                      $result.fold[Unit](
-      |                        {
-      |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                          closure($anonfun)
-      |                        }
-      |                      ,
-      |                        {
-      |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                          closure($anonfun)
-      |                        }
-      |                      )
-      |                     else ()
-      |                    $continuation.asInstanceOf[program$fooTest$1].I$0 = b##1
-      |                    $continuation.asInstanceOf[program$fooTest$1].I$1 = a##1
-      |                    $continuation.asInstanceOf[program$fooTest$1].$label = 1
+      |                    continuations.Continuation.checkResult($result)
+      |                    $continuation.I$0 = b##1
+      |                    $continuation.I$1 = a##1
+      |                    $continuation.$label = 1
       |                    val safeContinuation: continuations.SafeContinuation[A] =
       |                      new continuations.SafeContinuation[A](continuations.intrinsics.IntrinsicsJvm$package.intercepted[A]($continuation)(),
       |                        continuations.Continuation.State.Undecided
       |                      )
-      |                    safeContinuation.resume(
-      |                      Right.apply[Nothing, A](
-      |                        {
-      |                          a##1
-      |                        }
-      |                      )
-      |                    )
+      |                    safeContinuation.resume(Right.apply[Nothing, A](a##1))
       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                      safeContinuation.getOrThrow()
       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3961,27 +2573,15 @@ trait StateMachineFixtures {
       |                    return[label1] ()
       |                    ()
       |                  case 1 =>
-      |                    b##1 = $continuation.asInstanceOf[program$fooTest$1].I$0
-      |                    a##1 = $continuation.asInstanceOf[program$fooTest$1].I$1
-      |                    if $result.!=(null) then
-      |                      $result.fold[Unit](
-      |                        {
-      |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                          closure($anonfun)
-      |                        }
-      |                      ,
-      |                        {
-      |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                          closure($anonfun)
-      |                        }
-      |                      )
-      |                     else ()
+      |                    b##1 = $continuation.I$0
+      |                    a##1 = $continuation.I$1
+      |                    continuations.Continuation.checkResult($result)
       |                    z = $result.asInstanceOf[A]
       |                    label1[Unit]: <empty>
-      |                    $continuation.asInstanceOf[program$fooTest$1].I$0 = b##1
-      |                    $continuation.asInstanceOf[program$fooTest$1].I$1 = a##1
-      |                    $continuation.asInstanceOf[program$fooTest$1].I$2 = z
-      |                    $continuation.asInstanceOf[program$fooTest$1].$label = 2
+      |                    $continuation.I$0 = b##1
+      |                    $continuation.I$1 = a##1
+      |                    $continuation.I$2 = z
+      |                    $continuation.$label = 2
       |                    val safeContinuation: continuations.SafeContinuation[B] =
       |                      new continuations.SafeContinuation[B](continuations.intrinsics.IntrinsicsJvm$package.intercepted[B]($continuation)(),
       |                        continuations.Continuation.State.Undecided
@@ -3999,22 +2599,10 @@ trait StateMachineFixtures {
       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                    orThrow
       |                  case 2 =>
-      |                    b##1 = $continuation.asInstanceOf[program$fooTest$1].I$0
-      |                    a##1 = $continuation.asInstanceOf[program$fooTest$1].I$1
-      |                    z = $continuation.asInstanceOf[program$fooTest$1].I$2
-      |                    if $result.!=(null) then
-      |                      $result.fold[Unit](
-      |                        {
-      |                          def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                          closure($anonfun)
-      |                        }
-      |                      ,
-      |                        {
-      |                          def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                          closure($anonfun)
-      |                        }
-      |                      )
-      |                     else ()
+      |                    b##1 = $continuation.I$0
+      |                    a##1 = $continuation.I$1
+      |                    z = $continuation.I$2
+      |                    continuations.Continuation.checkResult($result)
       |                    $result
       |                  case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |                }
@@ -4074,91 +2662,53 @@ trait StateMachineFixtures {
       |        var ec##1: concurrent.ExecutionContext = ec
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = ec##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                continuations.Continuation.checkResult($result)
+      |                $continuation.I$0 = ec##1
+      |                $continuation.I$1 = y##1
+      |                $continuation.I$2 = x##1
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4166,105 +2716,32 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                ec##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                ec##1 = $continuation.I$0
+      |                y##1 = $continuation.I$1
+      |                x##1 = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = ec##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = ec##1
+      |                $continuation.I$1 = y##1
+      |                $continuation.I$2 = x##1
+      |                $continuation.I$3 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                ec##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                ec##1 = $continuation.I$0
+      |                y##1 = $continuation.I$1
+      |                x##1 = $continuation.I$2
+      |                z = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -4319,87 +2796,52 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                continuations.Continuation.checkResult($result)
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4407,91 +2849,29 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                z = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -4544,87 +2924,52 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                continuations.Continuation.checkResult($result)
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4632,91 +2977,29 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                z = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -4769,88 +3052,53 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                println("Hello")
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4858,91 +3106,29 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                z = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -4995,88 +3181,53 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                val w: Int = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(w)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(w)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -5084,91 +3235,29 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                z = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -5221,89 +3310,54 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                println("Hello")
       |                println("World")
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -5311,91 +3365,29 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                z = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -5448,89 +3440,54 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                println("Hello")
       |                val w: Int = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(w)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(w)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -5538,91 +3495,29 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(1)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                z = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -5678,93 +3573,55 @@ trait StateMachineFixtures {
       |        var a: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                a = 1
       |                val w: Int = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(w)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(w)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -5772,105 +3629,32 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(a)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(a)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                z = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -5926,93 +3710,55 @@ trait StateMachineFixtures {
       |        var a: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                a = 1
       |                val w: Int = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(w)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(w)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -6020,106 +3766,33 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                println("Hello")
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(a)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(a)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                z = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -6178,97 +3851,56 @@ trait StateMachineFixtures {
       |        var b: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                a = 1
       |                b = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(a)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -6276,120 +3908,36 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(1)
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$4 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.I$4 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(b).+(c)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(b).+(c)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$4
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                z = $continuation.I$4
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -6445,93 +3993,55 @@ trait StateMachineFixtures {
       |        var b: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                val a: Int = 1
       |                b = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = b
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(a)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -6539,107 +4049,34 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                b = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                println("Hello")
       |                println("World")
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = b
+      |                $continuation.I$3 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(b)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(b)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                b = $continuation.I$2
+      |                z = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -6698,97 +4135,56 @@ trait StateMachineFixtures {
       |        var b: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                a = 1
       |                b = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(a)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -6796,121 +4192,37 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                println("Hello")
       |                val c: Int = a.+(b)
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$4 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.I$4 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(c)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$4
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                z = $continuation.I$4
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -6969,97 +4281,56 @@ trait StateMachineFixtures {
       |        var b: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                a = 1
       |                b = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(a)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -7067,121 +4338,37 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(b)
       |                val d: Int = c.+(1)
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$4 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.I$4 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(c).+(d)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                orThrow
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$4
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                z = $continuation.I$4
+      |                continuations.Continuation.checkResult($result)
       |                $result
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -7243,97 +4430,56 @@ trait StateMachineFixtures {
       |        var z: Int = null
       |        var w: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                a = 1
       |                b = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(a)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -7341,122 +4487,38 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(b)
       |                val d: Int = c.+(1)
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$4 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.I$4 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(c).+(d)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                w = orThrow.asInstanceOf[Int]
       |                ()
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$4
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                z = $continuation.I$4
+      |                continuations.Continuation.checkResult($result)
       |                w = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -7519,97 +4581,56 @@ trait StateMachineFixtures {
       |        var z: Int = null
       |        var w: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                a = 1
       |                b = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(a)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -7617,122 +4638,38 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(b)
       |                val d: Int = c.+(1)
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$4 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.I$4 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(c).+(d)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                w = orThrow.asInstanceOf[Int]
       |                ()
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$4
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                z = $continuation.I$4
+      |                continuations.Continuation.checkResult($result)
       |                w = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -7796,97 +4733,56 @@ trait StateMachineFixtures {
       |        var z: Int = null
       |        var w: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                a = 1
       |                b = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(a)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -7894,122 +4790,38 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(b)
       |                val d: Int = c.+(1)
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$4 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.I$4 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(c).+(d)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                w = orThrow.asInstanceOf[Int]
       |                ()
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$4
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                z = $continuation.I$4
+      |                continuations.Continuation.checkResult($result)
       |                w = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -8073,97 +4885,56 @@ trait StateMachineFixtures {
       |        var z: Int = null
       |        var w: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                a = 1
       |                b = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(a)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -8171,122 +4942,38 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(b)
       |                val d: Int = c.+(1)
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$4 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.I$4 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(c).+(d)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                w = orThrow.asInstanceOf[Int]
       |                ()
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$4
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                z = $continuation.I$4
+      |                continuations.Continuation.checkResult($result)
       |                w = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -8351,97 +5038,56 @@ trait StateMachineFixtures {
       |        var b: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].&&(
+      |          val $continuation:
+      |            continuations.compileFromString$package.
+      |              compileFromString$package$fooTest$1
+      |           =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[
+      |                    continuations.compileFromString$package.
+      |                      compileFromString$package$fooTest$1
+      |                  ].&&(
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
       |                  x$0.asInstanceOf[
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  ].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation =
-      |                  x$0.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ]
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |                  ].$label =
+      |                    x$0.asInstanceOf[
+      |                      continuations.compileFromString$package.
+      |                        compileFromString$package$fooTest$1
+      |                    ].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[
-      |              continuations.compileFromString$package.
-      |                compileFromString$package$fooTest$1
-      |            ].$result
-      |          $continuation.asInstanceOf[
-      |            continuations.compileFromString$package.
-      |              compileFromString$package$fooTest$1
-      |          ].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                a = 1
       |                b = 1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      x##1.+(y##1).+(a)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -8449,121 +5095,37 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                continuations.Continuation.checkResult($result)
       |                z = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
       |                val c: Int = a.+(b)
       |                val d: Int = c.+(1)
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$0 = y##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$1 = x##1
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$2 = a
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$3 = b
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].I$4 = z
-      |                $continuation.asInstanceOf[
-      |                  continuations.compileFromString$package.
-      |                    compileFromString$package$fooTest$1
-      |                ].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = a
+      |                $continuation.I$3 = b
+      |                $continuation.I$4 = z
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      z.+(c).+(d)
-      |                    }
-      |                  )
-      |                )
+      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                ()
       |              case 2 =>
-      |                y##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$0
-      |                x##1 =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$1
-      |                a =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$2
-      |                b =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$3
-      |                z =
-      |                  $continuation.asInstanceOf[
-      |                    continuations.compileFromString$package.
-      |                      compileFromString$package$fooTest$1
-      |                  ].I$4
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                a = $continuation.I$2
+      |                b = $continuation.I$3
+      |                z = $continuation.I$4
+      |                continuations.Continuation.checkResult($result)
       |                ()
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }
@@ -8623,43 +5185,30 @@ trait StateMachineFixtures {
       |        def method2(x: Int): Int = x.+(1)
       |        def method5(x: Int): Int = x
       |        {
-      |          var $continuation: continuations.Continuation[Any] | Null = null
-      |          completion match
-      |            {
-      |              case x$0 @ <empty> if
-      |                x$0.isInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].&&(
-      |                  x$0.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label.&(scala.Int.MinValue).!=(0)
-      |                )
-      |               =>
-      |                $continuation = x$0.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1]
-      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label =
-      |                  $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label.-(scala.Int.MinValue)
-      |              case _ =>
-      |                $continuation =
+      |          val $continuation: continuations.ExampleObject.ExampleObject$continuations$1 =
+      |            completion match
+      |              {
+      |                case x$0 @ <empty> if
+      |                  x$0.isInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].&&(
+      |                    x$0.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label.&(scala.Int.MinValue).!=(0)
+      |                  )
+      |                 =>
+      |                  x$0.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label =
+      |                    x$0.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label.-(scala.Int.MinValue)
+      |                  x$0
+      |                case _ =>
       |                  new continuations.ExampleObject.ExampleObject$continuations$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
-      |            }
+      |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-      |            $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$result
-      |          $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label match
+      |            $continuation.$result
+      |          $continuation.$label match
       |            {
       |              case 0 =>
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                continuations.Continuation.checkResult($result)
       |                val z2: Int = 1
-      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0 = y##1
-      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1 = x##1
-      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label = 1
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.$label = 1
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
@@ -8686,27 +5235,15 @@ trait StateMachineFixtures {
       |                return[label1] ()
       |                ()
       |              case 1 =>
-      |                y##1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0
-      |                x##1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                continuations.Continuation.checkResult($result)
       |                suspension1 = $result.asInstanceOf[Int]
       |                label1[Unit]: <empty>
-      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0 = y##1
-      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1 = x##1
-      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$2 = suspension1
-      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label = 2
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = suspension1
+      |                $continuation.$label = 2
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
@@ -8718,28 +5255,16 @@ trait StateMachineFixtures {
       |                return[label2] ()
       |                ()
       |              case 2 =>
-      |                y##1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0
-      |                x##1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1
-      |                suspension1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                suspension1 = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                label2[Unit]: <empty>
       |                val z5: Int = suspension1
-      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0 = y##1
-      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1 = x##1
-      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$2 = suspension1
-      |                $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label = 3
+      |                $continuation.I$0 = y##1
+      |                $continuation.I$1 = x##1
+      |                $continuation.I$2 = suspension1
+      |                $continuation.$label = 3
       |                val safeContinuation: continuations.SafeContinuation[Int] =
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
@@ -8751,22 +5276,10 @@ trait StateMachineFixtures {
       |                suspension2 = orThrow.asInstanceOf[Int]
       |                ()
       |              case 3 =>
-      |                y##1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$0
-      |                x##1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$1
-      |                suspension1 = $continuation.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].I$2
-      |                if $result.!=(null) then
-      |                  $result.fold[Unit](
-      |                    {
-      |                      def $anonfun(x$0: Throwable): Nothing = throw x$0
-      |                      closure($anonfun)
-      |                    }
-      |                  ,
-      |                    {
-      |                      def $anonfun(x$0: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)): Unit = ()
-      |                      closure($anonfun)
-      |                    }
-      |                  )
-      |                 else ()
+      |                y##1 = $continuation.I$0
+      |                x##1 = $continuation.I$1
+      |                suspension1 = $continuation.I$2
+      |                continuations.Continuation.checkResult($result)
       |                suspension2 = $result.asInstanceOf[Int]
       |              case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
       |            }

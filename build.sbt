@@ -46,7 +46,8 @@ lazy val continuationsPluginExample = project
   .dependsOn(continuationsPlugin)
   .settings(
     continuationsPluginExampleSettings: _*
-  ).enablePlugins(ForceableCompilationPlugin)
+  )
+  .enablePlugins(ForceableCompilationPlugin)
 
 lazy val `zero-arguments-no-continuation-treeview` =
   (project in file("./zero-arguments-no-continuation-treeview"))
