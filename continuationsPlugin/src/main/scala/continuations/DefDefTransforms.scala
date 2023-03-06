@@ -1094,6 +1094,8 @@ object DefDefTransforms extends TreesChecks:
                 .fold(vd)(gv => tpd.Assign(ref(gv.symbol), vd.rhs))
             case _ => tree
 
+        val hasLastStatement = i == suspensionPointsSize - 1 && suspensionInReturnedValue
+
         val stats: List[tpd.Tree] = List(
           assignFromI$Ns,
           List(callToCheckResult),
@@ -1112,13 +1114,11 @@ object DefDefTransforms extends TreesChecks:
           List(suspendContinuationGetThrow),
           List(ifOrThrowReturn),
           List(assignGetOrThrowToGlobalVar),
-          List(returnToLabel)
+          if (hasLastStatement) then List(returnToLabel) else Nil
         ).flatten
 
         val resultValue =
-          if (i == suspensionPointsSize - 1 && suspensionInReturnedValue)
-            ref(suspendContinuationGetThrow.symbol)
-          else unitLiteral
+          if hasLastStatement then ref(suspendContinuationGetThrow.symbol) else returnToLabel
 
         tpd.CaseDef(tpd.Literal(Constant(i)), tpd.EmptyTree, tpd.Block(stats, resultValue))
       }
