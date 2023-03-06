@@ -849,52 +849,49 @@ object DefDefTransforms extends TreesChecks:
     end continuationStateMachineClass
 
     def transformSuspendTree(newParent: Symbol) =
-      val $continuation = tpd.ValDef(
+      val contSymbol: TermSymbol =
         newSymbol(
           newParent,
           termName("$continuation"),
-          Local | Mutable | Synthetic,
-          OrType(continuationClassRef.appliedTo(anyType), defn.NullType, soft = false)).entered,
-        nullLiteral
-      )
+          Local | Synthetic,
+          continuationStateMachineClass.tpe).entered
 
-      val continuationAsStateMachineClass =
-        ref($continuation.symbol)
-          .select(nme.asInstanceOf_)
-          .appliedToType(continuationStateMachineClass.tpe)
+      val completionMatch = {
 
-      val case11Param =
-        newSymbol(newParent, nme.x_0, Flags.Case | Flags.CaseAccessor, defn.AnyType).entered
-      val $continuationLabel =
-        continuationAsStateMachineClass.select(labelVarParam)
-      val case11 = tpd.CaseDef(
-        tpd.Bind(case11Param, tpd.EmptyTree),
-        ref(case11Param)
-          .select(nme.isInstanceOf_)
-          .appliedToType(continuationStateMachineClass.tpe)
-          .select(defn.Boolean_&&)
-          .appliedTo(
-            ref(case11Param)
+        val case11: tpd.CaseDef = {
+          val param =
+            newSymbol(newParent, nme.x_0, Flags.Case | Flags.CaseAccessor, defn.AnyType).entered
+
+          val paramLabel =
+            ref(param)
               .select(nme.asInstanceOf_)
               .appliedToType(continuationStateMachineClass.tpe)
               .select(labelVarParam)
-              .select(integerAND)
-              .appliedTo(integerMin)
-              .select(integerNE)
-              .appliedTo(tpd.Literal(Constant(0x0)))),
-        tpd.Block(
-          List(tpd.Assign(ref($continuation.symbol), ref(case11Param))),
-          tpd.Assign(
-            $continuationLabel,
-            $continuationLabel.select(defn.Int_-).appliedTo(integerMin))
-        )
-      )
 
-      val case12 = tpd.CaseDef(
-        Underscore(anyType),
-        tpd.EmptyTree,
-        tpd.Assign(
-          ref($continuation.symbol),
+          tpd.CaseDef(
+            tpd.Bind(param, tpd.EmptyTree),
+            ref(param)
+              .select(nme.isInstanceOf_)
+              .appliedToType(continuationStateMachineClass.tpe)
+              .select(defn.Boolean_&&)
+              .appliedTo(
+                paramLabel
+                  .select(integerAND)
+                  .appliedTo(integerMin)
+                  .select(integerNE)
+                  .appliedTo(tpd.Literal(Constant(0x0)))),
+            tpd.Block(
+              List(
+                tpd.Assign(paramLabel, paramLabel.select(defn.Int_-).appliedTo(integerMin))
+              ),
+              ref(param)
+            )
+          )
+        }
+
+        val case12 = tpd.CaseDef(
+          Underscore(anyType),
+          tpd.EmptyTree,
           tpd
             .New(tpd.TypeTree(continuationStateMachineClass.tpe))
             .select(nme.CONSTRUCTOR)
@@ -905,10 +902,10 @@ object DefDefTransforms extends TreesChecks:
                   continuationClassRef.appliedTo(anyOrNullType)
                 ))
         )
-      )
-
-      val completionMatch =
         tpd.Match(transformedMethodCompletionParam, List(case11, case12))
+      }
+
+      val $continuationValDef = tpd.ValDef(contSymbol, completionMatch)
 
       val resultSym: TermSymbol =
         newSymbol(
@@ -917,7 +914,7 @@ object DefDefTransforms extends TreesChecks:
           Local,
           eitherThrowableAnyNullSuspendedType).entered
 
-      val $result = tpd.ValDef(resultSym, continuationAsStateMachineClass.select(resultVarName))
+      val $result = tpd.ValDef(resultSym, ref(contSymbol).select(resultVarName))
 
       val callToCheckResult =
         ref(requiredModule(continuationFullName))
@@ -987,7 +984,7 @@ object DefDefTransforms extends TreesChecks:
           val interceptedCall =
             ref(interceptedMethod)
               .appliedToType(suspendContinuationType)
-              .appliedTo(ref($continuation.symbol))
+              .appliedTo(ref(contSymbol))
               .appliedToNone
 
           val safeContinuationConstructor =
@@ -1068,7 +1065,7 @@ object DefDefTransforms extends TreesChecks:
 
         def assignToI(tree: tpd.Tree, i: Int): tpd.Assign =
           tpd.Assign(
-            continuationAsStateMachineClass.select(continuationStateMachineI$Ns(i).symbol),
+            ref(contSymbol).select(continuationStateMachineI$Ns(i).symbol),
             ref(tree.symbol))
 
         val assignToI$Ns =
@@ -1106,7 +1103,7 @@ object DefDefTransforms extends TreesChecks:
           assignToI$Ns,
           List(
             tpd.Assign(
-              continuationAsStateMachineClass.select(labelVarParam),
+              ref(contSymbol).select(labelVarParam),
               tpd.Literal(Constant(i + 1))
             )
           ),
@@ -1140,7 +1137,7 @@ object DefDefTransforms extends TreesChecks:
           }.zipWithIndex.map { (tree, i) =>
             tpd.Assign(
               ref(tree.symbol),
-              continuationAsStateMachineClass.select(continuationStateMachineI$Ns(i).symbol)
+              ref(contSymbol).select(continuationStateMachineI$Ns(i).symbol)
             )
           } ++
             List(callToCheckResult),
@@ -1157,12 +1154,12 @@ object DefDefTransforms extends TreesChecks:
 
       val labelMatch = tpd
         .Match(
-          continuationAsStateMachineClass.select(labelVarParam),
+          ref(contSymbol).select(labelVarParam),
           cases ++ List(case2BeforeDefault, resumeDefaultCaseError)
         )
         .withType(anyNullSuspendedType)
 
-      tpd.Block(List($continuation, completionMatch, $result), labelMatch)
+      tpd.Block(List($continuationValDef, $result), labelMatch)
     end transformSuspendTree
 
     val transformedMethodParamSymbols: List[Symbol] =

@@ -37,7 +37,6 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
           )
       }
   }
-
   compilerContextWithContinuationsPlugin.test(
     "1- it should convert into a state machine two continuations chained with one generic param"
   ) {
@@ -85,7 +84,7 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
           |      val z = s.suspendContinuation[A] { _.resume(Right { a }) }
           |      s.suspendContinuation[B] { _.resume(Right { println(z); b }) }
           |  }
-          |  
+          |
           |  fooTest(Foo(1), Bar(2))
           |}
           |""".stripMargin
