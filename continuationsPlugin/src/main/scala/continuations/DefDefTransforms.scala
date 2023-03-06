@@ -952,9 +952,9 @@ object DefDefTransforms extends TreesChecks:
 
         val returnToLabel =
           if (suspensionPointsSize > 1 && i < suspensionPointsSize - 1)
-            tpd.Return(unitLiteral, labels(i + 1))
+            List(tpd.Return(unitLiteral, labels(i + 1)))
           else
-            tpd.EmptyTree
+            Nil
 
         val callSuspensionPoint: tpd.Tree = suspension match
           case vd: tpd.ValDef if vd.rhs.isInstanceOf[tpd.Inlined] =>
@@ -1026,9 +1026,9 @@ object DefDefTransforms extends TreesChecks:
                 ref(suspendContinuationGetThrow.symbol)
                   .select(nme.asInstanceOf_)
                   .appliedToType(vd.symbol.info)
-              )
+              ) :: Nil
             case _ =>
-              tpd.EmptyTree
+              Nil
 
         def assignGlobalVarResult(vd: tpd.ValDef): tpd.Assign =
           tpd.Assign(
@@ -1089,6 +1089,11 @@ object DefDefTransforms extends TreesChecks:
                 .fold(vd)(gv => tpd.Assign(ref(gv.symbol), vd.rhs))
             case _ => tree
 
+        val resultValue =
+          if (i == suspensionPointsSize - 1 && suspensionInReturnedValue)
+            List(ref(suspendContinuationGetThrow.symbol))
+          else Nil
+
         val stats: List[tpd.Tree] = List(
           assignFromI$Ns,
           List(callToCheckResult),
@@ -1106,16 +1111,14 @@ object DefDefTransforms extends TreesChecks:
           suspendContinuationBody,
           List(suspendContinuationGetThrow),
           List(ifOrThrowReturn),
-          List(assignGetOrThrowToGlobalVar),
-          List(returnToLabel)
+          assignGetOrThrowToGlobalVar,
+          returnToLabel,
+          resultValue
         ).flatten
 
-        val resultValue =
-          if (i == suspensionPointsSize - 1 && suspensionInReturnedValue)
-            ref(suspendContinuationGetThrow.symbol)
-          else unitLiteral
+        val block = tpd.Block(stats.dropRight(1), stats.last)
 
-        tpd.CaseDef(tpd.Literal(Constant(i)), tpd.EmptyTree, tpd.Block(stats, resultValue))
+        tpd.CaseDef(tpd.Literal(Constant(i)), tpd.EmptyTree, block)
       }
 
       val cases =
@@ -1123,28 +1126,31 @@ object DefDefTransforms extends TreesChecks:
           case ((suspension, rowsBefore), i) => toCase(suspension, rowsBefore, i)
         }
 
+      val lastStatement = suspensionPoints.lastOption match {
+        case Some(vd: tpd.ValDef) =>
+          tpd.Assign(
+            globalVars.find(matchesNameCoord(_, vd)).get,
+            ref($result.symbol).select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
+          ) :: Nil
+        case Some(_) if suspensionInReturnedValue => ref($result.symbol) :: Nil
+        case _ => Nil
+      }
+
+      val stats =
+        treesToAssignToI$Ns {
+          paramsAndRowsBeforeSuspendIncludingSuspend(suspensionPoints.size - 1)
+        }.zipWithIndex.map { (tree, i) =>
+          tpd.Assign(
+            ref(tree.symbol),
+            ref(contSymbol).select(continuationStateMachineI$Ns(i).symbol)
+          )
+        } ++ List(callToCheckResult) ++ lastStatement
+
+      val block = tpd.Block(stats.dropRight(1), stats.last)
       val case2BeforeDefault = tpd.CaseDef(
         tpd.Literal(Constant(suspensionPointsSize)),
         tpd.EmptyTree,
-        tpd.Block(
-          treesToAssignToI$Ns {
-            paramsAndRowsBeforeSuspendIncludingSuspend(suspensionPoints.size - 1)
-          }.zipWithIndex.map { (tree, i) =>
-            tpd.Assign(
-              ref(tree.symbol),
-              ref(contSymbol).select(continuationStateMachineI$Ns(i).symbol)
-            )
-          } ++
-            List(callToCheckResult),
-          suspensionPoints.lastOption match
-            case Some(vd: tpd.ValDef) =>
-              tpd.Assign(
-                globalVars.find(matchesNameCoord(_, vd)).get,
-                ref($result.symbol).select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
-              )
-            case Some(_) if suspensionInReturnedValue => ref($result.symbol)
-            case _ => unitLiteral
-        )
+        block
       )
 
       val labelMatch = tpd
