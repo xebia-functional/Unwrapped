@@ -69,7 +69,7 @@ trait StateMachineFixtures {
        |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
        |                      x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                      x$0
-       |                    case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                    case _ => new program$foo$1(completion)
        |                  }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |                $continuation.$result
@@ -146,7 +146,7 @@ trait StateMachineFixtures {
        |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
        |                      x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                      x$0
-       |                    case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                    case _ => new program$foo$1(completion)
        |                  }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |                $continuation.$result
@@ -222,7 +222,7 @@ trait StateMachineFixtures {
        |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
        |                      x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                      x$0
-       |                    case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                    case _ => new program$foo$1(completion)
        |                  }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |                $continuation.$result
@@ -324,7 +324,7 @@ trait StateMachineFixtures {
        |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
        |                      x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                      x$0
-       |                    case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                    case _ => new program$foo$1(completion)
        |                  }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |                $continuation.$result
@@ -431,7 +431,7 @@ trait StateMachineFixtures {
        |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
        |                      x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                      x$0
-       |                    case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                    case _ => new program$foo$1(completion)
        |                  }
        |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |                $continuation.$result
@@ -523,7 +523,7 @@ trait StateMachineFixtures {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
        |                    x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                    x$0
-       |                  case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                  case _ => new program$foo$1(completion)
        |                }
        |            val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |              $continuation.$result
@@ -622,7 +622,7 @@ trait StateMachineFixtures {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
        |                    x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                    x$0
-       |                  case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                  case _ => new program$foo$1(completion)
        |                }
        |            val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |              $continuation.$result
@@ -723,7 +723,7 @@ trait StateMachineFixtures {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
        |                    x$0.asInstanceOf[program$foo$1].$label = x$0.asInstanceOf[program$foo$1].$label.-(scala.Int.MinValue)
        |                    x$0
-       |                  case _ => new program$foo$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                  case _ => new program$foo$1(completion)
        |                }
        |            val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
        |              $continuation.$result
@@ -852,7 +852,7 @@ trait StateMachineFixtures {
        |                  new
        |                    continuations.compileFromString$package.
        |                      compileFromString$package$foo$1
-       |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+       |                  (completion)
        |              }
        |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
        |            $continuation.$result
@@ -950,7 +950,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$foo$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -1047,7 +1047,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$foo$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -1166,7 +1166,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -1340,7 +1340,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -1498,7 +1498,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -1634,7 +1634,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -1757,7 +1757,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -1909,7 +1909,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -2039,7 +2039,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -2175,7 +2175,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -2333,7 +2333,7 @@ trait StateMachineFixtures {
       |                     =>
       |                      x$0.asInstanceOf[program$fooTest$1].$label = x$0.asInstanceOf[program$fooTest$1].$label.-(scala.Int.MinValue)
       |                      x$0
-      |                    case _ => new program$fooTest$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                    case _ => new program$fooTest$1(completion)
       |                  }
       |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |                $continuation.$result
@@ -2550,7 +2550,7 @@ trait StateMachineFixtures {
       |                     =>
       |                      x$0.asInstanceOf[program$fooTest$1].$label = x$0.asInstanceOf[program$fooTest$1].$label.-(scala.Int.MinValue)
       |                      x$0
-      |                    case _ => new program$fooTest$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                    case _ => new program$fooTest$1(completion)
       |                  }
       |              val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |                $continuation.$result
@@ -2692,7 +2692,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -2826,7 +2826,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -2954,7 +2954,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -3082,7 +3082,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -3211,7 +3211,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -3340,7 +3340,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -3470,7 +3470,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -3603,7 +3603,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -3740,7 +3740,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -3881,7 +3881,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -4023,7 +4023,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -4165,7 +4165,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -4311,7 +4311,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -4460,7 +4460,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -4611,7 +4611,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -4763,7 +4763,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -4915,7 +4915,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -5068,7 +5068,7 @@ trait StateMachineFixtures {
       |                  new
       |                    continuations.compileFromString$package.
       |                      compileFromString$package$fooTest$1
-      |                  (completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                  (completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
