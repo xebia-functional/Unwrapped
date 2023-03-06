@@ -63,7 +63,7 @@ trait StateMachineFixtures {
        |         = 
        |          {
        |            {
-       |              var $continuation: program$foo$1 = 
+       |              val $continuation: program$foo$1 = 
        |                completion match 
        |                  {
        |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
@@ -140,7 +140,7 @@ trait StateMachineFixtures {
        |          {
        |            var x##1: Int = x
        |            {
-       |              var $continuation: program$foo$1 = 
+       |              val $continuation: program$foo$1 = 
        |                completion match 
        |                  {
        |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
@@ -216,7 +216,7 @@ trait StateMachineFixtures {
        |         = 
        |          {
        |            {
-       |              var $continuation: program$foo$1 = 
+       |              val $continuation: program$foo$1 = 
        |                completion match 
        |                  {
        |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
@@ -318,7 +318,7 @@ trait StateMachineFixtures {
        |         = 
        |          {
        |            {
-       |              var $continuation: program$foo$1 = 
+       |              val $continuation: program$foo$1 = 
        |                completion match 
        |                  {
        |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
@@ -425,7 +425,7 @@ trait StateMachineFixtures {
        |         = 
        |          {
        |            {
-       |              var $continuation: program$foo$1 = 
+       |              val $continuation: program$foo$1 = 
        |                completion match 
        |                  {
        |                    case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
@@ -517,7 +517,7 @@ trait StateMachineFixtures {
        |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
        |         = 
        |          {
-       |            var $continuation: program$foo$1 = 
+       |            val $continuation: program$foo$1 = 
        |              completion match 
        |                {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
@@ -616,7 +616,7 @@ trait StateMachineFixtures {
        |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
        |         = 
        |          {
-       |            var $continuation: program$foo$1 = 
+       |            val $continuation: program$foo$1 = 
        |              completion match 
        |                {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
@@ -717,7 +717,7 @@ trait StateMachineFixtures {
        |          Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
        |         = 
        |          {
-       |            var $continuation: program$foo$1 = 
+       |            val $continuation: program$foo$1 = 
        |              completion match 
        |                {
        |                  case x$0 @ <empty> if x$0.isInstanceOf[program$foo$1].&&(x$0.asInstanceOf[program$foo$1].$label.&(scala.Int.MinValue).!=(0)) => 
@@ -822,7 +822,7 @@ trait StateMachineFixtures {
        |        var x##1: Int = x
        |        var y: Int = null
        |        {
-       |          var $continuation:
+       |          val $continuation:
        |            continuations.compileFromString$package.
        |              compileFromString$package$foo$1
        |           =
@@ -920,7 +920,7 @@ trait StateMachineFixtures {
       |      {
       |        var qq##1: Int = qq
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$foo$1
       |           =
@@ -1017,7 +1017,7 @@ trait StateMachineFixtures {
       |      {
       |        var xx: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$foo$1
       |           =
@@ -1136,7 +1136,7 @@ trait StateMachineFixtures {
       |        var tt: Int = null
       |        var zz: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -1310,7 +1310,7 @@ trait StateMachineFixtures {
       |        var tt: Int = null
       |        var zz: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -1468,7 +1468,7 @@ trait StateMachineFixtures {
       |        var x##1: Int = x
       |        var y: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -1604,7 +1604,7 @@ trait StateMachineFixtures {
       |      {
       |        var x: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -1727,7 +1727,7 @@ trait StateMachineFixtures {
       |        var j: Int = null
       |        var w: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -1879,7 +1879,7 @@ trait StateMachineFixtures {
       |        var x##1: Int = x
       |        var y: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -2009,7 +2009,7 @@ trait StateMachineFixtures {
       |        var p: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -2145,7 +2145,7 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation: 
+      |          val $continuation: 
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -2325,7 +2325,7 @@ trait StateMachineFixtures {
       |            var b##1: Int = b
       |            var z: A = null
       |            {
-      |              var $continuation: program$fooTest$1 = 
+      |              val $continuation: program$fooTest$1 = 
       |                completion match
       |                  {
       |                    case x$0 @ <empty> if
@@ -2542,7 +2542,7 @@ trait StateMachineFixtures {
       |            var b##1: B = b
       |            var z: A = null
       |            {
-      |              var $continuation: program$fooTest$1 =
+      |              val $continuation: program$fooTest$1 =
       |                completion match
       |                  {
       |                    case x$0 @ <empty> if
@@ -2662,7 +2662,7 @@ trait StateMachineFixtures {
       |        var ec##1: concurrent.ExecutionContext = ec
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -2796,7 +2796,7 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -2924,7 +2924,7 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -3052,7 +3052,7 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -3181,7 +3181,7 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -3310,7 +3310,7 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -3440,7 +3440,7 @@ trait StateMachineFixtures {
       |        var y##1: Int = y
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -3573,7 +3573,7 @@ trait StateMachineFixtures {
       |        var a: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -3710,7 +3710,7 @@ trait StateMachineFixtures {
       |        var a: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -3851,7 +3851,7 @@ trait StateMachineFixtures {
       |        var b: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -3993,7 +3993,7 @@ trait StateMachineFixtures {
       |        var b: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -4135,7 +4135,7 @@ trait StateMachineFixtures {
       |        var b: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -4281,7 +4281,7 @@ trait StateMachineFixtures {
       |        var b: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -4430,7 +4430,7 @@ trait StateMachineFixtures {
       |        var z: Int = null
       |        var w: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -4581,7 +4581,7 @@ trait StateMachineFixtures {
       |        var z: Int = null
       |        var w: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -4733,7 +4733,7 @@ trait StateMachineFixtures {
       |        var z: Int = null
       |        var w: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -4885,7 +4885,7 @@ trait StateMachineFixtures {
       |        var z: Int = null
       |        var w: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =
@@ -5038,7 +5038,7 @@ trait StateMachineFixtures {
       |        var b: Int = null
       |        var z: Int = null
       |        {
-      |          var $continuation:
+      |          val $continuation:
       |            continuations.compileFromString$package.
       |              compileFromString$package$fooTest$1
       |           =

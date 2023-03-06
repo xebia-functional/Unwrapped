@@ -853,7 +853,7 @@ object DefDefTransforms extends TreesChecks:
         newSymbol(
           newParent,
           termName("$continuation"),
-          Local | Mutable | Synthetic,
+          Local | Synthetic,
           continuationStateMachineClass.tpe).entered
 
       val completionMatch = {
