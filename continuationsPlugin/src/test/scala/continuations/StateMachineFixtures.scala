@@ -150,7 +150,7 @@ trait StateMachineFixtures {
        |            {
        |              this.$result = result
        |              this.$label = this.$label.|(scala.Int.MinValue)
-       |              foo(this.asInstanceOf[continuations.Continuation[Int]])
+       |              foo(this)
        |            }
        |        }
        |        def foo(completion: continuations.Continuation[Int]): 
@@ -228,7 +228,7 @@ trait StateMachineFixtures {
        |            {
        |              this.$result = result
        |              this.$label = this.$label.|(scala.Int.MinValue)
-       |              foo(null, this.asInstanceOf[continuations.Continuation[Int]])
+       |              foo(null, this)
        |            }
        |        }
        |        def foo(x: Int, completion: continuations.Continuation[Int]): 
@@ -307,7 +307,7 @@ trait StateMachineFixtures {
        |            {
        |              this.$result = result
        |              this.$label = this.$label.|(scala.Int.MinValue)
-       |              foo(this.asInstanceOf[continuations.Continuation[Int]])
+       |              foo(this)
        |            }
        |        }
        |        def foo(completion: continuations.Continuation[Int]): 
@@ -417,7 +417,7 @@ trait StateMachineFixtures {
        |            {
        |              this.$result = result
        |              this.$label = this.$label.|(scala.Int.MinValue)
-       |              foo(this.asInstanceOf[continuations.Continuation[Int]])
+       |              foo(this)
        |            }
        |        }
        |        def foo(completion: continuations.Continuation[Int]): 
@@ -532,7 +532,7 @@ trait StateMachineFixtures {
        |            {
        |              this.$result = result
        |              this.$label = this.$label.|(scala.Int.MinValue)
-       |              foo(this.asInstanceOf[continuations.Continuation[Int]])
+       |              foo(this)
        |            }
        |        }
        |        def foo(completion: continuations.Continuation[Int]): 
@@ -630,7 +630,7 @@ trait StateMachineFixtures {
        |            {
        |              this.$result = result
        |              this.$label = this.$label.|(scala.Int.MinValue)
-       |              foo(this.asInstanceOf[continuations.Continuation[Int]])
+       |              foo(this)
        |            }
        |        }
        |        def foo(completion: continuations.Continuation[Int]): 
@@ -739,7 +739,7 @@ trait StateMachineFixtures {
        |            {
        |              this.$result = result
        |              this.$label = this.$label.|(scala.Int.MinValue)
-       |              foo(this.asInstanceOf[continuations.Continuation[Int]])
+       |              foo(this)
        |            }
        |        }
        |        def foo(completion: continuations.Continuation[Int]): 
@@ -850,7 +850,7 @@ trait StateMachineFixtures {
        |            {
        |              this.$result = result
        |              this.$label = this.$label.|(scala.Int.MinValue)
-       |              foo(this.asInstanceOf[continuations.Continuation[Int]])
+       |              foo(this)
        |            }
        |        }
        |        def foo(completion: continuations.Continuation[Int]): 
@@ -962,7 +962,7 @@ trait StateMachineFixtures {
        |        {
        |          this.$result = result
        |          this.$label = this.$label.|(scala.Int.MinValue)
-       |          continuations.compileFromString$package.foo(null, this.asInstanceOf[continuations.Continuation[Int]])
+       |          continuations.compileFromString$package.foo(null, this)
        |        }
        |    }
        |    def foo(x: Int, completion: continuations.Continuation[Int]):
@@ -1064,7 +1064,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.foo(null, this.asInstanceOf[continuations.Continuation[Int]])
+      |          continuations.compileFromString$package.foo(null, this)
       |        }
       |    }
       |    def foo(qq: Int, completion: continuations.Continuation[Int]):
@@ -1161,7 +1161,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.foo(this.asInstanceOf[continuations.Continuation[Int]])
+      |          continuations.compileFromString$package.foo(this)
       |        }
       |    }
       |    def foo(completion: continuations.Continuation[Int]):
@@ -1272,9 +1272,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, this)
       |        }
       |    }
       |    def fooTest(qq: Int, completion: continuations.Continuation[Int]):
@@ -1450,9 +1448,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, this) 
       |        }
       |    }
       |    def fooTest(qq: Int, completion: continuations.Continuation[Int]):
@@ -1615,9 +1611,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, this) 
       |        }
       |    }
       |    def fooTest(x: Int, completion: continuations.Continuation[Int]):
@@ -1757,7 +1751,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(this.asInstanceOf[continuations.Continuation[Int]])
+      |          continuations.compileFromString$package.fooTest(this)
       |        }
       |    }
       |    def fooTest(completion: continuations.Continuation[Int]):
@@ -1878,9 +1872,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, this) 
       |        }
       |    }
       |    def fooTest(q: Int, completion: continuations.Continuation[Int]):
@@ -2034,9 +2026,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, this) 
       |        }
       |    }
       |    def fooTest(x: Int, completion: continuations.Continuation[Int]):
@@ -2168,9 +2158,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, this) 
       |        }
       |    }
       |    def fooTest(x: Int, completion: continuations.Continuation[Int]):
@@ -2312,9 +2300,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this) 
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Int]):
@@ -2497,7 +2483,7 @@ trait StateMachineFixtures {
       |            {
       |              this.$result = result
       |              this.$label = this.$label.|(scala.Int.MinValue)
-      |              fooTest(null, null, this.asInstanceOf[continuations.Continuation[A]])
+      |              fooTest(null, null, this)
       |            }
       |        }
       |        def fooTest(a: A, b: Int, completion: continuations.Continuation[A]):
@@ -2717,7 +2703,7 @@ trait StateMachineFixtures {
       |            {
       |              this.$result = result
       |              this.$label = this.$label.|(scala.Int.MinValue)
-      |              fooTest(null, null, this.asInstanceOf[continuations.Continuation[B]])
+      |              fooTest(null, null, this)
       |            }
       |        }
       |        def fooTest(a: A, b: B, completion: continuations.Continuation[B]):
@@ -2837,9 +2823,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, ec: concurrent.ExecutionContext, completion: continuations.Continuation[Int]):
@@ -2975,9 +2959,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[(concurrent.ExecutionContext) ?=> Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[(concurrent.ExecutionContext) ?=> Int]):
@@ -3106,9 +3088,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Int]):
@@ -3237,9 +3217,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Int]):
@@ -3369,9 +3347,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Int]):
@@ -3501,9 +3477,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Int]):
@@ -3634,9 +3608,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Int]):
@@ -3769,9 +3741,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Int]):
@@ -3909,9 +3879,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Int]):
@@ -4052,9 +4020,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Int]):
@@ -4198,9 +4164,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Int]):
@@ -4342,9 +4306,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Int]):
@@ -4491,9 +4453,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Int]):
@@ -4642,9 +4602,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Unit]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Unit]):
@@ -4795,9 +4753,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Int]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Int]):
@@ -4949,9 +4905,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Unit]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Unit]):
@@ -5103,9 +5057,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Unit]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Unit]):
@@ -5259,9 +5211,7 @@ trait StateMachineFixtures {
       |        {
       |          this.$result = result
       |          this.$label = this.$label.|(scala.Int.MinValue)
-      |          continuations.compileFromString$package.fooTest(null, null,
-      |            this.asInstanceOf[continuations.Continuation[Unit]]
-      |          )
+      |          continuations.compileFromString$package.fooTest(null, null, this)
       |        }
       |    }
       |    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Unit]):
