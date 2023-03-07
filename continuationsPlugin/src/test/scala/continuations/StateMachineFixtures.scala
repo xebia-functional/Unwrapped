@@ -20,7 +20,102 @@ trait StateMachineFixtures {
        |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
        |            continuations.Continuation.State.Undecided
        |          )
-       |        safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |        {
+       |          safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |        }
+       |        safeContinuation.getOrThrow()
+       |      }
+       |  }
+       |}
+       |""".stripMargin
+
+  val expectedOneSuspendContinuationTwoBlocks =
+    """|
+       |package continuations {
+       |  final lazy module val compileFromString$package: 
+       |    continuations.compileFromString$package
+       |   = new continuations.compileFromString$package()
+       |  @SourceFile("compileFromString.scala") final module class 
+       |    compileFromString$package
+       |  () extends Object() { this: continuations.compileFromString$package.type =>
+       |    private def writeReplace(): AnyRef = 
+       |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+       |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+       |      {
+       |        val continuation1: continuations.Continuation[Int] = completion
+       |        val safeContinuation: continuations.SafeContinuation[Int] = 
+       |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+       |            continuations.Continuation.State.Undecided
+       |          )
+       |        {
+       |          {
+       |            safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |          }
+       |        }
+       |        safeContinuation.getOrThrow()
+       |      }
+       |  }
+       |}
+       |""".stripMargin
+
+  val expectedOneSuspendContinuationThreeBlocks =
+    """|
+       |package continuations {
+       |  final lazy module val compileFromString$package: 
+       |    continuations.compileFromString$package
+       |   = new continuations.compileFromString$package()
+       |  @SourceFile("compileFromString.scala") final module class 
+       |    compileFromString$package
+       |  () extends Object() { this: continuations.compileFromString$package.type =>
+       |    private def writeReplace(): AnyRef = 
+       |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+       |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+       |      {
+       |        val continuation1: continuations.Continuation[Int] = completion
+       |        val safeContinuation: continuations.SafeContinuation[Int] = 
+       |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+       |            continuations.Continuation.State.Undecided
+       |          )
+       |        {
+       |          {
+       |            {
+       |              safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |            }
+       |          }
+       |        }
+       |        safeContinuation.getOrThrow()
+       |      }
+       |  }
+       |}
+       |""".stripMargin
+
+  val expectedOneSuspendContinuationFourBlocks =
+    """|
+       |package continuations {
+       |  final lazy module val compileFromString$package: 
+       |    continuations.compileFromString$package
+       |   = new continuations.compileFromString$package()
+       |  @SourceFile("compileFromString.scala") final module class 
+       |    compileFromString$package
+       |  () extends Object() { this: continuations.compileFromString$package.type =>
+       |    private def writeReplace(): AnyRef = 
+       |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+       |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+       |      {
+       |        val continuation1: continuations.Continuation[Int] = completion
+       |        val safeContinuation: continuations.SafeContinuation[Int] = 
+       |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
+       |            continuations.Continuation.State.Undecided
+       |          )
+       |        {
+       |          {
+       |            {
+       |              {
+       |                safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |              }
+       |            }
+       |          }
+       |        }
        |        safeContinuation.getOrThrow()
        |      }
        |  }
@@ -82,7 +177,11 @@ trait StateMachineFixtures {
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                        continuations.Continuation.State.Undecided
        |                      )
-       |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                    {
+       |                      {
+       |                        safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                      }
+       |                    }
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -158,7 +257,11 @@ trait StateMachineFixtures {
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                        continuations.Continuation.State.Undecided
        |                      )
-       |                    safeContinuation.resume(Right.apply[Nothing, Int](x##1))
+       |                    {
+       |                      {
+       |                        safeContinuation.resume(Right.apply[Nothing, Int](x##1))
+       |                      }
+       |                    }
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -231,7 +334,11 @@ trait StateMachineFixtures {
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                        continuations.Continuation.State.Undecided
        |                      )
-       |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                    {
+       |                      {
+       |                        safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                      }
+       |                    }
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -244,7 +351,11 @@ trait StateMachineFixtures {
        |                      new continuations.SafeContinuation[Boolean](
        |                        continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
        |                      , continuations.Continuation.State.Undecided)
-       |                    safeContinuation.resume(Right.apply[Nothing, Boolean](false))
+       |                    {
+       |                      {
+       |                        safeContinuation.resume(Right.apply[Nothing, Boolean](false))
+       |                      }
+       |                    }
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -257,7 +368,11 @@ trait StateMachineFixtures {
        |                      new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)()
        |                        , 
        |                      continuations.Continuation.State.Undecided)
-       |                    safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
+       |                    {
+       |                      {
+       |                        safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
+       |                      }
+       |                    }
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -329,9 +444,13 @@ trait StateMachineFixtures {
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                        continuations.Continuation.State.Undecided
        |                      )
-       |                    println("Hello")
-       |                    println("World")
-       |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                    {
+       |                      {
+       |                        println("Hello")
+       |                        println("World")
+       |                        safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                      }
+       |                    }
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -344,8 +463,12 @@ trait StateMachineFixtures {
        |                      new continuations.SafeContinuation[Boolean](
        |                        continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
        |                      , continuations.Continuation.State.Undecided)
-       |                    safeContinuation.resume(Right.apply[Nothing, Boolean](false))
-       |                    safeContinuation.resume(Right.apply[Nothing, Boolean](true))
+       |                    {
+       |                      {
+       |                        safeContinuation.resume(Right.apply[Nothing, Boolean](false))
+       |                        safeContinuation.resume(Right.apply[Nothing, Boolean](true))
+       |                      }
+       |                    }
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -358,9 +481,13 @@ trait StateMachineFixtures {
        |                      new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)()
        |                        , 
        |                      continuations.Continuation.State.Undecided)
-       |                    safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
-       |                    val x: Int = 1
-       |                    ()
+       |                    {
+       |                      {
+       |                        safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
+       |                        val x: Int = 1
+       |                        ()
+       |                      }
+       |                    }
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -433,7 +560,11 @@ trait StateMachineFixtures {
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                        continuations.Continuation.State.Undecided
        |                      )
-       |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                    {
+       |                      {
+       |                        safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                      }
+       |                    }
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -449,7 +580,11 @@ trait StateMachineFixtures {
        |                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                        continuations.Continuation.State.Undecided
        |                      )
-       |                    safeContinuation.resume(Right.apply[Nothing, Int](2))
+       |                    {
+       |                      {
+       |                        safeContinuation.resume(Right.apply[Nothing, Int](2))
+       |                      }
+       |                    }
        |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                      safeContinuation.getOrThrow()
        |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -521,7 +656,11 @@ trait StateMachineFixtures {
        |                    new continuations.SafeContinuation[Boolean](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
        |                      , 
        |                    continuations.Continuation.State.Undecided)
-       |                  safeContinuation.resume(Right.apply[Nothing, Boolean](false))
+       |                  {
+       |                    {
+       |                      safeContinuation.resume(Right.apply[Nothing, Boolean](false))
+       |                    }
+       |                  }
        |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -534,7 +673,11 @@ trait StateMachineFixtures {
        |                    new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)(), 
        |                      continuations.Continuation.State.Undecided
        |                    )
-       |                  safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
+       |                  {
+       |                    {
+       |                      safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
+       |                    }
+       |                  }
        |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -547,7 +690,11 @@ trait StateMachineFixtures {
        |                    new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                      continuations.Continuation.State.Undecided
        |                    )
-       |                  safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                  {
+       |                    {
+       |                      safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                    }
+       |                  }
        |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -618,8 +765,12 @@ trait StateMachineFixtures {
        |                    new continuations.SafeContinuation[Boolean](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
        |                      , 
        |                    continuations.Continuation.State.Undecided)
-       |                  println("Hi")
-       |                  safeContinuation.resume(Right.apply[Nothing, Boolean](false))
+       |                  {
+       |                    {
+       |                      println("Hi")
+       |                      safeContinuation.resume(Right.apply[Nothing, Boolean](false))
+       |                    }
+       |                  }
        |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -632,8 +783,12 @@ trait StateMachineFixtures {
        |                    new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)(), 
        |                      continuations.Continuation.State.Undecided
        |                    )
-       |                  safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
-       |                  println("World")
+       |                  {
+       |                    {
+       |                      safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
+       |                      println("World")
+       |                    }
+       |                  }
        |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -646,7 +801,11 @@ trait StateMachineFixtures {
        |                    new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                      continuations.Continuation.State.Undecided
        |                    )
-       |                  safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                  {
+       |                    {
+       |                      safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                    }
+       |                  }
        |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -719,7 +878,11 @@ trait StateMachineFixtures {
        |                    new continuations.SafeContinuation[Boolean](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
        |                      , 
        |                    continuations.Continuation.State.Undecided)
-       |                  safeContinuation.resume(Right.apply[Nothing, Boolean](false))
+       |                  {
+       |                    {
+       |                      safeContinuation.resume(Right.apply[Nothing, Boolean](false))
+       |                    }
+       |                  }
        |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -733,7 +896,11 @@ trait StateMachineFixtures {
        |                    new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)(), 
        |                      continuations.Continuation.State.Undecided
        |                    )
-       |                  safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
+       |                  {
+       |                    {
+       |                      safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
+       |                    }
+       |                  }
        |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -746,7 +913,11 @@ trait StateMachineFixtures {
        |                    new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
        |                      continuations.Continuation.State.Undecided
        |                    )
-       |                  safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                  {
+       |                    {
+       |                      safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                    }
+       |                  }
        |                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
        |                    safeContinuation.getOrThrow()
        |                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -845,7 +1016,11 @@ trait StateMachineFixtures {
        |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
        |                    continuations.Continuation.State.Undecided
        |                  )
-       |                safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                {
+       |                  {
+       |                    safeContinuation.resume(Right.apply[Nothing, Int](1))
+       |                  }
+       |                }
        |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
        |                  safeContinuation.getOrThrow()
        |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -942,7 +1117,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Unit](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Unit]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Unit](println(qq##1)))
+      |                {  
+      |                  safeContinuation.resume(Right.apply[Nothing, Unit](println(qq##1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1039,7 +1216,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](10))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](10))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1156,7 +1335,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](qq##1.-(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](qq##1.-(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1179,7 +1360,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, String](rr))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, String](rr))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1205,7 +1388,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](ww.-(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](ww.-(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1327,7 +1512,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](qq##1.-(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](qq##1.-(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1350,7 +1537,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, String](rr))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, String](rr))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1373,7 +1562,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](ww.-(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](ww.-(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1481,14 +1672,16 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      println("World")
-      |                      1
-      |                    }
+      |                {
+      |                  safeContinuation.resume(
+      |                    Right.apply[Nothing, Int](
+      |                      {
+      |                        println("World")
+      |                        1
+      |                      }
+      |                    )
       |                  )
-      |                )
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1507,16 +1700,20 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                val w: String = "World"
-      |                println("Hello")
-      |                safeContinuation.resume(
-      |                  Right.apply[Nothing, Int](
-      |                    {
-      |                      println(z)
-      |                      x##1
-      |                    }
-      |                  )
-      |                )
+      |                {
+      |                  {
+      |                    val w: String = "World"
+      |                    println("Hello")
+      |                    safeContinuation.resume(
+      |                      Right.apply[Nothing, Int](
+      |                        {
+      |                          println(z)
+      |                          x##1
+      |                        }
+      |                      )
+      |                    )
+      |                  }
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1612,7 +1809,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](1))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](1))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1628,7 +1827,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x.+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x.+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1737,7 +1938,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](1.+(z)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](1.+(z)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1757,7 +1960,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x.+(1).+(q##1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x.+(1).+(q##1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1780,7 +1985,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x.+(w).+(1).+(j)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x.+(w).+(1).+(j)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1883,7 +2090,11 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(1)))
+      |                {
+      |                  {
+      |                    safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(1)))
+      |                  }
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -1901,7 +2112,11 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](y.+(1)))
+      |                {
+      |                  {
+      |                    safeContinuation.resume(Right.apply[Nothing, Int](y.+(1)))
+      |                  }
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2015,7 +2230,11 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(w)))
+      |                {
+      |                  {
+      |                    safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(w)))
+      |                  }
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2038,7 +2257,11 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](y.+(q).+(x##1)))
+      |                {
+      |                  {
+      |                    safeContinuation.resume(Right.apply[Nothing, Int](y.+(q).+(x##1)))
+      |                  }
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2147,7 +2370,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2167,7 +2392,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2304,7 +2531,9 @@ trait StateMachineFixtures {
       |                      new continuations.SafeContinuation[A](continuations.intrinsics.IntrinsicsJvm$package.intercepted[A]($continuation)(),
       |                        continuations.Continuation.State.Undecided
       |                      )
-      |                    safeContinuation.resume(Right.apply[Nothing, A](a##1))
+      |                    {
+      |                      safeContinuation.resume(Right.apply[Nothing, A](a##1))
+      |                    }
       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                      safeContinuation.getOrThrow()
       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2324,14 +2553,16 @@ trait StateMachineFixtures {
       |                      new continuations.SafeContinuation[A](continuations.intrinsics.IntrinsicsJvm$package.intercepted[A]($continuation)(),
       |                        continuations.Continuation.State.Undecided
       |                      )
-      |                    safeContinuation.resume(
-      |                      Right.apply[Nothing, A](
-      |                        {
-      |                          println("World")
-      |                          z
-      |                        }
+      |                    {
+      |                      safeContinuation.resume(
+      |                        Right.apply[Nothing, A](
+      |                          {
+      |                            println("World")
+      |                            z
+      |                          }
+      |                        )
       |                      )
-      |                    )
+      |                    }
       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                      safeContinuation.getOrThrow()
       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2520,7 +2751,9 @@ trait StateMachineFixtures {
       |                      new continuations.SafeContinuation[A](continuations.intrinsics.IntrinsicsJvm$package.intercepted[A]($continuation)(),
       |                        continuations.Continuation.State.Undecided
       |                      )
-      |                    safeContinuation.resume(Right.apply[Nothing, A](a##1))
+      |                    {
+      |                      safeContinuation.resume(Right.apply[Nothing, A](a##1))
+      |                    }
       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                      safeContinuation.getOrThrow()
       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2540,14 +2773,16 @@ trait StateMachineFixtures {
       |                      new continuations.SafeContinuation[B](continuations.intrinsics.IntrinsicsJvm$package.intercepted[B]($continuation)(),
       |                        continuations.Continuation.State.Undecided
       |                      )
-      |                    safeContinuation.resume(
-      |                      Right.apply[Nothing, B](
-      |                        {
-      |                          println(z)
-      |                          b##1
-      |                        }
+      |                    {
+      |                      safeContinuation.resume(
+      |                        Right.apply[Nothing, B](
+      |                          {
+      |                            println(z)
+      |                            b##1
+      |                          }
+      |                        )
       |                      )
-      |                    )
+      |                    }
       |                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                      safeContinuation.getOrThrow()
       |                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2662,7 +2897,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2684,7 +2921,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2794,7 +3033,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2814,7 +3055,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2921,7 +3164,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -2941,7 +3186,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3049,7 +3296,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3069,7 +3318,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3177,7 +3428,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(w)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(w)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3197,7 +3450,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3306,7 +3561,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3326,7 +3583,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3435,7 +3694,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(w)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(w)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3455,7 +3716,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(1)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3568,7 +3831,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(w)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(w)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3590,7 +3855,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(a)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(a)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3704,7 +3971,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(w)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(w)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3727,7 +3996,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(a)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(a)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3845,7 +4116,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3870,7 +4143,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(b).+(c)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(b).+(c)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -3985,7 +4260,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4009,7 +4286,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(b)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(b)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4127,7 +4406,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4153,7 +4434,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(c)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4272,7 +4555,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4298,7 +4583,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4420,7 +4707,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4446,7 +4735,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4569,7 +4860,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4595,7 +4888,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4719,7 +5014,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4745,7 +5042,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4869,7 +5168,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -4895,7 +5196,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -5020,7 +5323,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](x##1.+(y##1).+(a)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
@@ -5046,7 +5351,9 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
+      |                {
+      |                  safeContinuation.resume(Right.apply[Nothing, Int](z.+(c).+(d)))
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
