@@ -88,10 +88,7 @@ package continuations {
                 $continuation.I$0 = qq##1
                 $continuation.I$1 = pp
                 $continuation.$label = 1
-                val safeContinuation: continuations.SafeContinuation[Int] =
-                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
-                    continuations.Continuation.State.Undecided
-                  )
+                val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
                 {
                   safeContinuation.resume(Right.apply[Nothing, Int](qq##1.-(1)))
                 }
@@ -113,10 +110,7 @@ package continuations {
                 $continuation.I$2 = xx
                 $continuation.I$3 = ww
                 $continuation.$label = 2
-                val safeContinuation: continuations.SafeContinuation[String] =
-                  new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)(),
-                    continuations.Continuation.State.Undecided
-                  )
+                val safeContinuation: continuations.SafeContinuation[String] = continuations.SafeContinuation.init[String]($continuation)
                 {
                   safeContinuation.resume(Right.apply[Nothing, String](rr))
                 }
@@ -138,10 +132,7 @@ package continuations {
                 $continuation.I$3 = ww
                 $continuation.I$4 = tt
                 $continuation.$label = 3
-                val safeContinuation: continuations.SafeContinuation[Int] =
-                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
-                    continuations.Continuation.State.Undecided
-                  )
+                val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
                 {
                   safeContinuation.resume(Right.apply[Nothing, Int](ww.-(1)))
                 }

@@ -350,27 +350,11 @@ object DefDefTransforms extends TreesChecks:
      ```
      */
     val safeContinuation: tpd.ValDef = {
-      val classSym: ClassSymbol =
-        requiredClass("continuations.SafeContinuation")
-
-      val methodSym: TermSymbol =
-        requiredPackage("continuations.intrinsics").requiredMethod("intercepted")
-
-      val interceptedCall =
-        ref(methodSym)
+      val constructor =
+        ref(requiredModule("continuations.SafeContinuation"))
+          .select(termName("init"))
           .appliedToType(returnType)
           .appliedTo(ref(continuation1.symbol))
-          .appliedToNone
-
-      val undecidedState =
-        ref(continuationObjectSym).select(termName("State")).select(termName("Undecided"))
-
-      val constructor =
-        tpd
-          .New(ref(classSym))
-          .select(nme.CONSTRUCTOR)
-          .appliedToType(returnType)
-          .appliedTo(interceptedCall, undecidedState)
 
       val sym: TermSymbol = newSymbol(
         transformedMethodSymbol,
@@ -615,8 +599,7 @@ object DefDefTransforms extends TreesChecks:
     val anyNullSuspendedType =
       Types.OrType(Types.OrNull(defn.AnyType), suspendedState.symbol.namedType, false)
 
-    val stateMachineContinuationClassName =
-      s"${treeOwner.name.show}$$$defName$$1"
+    val stateMachineContinuationClassName = s"${treeOwner.name.show}$$$defName$$1"
 
     val continuationsStateMachineSymbol = newCompleteClassSymbol(
       treeOwner,
@@ -1017,18 +1000,11 @@ object DefDefTransforms extends TreesChecks:
         val safeContinuation: tpd.ValDef = {
           val suspendContinuationType = callSuspensionPoint.tpe
 
-          val interceptedCall =
-            ref(interceptedMethod)
+          val safeContinuationConstructor =
+            ref(requiredModule("continuations.SafeContinuation"))
+              .select(termName("init"))
               .appliedToType(suspendContinuationType)
               .appliedTo(ref(contSymbol))
-              .appliedToNone
-
-          val safeContinuationConstructor =
-            tpd
-              .New(ref(safeContinuationClass))
-              .select(nme.CONSTRUCTOR)
-              .appliedToType(suspendContinuationType)
-              .appliedTo(interceptedCall, undecidedState)
 
           tpd.ValDef(
             newSymbol(

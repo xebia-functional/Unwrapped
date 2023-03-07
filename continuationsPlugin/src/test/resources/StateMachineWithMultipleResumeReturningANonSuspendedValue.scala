@@ -47,10 +47,7 @@ package continuations {
                   case 0 => 
                     continuations.Continuation.checkResult($result)
                     $continuation.$label = 1
-                    val safeContinuation: continuations.SafeContinuation[Int] = 
-                      new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(), 
-                        continuations.Continuation.State.Undecided
-                      )
+                    val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
                     {
                       {
                         println("Hello")
@@ -66,10 +63,7 @@ package continuations {
                     continuations.Continuation.checkResult($result)
                     label1[Unit]: <empty>
                     $continuation.$label = 2
-                    val safeContinuation: continuations.SafeContinuation[Boolean] = 
-                      new continuations.SafeContinuation[Boolean](
-                        continuations.intrinsics.IntrinsicsJvm$package.intercepted[Boolean]($continuation)()
-                      , continuations.Continuation.State.Undecided)
+                    val safeContinuation: continuations.SafeContinuation[Boolean] = continuations.SafeContinuation.init[Boolean]($continuation)
                     {
                       {
                         safeContinuation.resume(Right.apply[Nothing, Boolean](false))
@@ -84,10 +78,7 @@ package continuations {
                     continuations.Continuation.checkResult($result)
                     label2[Unit]: <empty>
                     $continuation.$label = 3
-                    val safeContinuation: continuations.SafeContinuation[String] = 
-                      new continuations.SafeContinuation[String](continuations.intrinsics.IntrinsicsJvm$package.intercepted[String]($continuation)()
-                        , 
-                      continuations.Continuation.State.Undecided)
+                    val safeContinuation: continuations.SafeContinuation[String] = continuations.SafeContinuation.init[String]($continuation)
                     {
                       {
                         safeContinuation.resume(Right.apply[Nothing, String]("Hello"))

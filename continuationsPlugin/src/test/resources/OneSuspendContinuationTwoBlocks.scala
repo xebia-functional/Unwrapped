@@ -10,10 +10,7 @@ package continuations {
     def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
       {
         val continuation1: continuations.Continuation[Int] = completion
-        val safeContinuation: continuations.SafeContinuation[Int] = 
-          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-            continuations.Continuation.State.Undecided
-          )
+        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
         {
           {
             safeContinuation.resume(Right.apply[Nothing, Int](1))
