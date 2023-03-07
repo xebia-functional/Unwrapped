@@ -200,7 +200,7 @@ object DefDefTransforms extends TreesChecks:
         owner
           .paramSymss
           .flatten
-          .exists(_.info.hasClassSymbol(requiredClass(continuationFullName)))
+          .exists(hasContinuationClass)
       }
       .map(_.symbol.maybeOwner)
 
