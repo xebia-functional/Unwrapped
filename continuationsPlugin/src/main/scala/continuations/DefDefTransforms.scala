@@ -862,24 +862,26 @@ object DefDefTransforms extends TreesChecks:
             ref(transformedMethod.symbol).appliedToTermArgs(
               List.fill(numTransformedMethodOriginalParams)(nullLiteral) :+
                 continuationsStateMachineThis
-                  .select(nme.asInstanceOf_)
-                  .appliedToType(continuationClassRef.appliedTo(returnType))
             )
           )
       )
 
+      val extendsContImpl: tpd.Tree =
+        tpd
+          .New(ref(continuationImplClass))
+          .select(nme.CONSTRUCTOR)
+          .appliedTo(
+            ref($completion),
+            ref($completion).select(termName("context"))
+          )
+
+      val contOfReturnType = continuationClassRef.appliedTo(returnType)
+
       ClassDefWithParents(
-        continuationsStateMachineSymbol,
-        continuationsStateMachineConstructor,
-        List(
-          tpd
-            .New(ref(continuationImplClass))
-            .select(nme.CONSTRUCTOR)
-            .appliedTo(
-              ref($completion),
-              ref($completion).select(termName("context"))
-            )),
-        List(
+        cls = continuationsStateMachineSymbol,
+        constr = continuationsStateMachineConstructor,
+        parents = List(extendsContImpl),
+        body = List(
           continuationStateMachineI$Ns,
           continuationStateMachineI$Ns.map(toContFsmSetter),
           List(
