@@ -308,7 +308,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         case (tree, _) =>
           assertNoDiff(
             compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedOneSuspendContinuationFourBlocks)
+            expectedOneSuspendContinuationTwoBlocks)
       }
   }
 
@@ -346,7 +346,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         case (tree, _) =>
           assertNoDiff(
             compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedOneSuspendContinuationThreeBlocks)
+            expectedOneSuspendContinuation)
       }
   }
 
@@ -401,11 +401,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |          )
            |        {
            |          {
-           |            {
-           |              {
-           |                safeContinuation.resume(Left.apply[Exception, Nothing](new Exception("error")))
-           |              }
-           |            }
+           |            safeContinuation.resume(Left.apply[Exception, Nothing](new Exception("error")))
            |          }
            |        }
            |        safeContinuation.getOrThrow()
@@ -461,16 +457,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |          )
            |        {
            |          {
-           |            {
-           |              {
-           |                println("Hello")
-           |                safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |                val x: Int = 1
-           |                val y: Boolean = false
-           |                safeContinuation.resume(Right.apply[Nothing, Int](2))
-           |                println(x)
-           |              }
-           |            }
+           |            println("Hello")
+           |            safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |            val x: Int = 1
+           |            val y: Boolean = false
+           |            safeContinuation.resume(Right.apply[Nothing, Int](2))
+           |            println(x)
            |          }
            |        }
            |        safeContinuation.getOrThrow()
@@ -526,18 +518,14 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |          )
            |        {
            |          {
-           |            {
+           |            safeContinuation.resume(
            |              {
-           |                safeContinuation.resume(
-           |                  {
-           |                    println("Hello")
-           |                    val x: Int = 1
-           |                    val y: Int = 1
-           |                    Right.apply[Nothing, Int](x.+(y))
-           |                  }
-           |                )
+           |                println("Hello")
+           |                val x: Int = 1
+           |                val y: Int = 1
+           |                Right.apply[Nothing, Int](x.+(y))
            |              }
-           |            }
+           |            )
            |          }
            |        }
            |        safeContinuation.getOrThrow()
@@ -568,7 +556,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         case (tree, _) =>
           assertNoDiff(
             compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedOneSuspendContinuationFourBlocks)
+            expectedOneSuspendContinuationTwoBlocks)
       }
   }
 
@@ -587,7 +575,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         case (tree, _) =>
           assertNoDiff(
             compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedOneSuspendContinuationFourBlocks)
+            expectedOneSuspendContinuationTwoBlocks)
       }
   }
 
@@ -629,11 +617,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |            )
            |          {
            |            {
-           |              {
-           |                {
-           |                  safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |                }
-           |              }
+           |              safeContinuation.resume(Right.apply[Nothing, Int](1))
            |            }
            |          }
            |          safeContinuation.getOrThrow()
@@ -682,12 +666,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |          )
            |        {
            |          {
-           |            {
-           |              {
-           |                val x: Int = 1
-           |                println("Hello")
-           |              }
-           |            }
+           |            val x: Int = 1
+           |            println("Hello")
            |          }
            |        }
            |        safeContinuation.getOrThrow()
@@ -736,11 +716,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |          )
            |        {
            |          {
-           |            {
-           |              {
-           |                safeContinuation.resume(Right.apply[Nothing, Int](x.+(1)))
-           |              }
-           |            }
+           |            safeContinuation.resume(Right.apply[Nothing, Int](x.+(1)))
            |          }
            |        }
            |        safeContinuation.getOrThrow()
@@ -874,11 +850,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |                )
            |              {
            |                {
-           |                  {
-           |                    {
-           |                      safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |                    }
-           |                  }
+           |                  safeContinuation.resume(Right.apply[Nothing, Int](1))
            |                }
            |              }
            |              safeContinuation.getOrThrow()
@@ -1190,11 +1162,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |              )
            |            {
            |              {
-           |                {
-           |                  {
-           |                    safeContinuation.resume(Right.apply[Nothing, A](x))
-           |                  }
-           |                }
+           |                safeContinuation.resume(Right.apply[Nothing, A](x))
            |              }
            |            }
            |            safeContinuation.getOrThrow()

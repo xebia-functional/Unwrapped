@@ -34,7 +34,7 @@ object DefDefTransforms extends TreesChecks:
       case _ => report.logWith(s"oldTree:")(tree)
     }
 
-  def flattenBlock(b: tpd.Block)(using Context): tpd.Block =
+  def flattenBlock(b: tpd.Tree)(using Context): tpd.Tree =
     b match {
       case bb @ Trees.Block(Nil, _: tpd.Closure) => bb
       case Trees.Block(Nil, bb @ tpd.Block(_, _)) => flattenBlock(bb)
@@ -133,10 +133,7 @@ object DefDefTransforms extends TreesChecks:
           if t.symbol.exists &&
             t.symbol.isAnonymousFunction
             &&
-            t.symbol
-              .paramSymss
-              .flatten
-              .exists(hasContinuationClass) =>
+            t.symbol.paramSymss.flatten.exists(hasContinuationClass) =>
         true
       case tree @ Trees.Select(qualifier, name)
           if tree
@@ -156,9 +153,17 @@ object DefDefTransforms extends TreesChecks:
       List.fill(continuationReferences.size)(safeContinuationRef.symbol)
     val safeContinuationRefOwners = safeContinuationRefSymbols.map(_.owner)
 
+    def keepSubTree(t: tpd.Tree): Boolean =
+      t.symbol.exists &&
+        t.symbol.owner.isAnonymousFunction &&
+        t.symbol.owner.paramSymss.exists(_.exists(hasContinuationClass))
+
     val hypothesis = new TreeTypeMap(
       treeMap = {
-        case t @ Trees.DefDef(_, _, _, _) if keepSubTree(t) =>
+        case t @ Trees.DefDef(_, _, _, _)
+            if keepSubTree(t) || t
+              .paramss
+              .exists(_.exists(p => hasContinuationClass(p.symbol))) =>
           t.rhs
         case tree @ Trees.Apply(fun, args) if fun.symbol.name.show == suspendContinuationName =>
           if (args.isEmpty) {
@@ -185,7 +190,6 @@ object DefDefTransforms extends TreesChecks:
               .show == continuationClassName && name.show == resumeMethodName =>
           resumeMethod
         case t =>
-          val owner = t.symbol.maybeOwner
           t
       },
       oldOwners = continuationReferences.map(_.owner),
@@ -197,22 +201,20 @@ object DefDefTransforms extends TreesChecks:
       .filterSubTrees { t =>
         val owner = t.symbol.maybeOwner
         owner.isAnonymousFunction &&
-        owner
-          .paramSymss
-          .flatten
-          .exists(hasContinuationClass)
+        owner.paramSymss.flatten.exists(hasContinuationClass)
       }
       .map(_.symbol.maybeOwner)
 
     val leftoverReplacementSymbols = List.fill(leftoverSymbols.size)(safeContinuationRef.symbol)
     val leftoverReplocementSymbolOvers = leftoverReplacementSymbols.map(_.owner)
 
-    new TreeTypeMap(
-      oldOwners = leftoverSymbols,
-      newOwners = leftoverReplocementSymbolOvers,
-      substFrom = leftoverSymbols,
-      substTo = leftoverReplacementSymbols
-    )(hypothesis)
+    new BlockFlattener().transform(
+      new TreeTypeMap(
+        oldOwners = leftoverSymbols,
+        newOwners = leftoverReplocementSymbolOvers,
+        substFrom = leftoverSymbols,
+        substTo = leftoverReplacementSymbols
+      )(hypothesis))
   }
 
   private def createTransformedMethodSymbol(

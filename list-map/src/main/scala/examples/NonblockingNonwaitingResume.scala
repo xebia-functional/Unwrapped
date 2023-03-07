@@ -10,7 +10,7 @@ import scala.util.Random
 
 given ExecutorService = Executors.newWorkStealingPool()
 
-@main def ListMapNoResume =
+@main def NonblockingNonwaitingResume =
   def zeroArgumentsZeroContinuations()(using Suspend): Int = 1
 
   def twoArgumentsOneContinuationsCFBefore(
