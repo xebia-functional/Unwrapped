@@ -136,7 +136,7 @@ object DefDefTransforms extends TreesChecks:
             t.symbol
               .paramSymss
               .flatten
-              .exists(_.info.hasClassSymbol(requiredClass(continuationFullName))) =>
+              .exists(hasContinuationClass) =>
         true
       case tree @ Trees.Select(qualifier, name)
           if tree
