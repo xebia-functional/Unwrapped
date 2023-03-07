@@ -158,12 +158,7 @@ object DefDefTransforms extends TreesChecks:
 
     val hypothesis = new TreeTypeMap(
       treeMap = {
-        case t @ Trees.DefDef(_, _, _, _)
-            if t.symbol.isAnonymousFunction && t
-              .symbol
-              .paramSymss
-              .flatten
-              .exists(_.info.hasClassSymbol(requiredClass(continuationFullName))) =>
+        case t @ Trees.DefDef(_, _, _, _) if keepSubTree(t) =>
           t.rhs
         case tree @ Trees.Apply(fun, args) if fun.symbol.name.show == suspendContinuationName =>
           if (args.isEmpty) {
