@@ -153,17 +153,10 @@ object DefDefTransforms extends TreesChecks:
       List.fill(continuationReferences.size)(safeContinuationRef.symbol)
     val safeContinuationRefOwners = safeContinuationRefSymbols.map(_.owner)
 
-    def keepSubTree(t: tpd.Tree): Boolean =
-      t.symbol.exists &&
-        t.symbol.owner.isAnonymousFunction &&
-        t.symbol.owner.paramSymss.exists(_.exists(hasContinuationClass))
-
     val hypothesis = new TreeTypeMap(
       treeMap = {
         case t @ Trees.DefDef(_, _, _, _)
-            if keepSubTree(t) || t
-              .paramss
-              .exists(_.exists(p => hasContinuationClass(p.symbol))) =>
+            if t.paramss.exists(_.exists(p => hasContinuationClass(p.symbol))) =>
           t.rhs
         case tree @ Trees.Apply(fun, args) if fun.symbol.name.show == suspendContinuationName =>
           if (args.isEmpty) {
