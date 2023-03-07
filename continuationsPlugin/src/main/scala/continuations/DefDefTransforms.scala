@@ -7,7 +7,7 @@ import dotty.tools.dotc.ast.Trees.*
 import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Annotations.Annotation
 import dotty.tools.dotc.core.Constants.Constant
-import dotty.tools.dotc.core.Contexts.{ctx, inContext, Context}
+import dotty.tools.dotc.core.Contexts.{ctx, Context}
 import dotty.tools.dotc.core.{Flags, Names, Scopes, Symbols, Types}
 import dotty.tools.dotc.core.NullOpsDecorator.stripNull
 import dotty.tools.dotc.core.Flags.*
@@ -34,6 +34,7 @@ object DefDefTransforms extends TreesChecks:
       case _ => report.logWith(s"oldTree:")(tree)
     }
 
+  @tailrec
   def flattenBlock(b: tpd.Tree)(using Context): tpd.Tree =
     b match {
       case bb @ Trees.Block(Nil, _: tpd.Closure) => bb
@@ -41,7 +42,7 @@ object DefDefTransforms extends TreesChecks:
       case b => b
     }
 
-  private class BlockFlattener(using Context) extends TreeMap {
+  private class BlockFlattener extends TreeMap {
     override def transform(tree: tpd.Tree)(using Context): tpd.Tree =
       tree match {
         case bb @ Trees.Block(Nil, Trees.Block(Nil, Trees.Closure(_, _, _))) =>
@@ -135,20 +136,16 @@ object DefDefTransforms extends TreesChecks:
             &&
             t.symbol.paramSymss.flatten.exists(hasContinuationClass) =>
         true
-      case tree @ Trees.Select(qualifier, name)
-          if tree
-            .symbol
-            .owner
-            .name
-            .show == continuationClassName && name.show == resumeMethodName =>
+      case tree @ Trees.Select(_, name)
+          if tree.symbol.owner.name.show == continuationClassName &&
+            name.show == resumeMethodName =>
         true
-      case t =>
+      case _ =>
         false
     }
 
     val continuationReferences = anonymousContinuationFunctions.map(_.symbol.owner)
 
-    val continuationReferencesSize = continuationReferences.size
     val safeContinuationRefSymbols =
       List.fill(continuationReferences.size)(safeContinuationRef.symbol)
     val safeContinuationRefOwners = safeContinuationRefSymbols.map(_.owner)
@@ -160,12 +157,10 @@ object DefDefTransforms extends TreesChecks:
 
     val hypothesis = new TreeTypeMap(
       treeMap = {
-        case t @ Trees.DefDef(_, _, _, _)
-            if keepSubTree(t) || t
-              .paramss
-              .exists(_.exists(p => hasContinuationClass(p.symbol))) =>
+        case t: tpd.DefDef if keepSubTree(t) => t
+        case t: tpd.DefDef if t.paramss.exists(_.exists(p => hasContinuationClass(p.symbol))) =>
           t.rhs
-        case tree @ Trees.Apply(fun, args) if fun.symbol.name.show == suspendContinuationName =>
+        case _ @Trees.Apply(fun, args) if fun.symbol.name.show == suspendContinuationName =>
           if (args.isEmpty) {
             tpd.EmptyTree
           } else if (args.size == 1) {
@@ -182,12 +177,9 @@ object DefDefTransforms extends TreesChecks:
             val flattened = Trees.flatten(stats)
             tpd.Block(flattened.dropRight(1), flattened.last)
           }
-        case tree @ Trees.Select(qualifier, name)
-            if tree
-              .symbol
-              .owner
-              .name
-              .show == continuationClassName && name.show == resumeMethodName =>
+        case tree @ Trees.Select(_, name)
+            if tree.symbol.owner.name.show == continuationClassName &&
+              name.show == resumeMethodName =>
           resumeMethod
         case t =>
           t

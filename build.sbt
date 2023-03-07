@@ -9,6 +9,7 @@ addCommandAlias(
   "plugin-example",
   "reload; clean; publishLocal; continuationsPluginExample/compile")
 addCommandAlias("ci-test", "scalafmtCheckAll; scalafmtSbtCheck; github; mdoc; root / test")
+addCommandAlias("ci-it-test", "continuationsPlugin / IntegrationTest / test")
 addCommandAlias("ci-docs", "github; mdoc")
 addCommandAlias("ci-publish", "github; ci-release")
 

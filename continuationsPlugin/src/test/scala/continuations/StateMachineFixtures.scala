@@ -5420,7 +5420,7 @@ trait StateMachineFixtures {
       |        var suspension1: Int = null
       |        var suspension2: Int = null
       |        def method2(x: Int): Int = x.+(1)
-      |        def method5(x: Int): Int = x
+      |        def method5(x: Int): Int = x.+(1)
       |        {
       |          val $continuation: continuations.ExampleObject.ExampleObject$continuations$1 =
       |            completion match
@@ -5433,8 +5433,7 @@ trait StateMachineFixtures {
       |                  x$0.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label =
       |                    x$0.asInstanceOf[continuations.ExampleObject.ExampleObject$continuations$1].$label.-(scala.Int.MinValue)
       |                  x$0
-      |                case _ =>
-      |                  new continuations.ExampleObject.ExampleObject$continuations$1(completion.asInstanceOf[continuations.Continuation[Any | Null]])
+      |                case _ => new continuations.ExampleObject.ExampleObject$continuations$1(completion)
       |              }
       |          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
       |            $continuation.$result
@@ -5450,27 +5449,28 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                def method3(x: Int): Int = 1
-      |                val z3: Int = 1
-      |                safeContinuation.resume(
+      |                {
       |                  {
-      |                    val z4: Int = 1
-      |                    def method4(x: Int): Int = 1
-      |                    Right.apply[Nothing, Int](
-      |                      continuations.ExampleObject.method1(x##1).+(1).+(continuations.ExampleObject.z1).+(z2).+(method2(y##1)).+(z3).+(method3(x##1)).
-      |                        +
-      |                      (z4).+(method4(x##1))
+      |                    def method3(x: Int): Int = x.+(1)
+      |                    val z3: Int = 1
+      |                    safeContinuation.resume(
+      |                      {
+      |                        val z4: Int = 1
+      |                        def method4(x: Int): Int = x.+(1)
+      |                        Right.apply[Nothing, Int](
+      |                          continuations.ExampleObject.method1(x##1).+(1).+(continuations.ExampleObject.z1).+(z2).+(method2(y##1)).+(z3).+(
+      |                            method3(x##1)
+      |                          ).+(z4).+(method4(x##1))
+      |                        )
+      |                      }
       |                    )
       |                  }
-      |                )
-      |                1
-      |                1
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                suspension1 = orThrow.asInstanceOf[Int]
       |                return[label1] ()
-      |                ()
       |              case 1 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -5485,12 +5485,15 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](continuations.ExampleObject.method1(x##1).+(1)))
+      |                {
+      |                  {
+      |                    safeContinuation.resume(Right.apply[Nothing, Int](method1(x##1).+(1)))
+      |                  }
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                return[label2] ()
-      |                ()
       |              case 2 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -5506,12 +5509,15 @@ trait StateMachineFixtures {
       |                  new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int]($continuation)(),
       |                    continuations.Continuation.State.Undecided
       |                  )
-      |                safeContinuation.resume(Right.apply[Nothing, Int](z5.+(suspension1).+(method5(y##1))))
+      |                {
+      |                  {
+      |                    safeContinuation.resume(Right.apply[Nothing, Int](z5.+(suspension1).+(method5(y##1))))
+      |                  }
+      |                }
       |                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
       |                  safeContinuation.getOrThrow()
       |                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
       |                suspension2 = orThrow.asInstanceOf[Int]
-      |                ()
       |              case 3 =>
       |                y##1 = $continuation.I$0
       |                x##1 = $continuation.I$1
@@ -5522,7 +5528,7 @@ trait StateMachineFixtures {
       |            }
       |        }
       |        val z6: Int = 1
-      |        def method6(x: Int): Int = x
+      |        def method6(x: Int): Int = x.+(1)
       |        1.+(suspension1).+(suspension2).+(z6).+(continuations.ExampleObject.method1(x##1)).+(method2(x##1)).+(method5(x##1)).+(method6(x##1))
       |      }
       |  }

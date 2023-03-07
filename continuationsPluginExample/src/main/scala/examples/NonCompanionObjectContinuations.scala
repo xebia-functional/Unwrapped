@@ -1,8 +1,8 @@
-package examples
-
-import continuations.Suspend
-
-// runs only with scalac
+//package examples
+//
+//import continuations.Suspend
+//
+//// runs only with scalac
 //@main def NonCompanionObjectContinuations(): Unit =
 //  println(ExampleObj.continuations(1, 2))
 //
