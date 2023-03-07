@@ -128,6 +128,9 @@ trait CompilerFixtures { self: FunSuite =>
   def removeLineTrailingSpaces(s: String): String =
     s.lines.map(_.stripTrailing).reduce(_ ++ "\n" ++ _).get
 
+  def cleanCompilerOutput(tree: Tree)(using Context): String = removeLineTrailingSpaces(
+    compileSourceIdentifier.replaceAllIn(tree.show, ""))
+
   private def usingSuspend(owner: Symbol)(using c: Context): Symbol =
     Symbols.newSymbol(
       owner,

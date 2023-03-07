@@ -57,7 +57,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
           |    val z1 = 1
           |
           |    s.suspendContinuation[Int] { continuation =>
-          |      def method2(x: Int) = x
+          |      def method2(x: Int) = x + 1
           |      val z2 = 1
           |
           |      continuation.resume(Right(method1(x) + method2(x) + z1 + z2 + 1))
@@ -90,7 +90,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
           |    val z1 = 1
           |
           |    s.suspendContinuation[Int] { continuation =>
-          |      def method2(x: Int) = x
+          |      def method2(x: Int) = x + 1
           |      val z2 = 1
           |
           |      continuation.resume(Right(method1(x) + method2(x) + z1 + z2 + 1))
@@ -177,7 +177,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
           |    val z4 = 1
           |
           |    val result1 = s.suspendContinuation[Int] { continuation =>
-          |      def method5(x: Int) = 1
+          |      def method5(x: Int) = x + 1
           |      val z5 = 1
           |
           |      continuation.resume(
@@ -198,7 +198,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
           |    val z7 = 1
           |
           |    val result2 = s.suspendContinuation[Int] { continuation =>
-          |      def method8(x: Int) = 1
+          |      def method8(x: Int) = x + 1
           |      val z8 = 1
           |
           |      continuation.resume(
@@ -243,7 +243,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
           |    val z4 = 1
           |
           |    val result1 = s.suspendContinuation[Int] { continuation =>
-          |      def method5(x: Int) = 1
+          |      def method5(x: Int) = x + 1
           |      val z5 = 1
           |
           |      continuation.resume(
@@ -264,7 +264,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
           |    val z7 = 1
           |
           |    val result2 = s.suspendContinuation[Int] { continuation =>
-          |      def method8(x: Int) = 1
+          |      def method8(x: Int) = x + 1
           |      val z8 = 1
           |
           |      continuation.resume(
@@ -336,7 +336,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
           |    val z1 = 1
           |
           |    summon[Suspend].suspendContinuation[Int] { continuation =>
-          |      def method2(x: Int) = 1
+          |      def method2(x: Int) = x + 1
           |      val z2 = 1
           |
           |      continuation.resume(Right(method1(x) + method2(x) + z1 + z2 + 1))
@@ -423,7 +423,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
           |    val z4 = 1
           |
           |    val result1 = summon[Suspend].suspendContinuation[Int] { continuation =>
-          |      def method5(x: Int) = 1
+          |      def method5(x: Int) = x + 1
           |      val z5 = 1
           |
           |      continuation.resume(
@@ -444,7 +444,7 @@ class NonCompanionObjectSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
           |    val z7 = 1
           |
           |    val result2 = summon[Suspend].suspendContinuation[Int] { continuation =>
-          |      def method8(x: Int) = 1
+          |      def method8(x: Int) = x + 1
           |      val z8 = 1
           |
           |      continuation.resume(
