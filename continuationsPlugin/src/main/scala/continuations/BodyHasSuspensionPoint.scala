@@ -16,11 +16,8 @@ private[continuations] object BodyHasSuspensionPoint extends TreesChecks:
    * @param defdef
    *   The method to match upon
    * @return
-   *   A [[scala.Some]] if the method has a using [[continuations.Suspend]] parameter and has a
-   *   suspended continuation in its method body, [[scala.None]] otherwise
+   *   A true if the method has a using [[continuations.Suspend]] parameter and has a suspended
+   *   continuation in its method body, false otherwise
    */
-  def unapply(defdef: DefDef)(using Context): Option[DefDef] =
-    if (HasSuspendParameter.unapply(defdef).isDefined && subtreeCallsSuspend(defdef.rhs))
-      Option(defdef)
-    else
-      None
+  def apply(defdef: DefDef)(using Context): Boolean =
+    HasSuspendParameter(defdef) && subtreeCallsSuspend(defdef.rhs)

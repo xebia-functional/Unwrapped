@@ -27,9 +27,10 @@ object DefDefTransforms extends TreesChecks:
 
   def transformSuspendContinuation(tree: tpd.ValOrDefDef)(using Context): tpd.Tree =
     tree match {
-      case ReturnsContextFunctionWithSuspendType(_) if !tree.symbol.isAnonymousFunction =>
+      case _
+          if ReturnsContextFunctionWithSuspendType(tree) && !tree.symbol.isAnonymousFunction =>
         report.logWith(s"new tree:")(transformContinuationWithSuspend(tree))
-      case HasSuspendParameter(_) if !tree.symbol.isAnonymousFunction =>
+      case _ if HasSuspendParameter(tree) && !tree.symbol.isAnonymousFunction =>
         report.logWith(s"new tree:")(transformContinuationWithSuspend(tree))
       case _ => report.logWith(s"oldTree:")(tree)
     }
@@ -72,15 +73,15 @@ object DefDefTransforms extends TreesChecks:
         report.logWith("state machine and new defdef:")(transformedTree)
 
     tree match
-      case HasSuspensionNotInReturnedValue(_) =>
+      case _ if HasSuspensionNotInReturnedValue(tree) =>
         transformSuspensionsSuspendingStateMachine(fetchSuspensions, false)
-      case CallsSuspendContinuation(_) =>
+      case _ if CallsSuspendContinuation(tree) =>
         fetchSuspensions match
           case suspensionPoint :: Nil if !suspensionPoint.isInstanceOf[tpd.ValDef] =>
             transformSuspendOneContinuationResume(tree, suspensionPoint)
           case suspensionPoints =>
             transformSuspensionsSuspendingStateMachine(suspensionPoints, true)
-      case BodyHasSuspensionPoint(_) =>
+      case vd: tpd.DefDef if BodyHasSuspensionPoint(vd) =>
         // any suspension that still needs a transformation
         tree match
           case t: tpd.DefDef => cpy.DefDef(t)()
@@ -275,7 +276,7 @@ object DefDefTransforms extends TreesChecks:
 
   private def getReturnTypeBodyContextFunctionOwner(tree: tpd.ValOrDefDef)(
       using Context): (Type, tpd.Tree, Option[Symbol]) =
-    if (ReturnsContextFunctionWithSuspendType.unapply(tree).nonEmpty)
+    if (ReturnsContextFunctionWithSuspendType(tree))
       val returnType = removeSuspend(tree.tpt.tpe)
 
       val (rhs, contextFunctionOwner) = tree.rhs match

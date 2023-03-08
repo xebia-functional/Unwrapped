@@ -25,7 +25,7 @@ private[continuations] object CallsSuspendContinuation extends TreesChecks:
    *   [[scala.Some]] if the tree contains a subtree call to
    *   [[continuations.Suspend#suspendContinuation]], [[scala.None]] otherwise
    */
-  def unapply(tree: ValOrDefDef)(using Context): Option[Tree] =
+  def apply(tree: ValOrDefDef)(using Context): Boolean =
     val args =
       tree
         .rhs
@@ -51,4 +51,4 @@ private[continuations] object CallsSuspendContinuation extends TreesChecks:
             None
         }
 
-    Option.when(args.nonEmpty)(tree)
+    args.nonEmpty

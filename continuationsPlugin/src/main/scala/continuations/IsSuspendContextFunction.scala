@@ -18,15 +18,14 @@ object IsSuspendContextFunction:
    *   [[scala.Some]] if the type is a contextFunction containing a [[continuations.Suspend]]
    *   context function parameter, [[scala.None]] otherwise
    */
-  def unapply(typ: Type)(using c: Context): Option[Type] =
-    val isContextFunction = (t: Type) => c.definitions.isContextFunctionType(t)
-    val argTypes = (t: Type) => c.definitions.asContextFunctionType(t).argTypes
+  def apply(typ: Type)(using c: Context): Boolean =
     val isSuspendClass = (t: Type) => t.hasClassSymbol(Symbols.requiredClass(suspendFullName))
 
-    if (flattenTypes(typ).exists { t =>
-        val argType = argTypes(t)
-        isContextFunction(t) && argType.zipWithIndex.exists { (tpe, index) =>
-          isSuspendClass(tpe) && index != argType.length - 1
-        }
-      }) Option(typ)
-    else None
+    def isSCF(typ: Type): Boolean =
+      val argType = c.definitions.asContextFunctionType(typ).argTypes
+      c.definitions.isContextFunctionType(typ) &&
+      argType.zipWithIndex.exists { (tpe, index) =>
+        isSuspendClass(tpe) && index != argType.length - 1
+      }
+
+    flattenTypes(typ).exists(isSCF)
