@@ -50,7 +50,7 @@ object ContinuationsPhase {
  * `foo(ContinuationStub.contImpl)` for `def foo()(using s: Suspend)`.
  *
  * In phase `ContinuationsPhase` the `def foo()(using s: Suspend)` has been transformed to `def
- * fooTest(completion: continuations.Continuation[Int])`.
+ * foo(completion: continuations.Continuation[Int])`.
  */
 class ContinuationsCallsPhase extends PluginPhase:
 
