@@ -71,7 +71,7 @@ class ContinuationsCallsPhase extends PluginPhase:
     updatedMethods.toList.find(s => s.name == tree.symbol.name && s.coord == tree.symbol.coord)
 
   private def treeIsSuspendAndNotInApplyToChange(tree: Apply)(using Context): Boolean =
-    tree.filterSubTrees(CallsSuspendParameter.unapply(_).nonEmpty).nonEmpty &&
+    tree.filterSubTrees(CallsSuspendParameter.apply).nonEmpty &&
       !applyToChange.exists(_.filterSubTrees(_.sameTree(tree)).nonEmpty)
 
   private def treeExistsIsApplyAndIsNotInApplyToChange(tree: Apply, n: Name)(
