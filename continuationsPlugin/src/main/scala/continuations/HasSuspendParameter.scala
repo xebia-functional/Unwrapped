@@ -19,19 +19,14 @@ private[continuations] object HasSuspendParameter:
    * @param c
    *   A dotty compiler context
    * @return
-   *   a [[scala.Some]] if the tree has a using [[continuations.Suspend]] parameter,
-   *   [[scala.None]] otherwise
+   *   true if the tree has a using [[continuations.Suspend]] parameter, false otherwise
    */
-  def unapply(tree: tpd.ValOrDefDef)(using c: Context): Option[tpd.Tree] =
+  def apply(tree: tpd.ValOrDefDef)(using c: Context): Boolean =
+    def isGivenSuspend(v: tpd.Tree): Boolean =
+      v.denot.symbol.is(Flags.Given) &&
+        v.tpe.classSymbol.info.hasClassSymbol(Symbols.requiredClass(suspendFullName))
+
     tree match {
-      case defDef: tpd.DefDef
-          if defDef
-            .paramss
-            .exists(_.exists { v =>
-              v.denot.symbol.is {
-                Flags.Given
-              } && v.tpe.classSymbol.info.hasClassSymbol(Symbols.requiredClass(suspendFullName))
-            }) =>
-        Option(tree)
-      case _ => None
+      case defDef: tpd.DefDef if defDef.paramss.exists(_.exists(isGivenSuspend)) => true
+      case _ => false
     }

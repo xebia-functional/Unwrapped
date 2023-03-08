@@ -20,7 +20,7 @@ private[continuations] object HasSuspensionNotInReturnedValue extends TreesCheck
    */
   def unapply(tree: ValOrDefDef)(using Context): Option[Tree] =
     val rhs =
-      if (ReturnsContextFunctionWithSuspendType.unapply(tree).nonEmpty)
+      if (ReturnsContextFunctionWithSuspendType(tree))
         tree.rhs match
           case Block(List(d @ DefDef(_, _, _, _)), _) if d.symbol.isAnonymousFunction => d.rhs
           case rhs => rhs

@@ -10,7 +10,7 @@ class BodyHasSuspensionPointSuite extends FunSuite, CompilerFixtures:
        |def mySuspend()(using Suspend): Int = 1
        |should be None""".stripMargin) {
     case (given Context, defdef) =>
-      assertEquals(BodyHasSuspensionPoint.unapply(defdef), None)
+      assertEquals(BodyHasSuspensionPoint(defdef), false)
   }
 
   continuationsContextAndZeroAritySuspendSuspendingDefDef.test(
@@ -22,7 +22,7 @@ class BodyHasSuspensionPointSuite extends FunSuite, CompilerFixtures:
        |should be some(mySuspend)""".stripMargin) {
     case (given Context, defdef) =>
       val d = defdef
-      assertEquals(BodyHasSuspensionPoint.unapply(d), Some(d))
+      assertEquals(BodyHasSuspensionPoint(d), true)
   }
 
   continuationsContextAndZeroAritySuspendNonSuspendingDefDef.test(
@@ -31,5 +31,5 @@ class BodyHasSuspensionPointSuite extends FunSuite, CompilerFixtures:
        |should be None""".stripMargin) {
     case (ctx, defdef) =>
       given Context = ctx
-      assertEquals(BodyHasSuspensionPoint.unapply(defdef), None)
+      assertEquals(BodyHasSuspensionPoint(defdef), false)
   }
