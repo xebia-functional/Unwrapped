@@ -8,9 +8,7 @@ class HasSuspendParameterSuite extends FunSuite, CompilerFixtures {
   continuationsContextAndZeroAritySuspendNonSuspendingDefDef.test(
     "#unapply(defDefTree): def mySuspend()(using Suspend): Int = 1 should be Some(tree)") {
     case (given Context, defdef) =>
-      val before = defdef.show
-      val _ = HasSuspendParameter(defdef)
-      assertNoDiff(defdef.show, before)
+      assertEquals(HasSuspendParameter(defdef), true)
   }
 
   continuationsContextAndZeroArityNonSuspendNonSuspendingDefDef.test(
