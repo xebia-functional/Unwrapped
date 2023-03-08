@@ -29,6 +29,6 @@ class CallsSuspendParameterSuite extends FunSuite, CompilerFixtures {
   continuationsContextAndZeroAritySuspendSuspendingDefDef.test(
     "should return None when the tree is not a method call") {
     case (given Context, tree) =>
-      assertEquals(HasSuspensionNotInReturnedValue.unapply(tree), None)
+      assertEquals(HasSuspensionNotInReturnedValue(tree), false)
   }
 }

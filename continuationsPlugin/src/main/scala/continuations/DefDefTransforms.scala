@@ -73,9 +73,9 @@ object DefDefTransforms extends TreesChecks:
         report.logWith("state machine and new defdef:")(transformedTree)
 
     tree match
-      case HasSuspensionNotInReturnedValue(_) =>
+      case _ if HasSuspensionNotInReturnedValue(tree) =>
         transformSuspensionsSuspendingStateMachine(fetchSuspensions, false)
-      case CallsSuspendContinuation(_) =>
+      case _ if CallsSuspendContinuation(tree) =>
         fetchSuspensions match
           case suspensionPoint :: Nil if !suspensionPoint.isInstanceOf[tpd.ValDef] =>
             transformSuspendOneContinuationResume(tree, suspensionPoint)

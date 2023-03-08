@@ -18,7 +18,7 @@ private[continuations] object HasSuspensionNotInReturnedValue extends TreesCheck
    *   and [[continuations.Continuation.resume]] but not in the last row, [[scala.None]]
    *   otherwise
    */
-  def unapply(tree: ValOrDefDef)(using Context): Option[Tree] =
+  def apply(tree: ValOrDefDef)(using Context): Boolean =
     val rhs =
       if (ReturnsContextFunctionWithSuspendType(tree))
         tree.rhs match
@@ -50,7 +50,4 @@ private[continuations] object HasSuspensionNotInReturnedValue extends TreesCheck
           treeCallsSuspend(tree)
       }
 
-    if (CallsSuspendContinuation.unapply(tree).nonEmpty && !returnsSuspend)
-      Option(tree)
-    else
-      Option.empty
+    CallsSuspendContinuation(tree) && !returnsSuspend
