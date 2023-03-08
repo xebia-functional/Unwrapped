@@ -6,7 +6,7 @@ import munit.FunSuite
 class BodyHasSuspensionPointSuite extends FunSuite, CompilerFixtures:
 
   continuationsContextAndZeroArityNonSuspendNonSuspendingDefDef.test(
-    """|BodyHasNoSuspensionPoint#unapply(defDefTree):
+    """|BodyHasNoSuspensionPoint#apply(defDefTree):
        |def mySuspend()(using Suspend): Int = 1
        |should be None""".stripMargin) {
     case (given Context, defdef) =>
@@ -14,7 +14,7 @@ class BodyHasSuspensionPointSuite extends FunSuite, CompilerFixtures:
   }
 
   continuationsContextAndZeroAritySuspendSuspendingDefDef.test(
-    """|BodyHasNoSuspensionPoint#unapply(defDefTree):
+    """|BodyHasNoSuspensionPoint#apply(defDefTree):
        |def mySuspend()(using Suspend): Int =
        |  summon[Suspend].suspendContinuation[Int] {continuation =>
        |    continuation.resume(Right(1))
@@ -26,7 +26,7 @@ class BodyHasSuspensionPointSuite extends FunSuite, CompilerFixtures:
   }
 
   continuationsContextAndZeroAritySuspendNonSuspendingDefDef.test(
-    """|BodyHasNoSuspensionPoint#unapply(defDefTree):
+    """|BodyHasNoSuspensionPoint#apply(defDefTree):
        |def mySuspend()(using Suspend): Int = 1
        |should be None""".stripMargin) {
     case (ctx, defdef) =>
