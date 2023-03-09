@@ -940,9 +940,6 @@ object DefDefTransforms extends TreesChecks:
           .select(termName("checkResult"))
           .appliedTo(ref(resultSym))
 
-      val undecidedState =
-        ref(continuationModule).select(termName("State")).select(termName("Undecided"))
-
       val labels: List[Symbol] =
         rowsBeforeSuspensionPoint.keySet.toList.indices.toList.map { i =>
           newSymbol(newParent, termName(s"label$i"), Flags.Label, defn.UnitType).entered
