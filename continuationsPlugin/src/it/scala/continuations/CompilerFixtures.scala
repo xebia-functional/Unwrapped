@@ -11,6 +11,7 @@ import dotty.tools.dotc.core.Phases.Phase
 import munit.FunSuite
 
 import scala.concurrent.Promise
+import scala.io.Source
 import scala.util.Properties
 import scala.util.Try
 
@@ -18,6 +19,8 @@ trait CompilerFixtures { self: FunSuite =>
 
   val compileSourceIdentifier =
     """-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.""".r
+
+  def loadFile(file: String): String = Source.fromResource(s"$file.scala").mkString
 
   protected def compilerWithChecker(phase: String)(assertion: (Tree, Context) => Unit) =
     new Compiler {
