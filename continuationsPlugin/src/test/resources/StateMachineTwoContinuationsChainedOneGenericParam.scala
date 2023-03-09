@@ -83,8 +83,9 @@ package continuations {
               fooTest(null, null, this)
             }
         }
-
-        def fooTest(a: A, b: Int, completion: continuations.Continuation[A]): continuations.Continuation.Result[A] =
+        def fooTest(a: A, b: Int, completion: continuations.Continuation[A]):
+          A | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
+         =
           {
             var a##1: A = a
             var b##1: Int = b

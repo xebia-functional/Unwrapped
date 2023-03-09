@@ -179,7 +179,7 @@ package continuations {
                     $continuation.I$1 = a##1
                     $continuation.I$2 = z
                     $continuation.$label = 2
-                    val safeContinuation: continuations.SafeContinuation[Boolean] = continuations.SafeContinuation.init[Boolean]($continuation)
+                    val safeContinuation: continuations.SafeContinuation[B] = continuations.SafeContinuation.init[B]($continuation)
                     {
                       safeContinuation.resume(
                         Right.apply[Nothing, B](
