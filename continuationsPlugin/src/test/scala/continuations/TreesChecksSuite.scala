@@ -9,7 +9,7 @@ import munit.FunSuite
 class TreesChecksSuite extends FunSuite, CompilerFixtures, TreesChecks {
 
   continuationsContextAndInlinedSuspendingTree.test(
-    """|subtreeCallsSuspend(Suspend#suspendContinuation[Int] {continuation =>
+    """|subtreeCallsSuspend(Suspend#shift[Int] {continuation =>
        |  continuation.resume(Right(1))
        |})
        | should be true""".stripMargin) {
@@ -24,7 +24,7 @@ class TreesChecksSuite extends FunSuite, CompilerFixtures, TreesChecks {
   }
 
   continuationsContextAndInlinedSuspendingTree.test(
-    """|treeCallsSuspend(Suspend#suspendContinuation[Int] {continuation =>
+    """|treeCallsSuspend(Suspend#shift[Int] {continuation =>
        |  continuation.resume(Right(1))
        |})
        | should be true""".stripMargin) {
@@ -54,7 +54,7 @@ class TreesChecksSuite extends FunSuite, CompilerFixtures, TreesChecks {
 
   continuationsContextAndInlinedSuspendingTree.test(
     """
-      |treeCallsResume(Suspend#suspendContinuation[Int] {continuation =>
+      |treeCallsResume(Suspend#shift[Int] {continuation =>
       |  continuation.resume(Right(1))
       |})
       | should be false
@@ -64,7 +64,7 @@ class TreesChecksSuite extends FunSuite, CompilerFixtures, TreesChecks {
   }
 
   continutationsContextAndInlinedSuspendingSingleArityWithDependentNonSuspendingCalculation
-    .test("""|valDefTreeCallsSuspend(val y = Suspend#suspendContinuation[Int] {continuation =>
+    .test("""|valDefTreeCallsSuspend(val y = Suspend#shift[Int] {continuation =>
              |  continuation.resume(Right(x+1))
              |})
              | should be true""".stripMargin) {
@@ -77,7 +77,7 @@ class TreesChecksSuite extends FunSuite, CompilerFixtures, TreesChecks {
     }
 
   continuationsContextAndInlinedSuspendingTree.test(
-    """|valDefTreeCallsSuspend(Suspend#suspendContinuation[Int] {continuation =>
+    """|valDefTreeCallsSuspend(Suspend#shift[Int] {continuation =>
        |  continuation.resume(Right(1))
        |})
        | should be false""".stripMargin) {

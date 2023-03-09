@@ -6,7 +6,7 @@ import dotty.tools.dotc.core.Contexts.Context
 
 /**
  * Matcher for detecting methods that calls/returns
- * [[continuations.Suspend#suspendContinuation]] but not in their last row
+ * [[continuations.Suspend#shift]] but not in their last row
  */
 private[continuations] object HasSuspensionNotInReturnedValue extends TreesChecks:
 
@@ -14,7 +14,7 @@ private[continuations] object HasSuspensionNotInReturnedValue extends TreesCheck
    * @param tree
    *   the [[dotty.tools.dotc.ast.tpd.Tree]] to match upon
    * @return
-   *   [[scala.Some]] with the tree if it calls [[continuations.Suspend#suspendContinuation]]
+   *   [[scala.Some]] with the tree if it calls [[continuations.Suspend#shift]]
    *   and [[continuations.Continuation.resume]] but not in the last row, [[scala.None]]
    *   otherwise
    */

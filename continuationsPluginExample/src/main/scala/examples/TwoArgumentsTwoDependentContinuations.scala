@@ -4,10 +4,10 @@ import continuations.Suspend
 
 @main def TwoArgumentsTwoDependentContinuations =
   def twoArgumentsTwoDependentContinuations(x: Int, y: Int)(using s: Suspend): Int = {
-    val z = s.suspendContinuation[Int] {
+    val z = s.shift[Int] {
       _.resume(Right { x + y + 1 })
     }
-    s.suspendContinuation[Int] {
+    s.shift[Int] {
       _.resume(Right { z + 1 })
     }
   }

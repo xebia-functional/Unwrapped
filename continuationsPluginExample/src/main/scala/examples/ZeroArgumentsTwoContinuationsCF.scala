@@ -4,8 +4,8 @@ import continuations.Suspend
 
 @main def ZeroArgumentsTwoContinuationsCF =
   def zeroArgumentsTwoContinuationsCF(): Suspend ?=> Int =
-    summon[Suspend].suspendContinuation[Unit] { continuation =>
+    summon[Suspend].shift[Unit] { continuation =>
       continuation.resume(Right(println(1)))
     }
-    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(2)) }
+    summon[Suspend].shift[Int] { continuation => continuation.resume(Right(2)) }
   println(zeroArgumentsTwoContinuationsCF())

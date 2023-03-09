@@ -11,7 +11,7 @@ extension [A](continuation: Continuation[A])
 
 extension [A](suspendedFn: Suspend ?=> A)
 
-  // inline def suspendContinuation
+  // inline def shift
   /*
   suspend inline fun <T> suspendCoroutineUninterceptedOrReturn(
       crossinline block: (Continuation<T>) -> Any?
