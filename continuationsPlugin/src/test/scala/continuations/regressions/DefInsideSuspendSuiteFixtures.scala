@@ -14,7 +14,7 @@ trait DefInsideSuspendSuiteFixtures { self: FunSuite & CompilerFixtures =>
     teardown = _ => ())
 
   val expectedDefInsideSuspendOutput = FunFixture[String](
-    setup = _ => resourceAsString("DefInsideSuspendExpected.txt"),
+    setup = _ => resourceAsString("DefInsideSuspendExpected.scala"),
     teardown = _ => ())
 
   val defInsideSuspendFixtures = FunFixture.map3(

@@ -11,7 +11,7 @@ class ReturnsContextFunctionWithSuspendTypeSuite extends FunSuite, CompilerFixtu
     case (c, zeroArityContextFunctionDefDef) =>
       given Context = c
       val t = zeroArityContextFunctionDefDef
-      assertEquals(ReturnsContextFunctionWithSuspendType.unapply(t), Some(t))
+      assertEquals(ReturnsContextFunctionWithSuspendType(t), true)
   }
 
   continuationsContextAndSuspendingContextFunctionValDef.test(
@@ -19,7 +19,7 @@ class ReturnsContextFunctionWithSuspendTypeSuite extends FunSuite, CompilerFixtu
     case (c, suspendingContextFunctionValDef) =>
       given Context = c
       val t = suspendingContextFunctionValDef
-      assertEquals(ReturnsContextFunctionWithSuspendType.unapply(t), Some(t))
+      assertEquals(ReturnsContextFunctionWithSuspendType(t), true)
   }
 
   continuationsContextAndNonSuspendingContextFunctionValDef.test(
@@ -27,5 +27,5 @@ class ReturnsContextFunctionWithSuspendTypeSuite extends FunSuite, CompilerFixtu
     case (c, nonSuspendingContextFunctionValDef) =>
       given Context = c
       val t = nonSuspendingContextFunctionValDef
-      assertEquals(ReturnsContextFunctionWithSuspendType.unapply(t), None)
+      assertEquals(ReturnsContextFunctionWithSuspendType(t), false)
   }

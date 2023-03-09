@@ -160,10 +160,7 @@ package continuations {
                     $continuation.I$0 = b##1
                     $continuation.I$1 = a##1
                     $continuation.$label = 1
-                    val safeContinuation: continuations.SafeContinuation[A] =
-                      new continuations.SafeContinuation[A](continuations.intrinsics.IntrinsicsJvm$package.intercepted[A]($continuation)(),
-                        continuations.Continuation.State.Undecided
-                      )
+                    val safeContinuation: continuations.SafeContinuation[A] = continuations.SafeContinuation.init[A]($continuation)
                     {
                       safeContinuation.resume(Right.apply[Nothing, A](a##1))
                     }
@@ -182,10 +179,7 @@ package continuations {
                     $continuation.I$1 = a##1
                     $continuation.I$2 = z
                     $continuation.$label = 2
-                    val safeContinuation: continuations.SafeContinuation[B] =
-                      new continuations.SafeContinuation[B](continuations.intrinsics.IntrinsicsJvm$package.intercepted[B]($continuation)(),
-                        continuations.Continuation.State.Undecided
-                      )
+                    val safeContinuation: continuations.SafeContinuation[B] = continuations.SafeContinuation.init[B]($continuation)
                     {
                       safeContinuation.resume(
                         Right.apply[Nothing, B](

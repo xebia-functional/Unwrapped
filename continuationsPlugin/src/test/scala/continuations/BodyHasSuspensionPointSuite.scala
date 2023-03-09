@@ -6,15 +6,15 @@ import munit.FunSuite
 class BodyHasSuspensionPointSuite extends FunSuite, CompilerFixtures:
 
   continuationsContextAndZeroArityNonSuspendNonSuspendingDefDef.test(
-    """|BodyHasNoSuspensionPoint#unapply(defDefTree):
+    """|BodyHasNoSuspensionPoint#apply(defDefTree):
        |def mySuspend()(using Suspend): Int = 1
        |should be None""".stripMargin) {
     case (given Context, defdef) =>
-      assertEquals(BodyHasSuspensionPoint.unapply(defdef), None)
+      assertEquals(BodyHasSuspensionPoint(defdef), false)
   }
 
   continuationsContextAndZeroAritySuspendSuspendingDefDef.test(
-    """|BodyHasNoSuspensionPoint#unapply(defDefTree):
+    """|BodyHasNoSuspensionPoint#apply(defDefTree):
        |def mySuspend()(using Suspend): Int =
        |  summon[Suspend].suspendContinuation[Int] {continuation =>
        |    continuation.resume(Right(1))
@@ -22,14 +22,14 @@ class BodyHasSuspensionPointSuite extends FunSuite, CompilerFixtures:
        |should be some(mySuspend)""".stripMargin) {
     case (given Context, defdef) =>
       val d = defdef
-      assertEquals(BodyHasSuspensionPoint.unapply(d), Some(d))
+      assertEquals(BodyHasSuspensionPoint(d), true)
   }
 
   continuationsContextAndZeroAritySuspendNonSuspendingDefDef.test(
-    """|BodyHasNoSuspensionPoint#unapply(defDefTree):
+    """|BodyHasNoSuspensionPoint#apply(defDefTree):
        |def mySuspend()(using Suspend): Int = 1
        |should be None""".stripMargin) {
     case (ctx, defdef) =>
       given Context = ctx
-      assertEquals(BodyHasSuspensionPoint.unapply(defdef), None)
+      assertEquals(BodyHasSuspensionPoint(defdef), false)
   }
