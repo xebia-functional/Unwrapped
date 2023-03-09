@@ -71,10 +71,7 @@ package continuations {
                 continuations.Continuation.checkResult($result)
                 $continuation.I$0 = qq##1
                 $continuation.$label = 1
-                val safeContinuation: continuations.SafeContinuation[Unit] =
-                  new continuations.SafeContinuation[Unit](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Unit]($continuation)(),
-                    continuations.Continuation.State.Undecided
-                  )
+                val safeContinuation: continuations.SafeContinuation[Unit] = continuations.SafeContinuation.init[Unit]($continuation)
                 {  
                   safeContinuation.resume(Right.apply[Nothing, Unit](println(qq##1)))
                 }
