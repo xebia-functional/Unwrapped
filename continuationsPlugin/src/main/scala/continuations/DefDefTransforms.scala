@@ -924,16 +924,12 @@ object DefDefTransforms extends TreesChecks:
         tpd.Match(transformedMethodCompletionParam, List(case11, case12))
       }
 
-      val $continuationValDef = tpd.ValDef(contSymbol, completionMatch)
-
       val resultSym: TermSymbol =
         newSymbol(
           newParent,
           termName("$result"),
           Local,
           eitherThrowableAnyNullSuspendedType).entered
-
-      val $result = tpd.ValDef(resultSym, ref(contSymbol).select(resultVarName))
 
       val callToCheckResult =
         ref(requiredModule(continuationFullName))
@@ -1047,7 +1043,7 @@ object DefDefTransforms extends TreesChecks:
         def assignGlobalVarResult(vd: tpd.ValDef): tpd.Assign =
           tpd.Assign(
             globalVars.find(matchesNameCoord(_, vd)).get,
-            ref($result.symbol).select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
+            ref(resultSym).select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
           )
 
         val assignResultToGlobalVar =
@@ -1144,9 +1140,9 @@ object DefDefTransforms extends TreesChecks:
         case Some(vd: tpd.ValDef) =>
           tpd.Assign(
             globalVars.find(matchesNameCoord(_, vd)).get,
-            ref($result.symbol).select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
+            ref(resultSym).select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
           ) :: Nil
-        case Some(_) if suspensionInReturnedValue => ref($result.symbol) :: Nil
+        case Some(_) if suspensionInReturnedValue => ref(resultSym) :: Nil
         case _ => Nil
       }
 
@@ -1174,7 +1170,12 @@ object DefDefTransforms extends TreesChecks:
         )
         .withType(anyNullSuspendedType)
 
-      tpd.Block(List($continuationValDef, $result), labelMatch)
+      tpd.Block(
+        List(
+          tpd.ValDef(contSymbol, completionMatch),
+          tpd.ValDef(resultSym, ref(contSymbol).select(resultVarName))
+        ),
+        labelMatch)
     end transformSuspendTree
 
     val transformedMethodParamSymbols: List[Symbol] =
