@@ -37,6 +37,7 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
           )
       }
   }
+
   compilerContextWithContinuationsPlugin.test(
     "1- it should convert into a state machine two continuations chained with one generic param"
   ) {

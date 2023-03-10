@@ -63,12 +63,12 @@ class ContinuationsCallsPhase extends PluginPhase:
   private val applyToChange: mutable.ListBuffer[Tree] = ListBuffer.empty
 
   private def existsTree(tree: Tree)(using Context): Option[Symbol] =
-    updatedMethods.toList.find { s =>
+    updatedMethods.find { s =>
       tree.existsSubTree(t => s.name == t.symbol.name && s.coord == t.symbol.coord)
     }
 
   private def findTree(tree: Tree)(using Context): Option[Symbol] =
-    updatedMethods.toList.find(s => s.name == tree.symbol.name && s.coord == tree.symbol.coord)
+    updatedMethods.find(s => s.name == tree.symbol.name && s.coord == tree.symbol.coord)
 
   private def treeIsSuspendAndNotInApplyToChange(tree: Apply)(using Context): Boolean =
     tree.filterSubTrees(CallsSuspendParameter.apply).nonEmpty &&

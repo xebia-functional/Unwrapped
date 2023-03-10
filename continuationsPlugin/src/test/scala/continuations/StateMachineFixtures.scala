@@ -136,4 +136,6 @@ trait StateMachineFixtures {
     loadFile(
       "StateMachineTwoContinuationsChainedTwoValPriorTwoValBetweenTwoValAfterChainIgnored")
 
+  val expectedStateMachineContinuationsInNonCompanionObject =
+    loadFile("StateMachineContinuationsInNonCompanionObject")
 }

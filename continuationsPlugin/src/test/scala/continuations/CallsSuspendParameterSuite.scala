@@ -13,8 +13,10 @@ class CallsSuspendParameterSuite extends FunSuite, CompilerFixtures {
         case Block(_, call) => call
 
       val prev = call.show
-      val _ = CallsSuspendParameter(call)
+      val res = CallsSuspendParameter(call)
+
       assertNoDiff(call.show, prev)
+      assertEquals(res, true)
   }
 
   continutationsContextAndMethodCallWithoutSuspend.test(
