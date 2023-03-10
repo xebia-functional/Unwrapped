@@ -3,13 +3,13 @@ package continuations
 import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Contexts.{ctx, Context}
 import dotty.tools.dotc.core.Flags
+import dotty.tools.dotc.core.NameOps._
 import dotty.tools.dotc.core.Names.Name
 import dotty.tools.dotc.core.StdNames.nme
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.plugins.PluginPhase
 import dotty.tools.dotc.plugins.StandardPlugin
-import dotty.tools.dotc.transform.PickleQuotes
-import dotty.tools.dotc.transform.Staging
+import dotty.tools.dotc.transform.{PickleQuotes, Staging}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -62,10 +62,26 @@ class ContinuationsCallsPhase extends PluginPhase:
   private val updatedMethods: mutable.ListBuffer[Symbol] = mutable.ListBuffer.empty
   private val applyToChange: mutable.ListBuffer[Tree] = ListBuffer.empty
 
-  private def existsTree(tree: Tree)(using Context): Option[Symbol] =
-    updatedMethods.find { s =>
-      tree.existsSubTree(t => s.name == t.symbol.name && s.coord == t.symbol.coord)
-    }
+  private def existsTree(tree: Tree)(using Context): Option[Tree] =
+    updatedMethods
+      .find { s =>
+        tree.existsSubTree(t => s.name == t.symbol.name && s.coord == t.symbol.coord)
+      }
+      .fold(Option.empty)(s =>
+        var sym = Option.empty[Symbol]
+        tree
+          .find {
+            case t @ Select(Ident(_), n) if n.matchesTargetName(s.name) =>
+              sym = Option(t.symbol)
+              true
+            case t @ Ident(n) if n.matchesTargetName(s.name) =>
+              sym = Option(t.symbol)
+              true
+            case _ =>
+              false
+          }
+          .map(_.subst(sym.toList, List(s)))
+      )
 
   private def findTree(tree: Tree)(using Context): Option[Symbol] =
     updatedMethods.find(s => s.name == tree.symbol.name && s.coord == tree.symbol.coord)
@@ -84,7 +100,7 @@ class ContinuationsCallsPhase extends PluginPhase:
     trees.filterNot(_.tpe.hasClassSymbol(requiredClass(suspendFullName)))
 
   private def treeExistsAndIsMethod(tree: Tree)(using Context): Boolean =
-    existsTree(tree).exists(_.is(Flags.Method))
+    existsTree(tree).exists(_.symbol.is(Flags.Method))
 
   private def treeExistsIsApplyAndIsMethod(tree: Tree, n: Name)(using Context): Boolean =
     n.asTermName == nme.apply &&
@@ -142,19 +158,20 @@ class ContinuationsCallsPhase extends PluginPhase:
 
       paramsCF
         .filterNot(_.isEmpty)
-        .foldLeft(ref(existsTree(tree).get)
-          .appliedToTermArgs(paramsNonCF.flatten :+ continuation): Tree) { (parent, value) =>
-          val hasTypeTree = value.exists {
-            case _: TypeTree => true
-            case _ => false
-          }
+        .foldLeft(
+          existsTree(tree).get.appliedToTermArgs(paramsNonCF.flatten :+ continuation): Tree) {
+          (parent, value) =>
+            val hasTypeTree = value.exists {
+              case _: TypeTree => true
+              case _ => false
+            }
 
-          if (hasTypeTree)
-            parent.select(nme.apply).appliedToTypeTrees(value)
-          else
-            parent match
-              case _: TypeApply => parent.appliedToTermArgs(value)
-              case _ => parent.select(nme.apply).appliedToTermArgs(value)
+            if (hasTypeTree)
+              parent.select(nme.apply).appliedToTypeTrees(value)
+            else
+              parent match
+                case _: TypeApply => parent.appliedToTermArgs(value)
+                case _ => parent.select(nme.apply).appliedToTermArgs(value)
         }
     else tree
 

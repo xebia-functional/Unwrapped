@@ -15,7 +15,7 @@ import continuations.jvm.internal.ContinuationImpl
   println(programSuspendContinuationParamDependent)
   println(programSuspendContinuationResumeVals)
   println(programOneContinuationReturnValue)
-  println(programSuspendContinuationNoSuspendContinuationVal)
+//  println(programSuspendContinuationNoSuspendContinuationVal)
   println(ExampleObject.continuations(1, 2))
 
 object main$handler extends (Continuation[Any | Null] => Any):

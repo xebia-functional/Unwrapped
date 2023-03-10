@@ -306,7 +306,7 @@ object DefDefTransforms extends TreesChecks:
       val finalMethodReturnType: tpd.TypeTree =
         tpd.TypeTree(
           OrType(
-            OrType(ctx.definitions.AnyType, ctx.definitions.NullType, soft = false),
+            OrType(returnType, ctx.definitions.NullType, soft = false),
             suspendedState.symbol.namedType,
             soft = false)
         )
@@ -404,16 +404,29 @@ object DefDefTransforms extends TreesChecks:
       getReturnTypeBodyContextFunctionOwner(tree)
 
     val completion =
-      generateCompletion(parent, Types.OrType(methodReturnType, ctx.definitions.AnyType, false))
+      generateCompletion(parent, methodReturnType)
 
     val transformedMethodParams = params(tree, completion)
 
-    val transformedMethodSymbol =
+    val transformedMethodSymbol = {
+      val suspendedState =
+        ref(requiredModule("continuations.Continuation"))
+          .select(termName("State"))
+          .select(termName("Suspended"))
+
+      val finalMethodReturnType: tpd.TypeTree =
+        tpd.TypeTree(
+          OrType(
+            OrType(methodReturnType, ctx.definitions.NullType, soft = false),
+            suspendedState.symbol.namedType,
+            soft = false))
+
       createTransformedMethodSymbol(
         parent,
         transformedMethodParams,
-        removeSuspendReturnAny(methodReturnType)
+        removeSuspend(finalMethodReturnType.tpe)
       )
+    }
 
     deleteOldSymbol(parent)
 
@@ -613,6 +626,17 @@ object DefDefTransforms extends TreesChecks:
         List(completionParamName),
         List(continuationClassRef.appliedTo(anyOrNullType))
       ).entered.asTerm
+
+      val updatedParams =
+        symbol
+          .paramSymss
+          .map(_.map { s =>
+            val ss = s.asTerm.copy(flags = Flags.LocalParamAccessor)
+            continuationsStateMachineSymbol.enter(ss)
+            ss
+          })
+
+      symbol.setParamss(updatedParams)
 
       tpd.DefDef(symbol)
     }
@@ -852,8 +876,6 @@ object DefDefTransforms extends TreesChecks:
             ref($completion),
             ref($completion).select(termName("context"))
           )
-
-      val contOfReturnType = continuationClassRef.appliedTo(returnType)
 
       ClassDefWithParents(
         cls = continuationsStateMachineSymbol,
