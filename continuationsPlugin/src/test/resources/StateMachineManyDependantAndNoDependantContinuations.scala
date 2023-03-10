@@ -90,7 +90,7 @@ package continuations {
                 $continuation.$label = 1
                 val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
                 {
-                  safeContinuation.resume(Right.apply[Nothing, Int](qq##1.-(1)))
+                  safeContinuation.resume(qq##1.-(1))
                 }
                 val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
                   safeContinuation.getOrThrow()
@@ -112,7 +112,7 @@ package continuations {
                 $continuation.$label = 2
                 val safeContinuation: continuations.SafeContinuation[String] = continuations.SafeContinuation.init[String]($continuation)
                 {
-                  safeContinuation.resume(Right.apply[Nothing, String](rr))
+                  safeContinuation.resume(rr)
                 }
                 val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
                   safeContinuation.getOrThrow()
@@ -134,7 +134,7 @@ package continuations {
                 $continuation.$label = 3
                 val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
                 {
-                  safeContinuation.resume(Right.apply[Nothing, Int](ww.-(1)))
+                  safeContinuation.resume(ww.-(1))
                 }
                 val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
                   safeContinuation.getOrThrow()

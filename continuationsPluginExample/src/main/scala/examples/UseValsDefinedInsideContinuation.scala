@@ -8,6 +8,6 @@ import continuations.Suspend
       val x = 1
       val y = 2
       x + y
-      continuation.resume(Right(3))
+      continuation.resume(3)
     }
   println(useValsDefinedInsideContinuation())

@@ -5,7 +5,8 @@ import continuations.jvm.internal.BaseContinuationImpl
 trait Continuation[-A]:
   type Ctx <: Tuple
   def context: Ctx
-  def resume(value: Either[Throwable, A]): Unit
+  def resume(value: A): Unit
+  def raise(error: Throwable): Unit
   def contextService[T](): T | Null =
     context.toList.find(_.isInstanceOf[T]).map(_.asInstanceOf[T]).orNull
 

@@ -6,8 +6,11 @@ object ContinuationStub:
   private def c: Continuation[Any | Null] = new Continuation[Any | Null] {
     type Ctx = EmptyTuple
 
-    def resume(value: Either[Throwable, Any | Null]): Unit =
+    override def resume(value: Any | Null): Unit =
       println("ContinuationStub.resume")
+
+    override def raise(error: Throwable): Unit =
+      println("ContinuationStub.raise")
 
     override def context: Ctx = EmptyTuple
   }

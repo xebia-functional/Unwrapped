@@ -25,8 +25,8 @@ object ExampleObject {
       val z5 = 1
 
       continuation.resume(
-        Right(method1(x) + method2(x) + method3(x) + method4(x) + method5(x) +
-          z1 + z2 + z3 + z4 + z5 + 1))
+        method1(x) + method2(x) + method3(x) + method4(x) + method5(x) +
+          z1 + z2 + z3 + z4 + z5 + 1)
     }
 
     def method6(x: Int) = x + 1

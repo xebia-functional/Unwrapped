@@ -6,5 +6,5 @@ import continuations.Suspend
   def oneArgumentsSingleResumeContinuationsBefore(x: Int)(using Suspend): Int =
     println("Hello")
     val y = x
-    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
   println(oneArgumentsSingleResumeContinuationsBefore(1))

@@ -12,7 +12,10 @@ class SafeContinuation[-T](val delegate: Continuation[T], initialResult: Any | N
   override def context: Ctx = delegate.context
   result = initialResult
 
-  override def resume(value: Either[Throwable, T]): Unit =
+  override def resume(value: T): Unit = resumeAux(Right(value))
+  override def raise(error: Throwable): Unit = resumeAux(Left(error))
+
+  private def resumeAux(value: Either[Throwable, T]): Unit =
     while true do
       val cur = this.result
 
@@ -21,7 +24,7 @@ class SafeContinuation[-T](val delegate: Continuation[T], initialResult: Any | N
           return ()
       } else if (cur == Continuation.State.Suspended) {
         if (CAS_RESULT(Continuation.State.Suspended, Continuation.State.Resumed)) {
-          delegate.resume(value)
+          value.fold(delegate.raise, delegate.resume)
           return ()
         }
       } else {

@@ -7,7 +7,7 @@ import continuations.Suspend
     println("Hello")
     val x = 1
     summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(1)))
+      continuation.resume(println(1))
     }
-    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(2)) }
+    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(2) }
   println(zeroArgumentsCodeBefore())

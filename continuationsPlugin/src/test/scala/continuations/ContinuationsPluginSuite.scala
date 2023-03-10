@@ -143,7 +143,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def foo()(using Suspend): Int = {
            |  val x = 5
            |  println("HI")
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
            |}
            |""".stripMargin
       checkCompile("pickleQuotes", source) {
@@ -301,7 +301,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
            |""".stripMargin
 
       checkContinuations(source) {
@@ -320,7 +320,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int](continuation => continuation.resume(Right(1)))
+           |  summon[Suspend].suspendContinuation[Int](continuation => continuation.resume(1))
            |""".stripMargin
 
       checkContinuations(source) {
@@ -339,7 +339,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int] { _.resume(Right(1)) }
+           |  summon[Suspend].suspendContinuation[Int] { _.resume(1) }
            |""".stripMargin
 
       checkContinuations(source) {
@@ -358,7 +358,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int](_.resume(Right(1)))
+           |  summon[Suspend].suspendContinuation[Int](_.resume(1))
            |""".stripMargin
 
       checkContinuations(source) {
@@ -377,7 +377,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Left(new Exception("error"))) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.raise(new Exception("error")) }
            |""".stripMargin
 
       // format: off
@@ -398,7 +398,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
            |        {
            |          {
-           |            safeContinuation.resume(Left.apply[Exception, Nothing](new Exception("error")))
+           |            safeContinuation.raise(new Exception("error"))
            |          }
            |        }
            |        safeContinuation.getOrThrow()
@@ -425,10 +425,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def foo()(using Suspend): Int =
            |  summon[Suspend].suspendContinuation[Int]{ c =>
            |    println("Hello")
-           |    c.resume(Right(1))
+           |    c.resume(1)
            |    val x = 1
            |    val y = false
-           |    c.resume(Right(2))
+           |    c.resume(2)
            |    println(x)
            |  }
            |""".stripMargin
@@ -452,10 +452,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |        {
            |          {
            |            println("Hello")
-           |            safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |            safeContinuation.resume(1)
            |            val x: Int = 1
            |            val y: Boolean = false
-           |            safeContinuation.resume(Right.apply[Nothing, Int](2))
+           |            safeContinuation.resume(2)
            |            println(x)
            |          }
            |        }
@@ -486,7 +486,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |      println("Hello")
            |      val x = 1
            |      val y = 1
-           |      Right(x + y)
+           |      x + y
            |    }
            |  }
            |""".stripMargin
@@ -514,7 +514,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |                println("Hello")
            |                val x: Int = 1
            |                val y: Int = 1
-           |                Right.apply[Nothing, Int](x.+(y))
+           |                x.+(y)
            |              }
            |            )
            |          }
@@ -540,7 +540,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo()(using s: Suspend): Int =
-           |  s.suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  s.suspendContinuation[Int] { continuation => continuation.resume(1) }
            |""".stripMargin
 
       checkContinuations(source) {
@@ -559,7 +559,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo(): Suspend ?=> Int =
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
            |""".stripMargin
 
       checkContinuations(source) {
@@ -580,7 +580,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def foo()(using Suspend): Int = {
            |  val x = 5
            |  println("HI")
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
            |}
            |""".stripMargin
 
@@ -605,7 +605,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |          val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
            |          {
            |            {
-           |              safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |              safeContinuation.resume(1)
            |            }
            |          }
            |          safeContinuation.getOrThrow()
@@ -677,7 +677,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo(x: Int)(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(x + 1)) }
+           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(x + 1) }
            |""".stripMargin
 
       // format: off
@@ -698,7 +698,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
            |        {
            |          {
-           |            safeContinuation.resume(Right.apply[Nothing, Int](x.+(1)))
+           |            safeContinuation.resume(x.+(1))
            |          }
            |        }
            |        safeContinuation.getOrThrow()
@@ -724,7 +724,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo()(using Suspend): Int = {
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
            |    10
            |  }
            |  foo()
@@ -737,7 +737,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo(): Suspend ?=> Int = {
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
            |    10
            |  }
            |  foo()
@@ -769,7 +769,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo(x: Int)(using Suspend): Int = {
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(x)) }
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(x) }
            |    10
            |  }
            |  foo(11)
@@ -797,7 +797,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  if (x < y) then {
            |    x
            |  } else {
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
            |  }
            |}
            |""".stripMargin
@@ -829,7 +829,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |              val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
            |              {
            |                {
-           |                  safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |                  safeContinuation.resume(1)
            |                }
            |              }
            |              safeContinuation.getOrThrow()
@@ -857,9 +857,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo()(using Suspend): Int = {
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
-           |    summon[Suspend].suspendContinuation[Boolean] { continuation => continuation.resume(Right(false)) }
-           |    summon[Suspend].suspendContinuation[String] { continuation => continuation.resume(Right("Hello")) }
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |    summon[Suspend].suspendContinuation[Boolean] { continuation => continuation.resume(false) }
+           |    summon[Suspend].suspendContinuation[String] { continuation => continuation.resume("Hello") }
            |    10
            |  }
            |
@@ -889,14 +889,14 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |    summon[Suspend].suspendContinuation[Int] { continuation =>
            |      println("Hello")
            |      println("World")
-           |      continuation.resume(Right(1))
+           |      continuation.resume(1)
            |    }
            |    summon[Suspend].suspendContinuation[Boolean] { continuation =>
-           |      continuation.resume(Right(false))
-           |      continuation.resume(Right(true))
+           |      continuation.resume(false)
+           |      continuation.resume(true)
            |    }
            |    summon[Suspend].suspendContinuation[String] { continuation =>
-           |      continuation.resume(Right("Hello"))
+           |      continuation.resume("Hello")
            |      val x = 1
            |    }
            |    10
@@ -925,11 +925,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def program: Int = {
            |  def foo()(using Suspend): Int = {
            |    println("Start")
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
            |    val x = "World"
            |    println("Hello")
            |    println(x)
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(2)) }
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(2) }
            |    println("End")
            |    10
            |  }
@@ -944,11 +944,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def program: Int = {
            |  def foo(): Suspend ?=> Int = {
            |    println("Start")
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
            |    val x = "World"
            |    println("Hello")
            |    println(x)
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(2)) }
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(2) }
            |    println("End")
            |    10
            |  }
@@ -981,9 +981,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo()(using Suspend): Int = {
-           |    summon[Suspend].suspendContinuation[Boolean] { continuation => continuation.resume(Right(false)) }
-           |    summon[Suspend].suspendContinuation[String] { continuation => continuation.resume(Right("Hello")) }
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |    summon[Suspend].suspendContinuation[Boolean] { continuation => continuation.resume(false) }
+           |    summon[Suspend].suspendContinuation[String] { continuation => continuation.resume("Hello") }
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
            |  }
            |
            |foo()
@@ -1010,13 +1010,13 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  def foo()(using Suspend): Int = {
            |    summon[Suspend].suspendContinuation[Boolean] { continuation =>
            |      println("Hi")
-           |      continuation.resume(Right(false))
+           |      continuation.resume(false)
            |    }
            |    summon[Suspend].suspendContinuation[String] {
-           |      continuation => continuation.resume(Right("Hello"))
+           |      continuation => continuation.resume("Hello")
            |      println("World")
            |    }
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
            |  }
            |
            |foo()
@@ -1043,10 +1043,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  def foo()(using Suspend): Int = {
            |    println("Start")
            |    val x = 1
-           |    summon[Suspend].suspendContinuation[Boolean] { continuation => continuation.resume(Right(false)) }
+           |    summon[Suspend].suspendContinuation[Boolean] { continuation => continuation.resume(false) }
            |    println("Hello")
-           |    summon[Suspend].suspendContinuation[String] { continuation => continuation.resume(Right("Hello")) }
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |    summon[Suspend].suspendContinuation[String] { continuation => continuation.resume("Hello") }
+           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
            |  }
            |
            |foo()
@@ -1087,7 +1087,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo[A, B](x: A, y: B)(z: String)(using s: Suspend, ec: ExecutionContext): A =
-           |    summon[Suspend].suspendContinuation[A] { continuation => continuation.resume(Right(x)) }
+           |    summon[Suspend].suspendContinuation[A] { continuation => continuation.resume(x) }
            |  foo(1,2)("A")
            |}
            |""".stripMargin
@@ -1138,7 +1138,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |            val safeContinuation: continuations.SafeContinuation[A] = continuations.SafeContinuation.init[A](continuation1)
            |            {
            |              {
-           |                safeContinuation.resume(Right.apply[Nothing, A](x))
+           |                safeContinuation.resume(x)
            |              }
            |            }
            |            safeContinuation.getOrThrow()
@@ -1173,7 +1173,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo(x: Int)(using Suspend): Int = {
-           |  val y = summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) }
+           |  val y = summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
            |  x + y
            |}
            |""".stripMargin
@@ -1196,7 +1196,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo(qq: Int)(using s: Suspend): Int = {
-           |  summon[Suspend].suspendContinuation[Unit] { _.resume(Right { println(qq) }) }
+           |  summon[Suspend].suspendContinuation[Unit] { _.resume({ println(qq) }) }
            |  10
            |}
            |""".stripMargin
@@ -1222,7 +1222,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def foo()(using s: Suspend): Int = {
            |  val xx = 111
            |  println(xx)
-           |  summon[Suspend].suspendContinuation[Int] { _.resume(Right( 10 )) }
+           |  summon[Suspend].suspendContinuation[Int] { _.resume( 10 ) }
            |  xx
            |}
            |""".stripMargin
@@ -1248,12 +1248,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def fooTest(qq: Int)(using s: Suspend): Int = {
            |    val pp = 11
-           |    val xx = s.suspendContinuation[Int] { _.resume(Right { qq - 1 }) }
+           |    val xx = s.suspendContinuation[Int] { _.resume(qq - 1) }
            |    val ww = 13
            |    val rr = "AAA"
-           |    val yy = s.suspendContinuation[String] { _.resume(Right { rr }) }
+           |    val yy = s.suspendContinuation[String] { _.resume(rr) }
            |    val tt = 100
-           |    val zz = s.suspendContinuation[Int] { _.resume(Right { ww - 1 }) }
+           |    val zz = s.suspendContinuation[Int] { _.resume(ww - 1) }
            |    println(xx)
            |    xx + qq + yy.size + zz + pp + tt
            |}
@@ -1279,12 +1279,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def fooTest(qq: Int)(using s: Suspend): Int = {
            |    val pp = 11
-           |    val xx = s.suspendContinuation[Int] { _.resume(Right { qq - 1 }) }
+           |    val xx = s.suspendContinuation[Int] { _.resume(qq - 1) }
            |    val ww = 13
            |    val rr = "AAA"
-           |    s.suspendContinuation[String] { _.resume(Right { rr }) }
+           |    s.suspendContinuation[String] { _.resume(rr) }
            |    val tt = 100
-           |    val zz = s.suspendContinuation[Int] { _.resume(Right { ww - 1 }) }
+           |    val zz = s.suspendContinuation[Int] { _.resume(ww - 1) }
            |    println(xx)
            |    xx + qq + zz + pp + tt
            |}
@@ -1311,12 +1311,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def fooTest(x: Int)(using s: Suspend): Int = {
            |    println("Hello")
-           |    val y = s.suspendContinuation[Int] { _.resume(Right { println("World"); 1 }) }
+           |    val y = s.suspendContinuation[Int] { _.resume( { println("World"); 1 }) }
            |    val z = 1
            |    s.suspendContinuation[Int] { continuation =>
            |      val w = "World"
            |      println("Hello")
-           |      continuation.resume(Right { println(z); x })
+           |      continuation.resume( { println(z); x })
            |    }
            |    val tt = 2
            |    x + y + tt
@@ -1342,8 +1342,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def fooTest()(using s: Suspend): Int = {
-           |    val x = s.suspendContinuation[Int] { _.resume(Right { 1 }) }
-           |    s.suspendContinuation[Int] { _.resume(Right { x + 1 }) }
+           |    val x = s.suspendContinuation[Int] { _.resume(1) }
+           |    s.suspendContinuation[Int] { _.resume(x + 1) }
            |}
            |""".stripMargin
 
@@ -1368,11 +1368,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def fooTest(q: Int)(using s: Suspend): Int = {
            |    println("Hello")
            |    val z = 100
-           |    val x = s.suspendContinuation[Int] { _.resume(Right { 1 + z}) }
+           |    val x = s.suspendContinuation[Int] { _.resume(1 + z) }
            |    val j = 9
-           |    val w = s.suspendContinuation[Int] { _.resume(Right { x + 1 + q}) }
+           |    val w = s.suspendContinuation[Int] { _.resume(x + 1 + q) }
            |    println("World")
-           |    s.suspendContinuation[Int] { _.resume(Right { x + w + 1 + j}) }
+           |    s.suspendContinuation[Int] { _.resume(x + w + 1 + j) }
            |    10
            |}
            |""".stripMargin
@@ -1485,10 +1485,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def fooTest(x: Int)(using Suspend): Int = {
            |    val y = summon[Suspend].suspendContinuation[Int] { continuation =>
-           |      continuation.resume(Right(x + 1))
+           |      continuation.resume(x + 1)
            |    }
            |    summon[Suspend].suspendContinuation[Int] { continuation =>
-           |      continuation.resume(Right(y + 1))
+           |      continuation.resume(y + 1)
            |    }
            |}
            |""".stripMargin
@@ -1515,12 +1515,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |    val q = 2
            |    val w = 3
            |    val y = summon[Suspend].suspendContinuation[Int] { continuation =>
-           |      continuation.resume(Right(x + w))
+           |      continuation.resume(x + w)
            |    }
            |    val p = 1
            |    val t = 1
            |    val z = summon[Suspend].suspendContinuation[Int] { continuation =>
-           |      continuation.resume(Right(y + q + x))
+           |      continuation.resume(y + q + x)
            |    }
            |    z + y + p
            |}
@@ -1647,17 +1647,17 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
           |        val z4 = 1
           |        def method4(x: Int) = x + 1
           |
-          |        Right(method1(x) + 1 + z1 + z2 + method2(y) + z3 + method3(x) + z4 + method4(x))
+          |        method1(x) + 1 + z1 + z2 + method2(y) + z3 + method3(x) + z4 + method4(x)
           |      }
           |    }
           |
-          |    s.suspendContinuation[Int] { continuation => continuation.resume(Right(method1(x) + 1)) }
+          |    s.suspendContinuation[Int] { _.resume(method1(x) + 1) }
           |
           |    val z5 = suspension1
           |    def method5(x: Int) = x + 1
           |
           |    val suspension2 = s.suspendContinuation[Int] { continuation =>
-          |      continuation.resume(Right(z5 + suspension1 + method5(y)))
+          |      continuation.resume(z5 + suspension1 + method5(y))
           |    }
           |
           |    val z6 = 1

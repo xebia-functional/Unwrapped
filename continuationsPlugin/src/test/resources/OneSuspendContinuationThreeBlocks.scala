@@ -14,7 +14,7 @@ package continuations {
         {
           {
             {
-              safeContinuation.resume(Right.apply[Nothing, Int](1))
+              safeContinuation.resume(1)
             }
           }
         }

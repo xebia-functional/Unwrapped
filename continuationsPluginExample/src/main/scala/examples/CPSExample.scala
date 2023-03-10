@@ -233,7 +233,7 @@ object ExampleObject:
         val z4 = 1
         def method4(x: Int) = x
 
-        Right(method1(x) + 1 + z1 + z2 + method2(y) + z3 + method3(x) + z4 + method4(x))
+        method1(x) + 1 + z1 + z2 + method2(y) + z3 + method3(x) + z4 + method4(x)
       }
     }
 

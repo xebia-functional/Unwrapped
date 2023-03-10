@@ -75,7 +75,7 @@ package continuations {
                 $continuation.$label = 1
                 val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
                 {
-                  safeContinuation.resume(Right.apply[Nothing, Int](10))
+                  safeContinuation.resume(10)
                 }
                 val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
                   safeContinuation.getOrThrow()

@@ -72,11 +72,9 @@ package continuations {
                       {
                         val z4: Int = 1
                         def method4(x: Int): Int = x.+(1)
-                        Right.apply[Nothing, Int](
-                          continuations.ExampleObject.method1(x##1).+(1).+(continuations.ExampleObject.z1).+(z2).+(method2(y##1)).+(z3).+(
-                            method3(x##1)
-                          ).+(z4).+(method4(x##1))
-                        )
+                        continuations.ExampleObject.method1(x##1).+(1).+(continuations.ExampleObject.z1).+(z2).+(method2(y##1)).+(z3).+(method3(x##1)
+                          )
+                        .+(z4).+(method4(x##1))
                       }
                     )
                   }
@@ -98,9 +96,7 @@ package continuations {
                 $continuation.$label = 2
                 val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
                 {
-                  {
-                    safeContinuation.resume(Right.apply[Nothing, Int](method1(x##1).+(1)))
-                  }
+                  safeContinuation.resume(method1(x##1).+(1))
                 }
                 val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
                   safeContinuation.getOrThrow()
@@ -120,7 +116,7 @@ package continuations {
                 val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
                 {
                   {
-                    safeContinuation.resume(Right.apply[Nothing, Int](z5.+(suspension1).+(method5(y##1))))
+                    safeContinuation.resume(z5.+(suspension1).+(method5(y##1)))
                   }
                 }
                 val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =

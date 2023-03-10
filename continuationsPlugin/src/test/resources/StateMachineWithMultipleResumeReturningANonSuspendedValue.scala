@@ -52,7 +52,7 @@ package continuations {
                       {
                         println("Hello")
                         println("World")
-                        safeContinuation.resume(Right.apply[Nothing, Int](1))
+                        safeContinuation.resume(1)
                       }
                     }
                     val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
@@ -66,8 +66,8 @@ package continuations {
                     val safeContinuation: continuations.SafeContinuation[Boolean] = continuations.SafeContinuation.init[Boolean]($continuation)
                     {
                       {
-                        safeContinuation.resume(Right.apply[Nothing, Boolean](false))
-                        safeContinuation.resume(Right.apply[Nothing, Boolean](true))
+                        safeContinuation.resume(false)
+                        safeContinuation.resume(true)
                       }
                     }
                     val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
@@ -81,7 +81,7 @@ package continuations {
                     val safeContinuation: continuations.SafeContinuation[String] = continuations.SafeContinuation.init[String]($continuation)
                     {
                       {
-                        safeContinuation.resume(Right.apply[Nothing, String]("Hello"))
+                        safeContinuation.resume("Hello")
                         val x: Int = 1
                         ()
                       }
