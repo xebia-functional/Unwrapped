@@ -54,3 +54,9 @@ class SafeContinuation[-T](val delegate: Continuation[T], initialResult: Any | N
 
   override def getStackTraceElement(): StackTraceElement | Null =
     null
+
+object SafeContinuation:
+  def init[A](cont: Continuation[A]): SafeContinuation[A] =
+    import continuations.intrinsics.intercepted
+    val intrinsic = cont.intercepted()
+    new SafeContinuation[A](intrinsic, Continuation.State.Undecided)

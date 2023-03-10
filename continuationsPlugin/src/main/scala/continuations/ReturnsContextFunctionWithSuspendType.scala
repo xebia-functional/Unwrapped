@@ -15,11 +15,8 @@ private[continuations] object ReturnsContextFunctionWithSuspendType:
    * @param c
    *   A dotty compiler context
    * @return
-   *   [[scala.Some]] if the tree returns a context function, [[scala.None]] otherwise.
+   *   true if the tree returns a context function, false otherwise.
    */
-  def unapply(tree: tpd.ValOrDefDef)(using c: Context): Option[tpd.Tree] =
-    Option(tree).filter { t =>
-      val tpe = t.tpt.tpe
-      IsSuspendContextFunction.unapply(tpe).isDefined ||
-      IsSuspendContextFunction.unapply(tpe.underlyingIfProxy).isDefined
-    }
+  def apply(tree: tpd.ValOrDefDef)(using c: Context): Boolean =
+    val tpe = tree.tpt.tpe
+    IsSuspendContextFunction(tpe) || IsSuspendContextFunction(tpe.underlyingIfProxy)

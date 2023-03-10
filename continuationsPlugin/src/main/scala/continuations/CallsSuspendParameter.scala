@@ -2,7 +2,7 @@ package continuations
 
 import dotty.tools.dotc.ast.tpd
 import dotty.tools.dotc.core.Contexts.Context
-import dotty.tools.dotc.core.Symbols.requiredClass
+import dotty.tools.dotc.core.Symbols.{requiredClass, Symbol}
 import dotty.tools.dotc.core.Flags
 
 /**
@@ -19,14 +19,15 @@ private[continuations] object CallsSuspendParameter:
    * @param c
    *   A dotty compiler context
    * @return
-   *   a [[scala.Some]] if the tree has a given [[continuations.Suspend]] parameter,
-   *   [[scala.None]] otherwise
+   *   true if the tree has a given [[continuations.Suspend]] parameter, false otherwise
    */
-  def unapply(tree: tpd.Tree)(using c: Context): Option[tpd.Tree] =
+  def apply(tree: tpd.Tree)(using c: Context): Boolean =
+    def isGivenSuspend(s: Symbol): Boolean =
+      s.is(Flags.Given) && s
+        .info
+        .classSymbol
+        .info
+        .hasClassSymbol(requiredClass(suspendFullName))
     tree match
-      case tpd.Apply(_, args) if args.map(_.symbol).exists { s =>
-            s.is(Flags.Given) &&
-            s.info.classSymbol.info.hasClassSymbol(requiredClass(suspendFullName))
-          } =>
-        Option(tree)
-      case _ => None
+      case tpd.Apply(_, args) => args.exists(a => isGivenSuspend(a.symbol))
+      case _ => false

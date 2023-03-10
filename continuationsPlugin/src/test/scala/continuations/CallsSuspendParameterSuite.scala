@@ -12,7 +12,9 @@ class CallsSuspendParameterSuite extends FunSuite, CompilerFixtures {
       val call = tree match
         case Block(_, call) => call
 
-      assertNoDiff(CallsSuspendParameter.unapply(call).get.show, call.show)
+      val prev = call.show
+      val _ = CallsSuspendParameter(call)
+      assertNoDiff(call.show, prev)
   }
 
   continutationsContextAndMethodCallWithoutSuspend.test(
@@ -21,12 +23,12 @@ class CallsSuspendParameterSuite extends FunSuite, CompilerFixtures {
       val call = tree match
         case Block(_, call) => call
 
-      assertEquals(CallsSuspendParameter.unapply(call), None)
+      assertEquals(CallsSuspendParameter(call), false)
   }
 
   continuationsContextAndZeroAritySuspendSuspendingDefDef.test(
     "should return None when the tree is not a method call") {
     case (given Context, tree) =>
-      assertEquals(HasSuspensionNotInReturnedValue.unapply(tree), None)
+      assertEquals(HasSuspensionNotInReturnedValue(tree), false)
   }
 }

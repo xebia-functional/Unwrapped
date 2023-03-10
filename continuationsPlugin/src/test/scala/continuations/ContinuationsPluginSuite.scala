@@ -308,7 +308,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         case (tree, _) =>
           assertNoDiff(
             compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedOneSuspendContinuation)
+            expectedOneSuspendContinuationTwoBlocks)
       }
   }
 
@@ -395,11 +395,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
            |      {
            |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] = 
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        safeContinuation.resume(Left.apply[Exception, Nothing](new Exception("error")))
+           |        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
+           |        {
+           |          {
+           |            safeContinuation.resume(Left.apply[Exception, Nothing](new Exception("error")))
+           |          }
+           |        }
            |        safeContinuation.getOrThrow()
            |      }
            |  }
@@ -447,16 +448,17 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
            |      {
            |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] = 
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        println("Hello")
-           |        safeContinuation.resume(Right.apply[Nothing, Int](1))
-           |        val x: Int = 1
-           |        val y: Boolean = false
-           |        safeContinuation.resume(Right.apply[Nothing, Int](2))
-           |        println(x)
+           |        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
+           |        {
+           |          {
+           |            println("Hello")
+           |            safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |            val x: Int = 1
+           |            val y: Boolean = false
+           |            safeContinuation.resume(Right.apply[Nothing, Int](2))
+           |            println(x)
+           |          }
+           |        }
            |        safeContinuation.getOrThrow()
            |      }
            |  }
@@ -504,18 +506,19 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
            |      {
            |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] = 
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        safeContinuation.resume(
+           |        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
+           |        {
            |          {
-           |            println("Hello")
-           |            val x: Int = 1
-           |            val y: Int = 1
-           |            Right.apply[Nothing, Int](x.+(y))
+           |            safeContinuation.resume(
+           |              {
+           |                println("Hello")
+           |                val x: Int = 1
+           |                val y: Int = 1
+           |                Right.apply[Nothing, Int](x.+(y))
+           |              }
+           |            )
            |          }
-           |        )
+           |        }
            |        safeContinuation.getOrThrow()
            |      }
            |  }
@@ -544,7 +547,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         case (tree, _) =>
           assertNoDiff(
             compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedOneSuspendContinuation)
+            expectedOneSuspendContinuationTwoBlocks)
       }
   }
 
@@ -563,7 +566,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         case (tree, _) =>
           assertNoDiff(
             compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedOneSuspendContinuation)
+            expectedOneSuspendContinuationTwoBlocks)
       }
   }
 
@@ -599,11 +602,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |        println("HI")
            |        {
            |          val continuation1: continuations.Continuation[Int] = completion
-           |          val safeContinuation: continuations.SafeContinuation[Int] = 
-           |            new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |              continuations.Continuation.State.Undecided
-           |            )
-           |          safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |          val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
+           |          {
+           |            {
+           |              safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |            }
+           |          }
            |          safeContinuation.getOrThrow()
            |        }
            |      }
@@ -644,12 +648,13 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
            |      {
            |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] = 
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        val x: Int = 1
-           |        println("Hello")
+           |        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
+           |        {
+           |          {
+           |            val x: Int = 1
+           |            println("Hello")
+           |          }
+           |        }
            |        safeContinuation.getOrThrow()
            |      }
            |  }
@@ -690,11 +695,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |    def foo(x: Int, completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
            |      {
            |        val continuation1: continuations.Continuation[Int] = completion
-           |        val safeContinuation: continuations.SafeContinuation[Int] = 
-           |          new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |            continuations.Continuation.State.Undecided
-           |          )
-           |        safeContinuation.resume(Right.apply[Nothing, Int](x.+(1)))
+           |        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
+           |        {
+           |          {
+           |            safeContinuation.resume(Right.apply[Nothing, Int](x.+(1)))
+           |          }
+           |        }
            |        safeContinuation.getOrThrow()
            |      }
            |  }
@@ -741,15 +747,19 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineForSuspendContinuationReturningANonSuspendingVal)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineForSuspendContinuationReturningANonSuspendingVal)
+          )
       }
 
       checkContinuations(sourceContextFunction) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineForSuspendContinuationReturningANonSuspendingVal)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineForSuspendContinuationReturningANonSuspendingVal)
+          )
       }
   }
 
@@ -773,8 +783,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineWithSingleSuspendedContinuationReturningANonSuspendedVal)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineWithSingleSuspendedContinuationReturningANonSuspendedVal)
+          )
       }
   }
 
@@ -820,11 +832,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |          {
            |            {
            |              val continuation1: continuations.Continuation[Int] = completion
-           |              val safeContinuation: continuations.SafeContinuation[Int] = 
-           |                new continuations.SafeContinuation[Int](continuations.intrinsics.IntrinsicsJvm$package.intercepted[Int](continuation1)(), 
-           |                  continuations.Continuation.State.Undecided
-           |                )
-           |              safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |              val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
+           |              {
+           |                {
+           |                  safeContinuation.resume(Right.apply[Nothing, Int](1))
+           |                }
+           |              }
            |              safeContinuation.getOrThrow()
            |            }
            |          }
@@ -863,8 +876,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineMultipleSuspendedContinuationsReturningANonSuspendingVal)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineMultipleSuspendedContinuationsReturningANonSuspendingVal)
+          )
       }
   }
 
@@ -902,8 +917,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineWithMultipleResumeReturningANonSuspendedValue)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineWithMultipleResumeReturningANonSuspendedValue)
+          )
       }
   }
 
@@ -952,15 +969,17 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineReturningANonSuspendedValue)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineReturningANonSuspendedValue)
+          )
       }
 
       checkContinuations(sourceContextFunction) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineReturningANonSuspendedValue)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineReturningANonSuspendedValue)
+          )
       }
   }
 
@@ -986,8 +1005,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineNoDependantSuspensions)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineNoDependantSuspensions))
       }
   }
 
@@ -1019,8 +1038,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineNoDependantSuspensionsWithCodeInside)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineNoDependantSuspensionsWithCodeInside)
+          )
       }
   }
 
@@ -1049,8 +1069,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineNoDependantSuspensionsWithCodeBetween)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineNoDependantSuspensionsWithCodeBetween)
+          )
       }
   }
 
@@ -1128,11 +1149,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |         = 
            |          {
            |            val continuation1: continuations.Continuation[A] = completion
-           |            val safeContinuation: continuations.SafeContinuation[A] = 
-           |              new continuations.SafeContinuation[A](continuations.intrinsics.IntrinsicsJvm$package.intercepted[A](continuation1)(), 
-           |                continuations.Continuation.State.Undecided
-           |              )
-           |            safeContinuation.resume(Right.apply[Nothing, A](x))
+           |            val safeContinuation: continuations.SafeContinuation[A] = continuations.SafeContinuation.init[A](continuation1)
+           |            {
+           |              {
+           |                safeContinuation.resume(Right.apply[Nothing, A](x))
+           |              }
+           |            }
            |            safeContinuation.getOrThrow()
            |          }
            |        foo(1, 2, "A", concurrent.ExecutionContext.Implicits.global, continuations.jvm.internal.ContinuationStub.contImpl)

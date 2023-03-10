@@ -13,7 +13,7 @@ class IsSuspendContextFunctionSuite extends FunSuite, CompilerFixtures {
     case (c, suspendContextFunction) =>
       given Context = c
       val t = suspendContextFunction
-      assertEquals(IsSuspendContextFunction.unapply(t), Some(t))
+      assertEquals(IsSuspendContextFunction(t), true)
   }
 
   continuationsContextAndSuspendContextFunctionReturningSuspend.test(
@@ -21,23 +21,21 @@ class IsSuspendContextFunctionSuite extends FunSuite, CompilerFixtures {
     case (c, suspendContextFunctionReturningSuspend) =>
       given Context = c
       val t = suspendContextFunctionReturningSuspend
-      assertEquals(IsSuspendContextFunction.unapply(t), Some(t))
+      assertEquals(IsSuspendContextFunction(t), true)
   }
 
   continuationsContextAndNonSuspendContextFunctionReturingSuspend.test(
     "It should not detect context functions with Suspend as a return if Suspend is not a parameter") {
     case (c, nonSuspendContextFunctionReturingSuspend) =>
       given Context = c
-      assertEquals(
-        IsSuspendContextFunction.unapply(nonSuspendContextFunctionReturingSuspend),
-        None)
+      assertEquals(IsSuspendContextFunction(nonSuspendContextFunctionReturingSuspend), false)
   }
 
   continuationsContextAndNonSuspendContextFunction.test(
     "It should not detect context functions without Suspend as a parameter") {
     case (c, nonSuspendContextFunction) =>
       given Context = c
-      assertEquals(IsSuspendContextFunction.unapply(nonSuspendContextFunction), None)
+      assertEquals(IsSuspendContextFunction(nonSuspendContextFunction), false)
   }
 
   compilerContextWithContinuationsPlugin.test(
@@ -51,6 +49,6 @@ class IsSuspendContextFunctionSuite extends FunSuite, CompilerFixtures {
       val type4 = defn.FunctionOf(List(defn.StringType), type3, isContextual = true)
       val type5 = defn.FunctionOf(List(defn.IntType), type4)
 
-      assertEquals(IsSuspendContextFunction.unapply(type5), Some(type5))
+      assertEquals(IsSuspendContextFunction(type5), true)
   }
 }
