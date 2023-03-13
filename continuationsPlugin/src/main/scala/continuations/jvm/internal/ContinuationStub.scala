@@ -23,6 +23,10 @@ object ContinuationStub:
       ExecutionContext.global.execute {
         block.resume()
       }
+
+    import continuations.intrinsics.startContinuation
+    def startContinuation1[A](block: Continuation[A] => Unit) =
+      startContinuation(block)
      */
     protected def invokeSuspend(
         result: Either[Throwable, Any | Null | Continuation.State.Suspended.type]): Any | Null =

@@ -852,7 +852,7 @@ object DefDefTransforms extends TreesChecks:
         newSymbol(
           continuationsStateMachineSymbol,
           Names.termName("create"),
-          Flags.Override | Flags.Protected | Flags.Method,
+          Flags.Override | Flags.Method,
           MethodType(
             List(termName("value"), termName("completion")),
             List(anyOrNullType, continuationClassRef.appliedTo(anyOrNullType)),
