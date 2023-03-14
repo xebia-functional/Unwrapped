@@ -5,7 +5,7 @@ import continuations.*
 @main def ProgramSuspendingContinuationNoParamResumeIgnoreResult =
   def fooTest()(using s: Suspend): Int =
     println("Start")
-    s.suspendContinuation[Unit] { _.resume(Right { println("Hello") }) }
+    s.suspendContinuation[Unit] { _.resume({ println("Hello") }) }
     println("World")
     val x = 1
     s.suspendContinuation[Boolean] { continuation =>
