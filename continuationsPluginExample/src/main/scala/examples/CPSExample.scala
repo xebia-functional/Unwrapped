@@ -237,7 +237,7 @@ object ExampleObject:
       }
     }
 
-    s.suspendContinuation[Int] { continuation => continuation.resume(Right(method1(x) + 1)) }
+    s.suspendContinuation[Int] { continuation => continuation.resume(method1(x) + 1) }
 
     val z5 = suspension1
     def method5(x: Int) = x
