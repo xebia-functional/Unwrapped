@@ -26,7 +26,8 @@ extension [A](suspendedFn: Suspend ?=> A)
     suspendedFn
       .asInstanceOf[Continuation[A] => (Any | Null | Continuation.State.Suspended.type)](
         completion)
-  inline def createContinuation(completion: Continuation[A]): Continuation[Unit] =
+
+  def createContinuation(completion: Continuation[A]): Continuation[Unit] =
     if (suspendedFn.isInstanceOf[BaseContinuationImpl])
       suspendedFn.asInstanceOf[BaseContinuationImpl].create(completion)
     else
