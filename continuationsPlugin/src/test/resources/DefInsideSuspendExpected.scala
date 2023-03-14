@@ -14,7 +14,7 @@ package continuations {
         {
           {
             def test(x: Int): Int = x.+(1)
-            safeContinuation.resume(Right.apply[Nothing, Int](test(1).+(1)))
+            safeContinuation.resume(test(1).+(1))
           }
         }
         safeContinuation.getOrThrow()

@@ -13,7 +13,7 @@ class CallsSuspendContinuationSuite extends FunSuite, CompilerFixtures:
 
   continuationsContextAndZeroAritySuspendSuspendingDefDef.test(
     "CallsContinuationResumeWith#apply(defDefTree): def mySuspend()(using Suspend): Int = " +
-      "summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) } should be Some(mySuspend)") {
+      "summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) } should be Some(mySuspend)") {
     case (given Context, defdef) =>
       // because this is a subtree projection, we cannot use tree
       // equality on the returned trees, as the rightOne fixture and
@@ -32,7 +32,7 @@ class CallsSuspendContinuationSuite extends FunSuite, CompilerFixtures:
 
   continuationsContextAndZeroAritySuspendSuspendingValDef.test(
     "CallsContinuationResumeWith#apply(valDefTree): val mySuspend: Suspend ?=> Int = " +
-      "summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(Right(1)) } should be Some(mySuspend)") {
+      "summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) } should be Some(mySuspend)") {
     case (given Context, valdef) =>
       assertEquals(CallsSuspendContinuation(valdef), true)
   }

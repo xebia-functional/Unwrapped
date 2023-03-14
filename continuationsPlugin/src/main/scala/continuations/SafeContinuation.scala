@@ -11,22 +11,36 @@ class SafeContinuation[-T](val delegate: Continuation[T], initialResult: Any | N
   override type Ctx = delegate.Ctx
   override def context: Ctx = delegate.context
   result = initialResult
+  var errored: Boolean = false
 
-  override def resume(value: Either[Throwable, T]): Unit =
+  override def resume(value: T): Unit =
+    while true do
+      this.result match {
+        case Continuation.State.Undecided =>
+          if (CAS_RESULT(Continuation.State.Undecided, value))
+            return ()
+        case Continuation.State.Suspended =>
+          if (CAS_RESULT(Continuation.State.Suspended, Continuation.State.Resumed)) {
+            delegate.resume(value)
+            return ()
+          }
+        case _ =>
+          throw IllegalStateException("Already resumed")
+      }
+
+  override def raise(error: Throwable): Unit =
     while true do
       val cur = this.result
-
       if (cur == Continuation.State.Undecided) {
-        if (CAS_RESULT(Continuation.State.Undecided, value))
+        if (CAS_RESULT(Continuation.State.Undecided, error))
           return ()
       } else if (cur == Continuation.State.Suspended) {
         if (CAS_RESULT(Continuation.State.Suspended, Continuation.State.Resumed)) {
-          delegate.resume(value)
+          errored = true
+          delegate.raise(error)
           return ()
         }
-      } else {
-        throw IllegalStateException("Already resumed")
-      }
+      } else throw IllegalStateException("Already resumed")
 
   def getOrThrow(): Any | Null | Continuation.State.Suspended.type =
     var result = this.result
@@ -40,13 +54,10 @@ class SafeContinuation[-T](val delegate: Continuation[T], initialResult: Any | N
 
     if (result == Continuation.State.Resumed) {
       Continuation.State.Suspended
-    } else if (result.isInstanceOf[Left[_, _]]) {
-      throw result.asInstanceOf[Left[Throwable, _]].value
-    } else if (result.isInstanceOf[Right[_, _]]) {
-      result.asInstanceOf[Right[_, _]].value
-    } else {
-      result // Continuation.State.Suspended
-    }
+    } else if ((result ne null) && errored) {
+      throw result.asInstanceOf[Throwable]
+    } else
+      result
 
   override def callerFrame: ContinuationStackFrame | Null =
     if (delegate != null && delegate.isInstanceOf[ContinuationStackFrame]) delegate.asInstanceOf

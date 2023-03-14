@@ -25,8 +25,8 @@ object ExampleObject {
       val z5 = 1
 
       continuation.resume(
-        Right(method1(x) + method2(x) + method3(x) + method4(x) + method5(x) +
-          z1 + z2 + z3 + z4 + z5 + 1))
+        method1(x) + method2(x) + method3(x) + method4(x) + method5(x) +
+          z1 + z2 + z3 + z4 + z5 + 1)
     }
 
     def method6(x: Int) = x + 1
@@ -34,8 +34,8 @@ object ExampleObject {
 
     s.suspendContinuation[Int] { continuation =>
       continuation.resume(
-        Right(method1(x) + method2(x) + method3(x) + method6(x) +
-          z1 + z2 + z3 + z4 + z6 + 1))
+        method1(x) + method2(x) + method3(x) + method6(x) +
+          z1 + z2 + z3 + z4 + z6 + 1)
     }
 
     def method7(x: Int) = x + 1
@@ -46,8 +46,8 @@ object ExampleObject {
       val z8 = 1
 
       continuation.resume(
-        Right(method1(x) + method2(x) + method3(x) + method7(x) +
-          method8(x) + z1 + z2 + z3 + z4 + z6 + z7 + z8 + 1))
+        method1(x) + method2(x) + method3(x) + method7(x) +
+          method8(x) + z1 + z2 + z3 + z4 + z6 + z7 + z8 + 1)
     }
 
     def method9(x: Int) = x + 1

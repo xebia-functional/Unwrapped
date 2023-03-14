@@ -13,3 +13,4 @@ private[continuations] val continuationFullName = s"$continuationPackageName.Con
 private[continuations] val completionParamName = "completion"
 private[continuations] val continuationClassName = "Continuation"
 private[continuations] val resumeMethodName = "resume"
+private[continuations] val raiseMethodName = "raise"

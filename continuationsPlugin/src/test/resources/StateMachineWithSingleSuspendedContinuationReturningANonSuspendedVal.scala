@@ -54,7 +54,7 @@ package continuations {
                     val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
                     {
                       {
-                        safeContinuation.resume(Right.apply[Nothing, Int](x##1))
+                        safeContinuation.resume(x##1)
                       }
                     }
                     val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 

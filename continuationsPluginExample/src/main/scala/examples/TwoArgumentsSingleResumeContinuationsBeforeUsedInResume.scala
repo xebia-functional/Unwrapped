@@ -7,5 +7,5 @@ import continuations.Suspend
       using s: Suspend): Int =
     println("Hello")
     val z = 1
-    s.suspendContinuation[Int] { continuation => continuation.resume(Right(x + y + z)) }
+    s.suspendContinuation[Int] { continuation => continuation.resume(x + y + z) }
   println(twoArgumentsSingleResumeContinuationsBeforeUsedInResume(1, 2))

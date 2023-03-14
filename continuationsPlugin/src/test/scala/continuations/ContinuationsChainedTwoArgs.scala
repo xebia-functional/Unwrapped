@@ -24,8 +24,8 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |package continuations
            |
            |def fooTest(x: Int, y: Int)(using s: Suspend): Int = {
-           |    val z = s.suspendContinuation[Int] { _.resume(Right { x + y + 1 }) }
-           |    s.suspendContinuation[Int] { _.resume(Right { z + 1 }) }
+           |    val z = s.suspendContinuation[Int] { _.resume(x + y + 1) }
+           |    s.suspendContinuation[Int] { _.resume(z + 1) }
            |}
            |""".stripMargin
 
@@ -51,8 +51,8 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
           |def program: Foo = {
           |
           |  def fooTest[A](a: A, b: Int)(using s: Suspend): A = {
-          |      val z = s.suspendContinuation[A] { _.resume(Right { a }) }
-          |      s.suspendContinuation[A] { _.resume(Right { println("World"); z }) }
+          |      val z = s.suspendContinuation[A] { _.resume(a) }
+          |      s.suspendContinuation[A] { _.resume({ println("World"); z }) }
           |  }
           |  
           |  fooTest(Foo(1), 1)
@@ -82,8 +82,8 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
           |def program: Bar = {
           |
           |  def fooTest[A, B](a: A, b: B)(using s: Suspend): B = {
-          |      val z = s.suspendContinuation[A] { _.resume(Right { a }) }
-          |      s.suspendContinuation[B] { _.resume(Right { println(z); b }) }
+          |      val z = s.suspendContinuation[A] { _.resume(a) }
+          |      s.suspendContinuation[B] { _.resume({ println(z); b }) }
           |  }
           |
           |  fooTest(Foo(1), Bar(2))
@@ -109,8 +109,8 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |package continuations
            |
            |def fooTest(x: Int)(y: Int)(using s: Suspend): Int = {
-           |    val z = s.suspendContinuation[Int] { _.resume(Right { x + y + 1 }) }
-           |    s.suspendContinuation[Int] { _.resume(Right { z + 1 }) }
+           |    val z = s.suspendContinuation[Int] { _.resume( { x + y + 1 }) }
+           |    s.suspendContinuation[Int] { _.resume( { z + 1 }) }
            |}
            |""".stripMargin
 
@@ -135,8 +135,8 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |import concurrent.ExecutionContext.Implicits.global
            |
            |def fooTest(x: Int, y: Int)(using s: Suspend, ec: ExecutionContext): Int = {
-           |    val z = s.suspendContinuation[Int] { _.resume(Right { x + y + 1 }) }
-           |    s.suspendContinuation[Int] { _.resume(Right { z + 1 }) }
+           |    val z = s.suspendContinuation[Int] { _.resume( { x + y + 1 }) }
+           |    s.suspendContinuation[Int] { _.resume( { z + 1 }) }
            |}
            |""".stripMargin
 
@@ -162,8 +162,8 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |import concurrent.ExecutionContext.Implicits.global
            |
            |def fooTest(x: Int, y: Int): (Suspend, ExecutionContext) ?=> Int = {
-           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(Right { x + y + 1 }) }
-           |    summon[Suspend].suspendContinuation[Int] { _.resume(Right { z + 1 }) }
+           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume( { x + y + 1 }) }
+           |    summon[Suspend].suspendContinuation[Int] { _.resume({ z + 1 }) }
            |}
            |""".stripMargin
 
@@ -186,8 +186,8 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |package continuations
            |
            |def fooTest(x: Int, y: Int): Suspend ?=> Int = {
-           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(Right { x + y + 1 }) }
-           |    summon[Suspend].suspendContinuation[Int] { _.resume(Right { z + 1 }) }
+           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume( { x + y + 1 }) }
+           |    summon[Suspend].suspendContinuation[Int] { _.resume( { z + 1 }) }
            |}
            |""".stripMargin
 
@@ -211,8 +211,8 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |
            |def fooTest(x: Int, y: Int)(using s: Suspend): Int = {
            |    println("Hello")
-           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(Right { x + y + 1 }) }
-           |    summon[Suspend].suspendContinuation[Int] { _.resume(Right { z + 1 }) }
+           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume( { x + y + 1 }) }
+           |    summon[Suspend].suspendContinuation[Int] { _.resume( { z + 1 }) }
            |}
            |""".stripMargin
 
@@ -236,8 +236,8 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |
            |def fooTest(x: Int, y: Int)(using s: Suspend): Int = {
            |    val w = 1
-           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(Right { x + y + w }) }
-           |    summon[Suspend].suspendContinuation[Int] { _.resume(Right { z + 1 }) }
+           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume( { x + y + w }) }
+           |    summon[Suspend].suspendContinuation[Int] { _.resume( { z + 1 }) }
            |}
            |""".stripMargin
 
@@ -262,8 +262,8 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |def fooTest(x: Int, y: Int)(using s: Suspend): Int = {
            |    println("Hello")
            |    println("World")
-           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(Right { x + y + 1 }) }
-           |    summon[Suspend].suspendContinuation[Int] { _.resume(Right { z + 1 }) }
+           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume( { x + y + 1 }) }
+           |    summon[Suspend].suspendContinuation[Int] { _.resume( { z + 1 }) }
            |}
            |""".stripMargin
 
@@ -288,8 +288,8 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |def fooTest(x: Int, y: Int)(using s: Suspend): Int = {
            |    println("Hello")
            |    val w = 1
-           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(Right { x + y + w }) }
-           |    summon[Suspend].suspendContinuation[Int] { _.resume(Right { z + 1 }) }
+           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume( { x + y + w }) }
+           |    summon[Suspend].suspendContinuation[Int] { _.resume( { z + 1 }) }
            |}
            |""".stripMargin
 
@@ -315,8 +315,8 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |def fooTest(x: Int, y: Int)(using s: Suspend): Int = {
            |    val a = 1
            |    val w = 1
-           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(Right { x + y + w }) }
-           |    summon[Suspend].suspendContinuation[Int] { _.resume(Right { z + a }) }
+           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(x + y + w) }
+           |    summon[Suspend].suspendContinuation[Int] { _.resume(z + a) }
            |}
            |""".stripMargin
 
@@ -341,9 +341,9 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |def fooTest(x: Int, y: Int)(using s: Suspend): Int = {
            |    val a = 1
            |    val w = 1
-           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(Right { x + y + w }) }
+           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(x + y + w) }
            |    println("Hello")
-           |    summon[Suspend].suspendContinuation[Int] { _.resume(Right { z + a }) }
+           |    summon[Suspend].suspendContinuation[Int] { _.resume(z + a) }
            |}
            |""".stripMargin
 
@@ -369,9 +369,9 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |def fooTest(x: Int, y: Int)(using s: Suspend): Int = {
            |    val a = 1
            |    val b = 1
-           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(Right { x + y + a }) }
+           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(x + y + a) }
            |    val c = a + 1
-           |    summon[Suspend].suspendContinuation[Int] { _.resume(Right { z + b + c }) }
+           |    summon[Suspend].suspendContinuation[Int] { _.resume(z + b + c) }
            |}
            |""".stripMargin
 
@@ -397,10 +397,10 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |def fooTest(x: Int, y: Int)(using s: Suspend): Int = {
            |    val a = 1
            |    val b = 1
-           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(Right { x + y + a }) }
+           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(x + y + a) }
            |    println("Hello")
            |    println("World")
-           |    summon[Suspend].suspendContinuation[Int] { _.resume(Right { z + b }) }
+           |    summon[Suspend].suspendContinuation[Int] { _.resume(z + b) }
            |}
            |""".stripMargin
 
@@ -426,10 +426,10 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |def fooTest(x: Int, y: Int)(using s: Suspend): Int = {
            |    val a = 1
            |    val b = 1
-           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(Right { x + y + a }) }
+           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(x + y + a) }
            |    println("Hello")
            |    val c = a + b
-           |    summon[Suspend].suspendContinuation[Int] { _.resume(Right { z + c }) }
+           |    summon[Suspend].suspendContinuation[Int] { _.resume(z + c) }
            |}
            |""".stripMargin
 
@@ -455,10 +455,10 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |def fooTest(x: Int, y: Int)(using s: Suspend): Int = {
            |    val a = 1
            |    val b = 1
-           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(Right { x + y + a }) }
+           |    val z = summon[Suspend].suspendContinuation[Int] { _.resume(x + y + a) }
            |    val c = a + b
            |    val d = c + 1
-           |    summon[Suspend].suspendContinuation[Int] { _.resume(Right { z + c + d }) }
+           |    summon[Suspend].suspendContinuation[Int] { _.resume(z + c + d) }
            |}
            |""".stripMargin
 
@@ -484,10 +484,10 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |def fooTest(x: Int, y: Int)(using s: Suspend): Unit = {
            |    val a = 1
            |    val b = 1
-           |    val z = s.suspendContinuation[Int] { _.resume(Right { x + y + a }) }
+           |    val z = s.suspendContinuation[Int] { _.resume(x + y + a) }
            |    val c = a + b
            |    val d = c + 1
-           |    val w = s.suspendContinuation[Int] { _.resume(Right { z + c + d }) }
+           |    val w = s.suspendContinuation[Int] { _.resume(z + c + d) }
            |    println(w)
            |}
            |""".stripMargin
@@ -514,10 +514,10 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |def fooTest(x: Int, y: Int)(using s: Suspend): Int = {
            |    val a = 1
            |    val b = 1
-           |    val z = s.suspendContinuation[Int] { _.resume(Right { x + y + a }) }
+           |    val z = s.suspendContinuation[Int] { _.resume(x + y + a) }
            |    val c = a + b
            |    val d = c + 1
-           |    val w = s.suspendContinuation[Int] { _.resume(Right { z + c + d }) }
+           |    val w = s.suspendContinuation[Int] { _.resume(z + c + d) }
            |    val e = w + 1
            |    e
            |}
@@ -545,10 +545,10 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |def fooTest(x: Int, y: Int)(using s: Suspend): Unit = {
            |    val a = 1
            |    val b = 1
-           |    val z = s.suspendContinuation[Int] { _.resume(Right { x + y + a }) }
+           |    val z = s.suspendContinuation[Int] { _.resume(x + y + a) }
            |    val c = a + b
            |    val d = c + 1
-           |    val w = s.suspendContinuation[Int] { _.resume(Right { z + c + d }) }
+           |    val w = s.suspendContinuation[Int] { _.resume(z + c + d) }
            |    val e = w + 1
            |    println(e)
            |}
@@ -576,10 +576,10 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |def fooTest(x: Int, y: Int)(using s: Suspend): Unit = {
            |    val a = 1
            |    val b = 1
-           |    val z = s.suspendContinuation[Int] { _.resume(Right { x + y + a }) }
+           |    val z = s.suspendContinuation[Int] { _.resume(x + y + a) }
            |    val c = a + b
            |    val d = c + 1
-           |    val w = s.suspendContinuation[Int] { _.resume(Right { z + c + d }) }
+           |    val w = s.suspendContinuation[Int] { _.resume(z + c + d) }
            |    val e = w + 1
            |    val f = z + w + a
            |    e + f
@@ -608,10 +608,10 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
            |def fooTest(x: Int, y: Int)(using s: Suspend): Unit = {
            |    val a = 1
            |    val b = 1
-           |    val z = s.suspendContinuation[Int] { _.resume(Right { x + y + a }) }
+           |    val z = s.suspendContinuation[Int] { _.resume(x + y + a) }
            |    val c = a + b
            |    val d = c + 1
-           |    s.suspendContinuation[Int] { _.resume(Right { z + c + d }) }
+           |    s.suspendContinuation[Int] { _.resume(z + c + d) }
            |    val e = z + 1
            |    val f = z + a
            |    e + f

@@ -22,11 +22,11 @@ object ExampleObj:
         val z4 = 1
         def method4(x: Int) = x
 
-        Right(method1(x) + 1 + z1 + z2 + method2(y) + z3 + method3(x) + z4 + method4(x))
+        method1(x) + 1 + z1 + z2 + method2(y) + z3 + method3(x) + z4 + method4(x)
       }
     }
 
-    s.suspendContinuation[Int] { continuation => continuation.resume(Right(method1(x) + 1)) }
+    s.suspendContinuation[Int] { continuation => continuation.resume(method1(x) + 1) }
 
     val z5 = suspension1
     def method5(x: Int) = x

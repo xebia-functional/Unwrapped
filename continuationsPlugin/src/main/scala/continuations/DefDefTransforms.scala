@@ -129,26 +129,25 @@ object DefDefTransforms extends TreesChecks:
       callSuspensionPoint: tpd.Tree,
       safeContinuationRef: tpd.Tree)(using Context): tpd.Tree = {
     val resumeMethod = safeContinuationRef.select(termName(resumeMethodName))
+    val raiseMethod = safeContinuationRef.select(termName(raiseMethodName))
 
-    val anonymousContinuationFunctions = callSuspensionPoint.filterSubTrees {
-      case t @ Trees.DefDef(_, _, _, _)
-          if t.symbol.exists &&
-            t.symbol.isAnonymousFunction
-            &&
-            t.symbol.paramSymss.flatten.exists(hasContinuationClass) =>
-        true
-      case tree @ Trees.Select(_, name)
-          if tree.symbol.owner.name.show == continuationClassName &&
-            name.show == resumeMethodName =>
-        true
-      case _ =>
-        false
+    def isAnonContFunction(t: tpd.Tree): Boolean = t match {
+      case t @ Trees.DefDef(_, _, _, _) =>
+        t.symbol.exists &&
+          t.symbol.isAnonymousFunction &&
+          t.symbol.paramSymss.flatten.exists(hasContinuationClass)
+      case tree @ Trees.Select(_, name) =>
+        tree.symbol.owner.name.show == continuationClassName &&
+          (name.show == resumeMethodName || name.show == raiseMethodName)
+      case _ => false
     }
+
+    val anonymousContinuationFunctions = callSuspensionPoint.filterSubTrees(isAnonContFunction)
 
     val continuationReferences = anonymousContinuationFunctions.map(_.symbol.owner)
 
     val safeContinuationRefSymbols =
-      List.fill(continuationReferences.size)(safeContinuationRef.symbol)
+      List.fill(anonymousContinuationFunctions.size)(safeContinuationRef.symbol)
     val safeContinuationRefOwners = safeContinuationRefSymbols.map(_.owner)
 
     val hypothesis = new TreeTypeMap(
@@ -176,6 +175,10 @@ object DefDefTransforms extends TreesChecks:
             if tree.symbol.owner.name.show == continuationClassName &&
               name.show == resumeMethodName =>
           resumeMethod
+        case tree @ Trees.Select(_, name)
+            if tree.symbol.owner.name.show == continuationClassName &&
+              name.show == raiseMethodName =>
+          raiseMethod
         case t =>
           t
       },
@@ -559,8 +562,6 @@ object DefDefTransforms extends TreesChecks:
     val continuationClassRef = requiredClassRef(continuationFullName)
     val continuationModule = requiredModule(continuationFullName)
     val safeContinuationClass = requiredClass("continuations.SafeContinuation")
-    val interceptedMethod =
-      requiredPackage("continuations.intrinsics").requiredMethod("intercepted")
     val continuationImplClass = requiredClass("continuations.jvm.internal.ContinuationImpl")
 
     val parent = tree.symbol
@@ -572,10 +573,6 @@ object DefDefTransforms extends TreesChecks:
 
     val suspendedState =
       ref(continuationModule).select(termName("State")).select(termName("Suspended"))
-    val newReturnType =
-      tpd.TypeTree(
-        Types.OrType(Types.OrNull(returnType), suspendedState.symbol.namedType, false)
-      )
 
     val integerOR =
       defn.IntClass.requiredMethod(nme.OR, List(defn.IntType))
@@ -650,8 +647,10 @@ object DefDefTransforms extends TreesChecks:
 
     val transformedMethodParams = params(tree, completion)
 
+    val newReturnType =
+      Types.OrType(Types.OrNull(returnType), suspendedState.symbol.namedType, false)
     val transformedMethodSymbol =
-      createTransformedMethodSymbol(parent, transformedMethodParams, newReturnType.tpe)
+      createTransformedMethodSymbol(parent, transformedMethodParams, newReturnType)
 
     deleteOldSymbol(parent)
 

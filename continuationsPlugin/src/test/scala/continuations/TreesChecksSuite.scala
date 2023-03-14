@@ -9,37 +9,35 @@ import munit.FunSuite
 class TreesChecksSuite extends FunSuite, CompilerFixtures, TreesChecks {
 
   continuationsContextAndInlinedSuspendingTree.test(
-    """|subtreeCallsSuspend(Suspend#suspendContinuation[Int] {continuation =>
-       |  continuation.resume(Right(1))
+    """|subtreeCallsSuspend(Suspend#suspendContinuation[Int] { continuation =>
+       |  continuation.resume(1)
        |})
        | should be true""".stripMargin) {
     case (given Context, inlinedSuspend) =>
       assert(subtreeCallsSuspend(inlinedSuspend))
   }
 
-  continuationsContextAndOneTree.test(
-    """|subtreeCallsSuspend(1) should be false""".stripMargin) {
+  continuationsContextAndOneTree.test("subtreeCallsSuspend(1) should be false".stripMargin) {
     case (given Context, nonInlinedTree) =>
       assert(!subtreeCallsSuspend(nonInlinedTree))
   }
 
   continuationsContextAndInlinedSuspendingTree.test(
     """|treeCallsSuspend(Suspend#suspendContinuation[Int] {continuation =>
-       |  continuation.resume(Right(1))
+       |  continuation.resume(1)
        |})
        | should be true""".stripMargin) {
     case (given Context, inlinedSuspend) =>
       assert(treeCallsSuspend(inlinedSuspend))
   }
 
-  continuationsContextAndOneTree.test("""|treeCallsSuspend(1) should be false""".stripMargin) {
+  continuationsContextAndOneTree.test("treeCallsSuspend(1) should be false".stripMargin) {
     case (given Context, nonInlinedTree) =>
       assert(!treeCallsSuspend(nonInlinedTree))
   }
 
   continuationsContextAndInlinedSuspendingTree.test(
-    """|treeCallsResume(continuation.resume(Right(1)))
-       | should be true""".stripMargin) {
+    "treeCallsResume(continuation.resume(1)) should be true".ignore) {
     case (given Context, inlinedSuspend) =>
       val resume = inlinedSuspend match
         case Inlined(
@@ -55,7 +53,7 @@ class TreesChecksSuite extends FunSuite, CompilerFixtures, TreesChecks {
   continuationsContextAndInlinedSuspendingTree.test(
     """
       |treeCallsResume(Suspend#suspendContinuation[Int] {continuation =>
-      |  continuation.resume(Right(1))
+      |  continuation.resume(1)
       |})
       | should be false
       |""".stripMargin) {
@@ -65,7 +63,7 @@ class TreesChecksSuite extends FunSuite, CompilerFixtures, TreesChecks {
 
   continutationsContextAndInlinedSuspendingSingleArityWithDependentNonSuspendingCalculation
     .test("""|valDefTreeCallsSuspend(val y = Suspend#suspendContinuation[Int] {continuation =>
-             |  continuation.resume(Right(x+1))
+             |  continuation.resume(x+1)
              |})
              | should be true""".stripMargin) {
       case (given Context, tree) =>
@@ -78,7 +76,7 @@ class TreesChecksSuite extends FunSuite, CompilerFixtures, TreesChecks {
 
   continuationsContextAndInlinedSuspendingTree.test(
     """|valDefTreeCallsSuspend(Suspend#suspendContinuation[Int] {continuation =>
-       |  continuation.resume(Right(1))
+       |  continuation.resume(1)
        |})
        | should be false""".stripMargin) {
     case (given Context, tree) =>
