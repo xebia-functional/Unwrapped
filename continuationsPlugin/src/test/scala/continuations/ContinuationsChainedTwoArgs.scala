@@ -67,7 +67,6 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
           )
       }
   }
-  /*
 
   compilerContextWithContinuationsPlugin.test(
     "2- it should convert into a state machine two continuations chained with two generic params"
@@ -123,7 +122,6 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
           )
       }
   }
-
   compilerContextWithContinuationsPlugin.test(
     "4- it should convert into a state machine two continuations chained with one extra given parameter"
   ) {
@@ -330,6 +328,7 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
       }
   }
 
+  /*
   compilerContextWithContinuationsPlugin.test(
     "12- it should convert into a state machine two continuations chained with two val prior" +
       "to continuations and one line between"

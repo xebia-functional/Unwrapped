@@ -55,6 +55,7 @@ package continuations {
                       compileFromString$package$fooTest$1
                  if x$0.$label.&(scala.Int.MinValue).!=(0) =>
                   x$0.$label = x$0.$label.-(scala.Int.MinValue)
+                  x$0
                 case _ =>
                   new
                     continuations.compileFromString$package.
