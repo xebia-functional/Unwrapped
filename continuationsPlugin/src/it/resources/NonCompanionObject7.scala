@@ -18,7 +18,7 @@ object ExampleObject {
 
   def continuations(x: Int): Suspend ?=> Int = {
     summon[Suspend].suspendContinuation[Int] { continuation =>
-      continuation.resume(Right(method1(x) + method2(x) + method3(x) + z1 + z2 + z3 + 1))
+      continuation.resume(method1(x) + method2(x) + method3(x) + z1 + z2 + z3 + 1)
     }
 
     def method4(x: Int) = x + 1

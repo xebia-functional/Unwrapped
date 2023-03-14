@@ -13,7 +13,7 @@ package continuations {
         val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
         {
           {
-            safeContinuation.resume(Right.apply[Nothing, Int](1))
+            safeContinuation.resume(1)
           }
         }
         safeContinuation.getOrThrow()

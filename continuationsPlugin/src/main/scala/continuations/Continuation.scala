@@ -5,7 +5,8 @@ import continuations.jvm.internal.BaseContinuationImpl
 trait Continuation[-A]:
   type Ctx <: Tuple
   def context: Ctx
-  def resume(value: Either[Throwable, A]): Unit
+  def resume(value: A): Unit
+  def raise(error: Throwable): Unit
   def contextService[T](): T | Null =
     context.toList.find(_.isInstanceOf[T]).map(_.asInstanceOf[T]).orNull
 
@@ -30,7 +31,9 @@ object Continuation:
 
       override def context: Ctx = ctx
 
-      override def resume(value: Either[Throwable, T]): Unit = res(value)
+      override def resume(value: T): Unit = res(Right(value))
+
+      override def raise(error: Throwable): Unit = res(Left(error))
 
 end Continuation
 

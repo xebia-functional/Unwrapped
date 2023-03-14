@@ -7,6 +7,6 @@ import continuations.Suspend
   def oneArgumentOneAdditionalGivenArgumentOneContinuations(
       x: Int)(using Suspend, String): String =
     summon[Suspend].suspendContinuation[String] { continuation =>
-      continuation.resume(Right(summon[String] + x))
+      continuation.resume(summon[String] + x)
     }
   println(oneArgumentOneAdditionalGivenArgumentOneContinuations(1))

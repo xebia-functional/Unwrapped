@@ -11,10 +11,10 @@ import continuations.*
     s.suspendContinuation[Boolean] { continuation =>
       val q = "World"
       println("Hi")
-      continuation.resume(Right { println(q); false })
+      continuation.resume({ println(q); false })
     }
     s.suspendContinuation[Int] { continuation =>
-      continuation.resume(Left(new Exception("error")))
+      continuation.raise(new Exception("error"))
     }
     10
   fooTest()

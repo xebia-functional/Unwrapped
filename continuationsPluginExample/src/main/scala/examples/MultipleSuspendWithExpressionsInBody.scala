@@ -11,7 +11,7 @@ import continuations.Suspend
     s.suspendContinuation[Boolean] { continuation =>
       val q = "World"
       println("Hi")
-      continuation.resume(Right { println(q); false })
+      continuation.resume({ println(q); false })
     }
     10
 

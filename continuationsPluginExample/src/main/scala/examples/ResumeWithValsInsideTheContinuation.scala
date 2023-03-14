@@ -7,6 +7,6 @@ import continuations.Suspend
     s.suspendContinuation[Int] { continuation =>
       val x = 1
       val y = 2
-      continuation.resume(Right(x + y))
+      continuation.resume(x + y)
     }
   println(resumeWithValsInsideTheContinuation())

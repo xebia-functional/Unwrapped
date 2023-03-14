@@ -84,12 +84,10 @@ package continuations {
                 val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
                 {
                   safeContinuation.resume(
-                    Right.apply[Nothing, Int](
-                      {
-                        println("World")
-                        1
-                      }
-                    )
+                    {
+                      println("World")
+                      1
+                    }
                   )
                 }
                 val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
@@ -112,12 +110,10 @@ package continuations {
                     val w: String = "World"
                     println("Hello")
                     safeContinuation.resume(
-                      Right.apply[Nothing, Int](
-                        {
-                          println(z)
-                          x##1
-                        }
-                      )
+                      {
+                        println(z)
+                        x##1
+                      }
                     )
                   }
                 }

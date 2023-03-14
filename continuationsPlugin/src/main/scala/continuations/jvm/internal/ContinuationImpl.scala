@@ -8,7 +8,10 @@ abstract class BaseContinuationImpl(
       ContinuationStackFrame,
       Serializable:
 
-  final override def resume(result: Either[Throwable, Any | Null]): Unit = {
+  final override def resume(result: Any | Null): Unit = resumeAux(Right(result))
+  final override def raise(error: Throwable): Unit = resumeAux(Left(error))
+
+  private def resumeAux(result: Either[Throwable, Any | Null]): Unit = {
     var current = this
     var param = result
     while true do
@@ -83,5 +86,7 @@ object CompletedContinuation extends Continuation[Any | Null]:
   override type Ctx = Nothing
   override def context: CompletedContinuation.Ctx =
     throw IllegalStateException("Already completed")
-  override def resume(result: Either[Throwable, Any | Null]): Unit =
+  override def resume(result: Any | Null): Unit =
+    throw IllegalStateException("Already completed")
+  override def raise(error: Throwable): Unit =
     throw IllegalStateException("Already completed")
