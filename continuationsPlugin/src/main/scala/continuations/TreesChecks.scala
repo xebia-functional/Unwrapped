@@ -8,14 +8,13 @@ trait TreesChecks extends Trees {
 
   /**
    * @param tree
-   *   A [[dotty.tools.dotc.ast.tpd.Tree]] to check if
-   *   [[continuations.Suspend#suspendContinuation]] is called
+   *   A [[dotty.tools.dotc.ast.tpd.Tree]] to check if [[continuations.Suspend#shift]] is called
    * @return
-   *   True if the calls calls the method [[continuations.Suspend#suspendContinuation]]
+   *   True if the calls calls the method [[continuations.Suspend#shift]]
    */
   private[continuations] def subtreeCallsSuspend(tree: Tree)(using Context): Boolean =
     val treeIsContinuationsSuspendContinuation: Context ?=> Tree => Boolean = t =>
-      t.denot.matches(suspendContinuationMethod.symbol)
+      t.denot.matches(shiftMethod.symbol)
 
     tree.existsSubTree {
       case Inlined(call, _, _) => treeIsContinuationsSuspendContinuation(call)
@@ -24,14 +23,13 @@ trait TreesChecks extends Trees {
 
   /**
    * @param tree
-   *   A [[dotty.tools.dotc.ast.tpd.Tree]] to check if it calls
-   *   [[continuations.Suspend#suspendContinuation]]
+   *   A [[dotty.tools.dotc.ast.tpd.Tree]] to check if it calls [[continuations.Suspend#shift]]
    * @return
-   *   True if the tree calls the method [[continuations.Suspend#suspendContinuation]]
+   *   True if the tree calls the method [[continuations.Suspend#shift]]
    */
   private[continuations] def treeCallsSuspend(tree: Tree)(using Context): Boolean =
     val treeIsContinuationsSuspendContinuation: Context ?=> Tree => Boolean = t =>
-      t.denot.matches(suspendContinuationMethod.symbol)
+      t.denot.matches(shiftMethod.symbol)
 
     tree match
       case Inlined(call, _, _) => treeIsContinuationsSuspendContinuation(call)

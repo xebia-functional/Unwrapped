@@ -143,7 +143,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def foo()(using Suspend): Int = {
            |  val x = 5
            |  println("HI")
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |  summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |}
            |""".stripMargin
       checkCompile("pickleQuotes", source) {
@@ -301,7 +301,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |  summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |""".stripMargin
 
       checkContinuations(source) {
@@ -320,7 +320,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int](continuation => continuation.resume(1))
+           |  summon[Suspend].shift[Int](continuation => continuation.resume(1))
            |""".stripMargin
 
       checkContinuations(source) {
@@ -339,7 +339,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int] { _.resume(1) }
+           |  summon[Suspend].shift[Int] { _.resume(1) }
            |""".stripMargin
 
       checkContinuations(source) {
@@ -358,7 +358,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int](_.resume(1))
+           |  summon[Suspend].shift[Int](_.resume(1))
            |""".stripMargin
 
       checkContinuations(source) {
@@ -377,7 +377,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.raise(new Exception("error")) }
+           |  summon[Suspend].shift[Int] { continuation => continuation.raise(new Exception("error")) }
            |""".stripMargin
 
       // format: off
@@ -423,7 +423,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |
            |def foo()(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int]{ c =>
+           |  summon[Suspend].shift[Int]{ c =>
            |    println("Hello")
            |    c.resume(1)
            |    val x = 1
@@ -481,7 +481,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |
            |def foo()(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int]{ c =>
+           |  summon[Suspend].shift[Int]{ c =>
            |    c.resume{
            |      println("Hello")
            |      val x = 1
@@ -540,7 +540,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo()(using s: Suspend): Int =
-           |  s.suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |  s.shift[Int] { continuation => continuation.resume(1) }
            |""".stripMargin
 
       checkContinuations(source) {
@@ -559,7 +559,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo(): Suspend ?=> Int =
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |  summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |""".stripMargin
 
       checkContinuations(source) {
@@ -580,7 +580,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def foo()(using Suspend): Int = {
            |  val x = 5
            |  println("HI")
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |  summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |}
            |""".stripMargin
 
@@ -630,7 +630,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo()(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int] { _ => val x = 1; println("Hello") }
+           |  summon[Suspend].shift[Int] { _ => val x = 1; println("Hello") }
            |""".stripMargin
 
       // format: off
@@ -677,7 +677,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo(x: Int)(using Suspend): Int =
-           |  summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(x + 1) }
+           |  summon[Suspend].shift[Int] { continuation => continuation.resume(x + 1) }
            |""".stripMargin
 
       // format: off
@@ -724,7 +724,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo()(using Suspend): Int = {
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |    10
            |  }
            |  foo()
@@ -737,7 +737,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo(): Suspend ?=> Int = {
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |    10
            |  }
            |  foo()
@@ -769,7 +769,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo(x: Int)(using Suspend): Int = {
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(x) }
+           |    summon[Suspend].shift[Int] { continuation => continuation.resume(x) }
            |    10
            |  }
            |  foo(11)
@@ -797,7 +797,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  if (x < y) then {
            |    x
            |  } else {
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |  }
            |}
            |""".stripMargin
@@ -848,7 +848,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with no parameters with multiple `suspendContinuation` that returns " +
+    "it should convert simple suspended def with no parameters with multiple `shift` that returns " +
       "a non-suspending value into a state machine including an update of the call site:") {
     case given Context =>
       val source =
@@ -857,9 +857,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo()(using Suspend): Int = {
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
-           |    summon[Suspend].suspendContinuation[Boolean] { continuation => continuation.resume(false) }
-           |    summon[Suspend].suspendContinuation[String] { continuation => continuation.resume("Hello") }
+           |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
+           |    summon[Suspend].shift[Boolean] { continuation => continuation.resume(false) }
+           |    summon[Suspend].shift[String] { continuation => continuation.resume("Hello") }
            |    10
            |  }
            |
@@ -876,8 +876,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with no parameters with multiple `suspendContinuation` that returns " +
-      "a non-suspending value and with multiple expressions in the suspendContinuation body into a state machine " +
+    "it should convert simple suspended def with no parameters with multiple `shift` that returns " +
+      "a non-suspending value and with multiple expressions in the shift body into a state machine " +
       "including an update of the call site:") {
     case given Context =>
       val source =
@@ -886,16 +886,16 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo()(using Suspend): Int = {
-           |    summon[Suspend].suspendContinuation[Int] { continuation =>
+           |    summon[Suspend].shift[Int] { continuation =>
            |      println("Hello")
            |      println("World")
            |      continuation.resume(1)
            |    }
-           |    summon[Suspend].suspendContinuation[Boolean] { continuation =>
+           |    summon[Suspend].shift[Boolean] { continuation =>
            |      continuation.resume(false)
            |      continuation.resume(true)
            |    }
-           |    summon[Suspend].suspendContinuation[String] { continuation =>
+           |    summon[Suspend].shift[String] { continuation =>
            |      continuation.resume("Hello")
            |      val x = 1
            |    }
@@ -925,11 +925,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def program: Int = {
            |  def foo()(using Suspend): Int = {
            |    println("Start")
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |    val x = "World"
            |    println("Hello")
            |    println(x)
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(2) }
+           |    summon[Suspend].shift[Int] { continuation => continuation.resume(2) }
            |    println("End")
            |    10
            |  }
@@ -944,11 +944,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def program: Int = {
            |  def foo(): Suspend ?=> Int = {
            |    println("Start")
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |    val x = "World"
            |    println("Hello")
            |    println(x)
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(2) }
+           |    summon[Suspend].shift[Int] { continuation => continuation.resume(2) }
            |    println("End")
            |    10
            |  }
@@ -972,7 +972,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with no parameters with multiple `suspendContinuation` " +
+    "it should convert simple suspended def with no parameters with multiple `shift` " +
       "into a state machine including an update of the call site:") {
     case given Context =>
       val source =
@@ -981,9 +981,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo()(using Suspend): Int = {
-           |    summon[Suspend].suspendContinuation[Boolean] { continuation => continuation.resume(false) }
-           |    summon[Suspend].suspendContinuation[String] { continuation => continuation.resume("Hello") }
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |    summon[Suspend].shift[Boolean] { continuation => continuation.resume(false) }
+           |    summon[Suspend].shift[String] { continuation => continuation.resume("Hello") }
+           |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |  }
            |
            |foo()
@@ -999,8 +999,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with no parameters with multiple `suspendContinuation` " +
-      "and with multiple expressions in the suspendContinuation body into a state machine including an update of the call site:") {
+    "it should convert simple suspended def with no parameters with multiple `shift` " +
+      "and with multiple expressions in the shift body into a state machine including an update of the call site:") {
     case given Context =>
       val source =
         """|
@@ -1008,15 +1008,15 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo()(using Suspend): Int = {
-           |    summon[Suspend].suspendContinuation[Boolean] { continuation =>
+           |    summon[Suspend].shift[Boolean] { continuation =>
            |      println("Hi")
            |      continuation.resume(false)
            |    }
-           |    summon[Suspend].suspendContinuation[String] {
+           |    summon[Suspend].shift[String] {
            |      continuation => continuation.resume("Hello")
            |      println("World")
            |    }
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |  }
            |
            |foo()
@@ -1032,7 +1032,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should convert simple suspended def with no parameters with multiple `suspendContinuation` " +
+    "it should convert simple suspended def with no parameters with multiple `shift` " +
       "and with expressions between them into a state machine including an update of the call site:") {
     case given Context =>
       val source =
@@ -1043,10 +1043,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  def foo()(using Suspend): Int = {
            |    println("Start")
            |    val x = 1
-           |    summon[Suspend].suspendContinuation[Boolean] { continuation => continuation.resume(false) }
+           |    summon[Suspend].shift[Boolean] { continuation => continuation.resume(false) }
            |    println("Hello")
-           |    summon[Suspend].suspendContinuation[String] { continuation => continuation.resume("Hello") }
-           |    summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |    summon[Suspend].shift[String] { continuation => continuation.resume("Hello") }
+           |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |  }
            |
            |foo()
@@ -1087,7 +1087,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def program: Int = {
            |  def foo[A, B](x: A, y: B)(z: String)(using s: Suspend, ec: ExecutionContext): A =
-           |    summon[Suspend].suspendContinuation[A] { continuation => continuation.resume(x) }
+           |    summon[Suspend].shift[A] { continuation => continuation.resume(x) }
            |  foo(1,2)("A")
            |}
            |""".stripMargin
@@ -1166,14 +1166,14 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
   }
 
   compilerContextWithContinuationsPlugin.test(
-    "it should transform a dependent suspendContinuation with one param into a state machine") {
+    "it should transform a dependent shift with one param into a state machine") {
     case given Context =>
       val source =
         """|
            |package continuations
            |
            |def foo(x: Int)(using Suspend): Int = {
-           |  val y = summon[Suspend].suspendContinuation[Int] { continuation => continuation.resume(1) }
+           |  val y = summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |  x + y
            |}
            |""".stripMargin
@@ -1196,7 +1196,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def foo(qq: Int)(using s: Suspend): Int = {
-           |  summon[Suspend].suspendContinuation[Unit] { _.resume({ println(qq) }) }
+           |  summon[Suspend].shift[Unit] { _.resume({ println(qq) }) }
            |  10
            |}
            |""".stripMargin
@@ -1222,7 +1222,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def foo()(using s: Suspend): Int = {
            |  val xx = 111
            |  println(xx)
-           |  summon[Suspend].suspendContinuation[Int] { _.resume( 10 ) }
+           |  summon[Suspend].shift[Int] { _.resume( 10 ) }
            |  xx
            |}
            |""".stripMargin
@@ -1248,12 +1248,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def fooTest(qq: Int)(using s: Suspend): Int = {
            |    val pp = 11
-           |    val xx = s.suspendContinuation[Int] { _.resume(qq - 1) }
+           |    val xx = s.shift[Int] { _.resume(qq - 1) }
            |    val ww = 13
            |    val rr = "AAA"
-           |    val yy = s.suspendContinuation[String] { _.resume(rr) }
+           |    val yy = s.shift[String] { _.resume(rr) }
            |    val tt = 100
-           |    val zz = s.suspendContinuation[Int] { _.resume(ww - 1) }
+           |    val zz = s.shift[Int] { _.resume(ww - 1) }
            |    println(xx)
            |    xx + qq + yy.size + zz + pp + tt
            |}
@@ -1279,12 +1279,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def fooTest(qq: Int)(using s: Suspend): Int = {
            |    val pp = 11
-           |    val xx = s.suspendContinuation[Int] { _.resume(qq - 1) }
+           |    val xx = s.shift[Int] { _.resume(qq - 1) }
            |    val ww = 13
            |    val rr = "AAA"
-           |    s.suspendContinuation[String] { _.resume(rr) }
+           |    s.shift[String] { _.resume(rr) }
            |    val tt = 100
-           |    val zz = s.suspendContinuation[Int] { _.resume(ww - 1) }
+           |    val zz = s.shift[Int] { _.resume(ww - 1) }
            |    println(xx)
            |    xx + qq + zz + pp + tt
            |}
@@ -1311,9 +1311,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |
            |def fooTest(x: Int)(using s: Suspend): Int = {
            |    println("Hello")
-           |    val y = s.suspendContinuation[Int] { _.resume( { println("World"); 1 }) }
+           |    val y = s.shift[Int] { _.resume( { println("World"); 1 }) }
            |    val z = 1
-           |    s.suspendContinuation[Int] { continuation =>
+           |    s.shift[Int] { continuation =>
            |      val w = "World"
            |      println("Hello")
            |      continuation.resume( { println(z); x })
@@ -1342,8 +1342,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def fooTest()(using s: Suspend): Int = {
-           |    val x = s.suspendContinuation[Int] { _.resume(1) }
-           |    s.suspendContinuation[Int] { _.resume(x + 1) }
+           |    val x = s.shift[Int] { _.resume(1) }
+           |    s.shift[Int] { _.resume(x + 1) }
            |}
            |""".stripMargin
 
@@ -1368,11 +1368,11 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def fooTest(q: Int)(using s: Suspend): Int = {
            |    println("Hello")
            |    val z = 100
-           |    val x = s.suspendContinuation[Int] { _.resume(1 + z) }
+           |    val x = s.shift[Int] { _.resume(1 + z) }
            |    val j = 9
-           |    val w = s.suspendContinuation[Int] { _.resume(x + 1 + q) }
+           |    val w = s.shift[Int] { _.resume(x + 1 + q) }
            |    println("World")
-           |    s.suspendContinuation[Int] { _.resume(x + w + 1 + j) }
+           |    s.shift[Int] { _.resume(x + w + 1 + j) }
            |    10
            |}
            |""".stripMargin
@@ -1484,10 +1484,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations
            |
            |def fooTest(x: Int)(using Suspend): Int = {
-           |    val y = summon[Suspend].suspendContinuation[Int] { continuation =>
+           |    val y = summon[Suspend].shift[Int] { continuation =>
            |      continuation.resume(x + 1)
            |    }
-           |    summon[Suspend].suspendContinuation[Int] { continuation =>
+           |    summon[Suspend].shift[Int] { continuation =>
            |      continuation.resume(y + 1)
            |    }
            |}
@@ -1514,12 +1514,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |def fooTest(x: Int)(using Suspend): Int = {
            |    val q = 2
            |    val w = 3
-           |    val y = summon[Suspend].suspendContinuation[Int] { continuation =>
+           |    val y = summon[Suspend].shift[Int] { continuation =>
            |      continuation.resume(x + w)
            |    }
            |    val p = 1
            |    val t = 1
-           |    val z = summon[Suspend].suspendContinuation[Int] { continuation =>
+           |    val z = summon[Suspend].shift[Int] { continuation =>
            |      continuation.resume(y + q + x)
            |    }
            |    z + y + p
@@ -1639,7 +1639,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
           |    def method2(x: Int) = x + 1
           |    val z2 = 1
           |
-          |    val suspension1 = s.suspendContinuation[Int] { continuation =>
+          |    val suspension1 = s.shift[Int] { continuation =>
           |      def method3(x: Int) = x + 1
           |      val z3 = 1
           |
@@ -1651,12 +1651,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
           |      }
           |    }
           |
-          |    s.suspendContinuation[Int] { _.resume(method1(x) + 1) }
+          |    s.shift[Int] { _.resume(method1(x) + 1) }
           |
           |    val z5 = suspension1
           |    def method5(x: Int) = x + 1
           |
-          |    val suspension2 = s.suspendContinuation[Int] { continuation =>
+          |    val suspension2 = s.shift[Int] { continuation =>
           |      continuation.resume(z5 + suspension1 + method5(y))
           |    }
           |

@@ -154,7 +154,7 @@ object DefDefTransforms extends TreesChecks:
       treeMap = {
         case t: tpd.DefDef if t.paramss.exists(_.exists(p => hasContinuationClass(p.symbol))) =>
           t.rhs
-        case Trees.Apply(fun, args) if fun.symbol.name.show == suspendContinuationName =>
+        case Trees.Apply(fun, args) if fun.symbol.name.show == shiftName =>
           if (args.isEmpty) {
             tpd.EmptyTree
           } else if (args.size == 1) {
@@ -375,11 +375,11 @@ object DefDefTransforms extends TreesChecks:
           ).transform(call)
         case _ => tpd.EmptyTree
 
-    val suspendContinuationBody =
+    val shiftBody =
       transformSuspendContinuationBody(callSuspensionPoint, safeContinuationRef)
 
     val continuationBlock = tpd.Block(
-      List(continuation1, safeContinuation) ++ List(suspendContinuationBody),
+      List(continuation1, safeContinuation) ++ List(shiftBody),
       safeContinuationRef.select(termName("getOrThrow")).appliedToNone
     )
 
@@ -991,12 +991,12 @@ object DefDefTransforms extends TreesChecks:
           case _ => tpd.EmptyTree
 
         val safeContinuation: tpd.ValDef = {
-          val suspendContinuationType = callSuspensionPoint.tpe
+          val shiftType = callSuspensionPoint.tpe
 
           val safeContinuationConstructor =
             ref(requiredModule("continuations.SafeContinuation"))
               .select(termName("init"))
-              .appliedToType(suspendContinuationType)
+              .appliedToType(shiftType)
               .appliedTo(ref(contSymbol))
 
           tpd.ValDef(
@@ -1010,7 +1010,7 @@ object DefDefTransforms extends TreesChecks:
 
         val safeContinuationRef = ref(safeContinuation.symbol)
 
-        val suspendContinuationBody: tpd.Tree =
+        val shiftBody: tpd.Tree =
           transformSuspendContinuationBody(callSuspensionPoint, safeContinuationRef)
 
         /*
@@ -1019,7 +1019,7 @@ object DefDefTransforms extends TreesChecks:
            safeContinuation.getOrThrow()
          ```
          */
-        lazy val suspendContinuationGetThrow =
+        lazy val shiftGetThrow =
           tpd.ValDef(
             newSymbol(
               newParent,
@@ -1033,7 +1033,7 @@ object DefDefTransforms extends TreesChecks:
             case vd: tpd.ValDef =>
               tpd.Assign(
                 globalVars.find(matchesNameCoord(_, vd)).get,
-                ref(suspendContinuationGetThrow.symbol)
+                ref(shiftGetThrow.symbol)
                   .select(nme.asInstanceOf_)
                   .appliedToType(vd.symbol.info)
               ) :: Nil
@@ -1058,9 +1058,7 @@ object DefDefTransforms extends TreesChecks:
          */
         val ifOrThrowReturn =
           tpd.If(
-            ref(suspendContinuationGetThrow.symbol)
-              .select(nme.Equals)
-              .appliedTo(suspendedState),
+            ref(shiftGetThrow.symbol).select(nme.Equals).appliedTo(suspendedState),
             tpd.Return(suspendedState, newParent),
             tpd.EmptyTree
           )
@@ -1101,7 +1099,7 @@ object DefDefTransforms extends TreesChecks:
 
         val resultValue =
           if (i == suspensionPointsSize - 1 && suspensionInReturnedValue)
-            List(ref(suspendContinuationGetThrow.symbol))
+            List(ref(shiftGetThrow.symbol))
           else Nil
 
         val stats: List[tpd.Tree] = List(
@@ -1118,8 +1116,8 @@ object DefDefTransforms extends TreesChecks:
             )
           ),
           List(safeContinuation),
-          List(suspendContinuationBody),
-          List(suspendContinuationGetThrow),
+          List(shiftBody),
+          List(shiftGetThrow),
           List(ifOrThrowReturn),
           assignGetOrThrowToGlobalVar,
           returnToLabel,
@@ -1186,11 +1184,11 @@ object DefDefTransforms extends TreesChecks:
 
     /**
      * If there are more that one Suspension points we create the whole state machine for all
-     * the points and replace the last occurrence of `suspendContinuation`. The other
-     * occurrences are not needed and are being removed.
+     * the points and replace the last occurrence of `shift`. The other occurrences are not
+     * needed and are being removed.
      *
-     * We also don't need to keep the rest of the lines before the last `suspendContinuation` as
-     * they are embedded in the state machine.
+     * We also don't need to keep the rest of the lines before the last `shift` as they are
+     * embedded in the state machine.
      */
     var c = 0
     var rowsToRemove =
