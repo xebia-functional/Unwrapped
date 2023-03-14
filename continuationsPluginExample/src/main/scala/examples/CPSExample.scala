@@ -16,8 +16,8 @@ import concurrent.ExecutionContext.Implicits.global
 def await[A](future: Future[A]): A =
   Suspend.given_Suspend.suspendContinuation { (c: Continuation[A]) =>
     future.onComplete {
-      case Success(value) => c.resume(Right(value))
-      case Failure(exception) => c.resume(Left(exception))
+      case Success(value) => c.resume(value)
+      case Failure(exception) => c.raise(exception)
     }
   }
 
@@ -40,9 +40,9 @@ final class await$2$1(completion: Continuation[Any | Null])
   final def invoke[A](it: Try[A]): Unit =
     it match
       case Failure(exception) =>
-        this.$continuation.resume(Left(exception))
+        this.$continuation.raise(exception)
       case Success(value) =>
-        this.$continuation.resume(Right(value))
+        this.$continuation.resume(value)
 
 def a(): Int = 47
 def b(): Unit = ()
@@ -131,7 +131,7 @@ def programSuspendContinuationNoParamResume: Int =
   def fooTest()(using s: Suspend): Int =
     s.suspendContinuation[Int] { continuation =>
       println("Hello")
-      continuation.resume(Right(1))
+      continuation.resume(1)
     }
 
   fooTest()
@@ -140,8 +140,8 @@ def programSuspendContinuationNoParamResume: Int =
 def programNestedContinuationCompilationError: Int =
   def fooTest()(using s: Suspend): Int =
     s.suspendContinuation[Int] { continuation =>
-      val x = s.suspendContinuation[Int] { continuation1 => continuation1.resume(Right(1)) }
-      continuation.resume(Right(x + 1))
+      val x = s.suspendContinuation[Int] { continuation1 => continuation1.resume(1) }
+      continuation.resume(x + 1)
     }
 
   fooTest()
@@ -150,16 +150,16 @@ def programNestedContinuationCompilationError: Int =
 def programSuspendContinuationNoParamResumeIgnoreResult: Int =
   def fooTest()(using s: Suspend): Int =
     println("Start")
-    s.suspendContinuation[Unit] { _.resume(Right { println("Hello") }) }
+    s.suspendContinuation[Unit] { _.resume(println("Hello")) }
     println("World")
     val x = 1
     s.suspendContinuation[Boolean] { continuation =>
       val q = "World"
       println("Hi")
-      continuation.resume(Right { println(q); false })
+      continuation.resume({ println(q); false })
     }
 //    s.suspendContinuation[Int] { continuation =>
-//      continuation.resume(Left(new Exception("error")))
+//      continuation.raise(new Exception("error"))
 //    }
     10
 
@@ -168,12 +168,12 @@ def programSuspendContinuationNoParamResumeIgnoreResult: Int =
 def programSuspendContinuationParamDependent: Int =
   def fooTest(qq: Int)(using s: Suspend): Int =
     val pp = 11
-    val xx = s.suspendContinuation[Int] { _.resume(Right { qq - 1 }) }
+    val xx = s.suspendContinuation[Int] { _.resume(qq - 1) }
     val ww = 13
     val rr = "AAA"
-    val yy = s.suspendContinuation[String] { c => c.resume(Right { rr }) }
+    val yy = s.suspendContinuation[String] { c => c.resume(rr) }
     val tt = 100
-    val zz = s.suspendContinuation[Int] { _.resume(Right { ww - 1 + xx }) }
+    val zz = s.suspendContinuation[Int] { _.resume(ww - 1 + xx) }
     println(xx)
     xx + qq + zz + pp + tt + yy.length
 
@@ -186,7 +186,7 @@ def programSuspendContinuationResumeVals: Int =
         println("Hello")
         val x = 1
         val y = 1
-        Right(x + y)
+        x + y
       }
     }
 
@@ -197,7 +197,7 @@ def programOneContinuationReturnValue: Int =
     println("Hello")
     val x = 1
     summon[Suspend].suspendContinuation[Unit] { continuation =>
-      continuation.resume(Right(println(x)))
+      continuation.resume(println(x))
     }
     println("World")
     2
@@ -243,7 +243,7 @@ object ExampleObject:
     def method5(x: Int) = x
 
     val suspension2 = s.suspendContinuation[Int] { continuation =>
-      continuation.resume(Right(z5 + suspension1 + method5(y)))
+      continuation.resume(z5 + suspension1 + method5(y))
     }
 
     val z6 = 1

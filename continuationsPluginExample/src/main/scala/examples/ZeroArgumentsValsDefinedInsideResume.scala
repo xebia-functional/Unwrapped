@@ -7,14 +7,14 @@ import continuations.Suspend
     summon[Suspend].suspendContinuation[Unit] { continuation =>
       continuation.resume {
         val x = 1
-        Right(println(x))
+        println(x)
       }
     }
 
     summon[Suspend].suspendContinuation[Int] { continuation =>
       continuation.resume {
         val x = 2
-        Right(x)
+        x
       }
     }
     10

@@ -24,7 +24,7 @@ given ExecutorService = Executors.newWorkStealingPool()
           val sleepTime = Random.between(10, 5000)
           println(s"sleepTime $sleepTime")
           Thread.sleep(sleepTime)
-          c.resume(Right(x + y + z))
+          c.resume(x + y + z)
       })
     }
 

@@ -19,7 +19,7 @@ extension [A](suspendedFn: Suspend ?=> A)
    */
 
   def startContinuation(completion: Continuation[A]): Unit =
-    createContinuation(completion).intercepted().resume(Right(()))
+    createContinuation(completion).intercepted().resume(())
 
   inline def startContinuationOrSuspend(
       completion: Continuation[A]): Any | Null | Continuation.State.Suspended.type =
