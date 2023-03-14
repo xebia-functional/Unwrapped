@@ -49,4 +49,4 @@ private[continuations] object HasSuspensionNotInReturnedValue extends TreesCheck
           treeCallsSuspend(tree)
       }
 
-    CallsSuspendContinuation(tree) && !returnsSuspend
+    CallsShift(tree) && !returnsSuspend
