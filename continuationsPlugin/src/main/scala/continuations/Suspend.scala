@@ -6,7 +6,7 @@ sealed trait Suspend:
   def continuation[A](f: Continuation[A] => Unit): A
 
   extension (s: Suspend)
-    inline def suspendContinuation[A](f: Continuation[A] => Unit): A =
+    inline def shift[A](f: Continuation[A] => Unit): A =
       throw CompilerRewriteUnsuccessfulException
 
 object Suspend:

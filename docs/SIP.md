@@ -171,12 +171,12 @@ suspend def startContinuationUninterceptedOrReturn[T](
 Starts a continuation and executes it until its first suspension point. Returns the result of the computation or ContinuationSuspended if this continuation should remain in suspended state. 
 When the implementer returns `ContinuationSuspended` it invokes `completion` as the continuation computation completes.
 
-##### suspendContinuationUninterceptedOrReturn
+##### shiftUninterceptedOrReturn
 
 ```scala
 object ContinuationSuspended
 
-suspend def suspendContinuationUninterceptedOrReturn[T](
+suspend def shiftUninterceptedOrReturn[T](
   block: Continuation[T] => T | ContinuationSuspended.type
 ): T
 ```
