@@ -22,14 +22,16 @@ private[continuations] object CallsShift extends TreesChecks:
    * @param tree
    *   the [[dotty.tools.dotc.ast.tpd.Tree]] to match upon
    * @return
-   *   true if the tree contains a subtree call to [[continuations.Suspend#shift]],
-   *   false otherwise
+   *   true if the tree contains a subtree call to [[continuations.Suspend#shift]], false
+   *   otherwise
    */
   def apply(tree: ValOrDefDef)(using Context): Boolean = {
-    def isShiftCall(call: Apply): Boolean = 
+    def isShiftCall(call: Apply): Boolean =
       val isShift = call.denot.matches(shiftMethod.symbol)
       if isShift && hasNestedContinuation(call) then
-        report.error("Suspension functions can be called only within coroutine body", call.srcPos)
+        report.error(
+          "Suspension functions can be called only within coroutine body",
+          call.srcPos)
       isShift
 
     def hasShape(ap: Apply): Boolean = ap match {
