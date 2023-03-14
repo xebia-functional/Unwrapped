@@ -9,7 +9,7 @@ import dotty.tools.dotc.core.Names.*
 import dotty.tools.dotc.core.Symbols.*
 import munit.FunSuite
 
-class CallsSuspendContinuationSuite extends FunSuite, CompilerFixtures:
+class CallsShiftSuite extends FunSuite, CompilerFixtures:
 
   continuationsContextAndZeroAritySuspendSuspendingDefDef.test(
     "CallsContinuationResumeWith#apply(defDefTree): def mySuspend()(using Suspend): Int = " +
@@ -21,24 +21,24 @@ class CallsSuspendContinuationSuite extends FunSuite, CompilerFixtures:
       // reference equality. We can use NoDiff on the printed returned
       // tree, however, since we know we do not modify the inner tree in
       // the extractor.
-      assertEquals(CallsSuspendContinuation(defdef), true)
+      assertEquals(CallsShift(defdef), true)
   }
 
   continuationsContextAndZeroAritySuspendNonSuspendingDefDef.test(
     "CallsContinuationResumeWith#apply(defDefTree): def mySuspend()(using Suspend): Int = 1 should be None") {
     case (given Context, defdef) =>
-      assertEquals(CallsSuspendContinuation(defdef), false)
+      assertEquals(CallsShift(defdef), false)
   }
 
   continuationsContextAndZeroAritySuspendSuspendingValDef.test(
     "CallsContinuationResumeWith#apply(valDefTree): val mySuspend: Suspend ?=> Int = " +
       "summon[Suspend].shift[Int] { continuation => continuation.resume(1) } should be Some(mySuspend)") {
     case (given Context, valdef) =>
-      assertEquals(CallsSuspendContinuation(valdef), true)
+      assertEquals(CallsShift(valdef), true)
   }
 
   continuationsContextAndZeroAritySuspendNonSuspendingValDef.test(
     "CallsContinuationResumeWith#apply(valDefTree): val mySuspend: Suspend ?=> Int = 10 should be None") {
     case (given Context, valdef) =>
-      assertEquals(CallsSuspendContinuation(valdef), false)
+      assertEquals(CallsShift(valdef), false)
   }

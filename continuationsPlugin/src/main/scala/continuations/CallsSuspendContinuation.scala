@@ -9,7 +9,7 @@ import dotty.tools.dotc.report
 /**
  * Matcher for detecting methods that call [[continuations.Suspend#shift]]
  */
-private[continuations] object CallsSuspendContinuation extends TreesChecks:
+private[continuations] object CallsShift extends TreesChecks:
 
   private def hasNestedContinuation(tree: Tree)(using Context): Boolean =
     tree.existsSubTree {
@@ -22,33 +22,28 @@ private[continuations] object CallsSuspendContinuation extends TreesChecks:
    * @param tree
    *   the [[dotty.tools.dotc.ast.tpd.Tree]] to match upon
    * @return
-   *   [[scala.Some]] if the tree contains a subtree call to [[continuations.Suspend#shift]],
-   *   [[scala.None]] otherwise
+   *   true if the tree contains a subtree call to [[continuations.Suspend#shift]], false
+   *   otherwise
    */
-  def apply(tree: ValOrDefDef)(using Context): Boolean =
-    val args =
-      tree
-        .rhs
-        .filterSubTrees {
-          case Inlined(call, _, _) =>
-            val isSuspendContinuation = call.denot.matches(shiftMethod.symbol)
-            if isSuspendContinuation && hasNestedContinuation(call) then
-              report.error(
-                "Suspension functions can be called only within coroutine body",
-                call.srcPos)
-            isSuspendContinuation
-          case _ => false
-        }
-        .flatMap {
-          case Inlined(
-                Apply(_, List(Block(Nil, Block(List(DefDef(_, _, _, suspendBody)), _)))),
-                _,
-                _) =>
-            Option(suspendBody)
-          case Inlined(Apply(_, List(Block(List(DefDef(_, _, _, suspendBody)), _))), _, _) =>
-            Option(suspendBody)
-          case _ =>
-            None
-        }
+  def apply(tree: ValOrDefDef)(using Context): Boolean = {
+    def isShiftCall(call: Apply): Boolean =
+      val isShift = call.denot.matches(shiftMethod.symbol)
+      if isShift && hasNestedContinuation(call) then
+        report.error(
+          "Suspension functions can be called only within coroutine body",
+          call.srcPos)
+      isShift
+
+    def hasShape(ap: Apply): Boolean = ap match {
+      case Apply(_, List(Block(Nil, Block(List(DefDef(_, _, _, suspendBody)), _)))) => true
+      case Apply(_, List(Block(List(DefDef(_, _, _, suspendBody)), _))) => true
+      case _ => false
+    }
+
+    val args = tree.rhs.filterSubTrees {
+      case Inlined(call @ Apply(_, _), _, _) => isShiftCall(call) && hasShape(call)
+      case _ => false
+    }
 
     args.nonEmpty
+  }
