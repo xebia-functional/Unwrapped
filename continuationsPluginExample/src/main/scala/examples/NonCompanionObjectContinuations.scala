@@ -32,7 +32,7 @@ object ExampleObj:
     def method5(x: Int) = x
 
     val suspension2 = s.suspendContinuation[Int] { continuation =>
-      continuation.resume(Right(z5 + suspension1 + method5(y)))
+      continuation.resume(z5 + suspension1 + method5(y))
     }
 
     val z6 = 1
