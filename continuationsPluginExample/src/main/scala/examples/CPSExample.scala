@@ -159,7 +159,7 @@ def programSuspendContinuationNoParamResumeIgnoreResult: Int =
       continuation.resume({ println(q); false })
     }
 //    s.suspendContinuation[Int] { continuation =>
-//      continuation.resume(Left(new Exception("error")))
+//      continuation.raise(new Exception("error"))
 //    }
     10
 
@@ -186,7 +186,7 @@ def programSuspendContinuationResumeVals: Int =
         println("Hello")
         val x = 1
         val y = 1
-        Right(x + y)
+        x + y
       }
     }
 
