@@ -15,7 +15,7 @@ import dotty.tools.dotc.core.Names.{termName, typeName}
 import dotty.tools.dotc.core.NameOps.*
 import dotty.tools.dotc.core.StdNames.nme
 import dotty.tools.dotc.core.Symbols.*
-import dotty.tools.dotc.core.Types.{MethodType, OrType, PolyType, RefinedType, Type}
+import dotty.tools.dotc.core.Types.{MethodType, OrNull, OrType, PolyType, RefinedType, Type}
 import dotty.tools.dotc.report
 import dotty.tools.dotc.transform.ContextFunctionResults
 
@@ -235,10 +235,11 @@ object DefDefTransforms extends TreesChecks:
   private def matchesNameCoord(v: tpd.Tree, tree: tpd.Tree)(using ctx: Context): Boolean =
     v.symbol.name == tree.symbol.name && v.symbol.coord == tree.symbol.coord
 
-  private def removeSuspend(typ: Type, returnValue: Option[Type] = None)(using Context): Type =
+  private def removeSuspend(typ: Type, returnValue: Option[Type => Type] = None)(
+      using Context): Type =
     val types = flattenTypes(typ)
 
-    types.foldRight(returnValue.getOrElse(types.last)) {
+    types.foldRight(types.last) {
       case (defn.FunctionOf(args, _, ic, ie), inner) =>
         val argsWithoutSuspend =
           args.filterNot(_.hasClassSymbol(requiredClass(suspendFullName)))
@@ -261,11 +262,8 @@ object DefDefTransforms extends TreesChecks:
               paramInfosExp = _ => mt.paramInfos,
               resultTypeExp = _ => inner)))
       case (_, inner) =>
-        inner
+        returnValue.map(_(inner)).getOrElse(inner)
     }
-
-  private def removeSuspendReturnAny(typ: Type)(using Context): Type =
-    removeSuspend(typ, Some(ref(defn.AnyType).tpe))
 
   private def getReturnTypeBodyContextFunctionOwner(tree: tpd.ValOrDefDef)(
       using Context): (Type, tpd.Tree, Option[Symbol]) =
@@ -408,25 +406,20 @@ object DefDefTransforms extends TreesChecks:
 
     val transformedMethodParams = params(tree, completion)
 
-    val transformedMethodSymbol = {
-      val suspendedState =
-        ref(requiredModule("continuations.Continuation"))
-          .select(termName("State"))
-          .select(termName("Suspended"))
+    val suspendedState =
+      ref(requiredModule("continuations.Continuation"))
+        .select(termName("State"))
+        .select(termName("Suspended"))
 
-      val finalMethodReturnType: tpd.TypeTree =
-        tpd.TypeTree(
-          OrType(
-            OrType(methodReturnType, ctx.definitions.NullType, soft = false),
-            suspendedState.symbol.namedType,
-            soft = false))
+    val finalMethodReturnType: Type => Type = typ =>
+      OrType(OrNull(typ), suspendedState.symbol.namedType, soft = false)
 
+    val transformedMethodSymbol =
       createTransformedMethodSymbol(
         parent,
         transformedMethodParams,
-        removeSuspend(finalMethodReturnType.tpe)
+        removeSuspend(methodReturnType, Option(finalMethodReturnType))
       )
-    }
 
     deleteOldSymbol(parent)
 
@@ -443,7 +436,7 @@ object DefDefTransforms extends TreesChecks:
     val substituteContinuation = new TreeTypeMap(
       treeMap = {
         case defdef: tpd.DefDef if defdef.symbol.isAnonymousFunction =>
-          val tpt: Type = removeSuspendReturnAny(defdef.tpt.tpe)
+          val tpt: Type = removeSuspend(defdef.tpt.tpe, Option(finalMethodReturnType))
 
           val params: List[tpd.ParamClause] = new TreeTypeMap(treeMap = {
             case p: tpd.ValDef if hasSuspendClass(p.symbol) =>
