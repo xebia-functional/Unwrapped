@@ -23,19 +23,19 @@ object Continuation:
       case Right(_) => ()
     }
 
-  inline def Continuation[T, C <: Tuple](
-      ctx: C,
-      res: Either[Throwable, T] => Unit): Continuation[T] =
-    new Continuation[T]:
-      override type Ctx = C
-
-      override def context: Ctx = ctx
-
-      override def resume(value: T): Unit = res(Right(value))
-
-      override def raise(error: Throwable): Unit = res(Left(error))
-
 end Continuation
+
+inline def BuildContinuation[T](
+    ctx: Tuple,
+    res: Either[Throwable, T] => Unit): Continuation[T] =
+  new Continuation[T]:
+    override type Ctx = Tuple
+
+    override def context: Ctx = ctx
+
+    override def resume(value: T): Unit = res(Right(value))
+
+    override def raise(error: Throwable): Unit = res(Left(error))
 
 abstract class RestrictedContinuation(
     completion: Continuation[Any | Null] | Null
