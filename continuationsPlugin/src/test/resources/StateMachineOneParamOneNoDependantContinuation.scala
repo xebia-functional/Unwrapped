@@ -81,9 +81,11 @@ package continuations {
                 {  
                   safeContinuation.resume(println(qq##1))
                 }
-                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
-                  safeContinuation.getOrThrow()
-                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+                safeContinuation.getOrThrow() match
+                  {
+                    case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                    case orThrow @ <empty> => ()
+                  }
               case 1 =>
                 qq##1 = $continuation.I$0
                 continuations.Continuation.checkResult($result)

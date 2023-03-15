@@ -61,10 +61,11 @@ package continuations {
                         safeContinuation.resume(1)
                       }
                     }
-                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-                      safeContinuation.getOrThrow()
-                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-                    return[label1] ()
+                    safeContinuation.getOrThrow() match
+                      {
+                        case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                        case orThrow @ <empty> => return[label1] ()
+                      }
                   case 1 => 
                     continuations.Continuation.checkResult($result)
                     label1[Unit]: <empty>
@@ -76,10 +77,11 @@ package continuations {
                         safeContinuation.resume(true)
                       }
                     }
-                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-                      safeContinuation.getOrThrow()
-                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-                    return[label2] ()
+                    safeContinuation.getOrThrow() match
+                      {
+                        case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                        case orThrow @ <empty> => return[label2] ()
+                      }
                   case 2 => 
                     continuations.Continuation.checkResult($result)
                     label2[Unit]: <empty>
@@ -92,9 +94,11 @@ package continuations {
                         ()
                       }
                     }
-                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-                      safeContinuation.getOrThrow()
-                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+                    safeContinuation.getOrThrow() match
+                      {
+                        case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                        case orThrow @ <empty> => ()
+                      }
                   case 3 => 
                     continuations.Continuation.checkResult($result)
                   case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")

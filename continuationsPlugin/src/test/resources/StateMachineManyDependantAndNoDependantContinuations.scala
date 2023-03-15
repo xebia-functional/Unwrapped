@@ -98,11 +98,13 @@ package continuations {
                 {
                   safeContinuation.resume(qq##1.-(1))
                 }
-                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
-                  safeContinuation.getOrThrow()
-                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-                xx = orThrow.asInstanceOf[Int]
-                return[label1] ()
+                safeContinuation.getOrThrow() match
+                  {
+                    case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                    case orThrow @ <empty> =>
+                      xx = orThrow.asInstanceOf[Int]
+                      return[label1] ()
+                  }
               case 1 =>
                 qq##1 = $continuation.I$0
                 pp = $continuation.I$1
@@ -120,10 +122,11 @@ package continuations {
                 {
                   safeContinuation.resume(rr)
                 }
-                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
-                  safeContinuation.getOrThrow()
-                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-                return[label2] ()
+                safeContinuation.getOrThrow() match
+                  {
+                    case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                    case orThrow @ <empty> => return[label2] ()
+                  }
               case 2 =>
                 qq##1 = $continuation.I$0
                 pp = $continuation.I$1
@@ -142,10 +145,11 @@ package continuations {
                 {
                   safeContinuation.resume(ww.-(1))
                 }
-                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
-                  safeContinuation.getOrThrow()
-                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-                zz = orThrow.asInstanceOf[Int]
+                safeContinuation.getOrThrow() match
+                  {
+                    case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                    case orThrow @ <empty> => zz = orThrow.asInstanceOf[Int]
+                  }
               case 3 =>
                 qq##1 = $continuation.I$0
                 pp = $continuation.I$1

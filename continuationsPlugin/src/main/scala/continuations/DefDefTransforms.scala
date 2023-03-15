@@ -239,6 +239,12 @@ object DefDefTransforms extends TreesChecks:
   private def matchesNameCoord(v: tpd.Tree, tree: tpd.Tree)(using ctx: Context): Boolean =
     v.symbol.name == tree.symbol.name && v.symbol.coord == tree.symbol.coord
 
+  private def blockOf(stats: List[tpd.Tree])(using Context): tpd.Tree = stats match {
+    case Nil => tpd.unitLiteral
+    case x :: Nil => x
+    case xs => tpd.Block(xs.dropRight(1), xs.last)
+  }
+
   private def removeSuspend(typ: Type, returnValue: Option[Type] = None)(using Context): Type =
     val types = flattenTypes(typ)
 
@@ -577,6 +583,8 @@ object DefDefTransforms extends TreesChecks:
     val suspendedState =
       ref(continuationModule).select(termName("State")).select(termName("Suspended"))
 
+    val suspendedType: Types.NamedType = suspendedState.symbol.namedType
+
     val integerOR =
       defn.IntClass.requiredMethod(nme.OR, List(defn.IntType))
     val integerAND =
@@ -590,7 +598,7 @@ object DefDefTransforms extends TreesChecks:
     val anyType = defn.AnyType
     val anyOrNullType = Types.OrNull(anyType)
     val anyNullSuspendedType =
-      Types.OrType(Types.OrNull(defn.AnyType), suspendedState.symbol.namedType, false)
+      Types.OrType(Types.OrNull(defn.AnyType), suspendedType, false)
 
     val stateMachineContinuationClassName = s"${treeOwner.name.show}$$$defName$$1"
 
@@ -1031,12 +1039,6 @@ object DefDefTransforms extends TreesChecks:
         val label =
           if (i > 0) tpd.Labeled(labels(i).asTerm, tpd.EmptyTree) else tpd.EmptyTree
 
-        val returnToLabel =
-          if (suspensionPointsSize > 1 && i < suspensionPointsSize - 1)
-            List(tpd.Return(unitLiteral, labels(i + 1)))
-          else
-            Nil
-
         val callSuspensionPoint: tpd.Tree = suspension match
           case vd: tpd.ValDef if vd.rhs.isInstanceOf[tpd.Inlined] =>
             new TreeTypeMap(
@@ -1077,33 +1079,6 @@ object DefDefTransforms extends TreesChecks:
         val shiftBody: tpd.Tree =
           transformSuspendContinuationBody(callSuspensionPoint, safeContinuationRef)
 
-        /*
-         ```
-         val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
-           safeContinuation.getOrThrow()
-         ```
-         */
-        lazy val shiftGetThrow =
-          tpd.ValDef(
-            newSymbol(
-              newParent,
-              termName("orThrow"),
-              Flags.Local,
-              anyNullSuspendedType).entered,
-            safeContinuationRef.select(termName("getOrThrow")).appliedToNone)
-
-        val assignGetOrThrowToGlobalVar =
-          nonDefDefRowsBeforeSuspensionPoint.keySet.toList(i) match
-            case vd: tpd.ValDef =>
-              tpd.Assign(
-                globalVars.find(matchesNameCoord(_, vd)).get,
-                ref(shiftGetThrow.symbol)
-                  .select(nme.asInstanceOf_)
-                  .appliedToType(vd.symbol.info)
-              ) :: Nil
-            case _ =>
-              Nil
-
         def assignGlobalVarResult(vd: tpd.ValDef): tpd.Assign =
           tpd.Assign(
             globalVars.find(matchesNameCoord(_, vd)).get,
@@ -1114,18 +1089,6 @@ object DefDefTransforms extends TreesChecks:
           nonDefDefRowsBeforeSuspensionPoint.keySet.toList.lift(i - 1) match
             case Some(vd: tpd.ValDef) => assignGlobalVarResult(vd)
             case _ => tpd.EmptyTree
-
-        /*
-         ```
-         if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-         ````
-         */
-        val ifOrThrowReturn =
-          tpd.If(
-            ref(shiftGetThrow.symbol).select(nme.Equals).appliedTo(suspendedState),
-            tpd.Return(suspendedState, newParent),
-            tpd.EmptyTree
-          )
 
         val paramsAndRowsBeforeSuspendIncludingSuspendCurrent =
           paramsAndRowsBeforeSuspendIncludingSuspend(i)
@@ -1161,10 +1124,47 @@ object DefDefTransforms extends TreesChecks:
                 .fold(vd)(gv => tpd.Assign(ref(gv.symbol), vd.rhs))
             case _ => tree
 
-        val resultValue =
-          if (i == suspensionPointsSize - 1 && suspensionInReturnedValue)
-            List(ref(shiftGetThrow.symbol))
-          else Nil
+        val incrementLabel =
+          tpd.Assign(ref(contSymbol).select(labelVarParam), tpd.Literal(Constant(i + 1)))
+
+        val orThrowMatch: tpd.Match = {
+          val orThrowSymbol: TermSymbol =
+            newSymbol(
+              newParent,
+              termName("orThrow"),
+              Flags.Case | Flags.CaseAccessor,
+              anyNullSuspendedType).entered
+
+          val assignGetOrThrowToGlobalVar =
+            nonDefDefRowsBeforeSuspensionPoint.keySet.toList(i) match
+              case vd: tpd.ValDef =>
+                tpd.Assign(
+                  globalVars.find(matchesNameCoord(_, vd)).get,
+                  ref(orThrowSymbol).select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
+                ) :: Nil
+              case _ =>
+                Nil
+
+          val returnToLabel =
+            if (suspensionPointsSize > 1 && i < suspensionPointsSize - 1)
+              List(tpd.Return(unitLiteral, labels(i + 1)))
+            else
+              Nil
+
+          val resultValue =
+            if (i == suspensionPointsSize - 1 && suspensionInReturnedValue)
+              List(ref(orThrowSymbol))
+            else Nil
+
+          val sts = List(assignGetOrThrowToGlobalVar, returnToLabel, resultValue).flatten
+          tpd.Match(
+            ref(safeContinuation.symbol).select(termName("getOrThrow")).appliedToNone,
+            List(
+              tpd.CaseDef(suspendedState, tpd.EmptyTree, tpd.Return(suspendedState, newParent)),
+              tpd.CaseDef(tpd.Bind(orThrowSymbol, tpd.EmptyTree), tpd.EmptyTree, blockOf(sts))
+            )
+          )
+        }
 
         val stats: List[tpd.Tree] = List(
           assignFromI$Ns,
@@ -1173,24 +1173,13 @@ object DefDefTransforms extends TreesChecks:
           List(label),
           rowsBefore.map(updateForGlobalVars),
           assignToI$Ns,
-          List(
-            tpd.Assign(
-              ref(contSymbol).select(labelVarParam),
-              tpd.Literal(Constant(i + 1))
-            )
-          ),
+          List(incrementLabel),
           List(safeContinuation),
           List(shiftBody),
-          List(shiftGetThrow),
-          List(ifOrThrowReturn),
-          assignGetOrThrowToGlobalVar,
-          returnToLabel,
-          resultValue
+          List(orThrowMatch)
         ).flatten
 
-        val block = tpd.Block(stats.dropRight(1), stats.last)
-
-        tpd.CaseDef(tpd.Literal(Constant(i)), tpd.EmptyTree, block)
+        tpd.CaseDef(tpd.Literal(Constant(i)), tpd.EmptyTree, blockOf(stats))
       }
 
       val cases =

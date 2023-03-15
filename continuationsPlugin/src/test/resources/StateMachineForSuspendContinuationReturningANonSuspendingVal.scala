@@ -59,9 +59,11 @@ package continuations {
                         safeContinuation.resume(1)
                       }
                     }
-                    val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-                      safeContinuation.getOrThrow()
-                    if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
+                    safeContinuation.getOrThrow() match 
+                      {
+                        case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                        case orThrow @ <empty> => ()
+                      }
                   case 1 => 
                     continuations.Continuation.checkResult($result)
                   case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")

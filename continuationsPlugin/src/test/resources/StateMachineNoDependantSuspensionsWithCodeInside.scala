@@ -59,10 +59,11 @@ package continuations {
                       safeContinuation.resume(false)
                     }
                   }
-                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-                    safeContinuation.getOrThrow()
-                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-                  return[label1] ()
+                  safeContinuation.getOrThrow() match
+                    {
+                      case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                      case orThrow @ <empty> => return[label1] ()
+                    }
                 case 1 => 
                   continuations.Continuation.checkResult($result)
                   label1[Unit]: <empty>
@@ -74,10 +75,11 @@ package continuations {
                       println("World")
                     }
                   }
-                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-                    safeContinuation.getOrThrow()
-                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-                  return[label2] ()
+                  safeContinuation.getOrThrow() match
+                    {
+                      case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                      case orThrow @ <empty> => return[label2] ()
+                    }
                 case 2 => 
                   continuations.Continuation.checkResult($result)
                   label2[Unit]: <empty>
@@ -88,10 +90,11 @@ package continuations {
                       safeContinuation.resume(1)
                     }
                   }
-                  val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) = 
-                    safeContinuation.getOrThrow()
-                  if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-                  orThrow
+                  safeContinuation.getOrThrow() match
+                    {
+                      case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                      case orThrow @ <empty> => orThrow
+                    }
                 case 3 => 
                   continuations.Continuation.checkResult($result)
                   $result

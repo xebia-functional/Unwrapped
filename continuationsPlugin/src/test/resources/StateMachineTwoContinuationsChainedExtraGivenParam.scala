@@ -94,11 +94,13 @@ package continuations {
                 {
                   safeContinuation.resume(x##1.+(y##1).+(1))
                 }
-                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
-                  safeContinuation.getOrThrow()
-                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-                z = orThrow.asInstanceOf[Int]
-                return[label1] ()
+                safeContinuation.getOrThrow() match
+                  {
+                    case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                    case orThrow @ <empty> =>
+                      z = orThrow.asInstanceOf[Int]
+                      return[label1] ()
+                  }
               case 1 =>
                 ec##1 = $continuation.I$0
                 y##1 = $continuation.I$1
@@ -115,10 +117,11 @@ package continuations {
                 {
                   safeContinuation.resume(z.+(1))
                 }
-                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
-                  safeContinuation.getOrThrow()
-                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-                orThrow
+                safeContinuation.getOrThrow() match
+                  {
+                    case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                    case orThrow @ <empty> => orThrow
+                  }
               case 2 =>
                 ec##1 = $continuation.I$0
                 y##1 = $continuation.I$1

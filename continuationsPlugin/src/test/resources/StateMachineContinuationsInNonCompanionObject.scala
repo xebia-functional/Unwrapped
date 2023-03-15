@@ -85,11 +85,13 @@ package continuations {
                     )
                   }
                 }
-                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
-                  safeContinuation.getOrThrow()
-                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-                suspension1 = orThrow.asInstanceOf[Int]
-                return[label1] ()
+                safeContinuation.getOrThrow() match
+                  {
+                    case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                    case orThrow @ <empty> =>
+                      suspension1 = orThrow.asInstanceOf[Int]
+                      return[label1] ()
+                  }
               case 1 =>
                 y##1 = $continuation.I$0
                 x##1 = $continuation.I$1
@@ -104,10 +106,11 @@ package continuations {
                 {
                   safeContinuation.resume(method1(x##1).+(1))
                 }
-                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
-                  safeContinuation.getOrThrow()
-                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-                return[label2] ()
+                safeContinuation.getOrThrow() match
+                  {
+                    case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                    case orThrow @ <empty> => return[label2] ()
+                  }
               case 2 =>
                 y##1 = $continuation.I$0
                 x##1 = $continuation.I$1
@@ -125,10 +128,11 @@ package continuations {
                     safeContinuation.resume(z5.+(suspension1).+(method5(y##1)))
                   }
                 }
-                val orThrow: Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State) =
-                  safeContinuation.getOrThrow()
-                if orThrow.==(continuations.Continuation.State.Suspended) then return continuations.Continuation.State.Suspended
-                suspension2 = orThrow.asInstanceOf[Int]
+                safeContinuation.getOrThrow() match
+                  {
+                    case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
+                    case orThrow @ <empty> => suspension2 = orThrow.asInstanceOf[Int]
+                  }
               case 3 =>
                 y##1 = $continuation.I$0
                 x##1 = $continuation.I$1
