@@ -968,7 +968,7 @@ object DefDefTransforms extends TreesChecks:
           val paramLabel = ref(param).select(labelVarParam)
 
           tpd.CaseDef(
-            tpd.Typed(ref(param), ref(continuationsStateMachineSymbol)),
+            tpd.Bind(param, tpd.Typed(ref(param), ref(continuationsStateMachineSymbol))),
             ref(param)
               .select(labelVarParam)
               .select(integerAND)
