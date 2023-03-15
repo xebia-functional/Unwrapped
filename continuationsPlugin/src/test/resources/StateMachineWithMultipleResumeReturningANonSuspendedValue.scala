@@ -64,7 +64,7 @@ package continuations {
                     safeContinuation.getOrThrow() match
                       {
                         case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
-                        case orThrow => return[label1] ()
+                        case orThrow @ <empty> => return[label1] ()
                       }
                   case 1 => 
                     continuations.Continuation.checkResult($result)
@@ -80,7 +80,7 @@ package continuations {
                     safeContinuation.getOrThrow() match
                       {
                         case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
-                        case orThrow => return[label2] ()
+                        case orThrow @ <empty> => return[label2] ()
                       }
                   case 2 => 
                     continuations.Continuation.checkResult($result)
@@ -97,7 +97,7 @@ package continuations {
                     safeContinuation.getOrThrow() match
                       {
                         case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
-                        case orThrow => ()
+                        case orThrow @ <empty> => ()
                       }
                   case 3 => 
                     continuations.Continuation.checkResult($result)

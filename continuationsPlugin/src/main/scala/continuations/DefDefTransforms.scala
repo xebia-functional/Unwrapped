@@ -583,6 +583,8 @@ object DefDefTransforms extends TreesChecks:
     val suspendedState =
       ref(continuationModule).select(termName("State")).select(termName("Suspended"))
 
+    val suspendedType: Types.NamedType = suspendedState.symbol.namedType
+
     val integerOR =
       defn.IntClass.requiredMethod(nme.OR, List(defn.IntType))
     val integerAND =
@@ -596,7 +598,7 @@ object DefDefTransforms extends TreesChecks:
     val anyType = defn.AnyType
     val anyOrNullType = Types.OrNull(anyType)
     val anyNullSuspendedType =
-      Types.OrType(Types.OrNull(defn.AnyType), suspendedState.symbol.namedType, false)
+      Types.OrType(Types.OrNull(defn.AnyType), suspendedType, false)
 
     val stateMachineContinuationClassName = s"${treeOwner.name.show}$$$defName$$1"
 
@@ -1077,13 +1079,6 @@ object DefDefTransforms extends TreesChecks:
         val shiftBody: tpd.Tree =
           transformSuspendContinuationBody(callSuspensionPoint, safeContinuationRef)
 
-        val orThrowSymbol: TermSymbol =
-          newSymbol(
-            newParent,
-            termName("orThrow"),
-            Flags.Case | Flags.CaseAccessor,
-            anyNullSuspendedType).entered
-
         def assignGlobalVarResult(vd: tpd.ValDef): tpd.Assign =
           tpd.Assign(
             globalVars.find(matchesNameCoord(_, vd)).get,
@@ -1133,6 +1128,13 @@ object DefDefTransforms extends TreesChecks:
           tpd.Assign(ref(contSymbol).select(labelVarParam), tpd.Literal(Constant(i + 1)))
 
         val orThrowMatch: tpd.Match = {
+          val orThrowSymbol: TermSymbol =
+            newSymbol(
+              newParent,
+              termName("orThrow"),
+              Flags.Case | Flags.CaseAccessor,
+              anyNullSuspendedType).entered
+
           val assignGetOrThrowToGlobalVar =
             nonDefDefRowsBeforeSuspensionPoint.keySet.toList(i) match
               case vd: tpd.ValDef =>
@@ -1156,10 +1158,10 @@ object DefDefTransforms extends TreesChecks:
 
           val sts = List(assignGetOrThrowToGlobalVar, returnToLabel, resultValue).flatten
           tpd.Match(
-            safeContinuationRef.select(termName("getOrThrow")).appliedToNone,
+            ref(safeContinuation.symbol).select(termName("getOrThrow")).appliedToNone,
             List(
               tpd.CaseDef(suspendedState, tpd.EmptyTree, tpd.Return(suspendedState, newParent)),
-              tpd.CaseDef(ref(orThrowSymbol), tpd.EmptyTree, blockOf(sts))
+              tpd.CaseDef(tpd.Bind(orThrowSymbol, tpd.EmptyTree), tpd.EmptyTree, blockOf(sts))
             )
           )
         }

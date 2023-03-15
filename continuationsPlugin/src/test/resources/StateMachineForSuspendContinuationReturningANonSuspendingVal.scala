@@ -62,7 +62,7 @@ package continuations {
                     safeContinuation.getOrThrow() match 
                       {
                         case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
-                        case orThrow => ()
+                        case orThrow @ <empty> => ()
                       }
                   case 1 => 
                     continuations.Continuation.checkResult($result)
