@@ -240,7 +240,7 @@ object DefDefTransforms extends TreesChecks:
     v.symbol.name == tree.symbol.name && v.symbol.coord == tree.symbol.coord
 
   private def blockOf(stats: List[tpd.Tree])(using Context): tpd.Tree = stats match {
-    case Nil => tpd.EmptyTree
+    case Nil => tpd.unitLiteral
     case x :: Nil => x
     case xs => tpd.Block(xs.dropRight(1), xs.last)
   }
