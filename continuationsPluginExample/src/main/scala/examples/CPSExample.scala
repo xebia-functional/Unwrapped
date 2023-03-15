@@ -250,3 +250,17 @@ object ExampleObject:
     def method6(x: Int) = x
 
     1 + suspension1 + suspension2 + z6 + method1(x) + method2(x) + method5(x) + method6(x)
+
+end ExampleObject
+def programStartContinuation: Unit =
+  def fooTest()(using Suspend): Int =
+    println("Hello")
+    val x = 1
+    summon[Suspend].shift[Unit] { continuation =>
+      continuation.resume(println(x))
+    }
+    println("World")
+    2
+
+  val cont: Continuation[Int] = BuildContinuation[Int](EmptyTuple, { res => res.fold(t => throw t, or => or) })
+  fooTest().startContinuation(cont)

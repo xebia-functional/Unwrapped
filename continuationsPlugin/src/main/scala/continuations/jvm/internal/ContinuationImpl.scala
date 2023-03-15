@@ -43,7 +43,7 @@ abstract class BaseContinuationImpl(
   def create(completion: Continuation[?]): Continuation[Unit] =
     throw UnsupportedOperationException("create(Continuation) has not been overridden")
 
-  def create(value: Any | Null, completion: Continuation[?]): Continuation[Unit] =
+  def create(value: Any | Null, completion: Continuation[Any | Null]): Continuation[Unit] =
     throw UnsupportedOperationException("create(Any?;Continuation) has not been overridden")
 
   override def callerFrame: ContinuationStackFrame | Null =

@@ -747,15 +747,19 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineForSuspendContinuationReturningANonSuspendingVal)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineForSuspendContinuationReturningANonSuspendingVal)
+          )
       }
 
       checkContinuations(sourceContextFunction) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineForSuspendContinuationReturningANonSuspendingVal)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineForSuspendContinuationReturningANonSuspendingVal)
+          )
       }
   }
 
@@ -779,8 +783,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineWithSingleSuspendedContinuationReturningANonSuspendedVal)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineWithSingleSuspendedContinuationReturningANonSuspendedVal)
+          )
       }
   }
 
@@ -870,8 +876,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineMultipleSuspendedContinuationsReturningANonSuspendingVal)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineMultipleSuspendedContinuationsReturningANonSuspendingVal)
+          )
       }
   }
 
@@ -909,8 +917,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineWithMultipleResumeReturningANonSuspendedValue)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(
+              expectedStateMachineWithMultipleResumeReturningANonSuspendedValue)
+          )
       }
   }
 
@@ -959,15 +969,17 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineReturningANonSuspendedValue)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineReturningANonSuspendedValue)
+          )
       }
 
       checkContinuations(sourceContextFunction) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineReturningANonSuspendedValue)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineReturningANonSuspendedValue)
+          )
       }
   }
 
@@ -993,8 +1005,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineNoDependantSuspensions)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineNoDependantSuspensions))
       }
   }
 
@@ -1026,8 +1038,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineNoDependantSuspensionsWithCodeInside)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineNoDependantSuspensionsWithCodeInside)
+          )
       }
   }
 
@@ -1056,8 +1069,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineNoDependantSuspensionsWithCodeBetween)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedStateMachineNoDependantSuspensionsWithCodeBetween)
+          )
       }
   }
 
