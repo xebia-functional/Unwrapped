@@ -102,6 +102,7 @@
 
 package continuations
 
+import CompilerFixtures.removeLineTrailingSpaces
 import dotty.tools.dotc.Compiler
 import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.core.Comments.ContextDoc
@@ -124,9 +125,6 @@ import munit.FunSuite
 import scala.util.Properties
 
 trait CompilerFixtures { self: FunSuite =>
-
-  def removeLineTrailingSpaces(s: String): String =
-    s.lines.map(_.stripTrailing).reduce(_ ++ "\n" ++ _).get
 
   def cleanCompilerOutput(tree: Tree)(using Context): String = removeLineTrailingSpaces(
     compileSourceIdentifier.replaceAllIn(tree.show, ""))
@@ -966,4 +964,9 @@ trait CompilerFixtures { self: FunSuite =>
       Flags.union(Flags.GivenOrImplicit, Flags.Param),
       suspendType
     )
+}
+
+object CompilerFixtures {
+  def removeLineTrailingSpaces(s: String): String =
+    s.lines.map(_.stripTrailing).reduce(_ ++ "\n" ++ _).get
 }

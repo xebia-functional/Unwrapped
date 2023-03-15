@@ -109,9 +109,9 @@ package continuations {
       new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
     def program: continuations.Bar =
       {
-        class program$fooTest$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion
-          , 
-        $completion.context) {
+        class program$fooTest$1(private[this] val $completion: continuations.Continuation[Any | Null]) extends
+          continuations.jvm.internal.ContinuationImpl
+        ($completion, $completion.context) {
           var I$0: Any = _
           var I$1: Any = _
           var I$2: Any = _

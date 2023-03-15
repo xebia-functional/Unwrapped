@@ -1,5 +1,6 @@
 package continuations
 
+import CompilerFixtures.removeLineTrailingSpaces
 import dotty.tools.dotc.ast.tpd
 import dotty.tools.dotc.config.Printers
 import dotty.tools.dotc.core.Contexts.{ctx, Context}
@@ -47,7 +48,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
           |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
           |    def program: Unit =
           |      {
-          |        def foo(completion: continuations.Continuation[Int | Any]): Any = 1
+          |        def foo(completion: continuations.Continuation[Int]): Int | Null | continuations.Continuation.State.Suspended.type = 1
           |        println(foo(continuations.jvm.internal.ContinuationStub.contImpl))
           |      }
           |  }
@@ -90,7 +91,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
            |    def program: Unit =
            |      {
-           |        def foo(completion: continuations.Continuation[Int | Any]): Any = 1
+           |        def foo(completion: continuations.Continuation[Int]): Int | Null | continuations.Continuation.State.Suspended.type = 1
            |        println(foo(continuations.jvm.internal.ContinuationStub.contImpl))
            |      }
            |  }
@@ -118,7 +119,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       // format: on
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            expected)
       }
   }
 
@@ -131,7 +134,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
                         |}""".stripMargin
       checkContinuations(source) {
         case (tree, _) =>
-          assertEquals(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertEquals(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            expected)
       }
   }
 
@@ -175,7 +180,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: compileFromString$package.type =>
            |    private def writeReplace(): AnyRef =
            |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
-           |    def foo(x: Int, completion: continuations.Continuation[Int | Any]): Any = x.+(1)
+           |    def foo(x: Int, completion: continuations.Continuation[Int]): Int | Null | continuations.Continuation.State.Suspended.type = x.+(1)
            |  }
            |}
            |""".stripMargin
@@ -212,7 +217,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
-           |    def foo(x: Int, completion: continuations.Continuation[Int | Any]): Any = x.+(1)
+           |    def foo(x: Int, completion: continuations.Continuation[Int]): Int | Null | continuations.Continuation.State.Suspended.type = x.+(1)
            |  }
            |}
            |""".stripMargin
@@ -220,7 +225,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
 
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expected))
       }
   }
 
@@ -249,7 +256,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
-           |    def foo(x: Int, z: String*, ec: concurrent.ExecutionContext, completion: continuations.Continuation[Int | Any]): Any = x.+(1)
+           |    def foo(x: Int, z: String*, ec: concurrent.ExecutionContext, completion: continuations.Continuation[Int]):
+           |      Int | Null | continuations.Continuation.State.Suspended.type
+           |     = x.+(1)
            |  }
            |}
            |""".stripMargin
@@ -257,7 +266,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
 
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expected))
       }
   }
 
@@ -307,7 +318,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
             expectedOneSuspendContinuationTwoBlocks)
       }
   }
@@ -326,8 +337,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedOneSuspendContinuation)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedOneSuspendContinuation))
       }
   }
 
@@ -345,8 +356,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedOneSuspendContinuation)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedOneSuspendContinuation))
       }
   }
 
@@ -364,8 +375,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedOneSuspendContinuation)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expectedOneSuspendContinuation))
       }
   }
 
@@ -392,7 +403,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |    def foo(completion: continuations.Continuation[Int]): Int | Null | continuations.Continuation.State.Suspended.type =
            |      {
            |        val continuation1: continuations.Continuation[Int] = completion
            |        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
@@ -410,7 +421,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
 
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expected))
       }
   }
 
@@ -445,7 +458,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |    def foo(completion: continuations.Continuation[Int]): Int | Null | continuations.Continuation.State.Suspended.type =
            |      {
            |        val continuation1: continuations.Continuation[Int] = completion
            |        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
@@ -468,7 +481,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
 
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expected))
       }
   }
 
@@ -503,7 +518,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |    def foo(completion: continuations.Continuation[Int]): Int | Null | continuations.Continuation.State.Suspended.type =
            |      {
            |        val continuation1: continuations.Continuation[Int] = completion
            |        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
@@ -528,7 +543,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
 
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expected))
       }
   }
 
@@ -546,7 +563,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
             expectedOneSuspendContinuationTwoBlocks)
       }
   }
@@ -565,7 +582,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
             expectedOneSuspendContinuationTwoBlocks)
       }
   }
@@ -596,7 +613,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |    def foo(completion: continuations.Continuation[Int]): Int | Null | continuations.Continuation.State.Suspended.type =
            |      {
            |        val x: Int = 5
            |        println("HI")
@@ -618,7 +635,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
 
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expected))
       }
   }
 
@@ -645,7 +664,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |    def foo(completion: continuations.Continuation[Int]): Int | Null | continuations.Continuation.State.Suspended.type =
            |      {
            |        val continuation1: continuations.Continuation[Int] = completion
            |        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
@@ -664,7 +683,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
 
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expected))
       }
   }
 
@@ -692,7 +713,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(x: Int, completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |    def foo(x: Int, completion: continuations.Continuation[Int]): Int | Null | continuations.Continuation.State.Suspended.type =
            |      {
            |        val continuation1: continuations.Continuation[Int] = completion
            |        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
@@ -710,7 +731,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
 
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expected))
       }
   }
 
@@ -747,14 +770,14 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
             expectedStateMachineForSuspendContinuationReturningANonSuspendingVal)
       }
 
       checkContinuations(sourceContextFunction) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
             expectedStateMachineForSuspendContinuationReturningANonSuspendingVal)
       }
   }
@@ -779,8 +802,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineWithSingleSuspendedContinuationReturningANonSuspendedVal)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            expectedStateMachineWithSingleSuspendedContinuationReturningANonSuspendedVal
+          )
       }
   }
 
@@ -814,7 +838,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(x: Int, completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |    def foo(x: Int, completion: continuations.Continuation[Int]): Int | Null | continuations.Continuation.State.Suspended.type =
            |      {
            |        val y: Int = 5
            |        println("HI")
@@ -843,7 +867,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
 
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expected))
       }
   }
 
@@ -870,8 +896,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
-            expectedStateMachineMultipleSuspendedContinuationsReturningANonSuspendingVal)
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            expectedStateMachineMultipleSuspendedContinuationsReturningANonSuspendingVal
+          )
       }
   }
 
@@ -909,7 +936,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
             expectedStateMachineWithMultipleResumeReturningANonSuspendedValue)
       }
   }
@@ -959,14 +986,14 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
             expectedStateMachineReturningANonSuspendedValue)
       }
 
       checkContinuations(sourceContextFunction) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
             expectedStateMachineReturningANonSuspendedValue)
       }
   }
@@ -993,7 +1020,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
             expectedStateMachineNoDependantSuspensions)
       }
   }
@@ -1026,7 +1053,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
             expectedStateMachineNoDependantSuspensionsWithCodeInside)
       }
   }
@@ -1056,7 +1083,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       checkContinuations(source) {
         case (tree, _) =>
           assertNoDiff(
-            compileSourceIdentifier.replaceAllIn(tree.show, ""),
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
             expectedStateMachineNoDependantSuspensionsWithCodeBetween)
       }
   }
@@ -1108,7 +1135,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
            |    def program: Int =
            |      {
-           |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A | Any]): Any = x
+           |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A]):
+           |          A | Null | continuations.Continuation.State.Suspended.type
+           |         = x
            |        foo(1, 2, "A", concurrent.ExecutionContext.Implicits.global, continuations.jvm.internal.ContinuationStub.contImpl)
            |      }
            |  }
@@ -1130,9 +1159,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
            |    def program: Int =
            |      {
-           |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A]): 
-           |          Any | Null | continuations.Continuation.State.Suspended.type
-           |         = 
+           |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A]):
+           |          A | Null | continuations.Continuation.State.Suspended.type
+           |         =
            |          {
            |            val continuation1: continuations.Continuation[A] = completion
            |            val safeContinuation: continuations.SafeContinuation[A] = continuations.SafeContinuation.init[A](continuation1)
@@ -1461,7 +1490,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |          def fromProduct(x$0: Product): continuations.compileFromString$package.Foo.MirroredMonoType = 
            |            new Foo(x$0.productElement(0).$asInstanceOf[Int])
            |        }
-           |        def foo(a: A, completion: continuations.Continuation[A | Any]): Any = a
+           |        def foo(a: A, completion: continuations.Continuation[A]): A | Null | continuations.Continuation.State.Suspended.type = a
            |        foo(Foo.apply(1), continuations.jvm.internal.ContinuationStub.contImpl):Object & Product & Serializable
            |      }
            |  }
@@ -1471,7 +1500,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
 
       checkContinuations(source) {
         case (tree, _) =>
-          assertNoDiff(compileSourceIdentifier.replaceAllIn(tree.show, ""), expected)
+          assertNoDiff(
+            removeLineTrailingSpaces(compileSourceIdentifier.replaceAllIn(tree.show, "")),
+            removeLineTrailingSpaces(expected))
       }
   }
 
@@ -1559,9 +1590,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: compileFromString$package.type =>
            |    private def writeReplace(): AnyRef =
            |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[(Int => Int) | Any]): Int => Any =
+           |    def foo(completion: continuations.Continuation[Int => Int]): Int => Int | Null | continuations.Continuation.State.Suspended.type =
            |      {
-           |        def $anonfun(x: Int): Any = x.+(1)
+           |        def $anonfun(x: Int): Int | Null | continuations.Continuation.State.Suspended.type = x.+(1)
            |        closure($anonfun)
            |      }
            |  }
@@ -1600,7 +1631,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: compileFromString$package.type =>
            |    private def writeReplace(): AnyRef =
            |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
-           |    def foo(completion: continuations.Continuation[([A] => (List[A]) => Int) | Any]): [A] => (List[A]) => Any =
+           |    def foo(completion: continuations.Continuation[[A] => (List[A]) => Int]):
+           |      [A] => (List[A]) => Int | Null | continuations.Continuation.State.Suspended.type
+           |     =
            |      {
            |        final class $anon() extends Object(), PolyFunction {
            |          def apply[A >: Nothing <: Any](list: List[A]): Int = list.size

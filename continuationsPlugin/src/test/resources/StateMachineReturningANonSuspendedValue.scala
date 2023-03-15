@@ -10,9 +10,9 @@ package continuations {
       new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
     def program: Int = 
       {
-        class program$foo$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion, 
-          $completion.context
-        ) {
+        class program$foo$1(private[this] val $completion: continuations.Continuation[Any | Null]) extends
+          continuations.jvm.internal.ContinuationImpl
+        ($completion, $completion.context) {
           var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
           var $label: Int = _
           def $result_=(x$0: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)]): Unit

@@ -1,10 +1,12 @@
 package continuations
 
+import CompilerFixtures.removeLineTrailingSpaces
 import scala.io.Source
 
 trait StateMachineFixtures {
 
-  def loadFile(file: String): String = Source.fromResource(s"$file.scala").mkString
+  def loadFile(file: String): String =
+    removeLineTrailingSpaces(Source.fromResource(s"$file.scala").mkString)
 
   val expectedOneSuspendContinuation =
     loadFile("OneSuspendContinuation")

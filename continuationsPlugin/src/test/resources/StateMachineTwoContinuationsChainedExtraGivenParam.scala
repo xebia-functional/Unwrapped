@@ -9,9 +9,9 @@ package continuations {
   () extends Object() { this: continuations.compileFromString$package.type =>
     private def writeReplace(): AnyRef =
       new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-    class compileFromString$package$fooTest$1($completion: continuations.Continuation[Any | Null]) extends
-      continuations.jvm.internal.ContinuationImpl
-    ($completion, $completion.context) {
+    class compileFromString$package$fooTest$1(
+      private[this] val $completion: continuations.Continuation[Any | Null]
+    ) extends continuations.jvm.internal.ContinuationImpl($completion, $completion.context) {
       var I$0: Any = _
       var I$1: Any = _
       var I$2: Any = _

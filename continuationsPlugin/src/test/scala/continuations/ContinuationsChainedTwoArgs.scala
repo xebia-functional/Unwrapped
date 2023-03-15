@@ -1,5 +1,6 @@
 package continuations
 
+import CompilerFixtures.removeLineTrailingSpaces
 import dotty.tools.dotc.ast.tpd
 import dotty.tools.dotc.config.Printers
 import dotty.tools.dotc.core.Contexts.{ctx, Context}
