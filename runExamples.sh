@@ -53,4 +53,5 @@ continuationsPluginExample/runMain examples.ZeroArgumentsCodeBefore; \
 continuationsPluginExample/runMain examples.OneArgumentsSingleResumeContinuations; \
 continuationsPluginExample/runMain examples.OneFunctionArgumentTwoContinuationsTwoResumes; \
 continuationsPluginExample/runMain examples.TwoArgumentsZeroContinuations; \
-continuationsPluginExample/runMain examples.NonCompanionObjectContinuations"
+continuationsPluginExample/runMain examples.AbstractClassContinuations; \
+continuationsPluginExample/runMain examples.NonCompanionObjectContinuations;"

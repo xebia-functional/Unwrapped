@@ -71,7 +71,7 @@ class ContinuationsCallsPhase extends PluginPhase:
         var sym = Option.empty[Symbol]
         tree
           .find {
-            case t @ Select(Ident(_), n) if n.matchesTargetName(s.name) =>
+            case t @ Select(_, n) if n.matchesTargetName(s.name) =>
               sym = Option(t.symbol)
               true
             case t @ Ident(n) if n.matchesTargetName(s.name) =>

@@ -301,14 +301,10 @@ object DefDefTransforms extends TreesChecks:
       val suspendedState =
         ref(continuationObjectSym).select(termName("State")).select(termName("Suspended"))
 
-      val finalMethodReturnType: tpd.TypeTree =
-        tpd.TypeTree(
-          OrType(
-            OrType(returnType, ctx.definitions.NullType, soft = false),
-            suspendedState.symbol.namedType,
-            soft = false)
-        )
-      createTransformedMethodSymbol(parent, transformedMethodParams, finalMethodReturnType.tpe)
+      val finalMethodReturnType: Type =
+        OrType(OrNull(returnType), suspendedState.symbol.namedType, soft = false)
+
+      createTransformedMethodSymbol(parent, transformedMethodParams, finalMethodReturnType)
     }
 
     deleteOldSymbol(parent)
