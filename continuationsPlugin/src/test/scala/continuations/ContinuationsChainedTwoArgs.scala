@@ -54,7 +54,7 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
           |      val z = s.shift[A] { _.resume(a) }
           |      s.shift[A] { _.resume({ println("World"); z }) }
           |  }
-          |
+          |  
           |  fooTest(Foo(1), 1)
           |}
           |""".stripMargin
@@ -122,6 +122,7 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
           )
       }
   }
+
   compilerContextWithContinuationsPlugin.test(
     "4- it should convert into a state machine two continuations chained with one extra given parameter"
   ) {

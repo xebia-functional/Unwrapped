@@ -135,11 +135,10 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       }
   }
 
-  compilerContextWithContinuationsPlugin.test("debug".ignore) {
+  compilerContext.test("debug".ignore) {
     case given Context =>
       val source =
-        """|
-           |package continuations
+        """|package continuations
            |
            |def foo()(using Suspend): Int = {
            |  val x = 5
@@ -147,9 +146,8 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |}
            |""".stripMargin
-      checkCompile("patternMatcher", source) {
+      checkCompile("pickleQuotes", source) {
         case (tree, _) =>
-          // println(tree.show)
           assertEquals(tree.toString, """|""".stripMargin)
       }
   }
