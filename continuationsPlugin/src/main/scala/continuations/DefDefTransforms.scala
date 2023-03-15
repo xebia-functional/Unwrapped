@@ -922,8 +922,6 @@ object DefDefTransforms extends TreesChecks:
             ref($completion).select(termName("context"))
           )
 
-      val contOfReturnType = continuationClassRef.appliedTo(returnType)
-
       ClassDefWithParents(
         cls = continuationsStateMachineSymbol,
         constr = continuationsStateMachineConstructor,
@@ -953,38 +951,39 @@ object DefDefTransforms extends TreesChecks:
           continuationStateMachineClass.tpe).entered
 
       val completionMatch = {
-
+        /* ```
+         case x$0: ${contFsmClass} if x$0.$label & Integer.MinValue != 0 =>
+           x$0.$label = x$0.label - Integer.MinValue
+           x$0
+         ```*/
         val case11: tpd.CaseDef = {
           val param =
-            newSymbol(newParent, nme.x_0, Flags.Case | Flags.CaseAccessor, defn.AnyType).entered
+            newSymbol(
+              newParent,
+              nme.x_0,
+              Flags.Case | Flags.CaseAccessor,
+              continuationStateMachineClass.tpe
+            ).entered
 
-          val paramLabel =
-            ref(param)
-              .select(nme.asInstanceOf_)
-              .appliedToType(continuationStateMachineClass.tpe)
-              .select(labelVarParam)
+          val paramLabel = ref(param).select(labelVarParam)
 
           tpd.CaseDef(
-            tpd.Bind(param, tpd.EmptyTree),
+            tpd.Bind(param, tpd.Typed(ref(param), ref(continuationsStateMachineSymbol))),
             ref(param)
-              .select(nme.isInstanceOf_)
-              .appliedToType(continuationStateMachineClass.tpe)
-              .select(defn.Boolean_&&)
-              .appliedTo(
-                paramLabel
-                  .select(integerAND)
-                  .appliedTo(integerMin)
-                  .select(integerNE)
-                  .appliedTo(tpd.Literal(Constant(0x0)))),
+              .select(labelVarParam)
+              .select(integerAND)
+              .appliedTo(integerMin)
+              .select(integerNE)
+              .appliedTo(tpd.Literal(Constant(0x0))),
             tpd.Block(
-              List(
-                tpd.Assign(paramLabel, paramLabel.select(defn.Int_-).appliedTo(integerMin))
-              ),
+              List(tpd.Assign(paramLabel, paramLabel.select(defn.Int_-).appliedTo(integerMin))),
               ref(param)
             )
           )
         }
-
+        /* ```
+         case _ => new ${contFsmClass}($completion)
+        ```*/
         val case12 = tpd.CaseDef(
           Underscore(anyType),
           tpd.EmptyTree,

@@ -100,10 +100,8 @@ package continuations {
               val $continuation: program$fooTest$1 = 
                 completion match
                   {
-                    case x$0 @ <empty> if
-                      x$0.isInstanceOf[program$fooTest$1].&&(x$0.asInstanceOf[program$fooTest$1].$label.&(scala.Int.MinValue).!=(0))
-                     =>
-                      x$0.asInstanceOf[program$fooTest$1].$label = x$0.asInstanceOf[program$fooTest$1].$label.-(scala.Int.MinValue)
+                    case x$0 @ x$0:program$fooTest$1 if x$0.$label.&(scala.Int.MinValue).!=(0) =>
+                      x$0.$label = x$0.$label.-(scala.Int.MinValue)
                       x$0
                     case _ => new program$fooTest$1(completion)
                   }

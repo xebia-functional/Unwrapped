@@ -51,25 +51,13 @@ package continuations {
            =
             completion match
               {
-                case x$0 @ <empty> if
-                  x$0.isInstanceOf[
-                    continuations.compileFromString$package.
-                      compileFromString$package$fooTest$1
-                  ].&&(
-                    x$0.asInstanceOf[
+                case
+                  x$0 @
+                    x$0:
                       continuations.compileFromString$package.
                         compileFromString$package$fooTest$1
-                    ].$label.&(scala.Int.MinValue).!=(0)
-                  )
-                 =>
-                  x$0.asInstanceOf[
-                    continuations.compileFromString$package.
-                      compileFromString$package$fooTest$1
-                  ].$label =
-                    x$0.asInstanceOf[
-                      continuations.compileFromString$package.
-                        compileFromString$package$fooTest$1
-                    ].$label.-(scala.Int.MinValue)
+                 if x$0.$label.&(scala.Int.MinValue).!=(0) =>
+                  x$0.$label = x$0.$label.-(scala.Int.MinValue)
                   x$0
                 case _ =>
                   new
