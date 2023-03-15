@@ -11,7 +11,7 @@ extension [A](continuation: Continuation[A])
 
 extension [A](suspendedFn: Suspend ?=> A)
 
-  // inline def suspendContinuation
+  // inline def shift
   /*
   suspend inline fun <T> suspendCoroutineUninterceptedOrReturn(
       crossinline block: (Continuation<T>) -> Any?
@@ -19,7 +19,7 @@ extension [A](suspendedFn: Suspend ?=> A)
    */
 
   def startContinuation(completion: Continuation[A]): Unit =
-    createContinuation(completion).intercepted().resume(Right(()))
+    createContinuation(completion).intercepted().resume(())
 
   inline def startContinuationOrSuspend(
       completion: Continuation[A]): Any | Null | Continuation.State.Suspended.type =

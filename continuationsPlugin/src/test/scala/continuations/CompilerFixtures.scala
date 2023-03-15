@@ -364,7 +364,7 @@ trait CompilerFixtures { self: FunSuite =>
     teardown = _ => ()
   )
 
-  val suspendContinuation = FunFixture[Context ?=> Inlined](
+  val shift = FunFixture[Context ?=> Inlined](
     setup = _ => inlinedCallToContinuationsSuspendOfInt,
     teardown = _ => ()
   )
@@ -503,7 +503,7 @@ trait CompilerFixtures { self: FunSuite =>
               ValDef(
                 y.asTerm,
                 ref(usingSuspendArg)
-                  .select(Names.termName(suspendContinuationName))
+                  .select(Names.termName(shiftName))
                   .appliedTo(ref(usingSuspendArg))
                   .appliedToType(intType)
                   .appliedTo(
@@ -567,7 +567,7 @@ trait CompilerFixtures { self: FunSuite =>
                 y.asTerm,
                 Inlined(
                   ref(usingSuspendArg)
-                    .select(Names.termName(suspendContinuationName))
+                    .select(Names.termName(shiftName))
                     .appliedTo(ref(usingSuspendArg))
                     .appliedToType(intType)
                     .appliedTo(
@@ -670,7 +670,7 @@ trait CompilerFixtures { self: FunSuite =>
     )
 
   val continuationsContextAndInlinedSuspendingTree =
-    FunFixture.map2(compilerContextWithContinuationsPlugin, suspendContinuation)
+    FunFixture.map2(compilerContextWithContinuationsPlugin, shift)
 
   val continuationsContextAndOneTree =
     FunFixture.map2(compilerContextWithContinuationsPlugin, oneTree)
@@ -882,7 +882,7 @@ trait CompilerFixtures { self: FunSuite =>
       Apply(
         TypeApply(
           Apply(
-            ref(suspend).select(Names.termName("suspendContinuation")),
+            ref(suspend).select(Names.termName("shift")),
             List(ref(suspend))
           ),
           List(TypeTree(intType))),

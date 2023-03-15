@@ -16,7 +16,7 @@ class SuspensionPointsSuite extends FunSuite, CompilerFixtures, Trees {
           obtained.size == 2 &&
             obtained.headOption.exists { case vd: ValDef => vd.name.show == "y" } &&
             obtained.lastOption.exists {
-              case Inlined(call, _, _) => call.symbol.matches(suspendContinuationMethod.symbol)
+              case Inlined(call, _, _) => call.symbol.matches(shiftMethod.symbol)
             })
     }
 

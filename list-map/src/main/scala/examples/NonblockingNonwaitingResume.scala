@@ -18,13 +18,13 @@ given ExecutorService = Executors.newWorkStealingPool()
       y: Int): Suspend ?=> Int | Continuation.State.Suspended.type =
     println("twoArgumentsOneContinuationsCFBefore")
     val z = 1
-    summon[Suspend].suspendContinuation[Int] { c =>
+    summon[Suspend].shift[Int] { c =>
       summon[ExecutorService].submit(new Runnable {
         override def run =
           val sleepTime = Random.between(10, 5000)
           println(s"sleepTime $sleepTime")
           Thread.sleep(sleepTime)
-          c.resume(Right(x + y + z))
+          c.resume(x + y + z)
       })
     }
 

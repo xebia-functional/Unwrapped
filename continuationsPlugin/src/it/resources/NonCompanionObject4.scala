@@ -17,15 +17,15 @@ object ExampleObject {
   val z3 = 1
 
   def continuations(x: Int)(using s: Suspend): Int = {
-    val result1 = s.suspendContinuation[Int] { continuation =>
+    val result1 = s.shift[Int] { continuation =>
       continuation.resume(method1(x) + method2(x) + method3(x) + z1 + z2 + z3 + 1)
     }
 
-    s.suspendContinuation[Int] { continuation =>
+    s.shift[Int] { continuation =>
       continuation.resume(method1(x) + method2(x) + method3(x) + z1 + z2 + z3 + 1)
     }
 
-    val result2 = s.suspendContinuation[Int] { continuation =>
+    val result2 = s.shift[Int] { continuation =>
       continuation.resume(
         method1(x) + method2(x) + method3(x) + z1 + z2 + z3 + 1 + result1)
     }

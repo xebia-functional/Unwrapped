@@ -11,7 +11,7 @@ object ExampleObject {
     def method1(x: Int) = x + 1
     val z1 = 1
 
-    s.suspendContinuation[Int] { continuation =>
+    s.shift[Int] { continuation =>
       def method2(x: Int) = x + 1
       val z2 = 1
 
