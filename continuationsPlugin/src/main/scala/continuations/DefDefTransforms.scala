@@ -743,7 +743,10 @@ object DefDefTransforms extends TreesChecks:
         }
         .drop(1)
 
-    def toTreeBeforeSuspend(suspend: tpd.Tree, rows: List[tpd.Tree], i: Int): List[tpd.Tree] = {
+    val nonDefDefRowsBeforeSuspensionPointList = nonDefDefRowsBeforeSuspensionPoint.toList
+
+    def toTreeBeforeSuspend(i: Int): List[tpd.Tree] = {
+      val (suspend, rows) = nonDefDefRowsBeforeSuspensionPointList(i)
       val rowsAfter =
         nonDefDefRowsBeforeSuspensionPoint.drop(i + 1).values.toList.flatten ++
           nonDefDefRowsBeforeSuspensionPoint.drop(i + 1).keySet ++
@@ -761,10 +764,9 @@ object DefDefTransforms extends TreesChecks:
     }
 
     val treesBeforeSuspendUsedAfterwards: List[tpd.Tree] =
-      nonDefDefRowsBeforeSuspensionPoint
+      Range(0, nonDefDefRowsBeforeSuspensionPointList.size)
         .toList
-        .zipWithIndex
-        .flatMap { case ((suspend, rows), i) => toTreeBeforeSuspend(suspend, rows, i) }
+        .flatMap(toTreeBeforeSuspend)
         .distinctBy(_.symbol.coord)
 
     val distinctVars: List[Symbol] =
@@ -1038,14 +1040,11 @@ object DefDefTransforms extends TreesChecks:
 
       def frameVar(i: Int): tpd.Tree =
         ref(contSymbol).select(continuationStateMachineI$NsSyms(i))
-      def assignToI(sym: Symbol, i: Int): tpd.Assign = tpd.Assign(frameVar(i), ref(sym))
+      def assignToI(sym: TermSymbol, i: Int): tpd.Assign = tpd.Assign(frameVar(i), ref(sym))
       def assignFromI(sym: TermSymbol, i: Int): tpd.Assign = tpd.Assign(ref(sym), frameVar(i))
 
-      def toStateCase(
-          suspension: tpd.Tree,
-          rowsBefore: List[tpd.Tree],
-          stateIx: Int): tpd.CaseDef = {
-
+      def toStateCase(stateIx: Int): tpd.CaseDef = {
+        val (suspension, rowsBefore) = nonDefDefRowsBeforeSuspensionPointList(stateIx)
         val insertLabel =
           if (stateIx > 0) tpd.Labeled(labels(stateIx).asTerm, tpd.EmptyTree) else tpd.EmptyTree
 
@@ -1115,9 +1114,7 @@ object DefDefTransforms extends TreesChecks:
           tree match
             case vd: tpd.ValDef =>
               val gvSym = globalVarsSyms.find(_.denot.matches(vd.symbol))
-              globalVarsSyms
-                .find(_.denot.matches(vd.symbol))
-                .fold(vd)(gv => tpd.Assign(ref(gv), vd.rhs))
+              gvSym.fold(vd)(gv => tpd.Assign(ref(gv), vd.rhs))
             case _ => tree
 
         val orThrowMatch: tpd.Match = {
@@ -1179,11 +1176,6 @@ object DefDefTransforms extends TreesChecks:
         tpd.CaseDef(tpd.Literal(Constant(stateIx)), tpd.EmptyTree, blockOf(stats))
       }
 
-      val cases =
-        nonDefDefRowsBeforeSuspensionPoint.zipWithIndex.toList.map {
-          case ((suspension, rowsBefore), i) => toStateCase(suspension, rowsBefore, i)
-        }
-
       val lastCase = {
         val lastStatement = suspensionPoints.lastOption match {
           case Some(vd: tpd.ValDef) =>
@@ -1210,7 +1202,8 @@ object DefDefTransforms extends TreesChecks:
           tpd.ValDef(contSymbol, completionMatch),
           tpd.Match(
             ref(contSymbol).select(labelVarParam),
-            cases ++ List(lastCase, wrongStateCase))
+            Range(0, nonDefDefRowsBeforeSuspensionPointList.size).toList.map(toStateCase) ++
+              List(lastCase, wrongStateCase))
         ))
 
     end transformSuspendTree
