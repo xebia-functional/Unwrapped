@@ -1117,6 +1117,9 @@ object DefDefTransforms extends TreesChecks:
               gvSym.fold(vd)(gv => tpd.Assign(ref(gv), vd.rhs))
             case _ => tree
 
+        val incrementLabel =
+          tpd.Assign(ref(contSymbol).select(labelVarParam), tpd.Literal(Constant(stateIx + 1)))
+
         val orThrowMatch: tpd.Match = {
           val orThrowSymbol: TermSymbol =
             newSymbol(
@@ -1164,9 +1167,7 @@ object DefDefTransforms extends TreesChecks:
           rowsBefore.map(updateForGlobalVars),
           assignToIPairs.map(assignToI),
           List(
-            tpd.Assign(
-              ref(contSymbol).select(labelVarParam),
-              tpd.Literal(Constant(stateIx + 1))),
+            incrementLabel,
             safeContinuation,
             transformSuspendContinuationBody(callSuspensionPoint, safeContinuation.symbol),
             orThrowMatch
