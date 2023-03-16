@@ -110,11 +110,9 @@ object DefDefTransforms extends TreesChecks:
     def isImplicitSuspend(p: Trees.ValDef[Type] | Trees.TypeDef[Type]): Boolean =
       p match {
         case p: Trees.ValDef[Type] =>
-          p.typeOpt
-            .hasClassSymbol(suspendClazz) && p.symbol.flags.isOneOf(Flags.GivenOrImplicit)
+          p.typeOpt.hasClassSymbol(suspendClazz) && isImplicit(p.symbol)
         case t: Trees.TypeDef[Type] =>
-          t.typeOpt
-            .hasClassSymbol(suspendClazz) && t.symbol.flags.isOneOf(Flags.GivenOrImplicit)
+          t.typeOpt.hasClassSymbol(suspendClazz) && isImplicit(t.symbol)
       }
 
     tree match
@@ -138,7 +136,7 @@ object DefDefTransforms extends TreesChecks:
           t.symbol.isAnonymousFunction &&
           t.symbol.paramSymss.flatten.exists(hasContinuationClass)
       case tree @ Trees.Select(_, name) =>
-        tree.symbol.owner.name.show == continuationClassName &&
+        belongsToContinuation(tree.symbol) &&
           (name.show == resumeMethodName || name.show == raiseMethodName)
       case _ => false
     }
@@ -173,12 +171,10 @@ object DefDefTransforms extends TreesChecks:
             tpd.Block(flattened.dropRight(1), flattened.last)
           }
         case tree @ Trees.Select(_, name)
-            if tree.symbol.owner.name.show == continuationClassName &&
-              name.show == resumeMethodName =>
+            if belongsToContinuation(tree.symbol) && name.show == resumeMethodName =>
           resumeMethod
         case tree @ Trees.Select(_, name)
-            if tree.symbol.owner.name.show == continuationClassName &&
-              name.show == raiseMethodName =>
+            if belongsToContinuation(tree.symbol) && name.show == raiseMethodName =>
           raiseMethod
         case t =>
           t
@@ -235,6 +231,12 @@ object DefDefTransforms extends TreesChecks:
 
   private def hasContinuationClass(s: Symbol)(using ctx: Context): Boolean =
     s.info.hasClassSymbol(requiredClass(continuationFullName))
+
+  private def isImplicit(sym: Symbol)(using Context): Boolean =
+    sym.flags.isOneOf(Flags.GivenOrImplicit)
+
+  private def belongsToContinuation(symbol: Symbol)(using Context): Boolean =
+    symbol.owner.name.show == continuationClassName
 
   private def matchesNameCoord(v: Symbol, tree: tpd.Tree)(using ctx: Context): Boolean =
     v.name == tree.symbol.name && v.coord == tree.symbol.coord
