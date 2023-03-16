@@ -236,14 +236,17 @@ object DefDefTransforms extends TreesChecks:
   private def hasContinuationClass(s: Symbol)(using ctx: Context): Boolean =
     s.info.hasClassSymbol(requiredClass(continuationFullName))
 
-  private def matchesNameCoord(v: tpd.Tree, tree: tpd.Tree)(using ctx: Context): Boolean =
-    v.symbol.name == tree.symbol.name && v.symbol.coord == tree.symbol.coord
+  private def matchesNameCoord(v: Symbol, tree: tpd.Tree)(using ctx: Context): Boolean =
+    v.name == tree.symbol.name && v.coord == tree.symbol.coord
 
   private def blockOf(stats: List[tpd.Tree])(using Context): tpd.Tree = stats match {
     case Nil => tpd.unitLiteral
     case x :: Nil => x
     case xs => tpd.Block(xs.dropRight(1), xs.last)
   }
+
+  private def fieldMatchesParam(field: Symbol, param: Symbol)(using Context): Boolean =
+    field.name.show.dropRight(3) == param.name.show
 
   private def removeSuspend(typ: Type, returnValue: Option[Type] = None)(using Context): Type =
     val types = flattenTypes(typ)
@@ -1133,7 +1136,7 @@ object DefDefTransforms extends TreesChecks:
             nonDefDefRowsBeforeSuspensionPoint.keySet.toList(i) match
               case vd: tpd.ValDef =>
                 tpd.Assign(
-                  globalVars.find(matchesNameCoord(_, vd)).get,
+                  globalVars.find(gv => matchesNameCoord(gv.symbol, vd)).get,
                   ref(orThrowSymbol).select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
                 ) :: Nil
               case _ =>
@@ -1254,19 +1257,19 @@ object DefDefTransforms extends TreesChecks:
               coord
           }
           tpd.EmptyTree
-        case tree if globalVars.exists(matchesNameCoord(_, tree)) =>
-          ref(globalVars.find(matchesNameCoord(_, tree)).get.symbol)
+        case tree if globalVars.exists(gv => matchesNameCoord(gv.symbol, tree)) =>
+          ref(globalVars.find(gv => matchesNameCoord(gv.symbol, tree)).get.symbol)
         case tt
             if tt.symbol.exists &&
               tt.symbol.is(TermParam) &&
               tt.symbol.owner.denot.matches(tree.symbol) &&
               transformedMethodParamsWithoutCompletion.exists(
                 _.symbol.denot.matches(tt.symbol)) &&
-              transformedMethodParamsAsVals.exists(
-                _.symbol.name.show.dropRight(3) == tt.symbol.name.show) =>
+              transformedMethodParamsAsVals.exists(p =>
+                fieldMatchesParam(p.symbol, tt.symbol)) =>
           ref(
             transformedMethodParamsAsVals
-              .find(_.symbol.name.show.dropRight(3) == tt.symbol.name.show)
+              .find(p => fieldMatchesParam(p.symbol, tt.symbol))
               .get
               .symbol)
         case tree =>
