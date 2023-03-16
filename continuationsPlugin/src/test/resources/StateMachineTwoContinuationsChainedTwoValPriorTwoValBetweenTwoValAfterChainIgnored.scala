@@ -69,12 +69,10 @@ package continuations {
                       compileFromString$package$fooTest$1
                   (completion)
               }
-          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-            $continuation.$result
           $continuation.$label match
             {
               case 0 =>
-                continuations.Continuation.checkResult($result)
+                continuations.Continuation.checkResult($continuation.$result)
                 a = 1
                 b = 1
                 $continuation.I$0 = y##1
@@ -98,8 +96,8 @@ package continuations {
                 x##1 = $continuation.I$1
                 a = $continuation.I$2
                 b = $continuation.I$3
-                continuations.Continuation.checkResult($result)
-                z = $result.asInstanceOf[Int]
+                continuations.Continuation.checkResult($continuation.$result)
+                z = $continuation.$result.asInstanceOf[Int]
                 label1[Unit]: <empty>
                 val c: Int = a.+(b)
                 val d: Int = c.+(1)
@@ -124,7 +122,7 @@ package continuations {
                 a = $continuation.I$2
                 b = $continuation.I$3
                 z = $continuation.I$4
-                continuations.Continuation.checkResult($result)
+                continuations.Continuation.checkResult($continuation.$result)
               case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
             }
         }

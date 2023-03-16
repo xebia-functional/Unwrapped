@@ -995,17 +995,12 @@ object DefDefTransforms extends TreesChecks:
         tpd.Match(transformedMethodCompletionParam, List(case11, case12))
       }
 
-      val resultSym: TermSymbol =
-        newSymbol(
-          newParent,
-          termName("$result"),
-          Local,
-          eitherThrowableAnyNullSuspendedType).entered
+      val getResult = ref(contSymbol).select(resultVarName)
 
       val callToCheckResult =
         ref(requiredModule(continuationFullName))
           .select(termName("checkResult"))
-          .appliedTo(ref(resultSym))
+          .appliedTo(getResult)
 
       val labels: List[Symbol] =
         nonDefDefRowsBeforeSuspensionPoint.keySet.toList.indices.toList.map { i =>
@@ -1081,7 +1076,7 @@ object DefDefTransforms extends TreesChecks:
         def assignGlobalVarResult(vd: tpd.ValDef): tpd.Assign =
           tpd.Assign(
             globalVars.find(matchesNameCoord(_, vd)).get,
-            ref(resultSym).select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
+            getResult.select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
           )
 
         val assignResultToGlobalVar =
@@ -1190,9 +1185,9 @@ object DefDefTransforms extends TreesChecks:
         case Some(vd: tpd.ValDef) =>
           tpd.Assign(
             globalVars.find(matchesNameCoord(_, vd)).get,
-            ref(resultSym).select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
+            getResult.select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
           ) :: Nil
-        case Some(_) if suspensionInReturnedValue => ref(resultSym) :: Nil
+        case Some(_) if suspensionInReturnedValue => getResult :: Nil
         case _ => Nil
       }
 
@@ -1221,11 +1216,7 @@ object DefDefTransforms extends TreesChecks:
         )
         .withType(anyNullSuspendedType)
 
-      tpd.Block(
-        List(
-          tpd.ValDef(contSymbol, completionMatch),
-          tpd.ValDef(resultSym, ref(contSymbol).select(resultVarName))),
-        labelMatch)
+      blockOf(List(tpd.ValDef(contSymbol, completionMatch), labelMatch))
     end transformSuspendTree
 
     val transformedMethodParamSymbols: List[Symbol] =

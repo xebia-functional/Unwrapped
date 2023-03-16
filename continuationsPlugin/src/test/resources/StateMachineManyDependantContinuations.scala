@@ -75,12 +75,10 @@ package continuations {
                       compileFromString$package$fooTest$1
                   (completion)
               }
-          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-            $continuation.$result
           $continuation.$label match
             {
               case 0 =>
-                continuations.Continuation.checkResult($result)
+                continuations.Continuation.checkResult($continuation.$result)
                 pp = 11
                 $continuation.I$0 = qq##1
                 $continuation.I$1 = pp
@@ -99,8 +97,8 @@ package continuations {
               case 1 =>
                 qq##1 = $continuation.I$0
                 pp = $continuation.I$1
-                continuations.Continuation.checkResult($result)
-                xx = $result.asInstanceOf[Int]
+                continuations.Continuation.checkResult($continuation.$result)
+                xx = $continuation.$result.asInstanceOf[Int]
                 label1[Unit]: <empty>
                 ww = 13
                 val rr: String = "AAA"
@@ -125,8 +123,8 @@ package continuations {
                 pp = $continuation.I$1
                 xx = $continuation.I$2
                 ww = $continuation.I$3
-                continuations.Continuation.checkResult($result)
-                yy = $result.asInstanceOf[String]
+                continuations.Continuation.checkResult($continuation.$result)
+                yy = $continuation.$result.asInstanceOf[String]
                 label2[Unit]: <empty>
                 tt = 100
                 $continuation.I$0 = qq##1
@@ -152,8 +150,8 @@ package continuations {
                 ww = $continuation.I$3
                 yy = $continuation.I$4
                 tt = $continuation.I$5
-                continuations.Continuation.checkResult($result)
-                zz = $result.asInstanceOf[Int]
+                continuations.Continuation.checkResult($continuation.$result)
+                zz = $continuation.$result.asInstanceOf[Int]
               case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
             }
         }

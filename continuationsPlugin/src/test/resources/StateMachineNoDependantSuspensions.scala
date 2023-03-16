@@ -45,12 +45,10 @@ package continuations {
                     x$0
                   case _ => new program$foo$1(completion)
                 }
-            val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] = 
-              $continuation.$result
             $continuation.$label match 
               {
                 case 0 => 
-                  continuations.Continuation.checkResult($result)
+                  continuations.Continuation.checkResult($continuation.$result)
                   $continuation.$label = 1
                   val safeContinuation: continuations.SafeContinuation[Boolean] = continuations.SafeContinuation.init[Boolean]($continuation)
                   {
@@ -64,7 +62,7 @@ package continuations {
                       case orThrow @ <empty> => return[label1] ()
                     }
                 case 1 => 
-                  continuations.Continuation.checkResult($result)
+                  continuations.Continuation.checkResult($continuation.$result)
                   label1[Unit]: <empty>
                   $continuation.$label = 2
                   val safeContinuation: continuations.SafeContinuation[String] = continuations.SafeContinuation.init[String]($continuation)
@@ -79,7 +77,7 @@ package continuations {
                       case orThrow @ <empty> => return[label2] ()
                     }
                 case 2 => 
-                  continuations.Continuation.checkResult($result)
+                  continuations.Continuation.checkResult($continuation.$result)
                   label2[Unit]: <empty>
                   $continuation.$label = 3
                   val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
@@ -94,8 +92,8 @@ package continuations {
                       case orThrow @ <empty> => orThrow
                     }
                 case 3 => 
-                  continuations.Continuation.checkResult($result)
-                  $result
+                  continuations.Continuation.checkResult($continuation.$result)
+                  $continuation.$result
                 case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
               }
           }

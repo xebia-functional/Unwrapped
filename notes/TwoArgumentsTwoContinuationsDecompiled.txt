@@ -89,12 +89,12 @@ implements Serializable {
             } else {
                 var6_6 = new TwoArgumentsTwoContinuations.package.TwoArgumentsTwoContinuations.twoArgumentsTwoContinuations.1.1(completion);
             }
-            $result = var6_6.$result();
+            $continuation.$result = var6_6.$result();
             var10_10 = var6_6.$label();
             switch (var10_10) {
                 case 0: {
                     if ($result != null) {
-                        $result.fold((Function1)(Function1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, TwoArgumentsTwoContinuations$$anonfun$1(java.lang.Throwable ), (Ljava/lang/Throwable;)Lscala/runtime/Nothing$;)((TwoArgumentsTwoContinuations$package$)this), (Function1)(JProcedure1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)V, TwoArgumentsTwoContinuations$$anonfun$2(java.lang.Object ), (Ljava/lang/Object;)V)((TwoArgumentsTwoContinuations$package$)this));                                                
+                        $continuation.$result.fold((Function1)(Function1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, TwoArgumentsTwoContinuations$$anonfun$1(java.lang.Throwable ), (Ljava/lang/Throwable;)Lscala/runtime/Nothing$;)((TwoArgumentsTwoContinuations$package$)this), (Function1)(JProcedure1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)V, TwoArgumentsTwoContinuations$$anonfun$2(java.lang.Object ), (Ljava/lang/Object;)V)((TwoArgumentsTwoContinuations$package$)this));                                                
                     }
                     var6_6.I$0_$eq(BoxesRunTime.boxToInteger((int)var5_5));
                     var6_6.I$1_$eq(BoxesRunTime.boxToInteger((int)var4_4));
@@ -114,7 +114,7 @@ implements Serializable {
                     var5_5 = BoxesRunTime.unboxToInt((Object)var6_6.I$0());
                     var4_4 = BoxesRunTime.unboxToInt((Object)var6_6.I$1());
                     if ($result != null) {
-                        $result.fold((Function1)(Function1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, TwoArgumentsTwoContinuations$$anonfun$3(java.lang.Throwable ), (Ljava/lang/Throwable;)Lscala/runtime/Nothing$;)((TwoArgumentsTwoContinuations$package$)this), (Function1)(JProcedure1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)V, TwoArgumentsTwoContinuations$$anonfun$4(java.lang.Object ), (Ljava/lang/Object;)V)((TwoArgumentsTwoContinuations$package$)this));
+                        $continuation.$result.fold((Function1)(Function1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, TwoArgumentsTwoContinuations$$anonfun$3(java.lang.Throwable ), (Ljava/lang/Throwable;)Lscala/runtime/Nothing$;)((TwoArgumentsTwoContinuations$package$)this), (Function1)(JProcedure1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)V, TwoArgumentsTwoContinuations$$anonfun$4(java.lang.Object ), (Ljava/lang/Object;)V)((TwoArgumentsTwoContinuations$package$)this));
                     }
 lbl36:
                     // 4 sources
@@ -136,7 +136,7 @@ lbl36:
                     var5_5 = BoxesRunTime.unboxToInt((Object)var6_6.I$0());
                     var4_4 = BoxesRunTime.unboxToInt((Object)var6_6.I$1());
                     if ($result != null) {
-                        $result.fold((Function1)(Function1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, TwoArgumentsTwoContinuations$$anonfun$5(java.lang.Throwable ), (Ljava/lang/Throwable;)Lscala/runtime/Nothing$;)((TwoArgumentsTwoContinuations$package$)this), (Function1)(JProcedure1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)V, TwoArgumentsTwoContinuations$$anonfun$6(java.lang.Object ), (Ljava/lang/Object;)V)((TwoArgumentsTwoContinuations$package$)this));
+                        $continuation.$result!.fold((Function1)(Function1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, TwoArgumentsTwoContinuations$$anonfun$5(java.lang.Throwable ), (Ljava/lang/Throwable;)Lscala/runtime/Nothing$;)((TwoArgumentsTwoContinuations$package$)this), (Function1)(JProcedure1 & Serializable)LambdaMetafactory.altMetafactory(null, null, null, (Ljava/lang/Object;)V, TwoArgumentsTwoContinuations$$anonfun$6(java.lang.Object ), (Ljava/lang/Object;)V)((TwoArgumentsTwoContinuations$package$)this));
                     }
                     v3 /* !! */  = $result;
                     break block12;

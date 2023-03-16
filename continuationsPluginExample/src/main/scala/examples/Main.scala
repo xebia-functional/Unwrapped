@@ -48,14 +48,14 @@ def main$expanded(
   ($continuation.label) match
     case 0 =>
       if ($result.isInstanceOf[Left[_, _]])
-        val leftValue = $result.asInstanceOf[Left[_, _]].value
+        val leftValue = $continuation.$result.asInstanceOf[Left[_, _]].value
         if (leftValue.isInstanceOf[Throwable]) throw leftValue.asInstanceOf[Throwable]
       $continuation.label = 1
       var10000 = program$expanded(using $continuation)
       if (var10000 == var6) return var6
     case 1 =>
       if ($result.isInstanceOf[Left[_, _]])
-        val leftValue = $result.asInstanceOf[Left[_, _]].value
+        val leftValue = $continuation.$result.asInstanceOf[Left[_, _]].value
         if (leftValue.isInstanceOf[Throwable]) throw leftValue.asInstanceOf[Throwable]
       var10000 = $result
     case _ =>

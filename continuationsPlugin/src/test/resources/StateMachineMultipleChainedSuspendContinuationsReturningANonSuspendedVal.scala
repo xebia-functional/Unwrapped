@@ -66,12 +66,10 @@ package continuations {
                       compileFromString$package$fooTest$1
                   (completion)
               }
-          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-            $continuation.$result
           $continuation.$label match
             {
               case 0 =>
-                continuations.Continuation.checkResult($result)
+                continuations.Continuation.checkResult($continuation.$result)
                 println("Hello")
                 val z: Int = 100
                 $continuation.I$0 = q##1
@@ -89,8 +87,8 @@ package continuations {
                   }
               case 1 =>
                 q##1 = $continuation.I$0
-                continuations.Continuation.checkResult($result)
-                x = $result.asInstanceOf[Int]
+                continuations.Continuation.checkResult($continuation.$result)
+                x = $continuation.$result.asInstanceOf[Int]
                 label1[Unit]: <empty>
                 j = 9
                 $continuation.I$0 = q##1
@@ -112,8 +110,8 @@ package continuations {
                 q##1 = $continuation.I$0
                 x = $continuation.I$1
                 j = $continuation.I$2
-                continuations.Continuation.checkResult($result)
-                w = $result.asInstanceOf[Int]
+                continuations.Continuation.checkResult($continuation.$result)
+                w = $continuation.$result.asInstanceOf[Int]
                 label2[Unit]: <empty>
                 println("World")
                 $continuation.I$0 = q##1
@@ -135,7 +133,7 @@ package continuations {
                 x = $continuation.I$1
                 j = $continuation.I$2
                 w = $continuation.I$3
-                continuations.Continuation.checkResult($result)
+                continuations.Continuation.checkResult($continuation.$result)
               case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
             }
         }
