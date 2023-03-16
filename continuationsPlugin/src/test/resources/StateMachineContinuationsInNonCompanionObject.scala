@@ -54,12 +54,10 @@ package continuations {
                   x$0
                 case _ => new continuations.ExampleObject.ExampleObject$continuations$1(completion)
               }
-          val $result: Either[Throwable, Any | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)] =
-            $continuation.$result
           $continuation.$label match
             {
               case 0 =>
-                continuations.Continuation.checkResult($result)
+                continuations.Continuation.checkResult($continuation.$result)
                 val z2: Int = 1
                 $continuation.I$0 = y##1
                 $continuation.I$1 = x##1
@@ -90,8 +88,8 @@ package continuations {
               case 1 =>
                 y##1 = $continuation.I$0
                 x##1 = $continuation.I$1
-                continuations.Continuation.checkResult($result)
-                suspension1 = $result.asInstanceOf[Int]
+                continuations.Continuation.checkResult($continuation.$result)
+                suspension1 = $continuation.$result.asInstanceOf[Int]
                 label1[Unit]: <empty>
                 $continuation.I$0 = y##1
                 $continuation.I$1 = x##1
@@ -110,7 +108,7 @@ package continuations {
                 y##1 = $continuation.I$0
                 x##1 = $continuation.I$1
                 suspension1 = $continuation.I$2
-                continuations.Continuation.checkResult($result)
+                continuations.Continuation.checkResult($continuation.$result)
                 label2[Unit]: <empty>
                 val z5: Int = suspension1
                 $continuation.I$0 = y##1
@@ -132,8 +130,8 @@ package continuations {
                 y##1 = $continuation.I$0
                 x##1 = $continuation.I$1
                 suspension1 = $continuation.I$2
-                continuations.Continuation.checkResult($result)
-                suspension2 = $result.asInstanceOf[Int]
+                continuations.Continuation.checkResult($continuation.$result)
+                suspension2 = $continuation.$result.asInstanceOf[Int]
               case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
             }
         }

@@ -91,7 +91,7 @@ def program$expanded(
   ($continuation.label) match
     case 0 =>
       if ($result.isInstanceOf[Left[_, _]])
-        val leftValue = $result.asInstanceOf[Left[_, _]].value
+        val leftValue = $continuation.$result.asInstanceOf[Left[_, _]].value
         if (leftValue.isInstanceOf[Throwable]) throw leftValue.asInstanceOf[Throwable]
       x = a()
       var7 = foo(x)
@@ -102,12 +102,12 @@ def program$expanded(
     case 1 =>
       x = $continuation.I$0
       if ($result.isInstanceOf[Left[_, _]])
-        val leftValue = $result.asInstanceOf[Left[_, _]].value
+        val leftValue = $continuation.$result.asInstanceOf[Left[_, _]].value
         if (leftValue.isInstanceOf[Throwable]) throw leftValue.asInstanceOf[Throwable]
       var10000 = $result
     case 2 =>
       if ($result.isInstanceOf[Left[_, _]])
-        val leftValue = $result.asInstanceOf[Left[_, _]].value
+        val leftValue = $continuation.$result.asInstanceOf[Left[_, _]].value
         if (leftValue.isInstanceOf[Throwable]) throw leftValue.asInstanceOf[Throwable]
         executeAfterMatch = false
       var10000 = $result
