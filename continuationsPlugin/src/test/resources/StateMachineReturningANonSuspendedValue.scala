@@ -82,8 +82,7 @@ package continuations {
                         case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
                         case orThrow @ <empty> => ()
                       }
-                  case 2 => 
-                    continuations.Continuation.checkResult($continuation.$result)
+                  case 2 => continuations.Continuation.checkResult($continuation.$result)
                   case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
                 }
             }
