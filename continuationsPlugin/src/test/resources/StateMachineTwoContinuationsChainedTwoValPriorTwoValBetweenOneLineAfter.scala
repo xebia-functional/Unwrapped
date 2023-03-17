@@ -7,9 +7,9 @@ package continuations {
   () extends Object() { this: continuations.compileFromString$package.type =>
     private def writeReplace(): AnyRef =
       new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-    class compileFromString$package$fooTest$1($completion: continuations.Continuation[Any | Null]) extends
-      continuations.jvm.internal.ContinuationImpl
-    ($completion, $completion.context) {
+    private class $fooTest$Frame($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion
+      ,
+    $completion.context) {
       var I$0: Any = _
       var I$1: Any = _
       var I$2: Any = _
@@ -52,25 +52,15 @@ package continuations {
         var z: Int = null
         var w: Int = null
         {
-          val $continuation:
-            continuations.compileFromString$package.
-              compileFromString$package$fooTest$1
-           =
+          val $continuation: continuations.compileFromString$package.$fooTest$Frame =
             completion match
               {
-                case
-                  x$0 @
-                    x$0:
-                      continuations.compileFromString$package.
-                        compileFromString$package$fooTest$1
-                 if x$0.$label.&(scala.Int.MinValue).!=(0) =>
+                case x$0 @ x$0:continuations.compileFromString$package.$fooTest$Frame if
+                  x$0.$label.&(scala.Int.MinValue).!=(0)
+                 =>
                   x$0.$label = x$0.$label.-(scala.Int.MinValue)
                   x$0
-                case _ =>
-                  new
-                    continuations.compileFromString$package.
-                      compileFromString$package$fooTest$1
-                  (completion)
+                case _ => new continuations.compileFromString$package.$fooTest$Frame(completion)
               }
           $continuation.$label match
             {
