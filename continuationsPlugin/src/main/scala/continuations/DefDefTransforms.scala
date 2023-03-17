@@ -811,10 +811,12 @@ object DefDefTransforms extends TreesChecks:
     val sourceParamsValsSymbols: List[TermSymbol] =
       transformedMethodParamsAsValSyms ++ globalVarsSyms
 
-    val continuationStateMachineI$NsSyms: List[TermSymbol] = {
-      val numVal = transformedMethodParamsValDefs.size + distinctVars.size
-      Range(0, numVal).toList.map(contFsmSym)
-    }
+    val continuationStateMachineI$NsSyms: List[TermSymbol] =
+      Range(0, sourceParamsValsSymbols.size).toList.map(contFsmSym)
+
+    def assignToField(pointer: TermSymbol, key: TermSymbol, value: tpd.Tree): tpd.Assign =
+      val ix = sourceParamsValsSymbols.indexOf(key)
+      tpd.Assign(ref(pointer).select(continuationStateMachineI$NsSyms(ix)), value)
 
     val continuationStateMachineClass: tpd.TypeDef =
 
@@ -1007,8 +1009,7 @@ object DefDefTransforms extends TreesChecks:
 
       val transformedMethodParamsAsVals: List[tpd.Tree] =
         transformedMethodParamsAsValSyms.zip(transformedMethodParamsValDefs).map {
-          case (sym, vd) =>
-            tpd.Assign(frameVar(sourceParamsValsSymbols.indexOf(sym)), ref(vd.symbol))
+          case (sym, vd) => assignToField(contSymbol, sym, ref(vd.symbol))
         }
 
       val getResult = ref(contSymbol).select(resultVarName)
@@ -1065,9 +1066,8 @@ object DefDefTransforms extends TreesChecks:
 
         def assignFrameVarResult(vd: tpd.ValDef): tpd.Assign = {
           val gvs = globalVarsSyms.find(matchesNameCoord(_, vd)).get
-          val ix = sourceParamsValsSymbols.indexOf(gvs)
           val resultValue = getResult.select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
-          tpd.Assign(frameVar(ix), resultValue)
+          assignToField(contSymbol, gvs, resultValue)
         }
 
         val assignResultToGlobalVar =
@@ -1080,10 +1080,7 @@ object DefDefTransforms extends TreesChecks:
             case vd: tpd.ValDef =>
               globalVarsSyms.find(_.denot.matches(vd.symbol)) match {
                 case None => vd
-                case Some(gv) =>
-                  val ix = sourceParamsValsSymbols.indexOf(gv)
-                  tpd.Assign(frameVar(ix), vd.rhs)
-
+                case Some(gv) => assignToField(contSymbol, gv, vd.rhs)
               }
             case _ => tree
 
@@ -1232,12 +1229,7 @@ object DefDefTransforms extends TreesChecks:
 
     val transformedMethodBody =
       substituteContinuation.transform(rhs) match
-        case Trees.Block(stats, expr) =>
-          flattenBlock(
-            blockOf(
-              stats ++
-                List(expr)
-            ))
+        case Trees.Block(stats, expr) => flattenBlock(blockOf(stats :+ expr))
         case tree => tree
 
     tpd.Thicket(
