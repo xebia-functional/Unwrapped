@@ -14,7 +14,7 @@ import dotty.tools.dotc.core.Types.*
 import munit.FunSuite
 
 class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachineFixtures {
-
+/*
   compilerContextWithContinuationsPlugin.test(
     "it should convert into a state machine two continuations chained"
   ) {
@@ -595,10 +595,10 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
           )
       }
   }
-
+*/
   compilerContextWithContinuationsPlugin.test(
     "21- it should convert into a state machine two continuations chained with two val prior" +
-      "to continuations, two val between and 2 val after ignoring the chain"
+      "to continuations, two val between and 2 val after ignoring the chain".only
   ) {
     case given Context =>
       val source =

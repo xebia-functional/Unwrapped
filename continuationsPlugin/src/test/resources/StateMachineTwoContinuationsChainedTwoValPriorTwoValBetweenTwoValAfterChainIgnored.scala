@@ -38,49 +38,28 @@ package continuations {
         this.create(p1, p2).asInstanceOf[(BaseContinuationImpl.this : continuations.jvm.internal.BaseContinuationImpl)].invokeSuspend(
           new Right[Unit, Unit](())
         )
-    }
-    def fooTest(x: Int, y: Int, completion: continuations.Continuation[Unit]):
-      Unit | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
-     =
-      {
-        var x##1: Int = x
-        var y##1: Int = y
-        var a: Int = null
-        var b: Int = null
-        var z: Int = null
+      def fooTest(x: Int, y: Int, completion: continuations.Continuation[Unit]):
+        Unit | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
+       =
         {
-          val $continuation:
-            continuations.compileFromString$package.
-              compileFromString$package$fooTest$1
-           =
-            completion match
-              {
-                case 
-                  x$0 @ 
-                    x$0:
-                      continuations.compileFromString$package.
-                        compileFromString$package$fooTest$1
-                 if x$0.$label.&(scala.Int.MinValue).!=(0) =>
-                  x$0.$label = x$0.$label.-(scala.Int.MinValue)
-                  x$0
-                case _ =>
-                  new
-                    continuations.compileFromString$package.
-                      compileFromString$package$fooTest$1
-                  (completion)
-              }
-          $continuation.$label match
+          var x##1: Int = x
+          var y##1: Int = y
+          var a: Int = null
+          var b: Int = null
+          var z: Int = null
+          compileFromString$package$fooTest$1.this.$label match
             {
               case 0 =>
-                continuations.Continuation.checkResult($continuation.$result)
+                continuations.Continuation.checkResult(compileFromString$package$fooTest$1.this.$result)
                 a = 1
                 b = 1
-                $continuation.I$0 = y##1
-                $continuation.I$1 = x##1
-                $continuation.I$2 = a
-                $continuation.I$3 = b
-                $continuation.$label = 1
-                val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
+                compileFromString$package$fooTest$1.this.I$0 = y##1
+                compileFromString$package$fooTest$1.this.I$1 = x##1
+                compileFromString$package$fooTest$1.this.I$2 = a
+                compileFromString$package$fooTest$1.this.I$3 = b
+                compileFromString$package$fooTest$1.this.$label = 1
+                val safeContinuation: continuations.SafeContinuation[Int] =
+                  continuations.SafeContinuation.init[Int](compileFromString$package$fooTest$1.this)
                 {
                   safeContinuation.resume(x##1.+(y##1).+(a))
                 }
@@ -92,22 +71,23 @@ package continuations {
                       return[label1] ()
                   }
               case 1 =>
-                y##1 = $continuation.I$0
-                x##1 = $continuation.I$1
-                a = $continuation.I$2
-                b = $continuation.I$3
-                continuations.Continuation.checkResult($continuation.$result)
-                z = $continuation.$result.asInstanceOf[Int]
+                y##1 = compileFromString$package$fooTest$1.this.I$0
+                x##1 = compileFromString$package$fooTest$1.this.I$1
+                a = compileFromString$package$fooTest$1.this.I$2
+                b = compileFromString$package$fooTest$1.this.I$3
+                continuations.Continuation.checkResult(compileFromString$package$fooTest$1.this.$result)
+                z = compileFromString$package$fooTest$1.this.$result.asInstanceOf[Int]
                 label1[Unit]: <empty>
                 val c: Int = a.+(b)
                 val d: Int = c.+(1)
-                $continuation.I$0 = y##1
-                $continuation.I$1 = x##1
-                $continuation.I$2 = a
-                $continuation.I$3 = b
-                $continuation.I$4 = z
-                $continuation.$label = 2
-                val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
+                compileFromString$package$fooTest$1.this.I$0 = y##1
+                compileFromString$package$fooTest$1.this.I$1 = x##1
+                compileFromString$package$fooTest$1.this.I$2 = a
+                compileFromString$package$fooTest$1.this.I$3 = b
+                compileFromString$package$fooTest$1.this.I$4 = z
+                compileFromString$package$fooTest$1.this.$label = 2
+                val safeContinuation: continuations.SafeContinuation[Int] =
+                  continuations.SafeContinuation.init[Int](compileFromString$package$fooTest$1.this)
                 {
                   safeContinuation.resume(z.+(c).+(d))
                 }
@@ -117,21 +97,21 @@ package continuations {
                     case orThrow @ <empty> => ()
                   }
               case 2 =>
-                y##1 = $continuation.I$0
-                x##1 = $continuation.I$1
-                a = $continuation.I$2
-                b = $continuation.I$3
-                z = $continuation.I$4
-                continuations.Continuation.checkResult($continuation.$result)
+                y##1 = compileFromString$package$fooTest$1.this.I$0
+                x##1 = compileFromString$package$fooTest$1.this.I$1
+                a = compileFromString$package$fooTest$1.this.I$2
+                b = compileFromString$package$fooTest$1.this.I$3
+                z = compileFromString$package$fooTest$1.this.I$4
+                continuations.Continuation.checkResult(compileFromString$package$fooTest$1.this.$result)
               case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
             }
+          val e: Int = z.+(1)
+          val f: Int = z.+(a)
+          {
+            e.+(f)
+            ()
+          }
         }
-        val e: Int = z.+(1)
-        val f: Int = z.+(a)
-        {
-          e.+(f)
-          ()
-        }
-      }
+    }
   }
 }
