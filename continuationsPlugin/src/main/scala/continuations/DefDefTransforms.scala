@@ -809,7 +809,7 @@ object DefDefTransforms extends TreesChecks:
         anyType).entered
 
     val sourceParamsValsSymbols: List[TermSymbol] =
-      (transformedMethodParamsAsValSyms ++ globalVarsSyms)
+      transformedMethodParamsAsValSyms ++ globalVarsSyms
 
     val continuationStateMachineI$NsSyms: List[TermSymbol] = {
       val numVal = transformedMethodParamsValDefs.size + distinctVars.size
@@ -1164,13 +1164,14 @@ object DefDefTransforms extends TreesChecks:
         )
       }
 
-      blockOf(List(
-        tpd.ValDef(contSymbol, completionMatch),
+      blockOf(
+        List(
+          tpd.ValDef(contSymbol, completionMatch),
           tpd.Match(
             ref(contSymbol).select(labelVarParam),
             Range(0, nonDefDefRowsBeforeSuspensionPointList.size).toList.map(toStateCase) ++
               List(lastCase, wrongStateCase))
-      ))
+        ))
 
     end transformSuspendTree
 

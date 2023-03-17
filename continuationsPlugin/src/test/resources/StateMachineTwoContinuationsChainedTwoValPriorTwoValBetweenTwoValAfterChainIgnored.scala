@@ -43,11 +43,6 @@ package continuations {
       Unit | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
      =
       {
-        var x##1: Int = x
-        var y##1: Int = y
-        var a: Int = null
-        var b: Int = null
-        var z: Int = null
         {
           val $continuation:
             continuations.compileFromString$package.
@@ -72,13 +67,11 @@ package continuations {
           $continuation.$label match
             {
               case 0 =>
+                $continuation.I$0 = x
+                $continuation.I$1 = y
                 continuations.Continuation.checkResult($continuation.$result)
-                a = 1
-                b = 1
-                $continuation.I$0 = y##1
-                $continuation.I$1 = x##1
-                $continuation.I$2 = a
-                $continuation.I$3 = b
+                $continuation.I$2 = 1
+                $continuation.I$3 = 1
                 $continuation.$label = 1
                 val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
                 {
@@ -92,20 +85,11 @@ package continuations {
                       return[label1] ()
                   }
               case 1 =>
-                y##1 = $continuation.I$0
-                x##1 = $continuation.I$1
-                a = $continuation.I$2
-                b = $continuation.I$3
                 continuations.Continuation.checkResult($continuation.$result)
-                z = $continuation.$result.asInstanceOf[Int]
+                $continuation.I$4 = $continuation.$result.asInstanceOf[Int]
                 label1[Unit]: <empty>
                 val c: Int = a.+(b)
                 val d: Int = c.+(1)
-                $continuation.I$0 = y##1
-                $continuation.I$1 = x##1
-                $continuation.I$2 = a
-                $continuation.I$3 = b
-                $continuation.I$4 = z
                 $continuation.$label = 2
                 val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int]($continuation)
                 {
@@ -116,13 +100,7 @@ package continuations {
                     case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
                     case orThrow @ <empty> => ()
                   }
-              case 2 =>
-                y##1 = $continuation.I$0
-                x##1 = $continuation.I$1
-                a = $continuation.I$2
-                b = $continuation.I$3
-                z = $continuation.I$4
-                continuations.Continuation.checkResult($continuation.$result)
+              case 2 => continuations.Continuation.checkResult($continuation.$result)
               case _ => throw new IllegalArgumentException("call to \'resume\' before \'invoke\' with coroutine")
             }
         }
