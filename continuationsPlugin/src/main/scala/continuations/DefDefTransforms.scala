@@ -847,8 +847,7 @@ object DefDefTransforms extends TreesChecks:
           tpd.Block(
             List(
               tpd.Assign(frameThis.select(resultVarName), paramss.head.head),
-              tpd.Assign(selectLabel, selectLabel.select(integerOR).appliedTo(integerMin)
-              )
+              tpd.Assign(selectLabel, selectLabel.select(integerOR).appliedTo(integerMin))
             ),
             ref(transformedMethod.symbol).appliedToTermArgs(
               List.fill(numTransformedMethodOriginalParams)(nullLiteral) :+ frameThis
