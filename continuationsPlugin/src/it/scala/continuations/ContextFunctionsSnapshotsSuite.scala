@@ -293,7 +293,7 @@ class ContextFunctionsSnapshotsSuite extends SnapshotSuite, CompilerFixtures:
       continuationsCompilerSnapshot(source)
   }
 
-  compilerContextWithContinuationsPlugin.snapshotTest("context function def-19") {
+  compilerContextWithContinuationsPlugin.snapshotTest("context function def-19".clear) {
     case given Context =>
       val source =
         """

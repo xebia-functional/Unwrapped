@@ -175,7 +175,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: compileFromString$package.type =>
            |    private def writeReplace(): AnyRef =
            |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
-           |    def foo(x: Int, completion: continuations.Continuation[Int | Any]): Any = x.+(1)
+           |    def foo(x: Int)(completion: continuations.Continuation[Int | Any]): Any = x.+(1)
            |  }
            |}
            |""".stripMargin
@@ -212,7 +212,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
-           |    def foo(x: Int, completion: continuations.Continuation[Int | Any]): Any = x.+(1)
+           |    def foo(x: Int)(completion: continuations.Continuation[Int | Any]): Any = x.+(1)
            |  }
            |}
            |""".stripMargin
@@ -249,7 +249,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
-           |    def foo(x: Int, z: String*, ec: concurrent.ExecutionContext, completion: continuations.Continuation[Int | Any]): Any = x.+(1)
+           |    def foo(x: Int, z: String*)(completion: continuations.Continuation[Int | Any])(ec: concurrent.ExecutionContext): Any = x.+(1)
            |  }
            |}
            |""".stripMargin
@@ -692,7 +692,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(x: Int, completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |    def foo(x: Int)(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
            |      {
            |        val continuation1: continuations.Continuation[Int] = completion
            |        val safeContinuation: continuations.SafeContinuation[Int] = continuations.SafeContinuation.init[Int](continuation1)
@@ -820,7 +820,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def foo(x: Int, completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
+           |    def foo(x: Int)(completion: continuations.Continuation[Int]): Any | Null | continuations.Continuation.State.Suspended.type = 
            |      {
            |        val y: Int = 5
            |        println("HI")

@@ -2,7 +2,7 @@ package examples
 
 import continuations.Suspend
 
-@main def TwoArgumentsTwoContinuations =
+@main def TwoArgumentsTwoContinuationss =
   def twoArgumentsTwoContinuations(x: Int, y: Int)(using Suspend): Int =
     summon[Suspend].shift[Unit] { continuation =>
       continuation.resume(println(x + y))
