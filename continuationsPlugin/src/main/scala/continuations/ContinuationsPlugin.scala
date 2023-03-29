@@ -23,6 +23,10 @@ import dotty.tools.dotc.core.Symbols
 import dotty.tools.dotc.report
 import java.io.StringWriter
 import java.io.PrintWriter
+import dotty.tools.dotc.ast.Trees.Tree
+import dotty.tools.dotc.core.Types.Type
+import scala.annotation.meta.param
+import dotty.tools.dotc.core.Types.RefinedType
 
 class ContinuationsPlugin extends StandardPlugin:
 
@@ -43,13 +47,11 @@ class ContinuationsPhase extends PluginPhase:
   override val runsAfter = Set(Staging.name)
   override val runsBefore = Set(ContinuationsCallsPhase.name)
 
-  override def transformValDef(tree: ValDef)(using Context): Tree =
-    println("transformValDef")
+  override def transformValDef(tree: ValDef)(using Context): tpd.Tree =
     DefDefTransforms.transformSuspendContinuation(tree)
 
-  override def transformDefDef(tree: DefDef)(using ctx: Context): Tree =
-    println("transformDefDef continuationsPhase")
-    try{
+  override def transformDefDef(tree: DefDef)(using ctx: Context): tpd.Tree =
+    try {
       DefDefTransforms.transformSuspendContinuation(tree)
     } catch {
       case e: Throwable =>
@@ -79,20 +81,23 @@ class ContinuationsCallsPhase extends PluginPhase:
   override val runsAfter = Set(ContinuationsPhase.name)
   override val runsBefore = Set(PickleQuotes.name)
 
-  def isSuspend(t: Tree)(using Context): Boolean =
+  def isSuspend(t: tpd.Tree)(using Context): Boolean =
     t.symbol.info.hasClassSymbol(requiredClass(suspendFullName))
-  def isGivenSuspend(t: Tree)(using Context): Boolean =
+  def isGivenSuspend(t: tpd.Tree)(using Context): Boolean =
     t.symbol.originalOwner.showFullName == suspendFullName
 
   private val updatedMethods: mutable.ListBuffer[Symbol] = mutable.ListBuffer.empty
-  private val applyToChange: mutable.ListBuffer[Tree] = ListBuffer.empty
+  private val applyToChange: mutable.ListBuffer[tpd.Tree] = ListBuffer.empty
 
-  private def existsTree(tree: Tree)(using Context): Option[Symbol] =
+  private def existsTree(tree: tpd.Tree)(using Context): Option[Symbol] =
     updatedMethods.find { s =>
-      tree.existsSubTree(t => s.name == t.symbol.name && s.coord == t.symbol.coord)
+      tree.existsSubTree(t =>
+        s.name.show == t.symbol.name.show && s
+          .paramSymss
+          .exists(_.exists(_.info.hasClassSymbol(requiredClass(continuationFullName)))))
     }
 
-  private def findTree(tree: Tree)(using Context): Option[Symbol] =
+  private def findTree(tree: tpd.Tree)(using Context): Option[Symbol] =
     updatedMethods.find(s => s.name == tree.symbol.name && s.coord == tree.symbol.coord)
 
   private def treeIsSuspendAndNotInApplyToChange(tree: Apply)(using Context): Boolean =
@@ -105,21 +110,20 @@ class ContinuationsCallsPhase extends PluginPhase:
       n.asTermName == nme.apply &&
       treeIsSuspendAndNotInApplyToChange(tree)
 
-  private def removeSuspend(trees: List[Tree])(using Context): List[Tree] =
+  private def removeSuspend(trees: List[tpd.Tree])(using Context): List[tpd.Tree] =
     trees.filterNot(_.tpe.hasClassSymbol(requiredClass(suspendFullName)))
 
-  private def treeExistsAndIsMethod(tree: Tree)(using Context): Boolean =
+  private def treeExistsAndIsMethod(tree: tpd.Tree)(using Context): Boolean =
     existsTree(tree).exists(_.is(Flags.Method))
 
-  private def treeExistsIsApplyAndIsMethod(tree: Tree, n: Name)(using Context): Boolean =
+  private def treeExistsIsApplyAndIsMethod(tree: tpd.Tree, n: Name)(using Context): Boolean =
     n.asTermName == nme.apply &&
       treeExistsAndIsMethod(tree)
 
   def hasContinuationParam(tree: DefDef)(using Context): Boolean =
     tree.termParamss.flatten.exists { p =>
       !p.symbol.is(Flags.Given) &&
-      p.tpt.tpe.matches(requiredClassRef(continuationFullName)) &&
-      p.name.toString == completionParamName
+      p.tpt.tpe.matches(requiredClassRef(continuationFullName))
     }
 
   /**
@@ -135,38 +139,55 @@ class ContinuationsCallsPhase extends PluginPhase:
    *   The original context unchanged.
    */
   override def prepareForDefDef(tree: DefDef)(using Context): Context =
-    println("prepareForDefDef")
+    println(s"prepareForDefDef ${tree.show}")
     if (hasContinuationParam(tree))
       updatedMethods.addOne(tree.symbol)
+      println(s"updatedMethods after add: $updatedMethods")
     tree.foreachSubTree {
       case a @ Apply(_, _) if hasContinuationParam(tree) =>
+        println(s"non applyToChangeAddingApply ${a.show}")
         a.removeAttachment(CallerKey)
         a.putAttachment(CallerKey, Caller(tree))
       case a @ Apply(_, _) if hasContinuationParam(tree) =>
+        println(s"non applyToChangeAddingApply ${a.show}")
         a.removeAttachment(CallerKey)
         a.putAttachment(CallerKey, Caller(tree))
       case a @ Apply(Apply(_, _), _)
           if existsTree(tree).nonEmpty && treeIsSuspendAndNotInApplyToChange(a) =>
+        println(s"applyToChangeAddingApply ${a.show}")
         applyToChange.addOne(a)
       case a @ Apply(Select(_, selected), _)
           if treeExistsIsApplyAndIsNotInApplyToChange(a, selected) =>
+        println(s"applyToChangeAddingApply ${a.show}")
         applyToChange.addOne(a)
       case a @ Apply(TypeApply(Select(_, selected), _), _)
           if treeExistsIsApplyAndIsNotInApplyToChange(a, selected) =>
+        println(s"applyToChangeAddingApply ${a.show}")
         applyToChange.addOne(a)
       case a @ Apply(Ident(_), _)
           if findTree(a).nonEmpty && treeIsSuspendAndNotInApplyToChange(a) =>
+        println(s"applyToChangeAddingApply ${a.show}")
         applyToChange.addOne(a)
-      case t => ()
+      case t =>
+        if (t.show.startsWith("twoArgumentsTwoContinuations")) {
+          println(s"unknown tree: ${t.show}")
+          println(s"unknown tree: $t")
+        }
+        ()
     }
     ctx
 
   extension (s: Symbol)
-    def firstParamSyms(using Context): Option[( (Symbol, Int),Int)] = s
-      .paramSymss.zipWithIndex.find(_._1.exists(_.info.hasClassSymbol(requiredClass(continuationFullName)))).flatMap( pc =>
-        
+    def firstParamSyms(using Context): Option[((Symbol, Int), Int)] = s
+      .paramSymss
+      .zipWithIndex
+      .find(_._1.exists(_.info.hasClassSymbol(requiredClass(continuationFullName))))
+      .flatMap(pc =>
         // reviewer request for comment -- do we have a isContinuation anywhere?
-        pc._1.zipWithIndex.find(_._1.info.hasClassSymbol(requiredClass(continuationFullName))).map( foundCompletionPc => (foundCompletionPc, pc._2)))
+        pc._1
+          .zipWithIndex
+          .find(_._1.info.hasClassSymbol(requiredClass(continuationFullName)))
+          .map(foundCompletionPc => (foundCompletionPc, pc._2)))
 
   /**
    * Because TreeTypeMap recurses, to prevent extra additional completion arguments we manually
@@ -182,21 +203,28 @@ class ContinuationsCallsPhase extends PluginPhase:
    * @return
    *   A new GenericApply with the correct arguments applied with the correct owners
    */
-  def deconstructNestedApply(tree: Apply, accumulator: List[List[Tree]])(using Context): Tree =
+  def deconstructNestedApply(tree: Apply, accumulator: List[List[tpd.Tree]])(
+      using Context): tpd.Tree =
     println("deconstructNestedApply")
-    val defaultContinuation: Tree = ref(
+    val defaultContinuation: tpd.Tree = ref(
       requiredModule("continuations.jvm.internal.ContinuationStub").requiredMethod("contImpl"))
     tree match {
       case Apply(Select(fn @ Apply(_, _), selected), args) =>
-        // println(s"deconstructNestedApply ${tree.show}")
+        println(s"deconstructNestedApply Select ${tree.show}")
         val newArgs = args.filterNot(isSuspend)
         val deconstructedInnerApply = deconstructNestedApply(fn, Nil)
         if (newArgs.isEmpty) deconstructedInnerApply
         else Select(deconstructNestedApply(fn, Nil), selected).appliedToTermArgs(newArgs)
       case Apply(b @ Apply(_, _), _) =>
+        println(s"deconstructNestedApply Apply Apply ${tree.show}")
         deconstructNestedApply(b, tree.args :: accumulator)
-      case Apply(fn, args) =>
+      case Apply(fn @ TypeApply(_, tfnArgs), args) =>
+
+        println(s"deconstructNestedApply 222 Apply ${tree.show}, ${accumulator}")
+        println(s"deconstructNestedApply 223 Apply tree $tree")
+        println(s"updatedMethods $updatedMethods")
         val newSym = existsTree(fn).get
+        println(newSym.defTree)
         val symRef = ref(newSym)
         val caller = tree.getAttachment(CallerKey)
         // we can use Option#get in these calls because in
@@ -206,42 +234,71 @@ class ContinuationsCallsPhase extends PluginPhase:
         println(completionIndex)
 
         val completionRef = if (caller.isDefined) {
+          println("caller isDefined")
           // again, we can use Option#get here because we have just
           // checked to see if the caller is defined.
           (for {
             Caller(t) <- caller
-            ((completionSymbol, completionIndex), completionSymbolParamClauseIndex) <- t.symbol.firstParamSyms
+            ((completionSymbol, completionIndex), completionSymbolParamClauseIndex) <- t
+              .symbol
+              .firstParamSyms
           } yield ref(completionSymbol).changeOwner(newSym, existsTree(t).get.owner)).get
         } else defaultContinuation
-        val argsWithoutSuspend = args.filterNot(isSuspend)
 
-        val finalApply = if (accumulator.isEmpty) {
-          symRef.appliedTo(completionRef)
-        } else if(argsWithoutSuspend.isEmpty) {
-          val accumulatorHead = accumulator.head
-          accumulator.drop(1).foldLeft((symRef.appliedToArgs(accumulatorHead), 1)){
-            case ((currentApply, index), nextArgs) =>
-              if(index == completionIndex) {
-                val newApply = currentApply.appliedTo(completionRef)
-                if(nextArgs.filterNot(isSuspend).isEmpty){
-                  (newApply, index + 1)
-                } else (newApply.appliedToArgs(nextArgs.filterNot(isSuspend)), index + 1)
-              } else if(nextArgs.filterNot(isSuspend).isEmpty){
-                (currentApply, index + 1)
-              } else (currentApply.appliedToArgs(nextArgs.filterNot(isSuspend)), index + 1)
-          }._1
-        } else accumulator.foldLeft((symRef.appliedToArgs(argsWithoutSuspend), 0)){
-            case ((currentApply, index), nextArgs) =>
-              if(index == completionIndex) {
-                val newApply = currentApply.appliedTo(completionRef)
-                if(nextArgs.filterNot(isSuspend).isEmpty){
-                  (newApply, index + 1)
-                } else (newApply.appliedToArgs(nextArgs.filterNot(isSuspend)), index + 1)
-              } else if(nextArgs.filterNot(isSuspend).isEmpty){
-                (currentApply, index + 1)
-              } else (currentApply.appliedToArgs(nextArgs.filterNot(isSuspend)), index + 1)
-        }._1
-        // println(s"finalApply: ${finalApply.show}")
+        val argsWithoutSuspend: List[Tree[Type]] = args.filterNot(isSuspend)
+
+        val argsWithCompletion = (argsWithoutSuspend :: accumulator).insertAt(completionIndex, List(completionRef))
+
+        val combinedParamClauses =
+          if(newSym.paramSymss.exists(_.exists(_.isType))){
+            tfnArgs :: argsWithCompletion
+          } else argsWithCompletion
+
+        val filteredParamClauses =
+          combinedParamClauses.map(_.filterNot(isSuspend)).filter(_.nonEmpty)
+
+        println(s"filteredParamClauses: ${filteredParamClauses}")
+
+        val finalApply = symRef.appliedToArgss(filteredParamClauses)
+        println(s"final apply tree: $finalApply")
+        println(s"final apply: ${finalApply.show}")
+        finalApply
+      case Apply(fn, args) =>
+        println(s"deconstructNestedApply 292 Apply ${tree.show}")
+        println(s"deconstructNestedApply 292 Apply tree $tree")
+        val newSym = existsTree(fn).get
+        val symRef = ref(newSym)
+        val caller = tree.getAttachment(CallerKey)
+        // we can use Option#get in these calls because in
+        // prepareForDefDef we have identified all the applies that
+        // must change, so we know that the Options will not be None.
+        val (_, completionIndex) = newSym.firstParamSyms.get
+
+        val completionRef = if (caller.isDefined) {
+          println("caller isDefined")
+          // again, we can use Option#get here because we have just
+          // checked to see if the caller is defined.
+          (for {
+            Caller(t) <- caller
+            ((completionSymbol, completionIndex), completionSymbolParamClauseIndex) <- t
+              .symbol
+              .firstParamSyms
+          } yield ref(completionSymbol).changeOwner(newSym, existsTree(t).get.owner)).get
+        } else defaultContinuation
+
+        val argsWithoutSuspend: List[Tree[Type]] = args.filterNot(isSuspend)
+
+        val combinedParamClauses =
+          (argsWithoutSuspend :: accumulator).insertAt(completionIndex, List(completionRef))
+
+        
+
+        val filteredParamClauses =
+          combinedParamClauses.map(_.filterNot(isSuspend)).filter(_.nonEmpty)
+
+        val finalApply = symRef.appliedToArgss(filteredParamClauses)
+
+        println(s"finalApply: ${finalApply}")
         finalApply
     }
 
@@ -257,18 +314,24 @@ class ContinuationsCallsPhase extends PluginPhase:
    */
   override def transformDefDef(defDefTree: tpd.DefDef)(using Context): tpd.Tree =
     println("transformDefDef")
+    println(s"applyToChange: ${applyToChange}")
     TreeTypeMap(
       treeMap = {
-        case tree @ Apply(fn, args) if applyToChange.exists(_.sameTree(tree)) =>
-          println(s"will change args to nearest completion or default: ${tree}")
-          val replacement = deconstructNestedApply(tree, Nil)
-          replacement
+        // case tree @ Apply(fn, args) if applyToChange.exists(_.sameTree(tree)) =>
+        //   println(s"will change args to nearest completion or default: ${tree}")
+        //   println(s"existsTree(fn): ${existsTree(fn)}")
+        //   val possibleNewTree = TreeTypeMap(substTo = List(existsTree(fn).get), substFrom = List(fn.symbol))(tree)
+        //   println(s"oldTree show: ${tree.show}")
+        //   println(s"possibleNewTree: ${possibleNewTree.show}")
+        //   val replacement = deconstructNestedApply(tree, Nil)
+        //   replacement
         case tree @ Apply(fn, args) if args.exists(isSuspend) =>
-          println(s"will deconstruct suspended arg: ${tree}")
+          println(s"will deconstruct suspended arg with isSuspend: ${tree}")
+          println(s"existsTree(fn): ${existsTree(fn)}")
           val replacement = deconstructNestedApply(tree, Nil)
-          replacement
+          TreeTypeMap(substTo = List(existsTree(fn).get), substFrom = List(fn.symbol), newOwners = List(existsTree(fn).get), oldOwners = List(fn.symbol))(replacement)
         case tree @ Apply(_, _) =>
-          println(s"unchanged apply: ${tree}")
+          // println(s"unchanged apply: ${tree}")
           tree
         case t => t
       }
@@ -286,7 +349,7 @@ object ContinuationsCallsPhase {
    * @param t
    *   The caller
    */
-  case class Caller(t: Tree)
+  case class Caller(t: tpd.Tree)
 
   /**
    * A dotty Property.Key[V] class to use to add attachments to Apply trees that contain the

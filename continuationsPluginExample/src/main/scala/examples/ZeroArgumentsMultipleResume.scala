@@ -11,3 +11,4 @@ import scala.util.Try
       c.resume( { println("Resume2"); 2 })
     }
   println(Try(zeroArgumentsMultipleResume()))
+

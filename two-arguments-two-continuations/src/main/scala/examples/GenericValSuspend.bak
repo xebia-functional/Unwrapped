@@ -1,0 +1,43 @@
+package examples
+
+// import continuations.*
+
+// val foo:  Suspend ?=> [A] => List[A] => Int = [A] => (list: List[A]) => list.size
+
+// @main def GenericValSuspend =
+//   foo(List(1))
+
+// List(
+//   List(
+//     ValDef(
+//       completion,
+//       TypeTree[
+//         AppliedType(
+//           TypeRef(ThisType(TypeRef(NoPrefix,
+//             module class continuations)),
+//             trait Continuation),
+//           List(OrType(RefinedType(TypeRef(ThisType(TypeRef(NoPrefix,
+//             module class scala)),
+//             trait PolyFunction),
+//             apply,
+//             PolyType(List(A),
+//               List(TypeBounds(TypeRef(ThisType(TypeRef(NoPrefix,
+//                 module class scala)),
+//                 class Nothing),
+//                 TypeRef(ThisType(TypeRef(NoPrefix,
+//                   module class scala)),
+//                   class Any))),
+//               MethodType(List(x$1),
+//                 List(AppliedType(TypeRef(ThisType(TypeRef(NoPrefix,
+//                   module class immutable)),
+//                   class List),
+//                   List(TypeParamRef(A)))),
+//                 TypeRef(TermRef(ThisType(TypeRef(NoPrefix,
+//                   module class <root>)),
+//                   object scala),
+//                   class Int)))),
+//             TypeRef(ThisType(TypeRef(NoPrefix,
+//               module class scala)),
+//               class Any))))
+//       ],EmptyTree)
+//   ))
