@@ -9,9 +9,12 @@ import scala.annotation.tailrec
   */
 sealed trait Colour
 sealed trait Red extends Colour
-sealed trait Green extends Red // green is stronger than red: 
+sealed trait Green extends Colour // green is stronger than red:
 
-trait Suspend[- L <: Colour] // suspend: we want Suspend[Red] to substitute for a Suspend[Green]
+trait Lane[C <: Colour]
+trait Road[+ L]
+
+type Suspend[C <: Colour] = Road[Lane[C]]
 
 implicit def greenWash[A, B](f: A => B): (A => Suspend[Green] => B) = ???
 
@@ -40,7 +43,7 @@ extension [A](list: List[A]) {
     go(list)
     buf.toList
 
-  def mapC[B, C <: Colour](f: A => Suspend[C] ?=> B)(using Suspend[C]): List[B] = {
+  def mapC[B, C <: Colour](f: A => Road[Lane[C]] ?=> B)(using Road[Lane[C]]): List[B] = {
     val buf = ListBuffer.empty[B]
     @tailrec
     def go(ys: List[A]): Unit = ys match {
@@ -56,6 +59,9 @@ extension [A](list: List[A]) {
 
 given g: Suspend[Green] = new Suspend[Green] {}
 //given r: Suspend[Red] = new Suspend[Red] {}
+
+given bothColours(using Road[Lane[Red]]): Road[Lane[Green] & Lane[Red]] =
+  new Road[Lane[Green] & Lane[Red]] {}
 
 def fili(i: Int)(using Suspend[Green]): Char = ???
 def kili(i: Int)(using Suspend[Red]): Char = ???
@@ -96,9 +102,9 @@ def kilisSQ(using Suspend[Red]) = sudoku.mapSq(kili)
 
 
 def composeC[X, Y, Z, C <: Colour, D <: Colour](
-  pre: X => Suspend[C] ?=> Y,
-  post: Y => Suspend[D] ?=> Z):
-    X => Suspend[C | D] ?=> Z =
+  pre:  X => Road[Lane[C]] ?=> Y,
+  post: Y => Road[Lane[D]] ?=> Z
+): X => Road[Lane[C] & Lane[D]] ?=> Z =
   (x: X) => post(pre(x))
 
 
@@ -148,7 +154,7 @@ def valentine[C <: Colour, D <: Colour, E <: Colour](plants: List[Int])(
   select: Int => Suspend[C] ?=> Boolean,
   roses: Int => Suspend[D] ?=> Char)(
   violets: Int => Suspend[E] ?=> Char)(
-  using Suspend[C | D | E]
+  using Road[Lane[C] & Lane[D] & Lane[E]]
 ): List[Char] =
   plants.map( (p: Int) => if (select(p)) roses(p) else violets(p))
 
