@@ -101,6 +101,12 @@ def composeC[X, Y, Z, C <: Colour, D <: Colour](
     X => Suspend[C | D] ?=> Z =
   (x: X) => post(pre(x))
 
+def compose3C[W, X, Y, Z, C <: Colour, D <: Colour, E <: Colour](
+  pre: W => Suspend[C] ?=> X,
+  mid: X => Suspend[D] ?=> Y,
+  pos: Y => Suspend[E] ?=> Z
+): W => Suspend[C | D | E] ?=> Z =
+  composeC(composeC(pre, mid), pos)
 
 def dori[A <: Colour](i: Int)(using Suspend[A]): Int = i * i
 def ori(i: Int)(using Suspend[Green]): Int = i * 2
@@ -116,13 +122,13 @@ def noriori(i: Int)(using Suspend[Red]): Int = composeC(nori, ori)(i)
 def orinori(i: Int)(using Suspend[Red]): Int = composeC(ori, nori)(i)
 def norinori(i: Int)(using Suspend[Red]): Int = composeC(nori, nori)(i)
 
-def oridorinori(i: Int)(using Suspend[Red]): Int = composeC(composeC(ori, dori), nori)(i)
+def oridorinori(i: Int)(using Suspend[Red]): Int = compose3C(ori, dori, nori)(i)
 
 /** Potentially we can also build point-free declarations.
   * 
   * But what would they compile to? 
  */
-def oridorinoriPF: Int => Suspend[Red] ?=> Int = composeC(composeC(ori, dori[Green]), nori)
+def oridorinoriPF: Int => Suspend[Red] ?=> Int = compose3C(ori, dori, nori)
 
 /**
   So, why are all of these examples relevant? It shows that colour-polymorphism fixes many of the problems of "What colour is your function"
