@@ -135,9 +135,7 @@ package continuations {
           override def create(value: Any | Null, completion: continuations.Continuation[Any | Null]): continuations.Continuation[Unit] =
             new continuations.jvm.internal.BaseContinuationImpl(completion)
           protected def invoke(p1: Any | Null, p2: continuations.Continuation[Any | Null]): Any | Null =
-            this.create(p1, p2).asInstanceOf[(BaseContinuationImpl.this : continuations.jvm.internal.BaseContinuationImpl)].invokeSuspend(
-              new Right[Unit, Unit](())
-            )
+            this.create(p1, p2).asInstanceOf[(BaseContinuationImpl.this : continuations.jvm.internal.BaseContinuationImpl)].invokeSuspendDummy
         }
         def fooTest(a: A, b: B, completion: continuations.Continuation[B]):
           B | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)

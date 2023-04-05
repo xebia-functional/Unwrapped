@@ -38,6 +38,9 @@ abstract class BaseContinuationImpl(
   protected def invokeSuspend(
       result: Either[Throwable, Any | Null | Continuation.State.Suspended.type]): Any | Null
 
+  protected def invokeSuspendDummy: Unit =
+    invokeSuspend(Right[Nothing, Unit](()))
+
   protected def releaseIntercepted(): Unit = ()
 
   def create(completion: Continuation[?]): Continuation[Unit] =
