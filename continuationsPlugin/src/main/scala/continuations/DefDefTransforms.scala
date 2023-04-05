@@ -891,26 +891,11 @@ object DefDefTransforms extends TreesChecks:
       val invokeMethod = tpd.DefDef(
         invokeSymbol,
         paramss =>
-          val newContinuation = ref(createMethod.symbol).appliedToTermArgs(
-            List(paramss.head.head, paramss.head.drop(1).head)
-          )
-          val dummy = tpd
-            .New(requiredClassRef("scala.util.Right"))
-            .select(nme.CONSTRUCTOR)
-            .appliedToTypes(
-              List(defn.UnitType, defn.UnitType)
-            )
-            .appliedTo(
-              tpd.Literal(Constant(()))
-            )
-
-          newContinuation
+          ref(createMethod.symbol)
+            .appliedToTermArgs(paramss.head.take(2))
             .select(nme.asInstanceOf_)
             .appliedToType(baseContinuationImplClassRef.symbol.thisType)
-            .select(termName("invokeSuspend"))
-            .appliedTo(
-              dummy
-            )
+            .select(termName("invokeSuspendDummy"))
       )
 
       val extendsContImpl: tpd.Tree =
