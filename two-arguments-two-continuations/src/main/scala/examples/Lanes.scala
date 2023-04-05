@@ -76,7 +76,7 @@ def callMapManyTimes(xs: List[Int])(using Suspend[Red]): List[Char] =
   a ++ b
 
 /** mapSQ: we define new higher-order functions out of existing higuer-order functions
-  */
+u  */
 extension[A] (xss: List[List[A]])
   def mapSq[B, C <: Colour](f: A => Suspend[C] ?=> B)(using Suspend[C]): List[List[B]] =
     xss.mapC(_.mapC(f))
@@ -94,12 +94,72 @@ def kilisSQ(using Suspend[Red]) = sudoku.mapSq(kili)
 //): List[Char] =
 //  xs.camaleonMap(ori) ++ xs.camaleonMap(nori)
 
-
 def composeC[X, Y, Z, C <: Colour, D <: Colour](
   pre: X => Suspend[C] ?=> Y,
   post: Y => Suspend[D] ?=> Z):
     X => Suspend[C | D] ?=> Z =
   (x: X) => post(pre(x))
+
+
+// 
+
+// composeC Red Lane:
+
+class composeCRedLaneFSM {
+
+  // state machine
+
+  def invoke(
+    pre: (X, Y => K) => K,
+    post: (Y, (Z => K)) => K,
+    x: X,
+    k: Z => K
+  ): Suspended | Either[Throwable, Any] =
+    pre(x, (y => post(y, k)))
+    
+}
+// 
+//  |invoke(pre, post, x, k)|
+//  |pre(x, (\ y -> post(y, k))) |
+//  ----------
+//  |(\ y -> post(y, k)) @ yy |
+//  |post(yy, k) |
+//  ----------
+//  |k(z)|
+//
+
+
+//
+// |ComposeC 0| -----> pre(x, comp)
+// |ComposeC 1 (y)|
+// |ComposeC 2| -----> post(y, comp)
+// |ComposeC 3 (z)|
+// z
+
+// Red ComposeC:
+   
+def composeC_Red[X, Y, Z](
+  pre: (X, Comp) => Y | Stop,
+  post: (Y, Comp) => Z | Stop,
+  k: Comp,
+  x: X
+): Z | Stop =
+  val y = await(pre(x, k), k)
+  post(y, k)
+
+
+
+// Delimit ---> fooo --> ComposeC(comp) ---> pre(comp)  //
+//
+// PreFSM (completion, local variables/parameters of source pre, state Label) ----> SafeContinuation(preFSM)
+//                                                                        ^<--------|
+
+
+//  new DelimitFSM() 
+//   ^< new FooFSM()
+//       ^< new ComposeCFSM(comp)
+//           ^< new PreFSM(comp)
+
 
 def compose3C[W, X, Y, Z, C <: Colour, D <: Colour, E <: Colour](
   pre: W => Suspend[C] ?=> X,
@@ -107,6 +167,8 @@ def compose3C[W, X, Y, Z, C <: Colour, D <: Colour, E <: Colour](
   pos: Y => Suspend[E] ?=> Z
 ): W => Suspend[C | D | E] ?=> Z =
   composeC(composeC(pre, mid), pos)
+
+// Full red lane: all three are suspended
 
 def dori[A <: Colour](i: Int)(using Suspend[A]): Int = i * i
 def ori(i: Int)(using Suspend[Green]): Int = i * 2
@@ -123,6 +185,28 @@ def orinori(i: Int)(using Suspend[Red]): Int = composeC(ori, nori)(i)
 def norinori(i: Int)(using Suspend[Red]): Int = composeC(nori, nori)(i)
 
 def oridorinori(i: Int)(using Suspend[Red]): Int = compose3C(ori, dori, nori)(i)
+
+def orioriori(i: Int)(using Suspend[Green]): Int = compose3C(ori, ori, ori)(i)
+
+// two variants: green, red
+def orioriNext[E <: Colour]
+  (next: Int => Suspend[E] ?=> Int)
+  (i: Int)
+  (using Suspend[E])
+    : Int =
+  compose3C(ori, ori, next)
+
+// Red / Green variants: 
+
+def orioriNextGreen(next: Int => Int)(i: Int): Int =
+  compose3C_Green(ori, ori, next)
+
+def orioriNextRed(next: Int => Suspend[Red] ?=> Int)(i: Int)(using Suspend[Red]): Int =
+  compose3C_Red( redrun(ori), redrun(ori), next)
+
+
+
+
 
 /** Potentially we can also build point-free declarations.
   * 
@@ -191,3 +275,23 @@ class Nori extends Dwarven[Red] {
 //  val dwa = if ((i & 1) == 0) new Ori else new Nori
 //  dwa.dig(i)
 //
+
+
+  /** The following is an example from "Kotlin Coroutines: Design and Implementation",
+    the paper from Roman Elizarov and others. It comes from Section 6.1 on the
+    limitations of "Colour-Transparency"
+
+    */
+
+extension [A] (list: List[A])
+
+  @tailrec
+  def foreach[C <: Colour](foo: A => Suspend[C] ?=> Unit)(using Suspend[C]): Unit =
+    list match {
+      case x :: xs => foo(x) ; xs.foreach(foo)
+      case Nil => ()
+    }
+
+
+def invokeAll(actions: List[Unit => Suspend[Red] ?=> Unit])(using Suspend[Red]) =
+  actions.foreach(_.apply(()))
