@@ -134,7 +134,7 @@ object DefDefTransforms extends TreesChecks:
       case t @ Trees.DefDef(_, _, _, _) =>
         t.symbol.exists &&
           t.symbol.isAnonymousFunction &&
-          t.symbol.paramSymss.exists(_.exists(hasContinuationClass))
+          t.symbol.paramSymss.exists2(hasContinuationClass)
       case tree @ Trees.Select(_, name) =>
         belongsToContinuation(tree.symbol) &&
           (name.show == resumeMethodName || name.show == raiseMethodName)
@@ -151,7 +151,7 @@ object DefDefTransforms extends TreesChecks:
 
     val hypothesis = new TreeTypeMap(
       treeMap = {
-        case t: tpd.DefDef if t.paramss.exists(_.exists(p => hasContinuationClass(p.symbol))) =>
+        case t: tpd.DefDef if t.paramss.exists2(p => hasContinuationClass(p.symbol)) =>
           t.rhs
         case Trees.Apply(fun, args) if fun.symbol.name.show == shiftName =>
           if (args.isEmpty) {
@@ -188,7 +188,7 @@ object DefDefTransforms extends TreesChecks:
       .filterSubTrees { t =>
         val owner = t.symbol.maybeOwner
         owner.isAnonymousFunction &&
-        owner.paramSymss.exists(_.exists(hasContinuationClass))
+        owner.paramSymss.exists2(hasContinuationClass)
       }
       .map(_.symbol.maybeOwner)
 
@@ -334,10 +334,7 @@ object DefDefTransforms extends TreesChecks:
       tpd.DefDef(sym = transformedMethodSymbol)
 
     val completionParam =
-      transformedMethod
-        .termParamss
-        .flatMap(_.find(_.symbol.denot.matches(completion)))
-        .headOption
+      transformedMethod.termParamss.find2(_.symbol.denot.matches(completion))
 
     val cont1Symbol: TermSymbol =
       newSymbol(
@@ -468,9 +465,9 @@ object DefDefTransforms extends TreesChecks:
             def fillFlags(s: Symbol): Symbol = {
               val existingFlags =
                 params
-                  .flatten
-                  .find(_.name == s.name)
-                  .map(_.symbol.flags)
+                  .collectFirstOption2 { p =>
+                    if p.name == s.name then Some(p.symbol.flags) else None
+                  }
                   .getOrElse(Flags.EmptyFlags)
               s.setFlag(existingFlags)
               s
@@ -492,7 +489,7 @@ object DefDefTransforms extends TreesChecks:
               ))
         case tpd.Block(List(defdef: tpd.DefDef), _)
             if defdef.symbol.isAnonymousFunction &&
-              defdef.paramss.forall(_.forall(x => hasSuspendClass(x.symbol))) =>
+              defdef.paramss.forall2(p => hasSuspendClass(p.symbol)) =>
           new TreeTypeMap(
             oldOwners = List(defdef.symbol),
             newOwners = newAnonFunctions.lastOption.toList
@@ -500,9 +497,7 @@ object DefDefTransforms extends TreesChecks:
         case c: tpd.Closure =>
           // Any param of an anonymous function matches a param of the Closure
           def clashesParam(anonFun: Symbol): Boolean =
-            anonFun
-              .paramSymss
-              .exists(_.exists(s => c.meth.symbol.paramSymss.exists(_.exists(_.matches(s)))))
+            anonFun.paramSymss.exists2(s => c.meth.symbol.paramSymss.exists2(_.matches(s)))
           newAnonFunctions.find(clashesParam) match {
             case None => c
             case Some(anon) => tpd.Closure(c.env, ref(anon), c.tpt)
@@ -661,11 +656,7 @@ object DefDefTransforms extends TreesChecks:
       tpd.DefDef(sym = transformedMethodSymbol)
 
     val transformedMethodCompletionSym =
-      transformedMethod
-        .termParamss
-        .flatMap(_.find(_.symbol.denot.matches(completion)))
-        .head
-        .symbol
+      transformedMethod.termParamss.find2(_.symbol.denot.matches(completion)).get.symbol
 
     val transformedMethodParamsWithoutCompletion =
       transformedMethod.termParamss.map(_.filterNot(_.symbol.denot.matches(completion)))
@@ -675,8 +666,7 @@ object DefDefTransforms extends TreesChecks:
 
     val $completion = frameClassConstructor
       .termParamss
-      .flatten
-      .find(_.name.matchesTargetName(completionParamName))
+      .find2(_.name.matchesTargetName(completionParamName))
       .get
       .symbol
 
@@ -1221,14 +1211,10 @@ object DefDefTransforms extends TreesChecks:
             if tt.symbol.exists &&
               tt.symbol.is(TermParam) &&
               tt.symbol.owner.denot.matches(tree.symbol) &&
-              transformedMethodParamsWithoutCompletion.exists(
-                _.exists(_.symbol.denot.matches(tt.symbol))) &&
-              transformedMethodParamsAsValSyms.exists(
-                _.exists(fieldMatchesParam(_, tt.symbol))) =>
-          ref(
-            transformedMethodParamsAsValSyms
-              .flatMap(_.find(fieldMatchesParam(_, tt.symbol)))
-              .head)
+              transformedMethodParamsWithoutCompletion.exists2(
+                _.symbol.denot.matches(tt.symbol)) &&
+              transformedMethodParamsAsValSyms.exists2(fieldMatchesParam(_, tt.symbol)) =>
+          ref(transformedMethodParamsAsValSyms.find2(fieldMatchesParam(_, tt.symbol)).get)
         case tree =>
           tree
       },
