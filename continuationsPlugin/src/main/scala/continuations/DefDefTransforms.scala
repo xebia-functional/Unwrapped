@@ -781,9 +781,8 @@ object DefDefTransforms extends TreesChecks:
       transformedMethodParamsValDefs.map(_.map(toParamsAsVal))
 
     val transformedMethodParamsAsVals: List[List[tpd.Tree]] =
-      transformedMethodParamsAsValSyms.zip(transformedMethodParamsValDefs).map {
-        case (syms, vds) =>
-          syms.zip(vds).map { case (sym, vd) => tpd.ValDef(sym, ref(vd.symbol)) }
+      transformedMethodParamsAsValSyms.zipWith2(transformedMethodParamsValDefs) { (sym, vd) =>
+        tpd.ValDef(sym, ref(vd.symbol))
       }
 
     def contFsmSym(i: Int): TermSymbol =

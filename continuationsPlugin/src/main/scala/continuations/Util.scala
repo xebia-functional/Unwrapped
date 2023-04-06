@@ -1,6 +1,7 @@
 package continuations
 
 import scala.annotation.tailrec
+import scala.collection.mutable.ListBuffer
 
 extension [A](list: List[A])
   def collectFirstOption[B](reap: A => Option[B]): Option[B] =
@@ -16,7 +17,23 @@ extension [A](list: List[A])
       }
     go(list)
 
+  def zipWith[B, C](bs: List[B])(fun: (A, B) => C): List[C] =
+    val buf = ListBuffer.empty[C]
+    @tailrec
+    def go(xs: List[A], ys: List[B]): Unit =
+      (xs, ys) match {
+        case ((xh :: xt), (yh :: yt)) =>
+          buf += fun(xh, yh)
+          go(xt, yt)
+        case _ =>
+      }
+    go(list, bs)
+    buf.toList
+
 extension [A](mat: List[List[A]])
+  def zipWith2[B, C](bss: List[List[B]])(fun: (A, B) => C): List[List[C]] =
+    mat.zipWith(bss)(_.zipWith(_)(fun))
+
   def exists2(pred: A => Boolean): Boolean =
     mat.exists(_.exists(pred))
 
