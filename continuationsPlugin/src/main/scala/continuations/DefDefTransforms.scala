@@ -336,17 +336,12 @@ object DefDefTransforms extends TreesChecks:
     val transformedMethodCompletionParam = ref(
       transformedMethod.termParamss.flatten.find(_.symbol.denot.matches(completion)).get.symbol)
 
-    val continuation1: tpd.ValDef =
-      val continuationTyped: Type =
-        continuationTraitSym.typeRef.appliedTo(returnType)
-      tpd.ValDef(
-        sym = newSymbol(
-          transformedMethodSymbol,
-          termName("continuation1"),
-          Flags.Local,
-          continuationTyped).entered,
-        rhs = transformedMethodCompletionParam
-      )
+    val cont1Symbol: TermSymbol =
+      newSymbol(
+        transformedMethodSymbol,
+        termName("continuation1"),
+        Flags.Local,
+        continuationTraitSym.typeRef.appliedTo(returnType)).entered
 
     /*
      ```
@@ -362,7 +357,7 @@ object DefDefTransforms extends TreesChecks:
         ref(requiredModule("continuations.SafeContinuation"))
           .select(termName("init"))
           .appliedToType(returnType)
-          .appliedTo(ref(continuation1.symbol))
+          .appliedTo(ref(cont1Symbol))
 
       val sym: TermSymbol = newSymbol(
         transformedMethodSymbol,
@@ -386,7 +381,7 @@ object DefDefTransforms extends TreesChecks:
 
     val continuationBlock = blockOf(
       List(
-        continuation1,
+        tpd.ValDef(cont1Symbol, transformedMethodCompletionParam),
         safeContinuation,
         transformSuspendContinuationBody(callSuspensionPoint, safeContinuation.symbol),
         ref(safeContinuation.symbol).select(termName("getOrThrow")).appliedToNone
@@ -633,23 +628,19 @@ object DefDefTransforms extends TreesChecks:
         anyNullSuspendedType
       )
 
-    val resultField = tpd.ValDef(
+    val resultSym: TermSymbol =
       newSymbol(
         frameClassSymbol,
         resultVarName,
         Flags.Synthetic | Flags.Mutable,
-        eitherThrowableAnyNullSuspendedType).entered,
-      Underscore(eitherThrowableAnyNullSuspendedType)
-    )
+        eitherThrowableAnyNullSuspendedType).entered
 
-    val labelField = tpd.ValDef(
+    val labelSymbol: TermSymbol =
       newSymbol(
         frameClassSymbol,
         labelVarParam,
         Flags.Synthetic | Flags.Mutable,
-        intType).entered,
-      Underscore(intType)
-    )
+        intType).entered
 
     val frameThis: tpd.This =
       tpd.This(frameClassSymbol)
@@ -690,9 +681,9 @@ object DefDefTransforms extends TreesChecks:
     val resultSetter =
       newSymbol(
         frameClassSymbol,
-        resultField.symbol.asTerm.name.setterName,
+        resultSym.asTerm.name.setterName,
         Method | Flags.Accessor,
-        info = MethodType(resultField.symbol.asTerm.info.widenExpr :: Nil, defn.UnitType)
+        info = MethodType(resultSym.asTerm.info.widenExpr :: Nil, defn.UnitType)
       ).entered
 
     val labelSetter =
@@ -700,7 +691,7 @@ object DefDefTransforms extends TreesChecks:
         frameClassSymbol,
         selectLabel.symbol.asTerm.name.setterName,
         Method | Flags.Accessor,
-        info = MethodType(labelField.symbol.asTerm.info.widenExpr :: Nil, defn.UnitType)
+        info = MethodType(labelSymbol.asTerm.info.widenExpr :: Nil, defn.UnitType)
       ).entered
 
     val (nonDefDefRowsBeforeSuspensionPoint, rowsAfterLastSuspensionPoint)
@@ -915,8 +906,8 @@ object DefDefTransforms extends TreesChecks:
           frameI$NsSyms.map(contFsmI),
           frameI$NsSyms.map(toContFsmSetter),
           List(
-            resultField,
-            labelField,
+            tpd.ValDef(resultSym, Underscore(eitherThrowableAnyNullSuspendedType)),
+            tpd.ValDef(labelSymbol, Underscore(intType)),
             tpd.DefDef(resultSetter, tpd.unitLiteral),
             tpd.DefDef(labelSetter, tpd.unitLiteral),
             invokeSuspendMethod,
