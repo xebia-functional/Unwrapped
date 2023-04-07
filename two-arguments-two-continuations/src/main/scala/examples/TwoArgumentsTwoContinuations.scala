@@ -2,27 +2,35 @@ package examples
 
 import continuations.Suspend
 
+@main def main: Unit =
+  val polymorphicValDefZeroContinuations
+      : Suspend ?=> [A] => List[A] => [B] => List[B] => List[A] => List[A] => Int =
+    [A] =>
+      (x: List[A]) =>
+        [B] =>
+          (y: List[B]) =>
+            (q: List[A]) =>
+              (p: List[A]) =>
 
-// val foo:  Suspend ?=> [A] => List[A] => Int = [A] => (list: List[A]) => list.size
+                val z = 1
+                x.size + y.size + q.size + p.size + z
 
-def threeDependentContinuations[A](x: A)(using s: Suspend): A =
-  s.shift(_.resume(x)) // 5
+  def polymorphicDefDefZeroContinuations
+      : Suspend ?=> [A] => List[A] => [B] => List[B] => List[A] => List[A] => Int =
+    [A] =>
+      (x: List[A]) =>
+        [B] =>
+          (y: List[B]) =>
+            (q: List[A]) =>
+              (p: List[A]) =>
 
-// val polymorphicValDefZeroContinuations
-//     : Suspend ?=> [A] => List[A] => [B] => List[B] => List[A] => List[A] => Int =
-//   [A] =>
-//     (x: List[A]) =>
-//       [B] =>
-//         (y: List[B]) =>
-//           (q: List[A]) =>
-//             (p: List[A]) =>
+                val z = 1
+                x.size + y.size + q.size + p.size + z
 
-//               val z = 1
-//               x.size + y.size + q.size + p.size + z
+  println(
+    polymorphicValDefZeroContinuations(List(1))(List("A", "B"))(List(1, 1, 1))(
+      List(1, 1, 1, 1)))
 
-@main def main =
-  // println(foo(List(1)))
-  println(threeDependentContinuations(1))
-  // println(
-  //   polymorphicValDefZeroContinuations(List(1))(List("A", "B"))(List(1, 1, 1))(
-  //     List(1, 1, 1, 1)))
+  println(
+    polymorphicDefDefZeroContinuations(List(1))(List("A", "B"))(List(1, 1, 1))(
+      List(1, 1, 1, 1)))
