@@ -2,12 +2,18 @@ package continuations.jvm.internal
 
 import continuations.{Continuation, ContinuationInterceptor}
 
+import scala.concurrent.ExecutionContext
+
 abstract class BaseContinuationImpl(
     val completion: Continuation[Any | Null] | Null
 ) extends Continuation[Any | Null],
       ContinuationStackFrame,
       Serializable:
 
+  override val executionContext: ExecutionContext =
+    if completion == null then
+      ExecutionContext.global // throw RuntimeException("resume called with no completion")
+    else completion.executionContext
   final override def resume(result: Any | Null): Unit = resumeAux(Right(result))
   final override def raise(error: Throwable): Unit = resumeAux(Left(error))
 
@@ -46,6 +52,12 @@ abstract class BaseContinuationImpl(
   def create(value: Any | Null, completion: Continuation[Any | Null]): Continuation[Unit] =
     throw UnsupportedOperationException("create(Any?;Continuation) has not been overridden")
 
+  def invoke(
+      p1: Any | Null,
+      p2: Continuation[Any | Null]): Any |
+    Null =
+    throw UnsupportedOperationException("invoke(Any?,Continuation) has not been overridden")
+
   override def callerFrame: ContinuationStackFrame | Null =
     if (completion != null && completion.isInstanceOf[ContinuationStackFrame])
       completion.asInstanceOf
@@ -62,14 +74,18 @@ abstract class ContinuationImpl(
     override val context: Tuple
 ) extends BaseContinuationImpl(completion):
   override type Ctx = Tuple
+  override val executionContext: ExecutionContext = completion.executionContext
   private var _intercepted: Continuation[Any | Null] = null
 
-  def intercepted(): Continuation[Any | Null] =
+  def intercepted(ec: ExecutionContext /*, contInterceptor: */ ): Continuation[Any | Null] =
     if (_intercepted != null) _intercepted
     else
       val interceptor = contextService[ContinuationInterceptor]()
       val intercepted =
-        if (interceptor != null) interceptor.interceptContinuation(this)
+        if (interceptor != null)
+          interceptor.interceptContinuation(
+            this
+          ) // interceptContinuation(this) -> execute(...) 
         else this
       _intercepted = intercepted
       intercepted
@@ -84,6 +100,7 @@ abstract class ContinuationImpl(
 
 object CompletedContinuation extends Continuation[Any | Null]:
   override type Ctx = Nothing
+  override val executionContext: ExecutionContext = ???
   override def context: CompletedContinuation.Ctx =
     throw IllegalStateException("Already completed")
   override def resume(result: Any | Null): Unit =

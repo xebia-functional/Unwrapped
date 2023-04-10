@@ -663,6 +663,7 @@ object DefDefTransforms extends TreesChecks:
 
     val newReturnType =
       Types.OrType(Types.OrNull(returnType), suspendedState.symbol.namedType, false)
+    
     val transformedMethodSymbol =
       createTransformedMethodSymbol(parent, transformedMethodParams, newReturnType)
 
@@ -885,43 +886,6 @@ object DefDefTransforms extends TreesChecks:
             .appliedTo(paramss.head.drop(1).head)
       )
 
-      val invokeSymbol =
-        newSymbol(
-          continuationsStateMachineSymbol,
-          Names.termName("invoke"),
-          Flags.Protected | Flags.Method,
-          MethodType(
-            List(termName("p1"), termName("p2")),
-            List(anyOrNullType, continuationClassRef.appliedTo(anyOrNullType)),
-            anyOrNullType
-          )
-        ).entered.asTerm
-
-      val invokeMethod = tpd.DefDef(
-        invokeSymbol,
-        paramss =>
-          val newContinuation = ref(createMethod.symbol).appliedToTermArgs(
-            List(paramss.head.head, paramss.head.drop(1).head)
-          )
-          val dummy = tpd
-            .New(requiredClassRef("scala.util.Right"))
-            .select(nme.CONSTRUCTOR)
-            .appliedToTypes(
-              List(defn.UnitType, defn.UnitType)
-            )
-            .appliedTo(
-              tpd.Literal(Constant(()))
-            )
-
-          newContinuation
-            .select(nme.asInstanceOf_)
-            .appliedToType(baseContinuationImplClassRef.symbol.thisType)
-            .select(termName("invokeSuspend"))
-            .appliedTo(
-              dummy
-            )
-      )
-
       val extendsContImpl: tpd.Tree =
         tpd
           .New(ref(continuationImplClass))
@@ -944,8 +908,7 @@ object DefDefTransforms extends TreesChecks:
             tpd.DefDef(continuationStateMachineResultSetter, tpd.unitLiteral),
             tpd.DefDef(continuationStateMachineLabelSetter, tpd.unitLiteral),
             invokeSuspendMethod,
-            createMethod,
-            invokeMethod
+            createMethod
           )
         ).flatten
       )

@@ -1,15 +1,19 @@
 package continuations.intrinsics
 
-import continuations.jvm.internal.{BaseContinuationImpl, ContinuationImpl}
+import continuations.jvm.internal.{BaseContinuationImpl, ContinuationImpl, Thing}
 import continuations.{Continuation, RestrictedContinuation, Suspend}
 
+import scala.concurrent.ExecutionContext
+
 extension [A](continuation: Continuation[A])
-  def intercepted(): Continuation[A] =
+  def intercepted(ec: ExecutionContext): Continuation[A] =
+    println(s"intrinsics intercepted ${Thread.currentThread().getName}")
     if (continuation.isInstanceOf[ContinuationImpl])
-      continuation.asInstanceOf[ContinuationImpl].intercepted().asInstanceOf[Continuation[A]]
+      continuation.asInstanceOf[ContinuationImpl].intercepted(ec).asInstanceOf[Continuation[A]]
     else continuation
 
-extension [A](suspendedFn: Suspend ?=> A)
+
+extension [A](suspendedFn: Thing ?=> A)
 
   // inline def shift
   /*
@@ -19,7 +23,7 @@ extension [A](suspendedFn: Suspend ?=> A)
    */
 
   def startContinuation(completion: Continuation[A]): Unit =
-    createContinuation(completion).intercepted().resume(())
+    createContinuation(completion).intercepted(completion.executionContext).resume(())
 
   inline def startContinuationOrSuspend(
       completion: Continuation[A]): Any | Null | Continuation.State.Suspended.type =
@@ -32,16 +36,17 @@ extension [A](suspendedFn: Suspend ?=> A)
       suspendedFn.asInstanceOf[BaseContinuationImpl].create(completion)
     else
       createContinuationFromSuspendFunction(
-        completion,
-        (continuation: Continuation[A]) => {
-          suspendedFn
-            .asInstanceOf[Continuation[A] => (Any | Null | Continuation.State.Suspended.type)](
-              continuation)
-        })
+        completion
+        // (continuation: Continuation[A]) => {
+          // suspendedFn.asInstanceOf[Thing].invoke(continuation)
+        // }
+      )
+
+// TODO: call synthetic function invoke here and remove extra param p1
 
 private inline def createContinuationFromSuspendFunction[T](
-    completion: Continuation[T],
-    block: Continuation[T] => Any | Null
+    completion: Continuation[T]
+    // block: Continuation[T] => Any | Null
 ): Continuation[Unit] =
   val context = completion.context
   if (context == EmptyTuple)
@@ -57,7 +62,7 @@ private inline def createContinuationFromSuspendFunction[T](
               case Left(exception) =>
                 throw exception
               case _ => ()
-            block(this)
+            //completion.invoke(null, this.asInstanceOf[Continuation[Any | Null]])
           case 1 =>
             label = 2
             result match
@@ -82,7 +87,7 @@ private inline def createContinuationFromSuspendFunction[T](
               case Left(exception) =>
                 throw exception
               case _ => ()
-            block(this)
+            // invoke(null, this)
           case 1 =>
             label = 2
             result match
