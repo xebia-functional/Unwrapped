@@ -35,22 +35,28 @@ object DefDefTransforms extends TreesChecks:
       case t: Types.TypeRef if t.symbol.info.hasClassSymbol(requiredClass(suspendFullName)) =>
         NoType
       case t @ MethodType(termNames) =>
-        val newT = t.paramInfoss.map(_.map(apply).filterNot(ttpe => ttpe == NoType)).filterNot(_.isEmpty)
+        val newT =
+          t.paramInfoss.map(_.map(apply).filterNot(ttpe => ttpe == NoType)).filterNot(_.isEmpty)
         println(s"newT: ${newT}")
-        if(newT.isEmpty)
+        if (newT.isEmpty)
           t.resType
-        else newT.reverse.foldLeft(Option.empty[MethodType]) {
-            case (None, args) =>
-              Some(MethodType.apply(args, t.resType))
-            case (Some(mt), args) =>
-              Some(MethodType.apply(args, mt))
-          }
-          .get
+        else
+          newT
+            .reverse
+            .foldLeft(Option.empty[MethodType]) {
+              case (None, args) =>
+                Some(MethodType.apply(args, t.resType))
+              case (Some(mt), args) =>
+                Some(MethodType.apply(args, mt))
+            }
+            .get
       case t @ AppliedType(tyCon, args) =>
-        println(s"AppliedType t ${t}")
+        println(s"AppliedType t ${t.show}")
         val newArgs = args.map(apply).filterNot(ttpe => ttpe == NoType)
         println(s"newArgs ${newArgs}")
-        if(newArgs.size == 1) newArgs.head else AppliedType(tyCon, newArgs)
+        val finalT = if (newArgs.size == 1) newArgs.head else AppliedType(tyCon, newArgs)
+        println(s"finalT: $finalT")
+        finalT
       case t => t
     }
   }
@@ -123,7 +129,8 @@ object DefDefTransforms extends TreesChecks:
         val newTreeType =
           TransformedMethodTypeMap(completionIndex, tree.tpt.tpe).apply(tree.symbol.info)
         val newTreeSymbol = tree.symbol.asTerm.copy(info = newTreeType).entered.asTerm
-        println(s"newTreeSymbol.info.show: ${newTreeSymbol.info.show}")
+
+        val completionReturnType = new TransformReturnTypeMap().apply(tree.tpt.tpe)
         val completionSymbol = newSymbol(
           newTreeSymbol,
           Names.termName(completionParamName),
@@ -131,13 +138,20 @@ object DefDefTransforms extends TreesChecks:
           requiredPackage(continuationPackageName)
             .requiredType(continuationClassName)
             .typeRef
-            .appliedTo(new TransformReturnTypeMap().apply(tree.tpt.tpe))
+            .appliedTo(completionReturnType)
         ).entered
         val completionValDef = tpd.ValDef(completionSymbol.asTerm, tpd.EmptyTree)
 
-        val treeWithCompletion =
-          cpy.DefDef(tree)(paramss = transformParamsRemovingSuspend(
-            tree.paramss.insertAt(completionIndex, List(completionValDef))))
+        val treeWithCompletion = tpd.DefDef(
+          newTreeSymbol,
+          transformParamsRemovingSuspend(
+            tree.paramss.insertAt(completionIndex, List(completionValDef)))
+            .map(_.map(_.symbol)),
+          completionReturnType,
+          tree.rhs
+        )
+        println(s"newTreeSymbol.info.show: ${newTreeSymbol.info.show}")
+        println(s"treeWithCompletion.symbol.info.show: ${treeWithCompletion.symbol.info.show}")
 
         val ownershipChanger = TreeTypeMap(
           substFrom = List(tree.symbol, newTreeSymbol),
@@ -882,7 +896,8 @@ object DefDefTransforms extends TreesChecks:
           )
         ).entered.asTerm
       def applyNullOrThisOrType(currentApply: tpd.Tree, nextArgs: List[Symbol]): tpd.Tree =
-        if (nextArgs.exists(_.isType)) currentApply.appliedToTypes(nextArgs.map(_ => ctx.definitions.AnyType))
+        if (nextArgs.exists(_.isType))
+          currentApply.appliedToTypes(nextArgs.map(_ => ctx.definitions.AnyType))
         else
           currentApply.appliedToArgs(
             nextArgs.map(s =>

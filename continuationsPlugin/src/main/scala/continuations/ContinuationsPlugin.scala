@@ -144,11 +144,17 @@ class ContinuationsCallsPhase extends PluginPhase:
       updatedMethods.addOne(tree.symbol)
       println(s"updatedMethods after add: $updatedMethods")
     tree.foreachSubTree {
-      case a @ Apply(_, _) if hasContinuationParam(tree) =>
+      case a @ Apply(_, _) if hasContinuationParam(tree) && tree.symbol.isAnonymousFunction =>
+        println(s"adding caller tree ${tree.show} and ${hasContinuationParam(tree)} && ${tree.symbol.isAnonymousFunction}")
+      case a @ Apply(_, _) if hasContinuationParam(tree) && tree.symbol.isAnonymousFunction =>
+        println(s"adding caller tree ${tree.show} and ${hasContinuationParam(tree)} && ${tree.symbol.isAnonymousFunction}")
+      case a @ Apply(_, _) if hasContinuationParam(tree) && !tree.symbol.isAnonymousFunction =>
+        println(s"adding caller tree ${tree.show} and ${hasContinuationParam(tree)} && ${tree.symbol.isAnonymousFunction}")
         println(s"non applyToChangeAddingApply ${a.show}")
         a.removeAttachment(CallerKey)
         a.putAttachment(CallerKey, Caller(tree))
-      case a @ Apply(_, _) if hasContinuationParam(tree) =>
+      case a @ Apply(_, _) if hasContinuationParam(tree) && !tree.symbol.isAnonymousFunction =>
+        println(s"adding caller tree ${tree.show} and ${hasContinuationParam(tree)} && ${tree.symbol.isAnonymousFunction}")
         println(s"non applyToChangeAddingApply ${a.show}")
         a.removeAttachment(CallerKey)
         a.putAttachment(CallerKey, Caller(tree))
@@ -280,10 +286,13 @@ class ContinuationsCallsPhase extends PluginPhase:
           // checked to see if the caller is defined.
           (for {
             Caller(t) <- caller
+            _ = println(s"t: ${t.show}")
             ((completionSymbol, completionIndex), completionSymbolParamClauseIndex) <- t
               .symbol
               .firstParamSyms
-          } yield ref(completionSymbol).changeOwner(newSym, existsTree(t).get.owner)).get
+              _ = println(s"completionSymbol: ${completionSymbol}")
+              _ = println(s"completionIndex: ${completionIndex}")
+            } yield ref(completionSymbol).changeOwner(newSym, existsTree(t).get.owner)).get
         } else defaultContinuation
 
         val argsWithoutSuspend: List[Tree[Type]] = args.filterNot(isSuspend)
