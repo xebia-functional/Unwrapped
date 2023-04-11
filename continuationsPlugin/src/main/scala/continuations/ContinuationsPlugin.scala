@@ -225,7 +225,6 @@ class ContinuationsCallsPhase extends PluginPhase:
         println(s"deconstructNestedApply Apply Apply ${tree.show}")
         deconstructNestedApply(b, tree.args :: accumulator)
       case Apply(fn @ TypeApply(_, tfnArgs), args) =>
-
         println(s"deconstructNestedApply 222 Apply ${tree.show}, ${accumulator}")
         println(s"deconstructNestedApply 223 Apply tree $tree")
         println(s"updatedMethods $updatedMethods")
@@ -253,10 +252,11 @@ class ContinuationsCallsPhase extends PluginPhase:
 
         val argsWithoutSuspend: List[Tree[Type]] = args.filterNot(isSuspend)
 
-        val argsWithCompletion = (argsWithoutSuspend :: accumulator).insertAt(completionIndex, List(completionRef))
+        val argsWithCompletion =
+          (argsWithoutSuspend :: accumulator).insertAt(completionIndex, List(completionRef))
 
         val combinedParamClauses =
-          if(newSym.paramSymss.exists(_.exists(_.isType))){
+          if (newSym.paramSymss.exists(_.exists(_.isType))) {
             tfnArgs :: argsWithCompletion
           } else argsWithCompletion
 
@@ -290,17 +290,15 @@ class ContinuationsCallsPhase extends PluginPhase:
             ((completionSymbol, completionIndex), completionSymbolParamClauseIndex) <- t
               .symbol
               .firstParamSyms
-              _ = println(s"completionSymbol: ${completionSymbol}")
-              _ = println(s"completionIndex: ${completionIndex}")
-            } yield ref(completionSymbol).changeOwner(newSym, existsTree(t).get.owner)).get
+            _ = println(s"completionSymbol: ${completionSymbol}")
+            _ = println(s"completionIndex: ${completionIndex}")
+          } yield ref(completionSymbol).changeOwner(newSym, existsTree(t).get.owner)).get
         } else defaultContinuation
 
         val argsWithoutSuspend: List[Tree[Type]] = args.filterNot(isSuspend)
 
         val combinedParamClauses =
           (argsWithoutSuspend :: accumulator).insertAt(completionIndex, List(completionRef))
-
-        
 
         val filteredParamClauses =
           combinedParamClauses.map(_.filterNot(isSuspend)).filter(_.nonEmpty)
@@ -338,7 +336,11 @@ class ContinuationsCallsPhase extends PluginPhase:
           println(s"will deconstruct suspended arg with isSuspend: ${tree}")
           println(s"existsTree(fn): ${existsTree(fn)}")
           val replacement = deconstructNestedApply(tree, Nil)
-          TreeTypeMap(substTo = List(existsTree(fn).get), substFrom = List(fn.symbol), newOwners = List(existsTree(fn).get), oldOwners = List(fn.symbol))(replacement)
+          TreeTypeMap(
+            substTo = List(existsTree(fn).get),
+            substFrom = List(fn.symbol),
+            newOwners = List(existsTree(fn).get),
+            oldOwners = List(fn.symbol))(replacement)
         case tree @ Apply(_, _) =>
           // println(s"unchanged apply: ${tree}")
           tree
