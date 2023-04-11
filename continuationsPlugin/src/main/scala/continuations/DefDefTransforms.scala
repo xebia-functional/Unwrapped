@@ -944,6 +944,12 @@ object DefDefTransforms extends TreesChecks:
             nextArgs.map(s =>
               if (hasContinuationClass(s)) continuationsStateMachineThis else nullLiteral)
           )
+      val applyTransformedMethod =
+        transformedMethod
+          .symbol
+          .paramSymss
+          .foldLeft(ref(transformedMethodSymbol))(applyNullOrThisOrType)
+
       val invokeSuspendMethod = tpd.DefDef(
         invokeSuspendSymbol,
         paramss =>
@@ -956,10 +962,7 @@ object DefDefTransforms extends TreesChecks:
                 continuationsStateMachineLabelSelect.select(integerOR).appliedTo(integerMin)
               )
             ),
-            transformedMethod
-              .symbol
-              .paramSymss
-              .foldLeft(ref(transformedMethodSymbol))(applyNullOrThisOrType)
+            applyTransformedMethod
           )
       )
 
@@ -1365,13 +1368,10 @@ object DefDefTransforms extends TreesChecks:
     val transformedMethodBody =
       substituteContinuation.transform(rhs) match
         case Trees.Block(stats, expr) =>
-          flattenBlock(
-            blockOf(
-              transformedMethodParamsAsVals ++
-                globalVarsSyms.map(toGlobalVar) ++
-                stats ++
-                List(expr)
-            ))
+          val allExprs =
+            transformedMethodParamsAsVals ++ globalVarsSyms.map(toGlobalVar) ++ stats ++ List(
+              expr)
+          flattenBlock(blockOf(allExpres))
         case tree => tree
 
     tpd.Thicket(
