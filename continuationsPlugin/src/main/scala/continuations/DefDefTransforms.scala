@@ -1371,7 +1371,7 @@ object DefDefTransforms extends TreesChecks:
           val allExprs =
             transformedMethodParamsAsVals ++ globalVarsSyms.map(toGlobalVar) ++ stats ++ List(
               expr)
-          flattenBlock(blockOf(allExpres))
+          flattenBlock(blockOf(allExprs))
         case tree => tree
 
     tpd.Thicket(
