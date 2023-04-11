@@ -27,6 +27,7 @@ import dotty.tools.dotc.core.Types.TypeMap
 import dotty.tools.dotc.core.Types.NoType
 import dotty.tools.dotc.ast.Trees.TypeDef
 import dotty.tools.dotc.core.Types.AppliedType
+import dotty.tools.dotc.ast.Trees.Closure
 
 object DefDefTransforms extends TreesChecks:
 
@@ -79,6 +80,41 @@ object DefDefTransforms extends TreesChecks:
           .appliedTo(resultWithoutSuspend)
         println(s"completionType.show: ${completionType.show}")
         val newParamInfoss = withoutSuspend.insertAt(completionIndex, List(completionType))
+        val newTpe = newParamInfoss
+          .reverse
+          .foldLeft(Option.empty[MethodType]) {
+            case (None, args) =>
+              Some(MethodType.apply(args, resultWithoutSuspend))
+            case (Some(mt), args) =>
+              Some(MethodType.apply(args, mt))
+          }
+          .get
+        println(s"newTpe.show: ${newTpe.show}")
+        newTpe
+      case t @ PolyType(lambdaParams, tpe) =>
+        PolyType(t.paramNames)(pt => t.paramInfos, pt => apply(tpe))
+      case t =>
+        t
+    }
+  }
+  final class TransformedAnonFunWithoutSuspend(resultTpe: Type)(using Context) extends TypeMap {
+    override def apply(tp: Type): Type = tp match {
+      case t: Types.TypeRef if t.symbol.info.hasClassSymbol(requiredClass(suspendFullName)) =>
+        NoType
+      case t @ MethodType(termNames) =>
+        println(s"resultTpe: ${resultTpe.show}")
+        println(s"resultTpe tree: ${resultTpe}")
+        val withoutSuspend =
+          t.paramInfoss.map(_.map(apply).filterNot(ttpe => ttpe == NoType)).filterNot(_.isEmpty)
+        val resultWithoutSuspend = new TransformReturnTypeMap().apply(resultTpe)
+        println(s"resultWithoutSuspend.show: ${resultWithoutSuspend.show}")
+        println(s"resultWithoutSuspend: ${resultWithoutSuspend.show}")
+        val completionType = requiredPackage(continuationPackageName)
+          .requiredType(continuationClassName)
+          .typeRef
+          .appliedTo(resultWithoutSuspend)
+        println(s"completionType.show: ${completionType.show}")
+        val newParamInfoss = withoutSuspend
         val newTpe = newParamInfoss
           .reverse
           .foldLeft(Option.empty[MethodType]) {
@@ -223,6 +259,7 @@ object DefDefTransforms extends TreesChecks:
     def transformSuspensionsSuspendingStateMachine(
         suspensionPoints: List[tpd.Tree],
         suspensionInReturnedValue: Boolean)(using ctx: Context) =
+      println(s"transformSuspensionsSuspendingStateMachine")
       if suspensionPoints.isEmpty then tree
       else
         val transformedTree =
@@ -363,13 +400,15 @@ object DefDefTransforms extends TreesChecks:
     val leftoverReplacementSymbols = List.fill(leftoverSymbols.size)(safeContinuationSym)
     val leftoverReplocementSymbolOvers = leftoverReplacementSymbols.map(_.owner)
 
-    new BlockFlattener().transform(
+    val finalHypothesis = new BlockFlattener().transform(
       new TreeTypeMap(
         oldOwners = leftoverSymbols,
         newOwners = leftoverReplocementSymbolOvers,
         substFrom = leftoverSymbols,
         substTo = leftoverReplacementSymbols
       )(hypothesis))
+    println(s"finalHypothesis: ${finalHypothesis.show}")
+    finalHypothesis
   }
 
   private def createTransformedMethodSymbol(
@@ -472,108 +511,130 @@ object DefDefTransforms extends TreesChecks:
 
     val transformedMethod =
       addCompletionParam(tree)
-    println(s"transformedMethod.show: ${transformedMethod.show}")
 
-    val (methodReturnType, _, _) =
-      getReturnTypeBodyContextFunctionOwner(transformedMethod)
+    // val (methodReturnType, _, _) =
+    //   getReturnTypeBodyContextFunctionOwner(transformedMethod)
 
-    val transformedMethodSymbol = transformedMethod.symbol
+    // val transformedMethodSymbol = transformedMethod.symbol
 
-    val transformedMethodParamSymbols: List[Symbol] =
-      transformedMethodSymbol.paramSymss.flatMap(_.filterNot(hasContinuationClass))
+    // val transformedMethodParamSymbols: List[Symbol] =
+    //   transformedMethodSymbol.paramSymss.flatMap(_.filterNot(hasContinuationClass))
 
-    val oldMethodParamSymbols: List[Symbol] =
-      parent.paramSymss.flatten.filterNot(s => hasSuspendClass(s) || s.isTypeParam)
+    // val oldMethodParamSymbols: List[Symbol] =
+    //   parent.paramSymss.flatten.filterNot(s => hasSuspendClass(s) || s.isTypeParam)
 
-    val newAnonFunctions = ListBuffer(transformedMethod.symbol)
-    val substituteContinuation = new TreeTypeMap(
-      treeMap = {
-        case defdef: tpd.DefDef if defdef.symbol.isAnonymousFunction =>
-          val tpt: Type = removeSuspendReturnAny(defdef.tpt.tpe)
+    // val newAnonFunctions = ListBuffer(transformedMethod.symbol)
+    // val substituteContinuation = new TreeTypeMap(
+    //   treeMap = {
+    //     case defdef: tpd.DefDef if defdef.symbol.isAnonymousFunction =>
+    //       val tpt: Type = removeSuspendReturnAny(defdef.tpt.tpe)
 
-          val params: List[tpd.ParamClause] = new TreeTypeMap(treeMap = {
-            case p: tpd.ValDef if hasSuspendClass(p.symbol) =>
-              tpd.EmptyTree
-            case t => t
-          }).transformParamss(defdef.paramss)
+    //       val params: List[tpd.ParamClause] = new TreeTypeMap(treeMap = {
+    //         case p: tpd.ValDef if hasSuspendClass(p.symbol) =>
+    //           tpd.EmptyTree
+    //         case t => t
+    //       }).transformParamss(defdef.paramss)
 
-          val newMethodOwner: Option[Symbol] =
-            if (defdef.symbol.owner.is(Method) &&
-              defdef.symbol.owner.name.matchesTargetName(nme.apply) &&
-              defdef.symbol.owner.owner.isAnonymousClass &&
-              defdef.symbol.owner.owner.info.parents.exists {
-                _.hasClassSymbol(defn.PolyFunctionClass)
-              })
-              Some(defdef.symbol.owner)
-            else newAnonFunctions.lastOption
+    //       val newMethodOwner: Option[Symbol] =
+    //         if (defdef.symbol.owner.is(Method) &&
+    //           defdef.symbol.owner.name.matchesTargetName(nme.apply) &&
+    //           defdef.symbol.owner.owner.isAnonymousClass &&
+    //           defdef.symbol.owner.owner.info.parents.exists {
+    //             _.hasClassSymbol(defn.PolyFunctionClass)
+    //           })
+    //           Some(defdef.symbol.owner)
+    //         else newAnonFunctions.lastOption
 
-          val newMethodSymbol =
-            createTransformedMethodSymbol(
-              defdef.symbol,
-              params,
-              tpt,
-              newMethodOwner
-            )
+    //       val newMethodSymbol =
+    //         createTransformedMethodSymbol(
+    //           defdef.symbol,
+    //           params,
+    //           tpt,
+    //           newMethodOwner
+    //         )
 
-          if (params.isEmpty) defdef.rhs
-          else
-            newAnonFunctions.append(newMethodSymbol)
+    //       if (params.isEmpty) defdef.rhs
+    //       else
+    //         newAnonFunctions.append(newMethodSymbol)
 
-            def fillFlags(s: Symbol): Symbol = {
-              val existingFlags =
-                params
-                  .flatten
-                  .find(_.name == s.name)
-                  .map(_.symbol.flags)
-                  .getOrElse(Flags.EmptyFlags)
-              s.setFlag(existingFlags)
-              s
-            }
+    //         def fillFlags(s: Symbol): Symbol = {
+    //           val existingFlags =
+    //             params
+    //               .flatten
+    //               .find(_.name == s.name)
+    //               .map(_.symbol.flags)
+    //               .getOrElse(Flags.EmptyFlags)
+    //           s.setFlag(existingFlags)
+    //           s
+    //         }
 
-            val methodParams = newMethodSymbol.paramSymss.map(_.map(fillFlags))
+    //         val methodParams = newMethodSymbol.paramSymss.map(_.map(fillFlags))
 
-            new TreeTypeMap(
-              oldOwners = List(defdef.symbol),
-              newOwners = List(newMethodSymbol),
-              substFrom = params.flatMap(_.map(_.symbol)),
-              substTo = methodParams.flatten
-            ).transform(
-              tpd.DefDef(
-                sym = newMethodSymbol.asTerm,
-                paramss = methodParams,
-                resultType = newMethodSymbol.info.resultType,
-                rhs = defdef.rhs
-              ))
-        case tpd.Block(List(defdef: tpd.DefDef), _)
-            if defdef.symbol.isAnonymousFunction &&
-              defdef.paramss.forall(_.forall(x => hasSuspendClass(x.symbol))) =>
-          new TreeTypeMap(
-            oldOwners = List(defdef.symbol),
-            newOwners = newAnonFunctions.lastOption.toList
-          ).transform(defdef.rhs)
-        case c: tpd.Closure =>
-          // Any param of an anonymous function matches a param of the Closure
-          def clashesParam(anonFun: Symbol): Boolean =
-            anonFun
-              .paramSymss
-              .exists(_.exists(s => c.meth.symbol.paramSymss.exists(_.exists(_.matches(s)))))
-          newAnonFunctions.find(clashesParam) match {
-            case None => c
-            case Some(anon) => tpd.Closure(c.env, ref(anon), c.tpt)
-          }
-        case t => t
-      },
-      substFrom = List(parent) ++ oldMethodParamSymbols,
-      substTo = List(transformedMethod.symbol) ++ transformedMethodParamSymbols,
-      oldOwners = List(parent),
-      newOwners = List(transformedMethod.symbol)
-    )
+    //         new TreeTypeMap(
+    //           oldOwners = List(defdef.symbol),
+    //           newOwners = List(newMethodSymbol),
+    //           substFrom = params.flatMap(_.map(_.symbol)),
+    //           substTo = methodParams.flatten
+    //         ).transform(
+    //           tpd.DefDef(
+    //             sym = newMethodSymbol.asTerm,
+    //             paramss = methodParams,
+    //             resultType = newMethodSymbol.info.resultType,
+    //             rhs = defdef.rhs
+    //           ))
+    //     case tpd.Block(List(defdef: tpd.DefDef), _)
+    //         if defdef.symbol.isAnonymousFunction &&
+    //           defdef.paramss.forall(_.forall(x => hasSuspendClass(x.symbol))) =>
+    //       new TreeTypeMap(
+    //         oldOwners = List(defdef.symbol),
+    //         newOwners = newAnonFunctions.lastOption.toList
+    //       ).transform(defdef.rhs)
+    //     case c: tpd.Closure =>
+    //       // Any param of an anonymous function matches a param of the Closure
+    //       def clashesParam(anonFun: Symbol): Boolean =
+    //         anonFun
+    //           .paramSymss
+    //           .exists(_.exists(s => c.meth.symbol.paramSymss.exists(_.exists(_.matches(s)))))
+    //       newAnonFunctions.find(clashesParam) match {
+    //         case None => c
+    //         case Some(anon) => tpd.Closure(c.env, ref(anon), c.tpt)
+    //       }
+    //     case t => t
+    //   },
+    //   substFrom = List(parent),
+    //   substTo = List(transformedMethod.symbol),
+    //   oldOwners = List(parent),
+    //   newOwners = List(transformedMethod.symbol)
+    // )
 
-    val transformedDefDef =
-      cpy.DefDef(transformedMethod)(rhs = substituteContinuation.transform(tree.rhs))
+    // val transformedDefDef =
+    //   cpy.DefDef(transformedMethod)(rhs = substituteContinuation.transform(tree.rhs))
 
-    ContextFunctionResults.annotateContextResults(transformedDefDef)
-    transformedDefDef
+    val unwrapAnonWithSuspend = TreeTypeMap(treeMap = {
+      case tree @ tpd.DefDef(_, paramss, _, _)
+          if paramss.exists(
+            _.exists(_.symbol.info.hasClassSymbol(requiredClass(suspendFullName)))) && paramss.map(
+            _.filterNot(_.symbol.info.hasClassSymbol(requiredClass(suspendFullName)))).filterNot(_.isEmpty).isEmpty =>
+            tree.rhs
+      case tree @ Closure(List(),meth,tpd.EmptyTree) if meth.symbol.paramSymss.exists(_.exists(_.info.hasClassSymbol(requiredClass(suspendFullName)))) =>
+        println(s"inner closure ${tree.show}")
+        tpd.EmptyTree
+      case t =>
+        println(s"unmatched tree: ${t.show}")
+        println(s"unmatched tree owners: ${t.symbol.ownersIterator.toList}")
+        t
+    })
+
+    val removeEmptyTreeBlock = TreeTypeMap(treeMap = {
+      case tree @ tpd.Block(l, tpd.EmptyTree) =>
+        println(s"Block with empty expression: ${tree.show}")
+        if(l.size == 1) l.head else tpd.Block(l.dropRight(1), l.last)
+      case t => t
+    })
+
+
+    ContextFunctionResults.annotateContextResults(transformedMethod)
+    removeEmptyTreeBlock(unwrapAnonWithSuspend(transformedMethod))
 
   /* The representation for the following code:
    ```
@@ -758,16 +819,18 @@ object DefDefTransforms extends TreesChecks:
           defn.UnitType)
       ).entered
 
+    val rhsAsList = rhs.toList.flatMap {
+      case b @ Trees.Block(trees, tree) =>
+        trees :+ tree
+      case tree => tree.toList
+    }
+
     val (nonDefDefRowsBeforeSuspensionPoint, rowsAfterLastSuspensionPoint)
         : (Map[tpd.Tree, List[tpd.Tree]], List[tpd.Tree]) =
-      rhs
-        .toList
-        .flatMap {
-          case Trees.Block(trees, tree) => trees :+ tree
-          case tree => List(tree)
-        }
+      rhsAsList
         .foldLeft((0, Map.empty[tpd.Tree, List[tpd.Tree]], List.empty[tpd.Tree])) {
           case ((suspensionPointsCounter, nonDefDefRowsBefore, rowsAfterLast), row) =>
+            println(s"row as ${row.show}")
             if (treeCallsSuspend(row) || valDefTreeCallsSuspend(row))
               val rowsBefore =
                 row match
@@ -795,6 +858,11 @@ object DefDefTransforms extends TreesChecks:
             else (suspensionPointsCounter, nonDefDefRowsBefore, row :: rowsAfterLast)
         }
         .drop(1)
+
+    nonDefDefRowsBeforeSuspensionPoint.foreach { kv =>
+      println(s"nonDefDefRowsBeforeSuspensionPoint k: ${kv._1.show}")
+      kv._2.foreach { v => println(s"nonDefDefRowsBeforeSuspensionPoint v: ${v.show}") }
+    }
 
     val nonDefDefRowsBeforeSuspensionPointList = nonDefDefRowsBeforeSuspensionPoint.toList
 
@@ -1166,7 +1234,7 @@ object DefDefTransforms extends TreesChecks:
             .drop(1)
             .dropWhile(r => !treeCallsSuspend(r) && !valDefTreeCallsSuspend(r))
             .drop(1)
-
+        relevantParamsAndRows.foreach(i => println(s"relevantParamsAndRows item: ${i.show}"))
         def needsAssignFrom(sym: TermSymbol): Boolean =
           relevantParamsAndRows.exists(_.symbol.denot.matches(sym))
 
