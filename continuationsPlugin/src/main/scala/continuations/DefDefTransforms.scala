@@ -580,14 +580,15 @@ object DefDefTransforms extends TreesChecks:
     // val transformedDefDef =
     //   cpy.DefDef(transformedMethod)(rhs = substituteContinuation.transform(tree.rhs))
 
+    /* Indicates if this `Def Definition` only has `Suspend` parameters.
+     */
+    def isLoneSuspend(dd: tpd.DefDef): Boolean = {
+      tpd.paramss.exists(_.exists(p => hasSuspendClass(p.symbol))) &&
+      tpd.paramss.forall(_.forall(p => hasSuspendClass(p.symbol)))
+    }
+
     val unwrapAnonWithSuspend = TreeTypeMap(treeMap = {
-      case tree @ tpd.DefDef(_, paramss, _, _)
-          if paramss.exists(_.exists(p => hasSuspendClass(p.symbol))) &&
-            paramss
-              .map(_.filterNot(p => hasSuspendClass(p.symbol)))
-              .filterNot(_.isEmpty)
-              .isEmpty =>
-        tree.rhs
+      case dd @ tpd.DefDef(_, paramss, _, _) if isLoneSuspend(dd) => dd.rhs
       case tree @ Closure(List(), meth, tpd.EmptyTree)
           if meth.symbol.paramSymss.exists(_.exists(hasSuspendClass)) =>
         println(s"inner closure ${tree.show}")
