@@ -583,8 +583,8 @@ object DefDefTransforms extends TreesChecks:
     /* Indicates if this `Def Definition` only has `Suspend` parameters.
      */
     def isLoneSuspend(dd: tpd.DefDef): Boolean = {
-      tpd.paramss.exists(_.exists(p => hasSuspendClass(p.symbol))) &&
-      tpd.paramss.forall(_.forall(p => hasSuspendClass(p.symbol)))
+      dd.paramss.exists(_.exists(p => hasSuspendClass(p.symbol))) &&
+      dd.paramss.forall(_.forall(p => hasSuspendClass(p.symbol)))
     }
 
     val unwrapAnonWithSuspend = TreeTypeMap(treeMap = {
