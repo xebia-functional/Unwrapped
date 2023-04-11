@@ -71,13 +71,7 @@ object DefDefTransforms extends TreesChecks:
         val newParamInfoss = withoutSuspend.insertAt(completionIndex, List(completionType))
         val newTpe = newParamInfoss
           .reverse
-          .foldLeft(Option.empty[MethodType]) {
-            case (None, args) =>
-              Some(MethodType.apply(args, resultWithoutSuspend))
-            case (Some(mt), args) =>
-              Some(MethodType.apply(args, mt))
-          }
-          .get
+          .foldLeft(resultWithoutSuspend) { (mt, args) => MethodType.apply(args, mt) }
         println(s"newTpe.show: ${newTpe.show}")
         newTpe
       case t @ PolyType(lambdaParams, tpe) =>
@@ -106,13 +100,7 @@ object DefDefTransforms extends TreesChecks:
         val newParamInfoss = withoutSuspend
         val newTpe = newParamInfoss
           .reverse
-          .foldLeft(Option.empty[MethodType]) {
-            case (None, args) =>
-              Some(MethodType.apply(args, resultWithoutSuspend))
-            case (Some(mt), args) =>
-              Some(MethodType.apply(args, mt))
-          }
-          .get
+          .foldLeft(resultWithoutSuspend) { (mt, args) => MethodType.apply(args, mt) }
         println(s"newTpe.show: ${newTpe.show}")
         newTpe
       case t @ PolyType(lambdaParams, tpe) =>
