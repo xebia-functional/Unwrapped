@@ -39,7 +39,7 @@ object DefDefTransforms extends TreesChecks:
         val newT =
           t.paramInfoss.map(_.map(apply).filterNot(ttpe => ttpe == NoType)).filterNot(_.isEmpty)
         println(s"newT: ${newT}")
-        newT.reverse.foldLeft(t.resType) { (mt, args) => MethodType.apply(args, mt) }
+        newT.foldRight(t.resType)(MethodType.apply)
       case t @ AppliedType(tyCon, args) =>
         println(s"AppliedType t ${t.show}")
         val newArgs = args.map(apply).filterNot(ttpe => ttpe == NoType)
@@ -69,9 +69,7 @@ object DefDefTransforms extends TreesChecks:
           .appliedTo(resultWithoutSuspend)
         println(s"completionType.show: ${completionType.show}")
         val newParamInfoss = withoutSuspend.insertAt(completionIndex, List(completionType))
-        val newTpe = newParamInfoss
-          .reverse
-          .foldLeft(resultWithoutSuspend) { (mt, args) => MethodType.apply(args, mt) }
+        val newTpe = newParamInfoss.foldRight(resultWithoutSuspend)(MethodType.apply)
         println(s"newTpe.show: ${newTpe.show}")
         newTpe
       case t @ PolyType(lambdaParams, tpe) =>
@@ -98,9 +96,7 @@ object DefDefTransforms extends TreesChecks:
           .appliedTo(resultWithoutSuspend)
         println(s"completionType.show: ${completionType.show}")
         val newParamInfoss = withoutSuspend
-        val newTpe = newParamInfoss
-          .reverse
-          .foldLeft(resultWithoutSuspend) { (mt, args) => MethodType.apply(args, mt) }
+        val newTpe = newParamInfoss.foldRight(resultWithoutSuspend)(MethodType.apply)
         println(s"newTpe.show: ${newTpe.show}")
         newTpe
       case t @ PolyType(lambdaParams, tpe) =>
