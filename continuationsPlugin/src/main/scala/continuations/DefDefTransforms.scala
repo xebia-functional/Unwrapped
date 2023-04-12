@@ -141,6 +141,8 @@ object DefDefTransforms extends TreesChecks:
       .asInstanceOf[List[tpd.ParamClause]]
 
   def addCompletionParam(valOrDefDef: tpd.ValOrDefDef)(using Context): tpd.DefDef = {
+    println(s"valOrDefDef.symbol.info.show: ${valOrDefDef.symbol.info.show}")
+    println(s"valOrDefDef.symbol.info: ${valOrDefDef.symbol.info}")
     valOrDefDef match {
       case tree: tpd.DefDef
           if !tree.paramss.exists(_.exists(p => hasContinuationClass(p.symbol))) =>

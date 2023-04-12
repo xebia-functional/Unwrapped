@@ -37,6 +37,8 @@ final class ExampleTypeMap()(using Context) extends TypeMap {
         newType
       case ExprType(resType) =>
         apply(resType)
+      case t @ PolyType(lambdaParams, tpe) =>
+          PolyType(t.paramNames)(pt => t.paramInfos, pt => apply(tpe))
       case t => t
     }
 }

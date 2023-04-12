@@ -127,6 +127,7 @@ import munit.Location
 import munit.internal.console.StackTraces
 import munit.internal.difflib.Diffs
 import munit.internal.difflib.ComparisonFailExceptionHandler
+import dotty.tools.dotc.core.TypeComparer
 
 trait CompilerFixtures { self: FunSuite =>
 
@@ -845,8 +846,7 @@ trait CompilerFixtures { self: FunSuite =>
         ): Nothing = failComparison(message, actualObtained, actualExpected)(loc)
       }
     StackTraces.dropInside {
-      if (!(obtained =:= expected)) {
-
+      if (!(TypeComparer.isSameType(obtained, expected))) {
         Diffs.assertNoDiff(
           munitPrint(obtained.show),
           munitPrint(expected.show),
@@ -874,7 +874,7 @@ trait CompilerFixtures { self: FunSuite =>
       expected: B
   )(using Location, Context): Unit = {
     StackTraces.dropInside {
-      if (obtained == expected) {
+      if (!TypeComparer.isSameType(obtained, expected)) {
         failComparison(
           s"expected different types: ${expected.show} =:= ${obtained.show}",
           obtained,
