@@ -139,46 +139,30 @@ class ContinuationsCallsPhase extends PluginPhase:
    *   The original context unchanged.
    */
   override def prepareForDefDef(tree: DefDef)(using Context): Context =
-    println(s"prepareForDefDef ${tree.show}")
     if (hasContinuationParam(tree))
       updatedMethods.addOne(tree.symbol)
-      println(s"updatedMethods after add: $updatedMethods")
     tree.foreachSubTree {
       case a @ Apply(_, _) if hasContinuationParam(tree) && tree.symbol.isAnonymousFunction =>
-        println(s"adding caller tree ${tree.show} and ${hasContinuationParam(tree)} && ${tree.symbol.isAnonymousFunction}")
       case a @ Apply(_, _) if hasContinuationParam(tree) && tree.symbol.isAnonymousFunction =>
-        println(s"adding caller tree ${tree.show} and ${hasContinuationParam(tree)} && ${tree.symbol.isAnonymousFunction}")
       case a @ Apply(_, _) if hasContinuationParam(tree) && !tree.symbol.isAnonymousFunction =>
-        println(s"adding caller tree ${tree.show} and ${hasContinuationParam(tree)} && ${tree.symbol.isAnonymousFunction}")
-        println(s"non applyToChangeAddingApply ${a.show}")
         a.removeAttachment(CallerKey)
         a.putAttachment(CallerKey, Caller(tree))
       case a @ Apply(_, _) if hasContinuationParam(tree) && !tree.symbol.isAnonymousFunction =>
-        println(s"adding caller tree ${tree.show} and ${hasContinuationParam(tree)} && ${tree.symbol.isAnonymousFunction}")
-        println(s"non applyToChangeAddingApply ${a.show}")
         a.removeAttachment(CallerKey)
         a.putAttachment(CallerKey, Caller(tree))
       case a @ Apply(Apply(_, _), _)
           if existsTree(tree).nonEmpty && treeIsSuspendAndNotInApplyToChange(a) =>
-        println(s"applyToChangeAddingApply ${a.show}")
         applyToChange.addOne(a)
       case a @ Apply(Select(_, selected), _)
           if treeExistsIsApplyAndIsNotInApplyToChange(a, selected) =>
-        println(s"applyToChangeAddingApply ${a.show}")
         applyToChange.addOne(a)
       case a @ Apply(TypeApply(Select(_, selected), _), _)
           if treeExistsIsApplyAndIsNotInApplyToChange(a, selected) =>
-        println(s"applyToChangeAddingApply ${a.show}")
         applyToChange.addOne(a)
       case a @ Apply(Ident(_), _)
           if findTree(a).nonEmpty && treeIsSuspendAndNotInApplyToChange(a) =>
-        println(s"applyToChangeAddingApply ${a.show}")
         applyToChange.addOne(a)
       case t =>
-        if (t.show.startsWith("twoArgumentsTwoContinuations")) {
-          println(s"unknown tree: ${t.show}")
-          println(s"unknown tree: $t")
-        }
         ()
     }
     ctx
@@ -320,8 +304,6 @@ class ContinuationsCallsPhase extends PluginPhase:
    *   in the correct param positions.
    */
   override def transformDefDef(defDefTree: tpd.DefDef)(using Context): tpd.Tree =
-    println("transformDefDef")
-    println(s"applyToChange: ${applyToChange}")
     TreeTypeMap(
       treeMap = {
         // case tree @ Apply(fn, args) if applyToChange.exists(_.sameTree(tree)) =>
@@ -333,8 +315,6 @@ class ContinuationsCallsPhase extends PluginPhase:
         //   val replacement = deconstructNestedApply(tree, Nil)
         //   replacement
         case tree @ Apply(fn, args) if args.exists(isSuspend) =>
-          println(s"will deconstruct suspended arg with isSuspend: ${tree}")
-          println(s"existsTree(fn): ${existsTree(fn)}")
           val replacement = deconstructNestedApply(tree, Nil)
           TreeTypeMap(
             substTo = List(existsTree(fn).get),
@@ -342,7 +322,6 @@ class ContinuationsCallsPhase extends PluginPhase:
             newOwners = List(existsTree(fn).get),
             oldOwners = List(fn.symbol))(replacement)
         case tree @ Apply(_, _) =>
-          // println(s"unchanged apply: ${tree}")
           tree
         case t => t
       }

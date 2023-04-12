@@ -1,5 +1,6 @@
 package continuations
 
+import continuations.types.*
 import continuations.DefDefTransforms.*
 import continuations.Types.flattenTypes
 import continuations.jvm.internal.ContinuationImpl
@@ -28,6 +29,8 @@ import dotty.tools.dotc.core.Types.NoType
 import dotty.tools.dotc.ast.Trees.TypeDef
 import dotty.tools.dotc.core.Types.AppliedType
 import dotty.tools.dotc.ast.Trees.Closure
+import dotty.tools.dotc.core.Types.ExprType
+import dotty.tools.dotc.core.Types.StopAt
 
 object DefDefTransforms extends TreesChecks:
 
@@ -38,66 +41,78 @@ object DefDefTransforms extends TreesChecks:
       case t @ MethodType(termNames) =>
         val newT =
           t.paramInfoss.map(_.map(apply).filterNot(ttpe => ttpe == NoType)).filterNot(_.isEmpty)
-        println(s"newT: ${newT}")
         newT.foldRight(t.resType)(MethodType.apply)
       case t @ AppliedType(tyCon, args) =>
-        println(s"AppliedType t ${t.show}")
         val newArgs = args.map(apply).filterNot(ttpe => ttpe == NoType)
-        println(s"newArgs ${newArgs}")
         val finalT = if (newArgs.size == 1) newArgs.head else AppliedType(tyCon, newArgs)
-        println(s"finalT: $finalT")
         finalT
       case t => t
     }
   }
   final class TransformedMethodTypeMap(completionIndex: Int, resultTpe: Type)(using Context)
       extends TypeMap {
-    override def apply(tp: Type): Type = tp match {
-      case t: Types.TypeRef if hasSuspendClass(t.symbol) =>
-        NoType
-      case t @ MethodType(termNames) =>
-        println(s"resultTpe: ${resultTpe.show}")
-        println(s"resultTpe tree: ${resultTpe}")
-        val withoutSuspend =
-          t.paramInfoss.map(_.map(apply).filterNot(ttpe => ttpe == NoType)).filterNot(_.isEmpty)
-        val resultWithoutSuspend = new TransformReturnTypeMap().apply(resultTpe)
-        println(s"resultWithoutSuspend.show: ${resultWithoutSuspend.show}")
-        println(s"resultWithoutSuspend: ${resultWithoutSuspend.show}")
-        val completionType = requiredPackage(continuationPackageName)
-          .requiredType(continuationClassName)
-          .typeRef
-          .appliedTo(resultWithoutSuspend)
-        println(s"completionType.show: ${completionType.show}")
-        val newParamInfoss = withoutSuspend.insertAt(completionIndex, List(completionType))
-        val newTpe = newParamInfoss.foldRight(resultWithoutSuspend)(MethodType.apply)
-        println(s"newTpe.show: ${newTpe.show}")
-        newTpe
-      case t @ PolyType(lambdaParams, tpe) =>
-        PolyType(t.paramNames)(pt => t.paramInfos, pt => apply(tpe))
-      case t =>
-        t
-    }
+    override def apply(tp: Type): Type ={
+
+      tp match {
+        case t: Types.TypeRef if hasSuspendClass(t.symbol) =>
+          NoType
+        case t @ MethodType(termNames) =>
+          val withoutSuspend =
+            t.paramInfoss
+              .map(_.map(apply).filterNot(ttpe => ttpe == NoType))
+              .filterNot(_.isEmpty)
+          val resultWithoutSuspend = new TransformReturnTypeMap().apply(resultTpe)
+          val completionType = requiredPackage(continuationPackageName)
+            .requiredType(continuationClassName)
+            .typeRef
+            .appliedTo(resultWithoutSuspend)
+          val newParamInfoss = withoutSuspend.insertAt(completionIndex, List(completionType))
+          val newTpe = newParamInfoss.foldRight(resultWithoutSuspend)(MethodType.apply)
+          newTpe
+        case t @ PolyType(lambdaParams, tpe) =>
+          PolyType(t.paramNames)(pt => t.paramInfos, pt => apply(tpe))
+        case t @ AppliedType(tyCon, args) =>
+          val newArgs = args.map(apply).filterNot(ttpe => ttpe == NoType)
+          val finalT = if (newArgs.size == 1) newArgs.head else AppliedType(tyCon, newArgs)
+          finalT
+        case t @ RefinedType(parent, refinedName, refinedInfo) =>
+
+            RefinedType(mapOver(parent), refinedName, apply(refinedInfo))
+        case t =>
+          println(s"unmatchedType: ${t.show}, $t")
+          t
+      }}
   }
   final class TransformedAnonFunWithoutSuspend(resultTpe: Type)(using Context) extends TypeMap {
     override def apply(tp: Type): Type = tp match {
       case t: Types.TypeRef if hasSuspendClass(t.symbol) =>
         NoType
+      case AppliedType(tycon, args) =>
+        println(s"found applied type 108")
+        val argsWithoutSuspend = args.filterNot {
+          case tr: Types.TypeRef if hasSuspendClass(tr.symbol) =>
+            true
+          case _ => false
+        }
+        println(s"argsWithoutSuspend.size: ${argsWithoutSuspend.size}")
+        println(s"argsWithoutSuspend.head: ${argsWithoutSuspend.head.show}")
+        val newType =
+          if (argsWithoutSuspend.size == 1) argsWithoutSuspend.head
+          else AppliedType(tycon, argsWithoutSuspend)
+        println(s"newType 110: ${newType.show}")
+        newType
+      case ExprType(resType) =>
+        apply(resType)
       case t @ MethodType(termNames) =>
-        println(s"resultTpe: ${resultTpe.show}")
-        println(s"resultTpe tree: ${resultTpe}")
         val withoutSuspend =
           t.paramInfoss.map(_.map(apply).filterNot(ttpe => ttpe == NoType)).filterNot(_.isEmpty)
-        val resultWithoutSuspend = new TransformReturnTypeMap().apply(resultTpe)
-        println(s"resultWithoutSuspend.show: ${resultWithoutSuspend.show}")
-        println(s"resultWithoutSuspend: ${resultWithoutSuspend.show}")
+        val resultWithoutSuspend = new TransformReturnTypeMap().apply(flattenTypes(resultTpe).lastOption.getOrElse(NoType))
         val completionType = requiredPackage(continuationPackageName)
           .requiredType(continuationClassName)
           .typeRef
           .appliedTo(resultWithoutSuspend)
-        println(s"completionType.show: ${completionType.show}")
         val newParamInfoss = withoutSuspend
         val newTpe = newParamInfoss.foldRight(resultWithoutSuspend)(MethodType.apply)
-        println(s"newTpe.show: ${newTpe.show}")
         newTpe
       case t @ PolyType(lambdaParams, tpe) =>
         PolyType(t.paramNames)(pt => t.paramInfos, pt => apply(tpe))
@@ -106,6 +121,7 @@ object DefDefTransforms extends TreesChecks:
     }
   }
 
+  
   def isContinuation(t: tpd.Tree)(using Context): Boolean =
     t.symbol.info.hasClassSymbol(requiredClass(continuationFullName))
   def isSuspend(t: tpd.Tree)(using Context): Boolean =
@@ -132,11 +148,13 @@ object DefDefTransforms extends TreesChecks:
           tree.paramss.indexWhere(_.exists(_.symbol.isOneOf(GivenOrImplicit)))
         val completionIndex =
           if (maybeCompletionIndex == -1) tree.paramss.size - 1 else maybeCompletionIndex
+        val methodReturnType = new ExampleTypeMap().apply(tree.symbol.info)
+        println(s"tree.type: ${tree.symbol.info}")
+        
         val newTreeType =
-          TransformedMethodTypeMap(completionIndex, tree.tpt.tpe).apply(tree.symbol.info)
+          TransformedMethodTypeMap(completionIndex, methodReturnType).apply(methodReturnType)
         val newTreeSymbol = tree.symbol.asTerm.copy(info = newTreeType).entered.asTerm
-
-        val completionReturnType = new TransformReturnTypeMap().apply(tree.tpt.tpe)
+        println(s"newTreeSymbol: ${newTreeSymbol.info.resultType.show}")
         val completionSymbol = newSymbol(
           newTreeSymbol,
           Names.termName(completionParamName),
@@ -144,7 +162,7 @@ object DefDefTransforms extends TreesChecks:
           requiredPackage(continuationPackageName)
             .requiredType(continuationClassName)
             .typeRef
-            .appliedTo(completionReturnType)
+            .appliedTo(flattenTypes(methodReturnType).lastOption.getOrElse(NoType))
         ).entered
         val completionValDef = tpd.ValDef(completionSymbol.asTerm, tpd.EmptyTree)
 
@@ -153,12 +171,9 @@ object DefDefTransforms extends TreesChecks:
           transformParamsRemovingSuspend(
             tree.paramss.insertAt(completionIndex, List(completionValDef)))
             .map(_.map(_.symbol)),
-          completionReturnType,
+          methodReturnType,
           tree.rhs
         )
-        println(s"newTreeSymbol.info.show: ${newTreeSymbol.info.show}")
-        println(s"treeWithCompletion.symbol.info.show: ${treeWithCompletion.symbol.info.show}")
-
         val ownershipChanger = TreeTypeMap(
           substFrom = List(tree.symbol, newTreeSymbol),
           substTo = List(newTreeSymbol, newTreeSymbol),
@@ -229,7 +244,6 @@ object DefDefTransforms extends TreesChecks:
     def transformSuspensionsSuspendingStateMachine(
         suspensionPoints: List[tpd.Tree],
         suspensionInReturnedValue: Boolean)(using ctx: Context) =
-      println(s"transformSuspensionsSuspendingStateMachine")
       if suspensionPoints.isEmpty then tree
       else
         val transformedTree =
@@ -290,7 +304,6 @@ object DefDefTransforms extends TreesChecks:
   private def transformSuspendContinuationBody(
       callSuspensionPoint: tpd.Tree,
       safeContinuationSym: Symbol)(using Context): tpd.Tree = {
-    println(s"callSuspensionPoint: ${callSuspensionPoint.show}")
     val resumeMethod = ref(safeContinuationSym).select(termName(resumeMethodName))
     val raiseMethod = ref(safeContinuationSym).select(termName(raiseMethodName))
 
@@ -318,13 +331,11 @@ object DefDefTransforms extends TreesChecks:
         case t: tpd.DefDef if t.paramss.exists(_.exists(p => hasContinuationClass(p.symbol))) =>
           t.rhs
         case t @ Trees.Apply(fun, args) if fun.symbol.name.show == shiftName =>
-          println(s"transformSuspendContinuationBody resume apply tree: ${t} ${args}")
           val newTree = if (args.isEmpty) {
             tpd.EmptyTree
           } else if (args.size == 1) {
             tpd.Block(List.empty, args.last)
           } else tpd.Block(args.dropRight(1), args.last)
-          println(s"newTree: ${newTree.show}")
           newTree
         case Trees.Block(stats, Trees.Closure(_, m, _)) if m.existsSubTree { t =>
               anonymousContinuationFunctions.exists(anon => t.symbol.containsSym(anon.symbol))
@@ -337,27 +348,21 @@ object DefDefTransforms extends TreesChecks:
             val flattened = Trees.flatten(stats)
             tpd.Block(flattened.dropRight(1), flattened.last)
           }
-          println(s"closureTree: ${closureTree.show}")
           closureTree
         case tree @ Trees.Select(_, name)
             if belongsToContinuation(tree.symbol) && name.show == resumeMethodName =>
-          println(s"transformSuspendContinuationBody resume tree: ${tree.show}")
           val newResumeTree = resumeMethod
-          println(s"newResumeTree: ${newResumeTree.show}")
           newResumeTree
         case tree @ Trees.Select(_, name)
             if belongsToContinuation(tree.symbol) && name.show == raiseMethodName =>
           raiseMethod
         case t =>
-          println(s"transformSuspendContinuationBody resume t: ${t}")
           t
       },
       oldOwners = continuationReferences.map(_.owner),
       newOwners = safeContinuationRefOwners,
       substFrom = continuationReferences,
       substTo = safeContinuationRefSymbols)(callSuspensionPoint)
-
-    println(s"hypothesis: ${hypothesis.show}")
 
     val leftoverSymbols = hypothesis
       .filterSubTrees { t =>
@@ -377,7 +382,6 @@ object DefDefTransforms extends TreesChecks:
         substFrom = leftoverSymbols,
         substTo = leftoverReplacementSymbols
       )(hypothesis))
-    println(s"finalHypothesis: ${finalHypothesis.show}")
     finalHypothesis
   }
 
@@ -476,7 +480,6 @@ object DefDefTransforms extends TreesChecks:
     sym.enclosingClass.asClass.delete(sym)
 
   private def transformNonSuspending(tree: tpd.ValOrDefDef)(using ctx: Context): tpd.Tree =
-    println(s"transformNonSuspending")
     val parent = tree.symbol
 
     val transformedMethod =
@@ -591,17 +594,13 @@ object DefDefTransforms extends TreesChecks:
       case dd @ tpd.DefDef(_, paramss, _, _) if isLoneSuspend(dd) => dd.rhs
       case tree @ Closure(List(), meth, tpd.EmptyTree)
           if meth.symbol.paramSymss.exists(_.exists(hasSuspendClass)) =>
-        println(s"inner closure ${tree.show}")
         tpd.EmptyTree
       case t =>
-        println(s"unmatched tree: ${t.show}")
-        println(s"unmatched tree owners: ${t.symbol.ownersIterator.toList}")
         t
     })
 
     val removeEmptyTreeBlock = TreeTypeMap(treeMap = {
       case tree @ tpd.Block(l, tpd.EmptyTree) =>
-        println(s"Block with empty expression: ${tree.show}")
         if (l.size == 1) l.head else tpd.Block(l.dropRight(1), l.last)
       case t => t
     })
@@ -803,7 +802,6 @@ object DefDefTransforms extends TreesChecks:
       rhsAsList
         .foldLeft((0, Map.empty[tpd.Tree, List[tpd.Tree]], List.empty[tpd.Tree])) {
           case ((suspensionPointsCounter, nonDefDefRowsBefore, rowsAfterLast), row) =>
-            println(s"row as ${row.show}")
             if (treeCallsSuspend(row) || valDefTreeCallsSuspend(row))
               val rowsBefore =
                 row match
@@ -831,11 +829,6 @@ object DefDefTransforms extends TreesChecks:
             else (suspensionPointsCounter, nonDefDefRowsBefore, row :: rowsAfterLast)
         }
         .drop(1)
-
-    nonDefDefRowsBeforeSuspensionPoint.foreach { kv =>
-      println(s"nonDefDefRowsBeforeSuspensionPoint k: ${kv._1.show}")
-      kv._2.foreach { v => println(s"nonDefDefRowsBeforeSuspensionPoint v: ${v.show}") }
-    }
 
     val nonDefDefRowsBeforeSuspensionPointList = nonDefDefRowsBeforeSuspensionPoint.toList
 
@@ -1204,7 +1197,6 @@ object DefDefTransforms extends TreesChecks:
             .drop(1)
             .dropWhile(r => !treeCallsSuspend(r) && !valDefTreeCallsSuspend(r))
             .drop(1)
-        relevantParamsAndRows.foreach(i => println(s"relevantParamsAndRows item: ${i.show}"))
         def needsAssignFrom(sym: TermSymbol): Boolean =
           relevantParamsAndRows.exists(_.symbol.denot.matches(sym))
 
