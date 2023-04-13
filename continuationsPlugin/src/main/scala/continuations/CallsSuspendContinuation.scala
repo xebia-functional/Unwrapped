@@ -7,7 +7,7 @@ import dotty.tools.dotc.core.Names.*
 import dotty.tools.dotc.report
 
 /**
- * Matcher for detecting methods that call [[continuations.Suspend#shift]]
+ * Matcher for detecting methods that call [[continuations#shift]]
  */
 private[continuations] object CallsSuspendContinuation extends TreesChecks:
 
@@ -22,7 +22,7 @@ private[continuations] object CallsSuspendContinuation extends TreesChecks:
    * @param tree
    *   the [[dotty.tools.dotc.ast.tpd.Tree]] to match upon
    * @return
-   *   [[scala.Some]] if the tree contains a subtree call to [[continuations.Suspend#shift]],
+   *   [[scala.Some]] if the tree contains a subtree call to [[continuations#shift]],
    *   [[scala.None]] otherwise
    */
   def apply(tree: ValOrDefDef)(using Context): Boolean =
@@ -30,6 +30,7 @@ private[continuations] object CallsSuspendContinuation extends TreesChecks:
       tree
         .rhs
         .filterSubTrees {
+          // case Apply() =>
           case Inlined(call, _, _) =>
             val isSuspendContinuation = call.denot.matches(shiftMethod.symbol)
             if isSuspendContinuation && hasNestedContinuation(call) then

@@ -14,7 +14,7 @@ object ExampleObj:
     def method2(x: Int) = x + 1
     val z2 = 1
 
-    val suspension1 = s.shift[Int] { continuation =>
+    val suspension1 = shift[Int] { continuation =>
       def method3(x: Int) = x
       val z3 = 1
 
@@ -26,12 +26,12 @@ object ExampleObj:
       }
     }
 
-    s.shift[Int] { continuation => continuation.resume(method1(x) + 1) }
+    shift[Int] { continuation => continuation.resume(method1(x) + 1) }
 
     val z5 = suspension1
     def method5(x: Int) = x
 
-    val suspension2 = s.shift[Int] { continuation =>
+    val suspension2 = shift[Int] { continuation =>
       continuation.resume(z5 + suspension1 + method5(y))
     }
 

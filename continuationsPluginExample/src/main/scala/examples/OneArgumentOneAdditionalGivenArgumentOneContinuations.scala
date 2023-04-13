@@ -6,7 +6,7 @@ import continuations.Suspend
   given String = "Output: "
   def oneArgumentOneAdditionalGivenArgumentOneContinuations(
       x: Int)(using Suspend, String): String =
-    summon[Suspend].shift[String] { continuation =>
+    shift[String] { continuation =>
       continuation.resume(summon[String] + x)
     }
   println(oneArgumentOneAdditionalGivenArgumentOneContinuations(1))

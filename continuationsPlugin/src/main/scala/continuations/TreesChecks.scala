@@ -8,9 +8,9 @@ trait TreesChecks extends Trees {
 
   /**
    * @param tree
-   *   A [[dotty.tools.dotc.ast.tpd.Tree]] to check if [[continuations.Suspend#shift]] is called
+   *   A [[dotty.tools.dotc.ast.tpd.Tree]] to check if [[continuations.shift]] is called
    * @return
-   *   True if the calls calls the method [[continuations.Suspend#shift]]
+   *   True if the calls calls the method [[continuations.shift]]
    */
   private[continuations] def subtreeCallsSuspend(tree: Tree)(using Context): Boolean =
     val treeIsContinuationsSuspendContinuation: Context ?=> Tree => Boolean = t =>
@@ -23,9 +23,9 @@ trait TreesChecks extends Trees {
 
   /**
    * @param tree
-   *   A [[dotty.tools.dotc.ast.tpd.Tree]] to check if it calls [[continuations.Suspend#shift]]
+   *   A [[dotty.tools.dotc.ast.tpd.Tree]] to check if it calls [[continuations.shift]]
    * @return
-   *   True if the tree calls the method [[continuations.Suspend#shift]]
+   *   True if the tree calls the method [[continuations.shift]]
    */
   private[continuations] def treeCallsSuspend(tree: Tree)(using Context): Boolean =
     val treeIsContinuationsSuspendContinuation: Context ?=> Tree => Boolean = t =>

@@ -25,8 +25,8 @@ class ContinuationsCallingContinuationsSuite extends SnapshotSuite, CompilerFixt
       val source = """|package examples
                       |import continuations.*
                       |def NonSuspendingContinuationCallsOtherContinuation = {
-                      |  def cont2(x: Int)(using s:Suspend): Int = s.shift(_.resume(x + 1))
-                      |  def cont1(x: Int)(using s:Suspend): Int = cont2(x + 2)
+                      |  def cont2(x: Int)(using Suspend): Int = shift(_.resume(x + 1))
+                      |  def cont1(x: Int)(using Suspend): Int = cont2(x + 2)
                       |
                       |  println(cont1(1))
                       |}
@@ -41,8 +41,8 @@ class ContinuationsCallingContinuationsSuite extends SnapshotSuite, CompilerFixt
         """|package examples
            |import continuations.*
            |def NonSuspendingContinuationCallsOtherContinuation = {
-           |  def cont2(x: Int)(using s:Suspend): Int = s.shift(_.resume(x + 1))
-           |  def cont1(x: Int)(using s:Suspend): Int = s.shift(_.resume(cont2(x + 2)))
+           |  def cont2(x: Int)(using Suspend): Int = shift(_.resume(x + 1))
+           |  def cont1(x: Int)(using Suspend): Int = shift(_.resume(cont2(x + 2)))
            |
            |  println(cont1(1))
            |}
@@ -57,13 +57,13 @@ class ContinuationsCallingContinuationsSuite extends SnapshotSuite, CompilerFixt
         """|package examples
            |import continuations.*
            |def NonSuspendingContinuationCallsOtherContinuation = {
-           |  def cont2(x: Int)(using s:Suspend): Int ={
+           |  def cont2(x: Int)(using Suspend): Int ={
            |
-           |    val y = s.shift[Int](_.resume(x + 1))
-           |    val z = s.shift[Int](_.resume(y + 1))
+           |    val y = shift[Int](_.resume(x + 1))
+           |    val z = shift[Int](_.resume(y + 1))
            |    y + z
            |  }
-           |  def cont1(x: Int)(using s:Suspend): Int = s.shift(_.resume(cont2(x + 2)))
+           |  def cont1(x: Int)(using Suspend): Int = shift(_.resume(cont2(x + 2)))
            |
            |  println(cont1(1))
            |}
@@ -77,15 +77,15 @@ class ContinuationsCallingContinuationsSuite extends SnapshotSuite, CompilerFixt
       val source = """|package examples
                       |import continuations.*
                       |def NonSuspendingContinuationCallsOtherContinuation = {
-                      |  def cont2(x: Int)(using s:Suspend): Int ={
+                      |  def cont2(x: Int)(using Suspend): Int ={
                       |
-                      |    val y = s.shift[Int](_.resume(x + 1))
-                      |    val z = s.shift[Int](_.resume(y + 1))
+                      |    val y = shift[Int](_.resume(x + 1))
+                      |    val z = shift[Int](_.resume(y + 1))
                       |    y + z
                       |  }
-                      |  def cont1(x: Int)(using s:Suspend): Int = {
-                      |    val y = s.shift[Int](_.resume(cont2(x + 2)))
-                      |    val z = s.shift[Int](_.resume(y + 1))
+                      |  def cont1(x: Int)(using Suspend): Int = {
+                      |    val y = shift[Int](_.resume(cont2(x + 2)))
+                      |    val z = shift[Int](_.resume(y + 1))
                       |    y + z
                       |  }
                       |

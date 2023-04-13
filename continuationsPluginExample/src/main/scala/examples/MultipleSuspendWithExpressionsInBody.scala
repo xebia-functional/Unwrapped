@@ -3,12 +3,12 @@ package examples
 import continuations.Suspend
 
 @main def MultipleSuspendWithExpressionsInBody =
-  def foo1()(using s: Suspend): Int =
+  def foo1()(using Suspend): Int =
     println("Start")
-    s.shift[Unit] { _.resume(println("Hello")) }
+    shift[Unit] { _.resume(println("Hello")) }
     println("World")
     val x = 1
-    s.shift[Boolean] { continuation =>
+    shift[Boolean] { continuation =>
       val q = "World"
       println("Hi")
       continuation.resume({ println(q); false })

@@ -124,12 +124,12 @@ def program$expanded(
   c(z)
 
 def programSuspendContinuationNoParamNoSuspendContinuation: Int =
-  def fooTest()(using s: Suspend): Int = 1
+  def fooTest()(using Suspend): Int = 1
   fooTest()
 
 def programSuspendContinuationNoParamResume: Int =
-  def fooTest()(using s: Suspend): Int =
-    s.shift[Int] { continuation =>
+  def fooTest()(using Suspend): Int =
+    shift[Int] { continuation =>
       println("Hello")
       continuation.resume(1)
     }
@@ -138,8 +138,8 @@ def programSuspendContinuationNoParamResume: Int =
 
 /*
 def programNestedContinuationCompilationError: Int =
-  def fooTest()(using s: Suspend): Int =
-    s.shift[Int] { continuation =>
+  def fooTest()(using Suspend): Int =
+    shift[Int] { continuation =>
       val x = s.shift[Int] { continuation1 => continuation1.resume(1) }
       continuation.resume(x + 1)
     }
@@ -148,12 +148,12 @@ def programNestedContinuationCompilationError: Int =
  */
 
 def programSuspendContinuationNoParamResumeIgnoreResult: Int =
-  def fooTest()(using s: Suspend): Int =
+  def fooTest()(using Suspend): Int =
     println("Start")
-    s.shift[Unit] { _.resume(println("Hello")) }
+    shift[Unit] { _.resume(println("Hello")) }
     println("World")
     val x = 1
-    s.shift[Boolean] { continuation =>
+    shift[Boolean] { continuation =>
       val q = "World"
       println("Hi")
       continuation.resume({ println(q); false })
@@ -166,14 +166,14 @@ def programSuspendContinuationNoParamResumeIgnoreResult: Int =
   fooTest()
 
 def programSuspendContinuationParamDependent: Int =
-  def fooTest(qq: Int)(using s: Suspend): Int =
+  def fooTest(qq: Int)(using Suspend): Int =
     val pp = 11
-    val xx = s.shift[Int] { _.resume(qq - 1) }
+    val xx = shift[Int] { _.resume(qq - 1) }
     val ww = 13
     val rr = "AAA"
-    val yy = s.shift[String] { c => c.resume(rr) }
+    val yy = shift[String] { c => c.resume(rr) }
     val tt = 100
-    val zz = s.shift[Int] { _.resume(ww - 1 + xx) }
+    val zz = shift[Int] { _.resume(ww - 1 + xx) }
     println(xx)
     xx + qq + zz + pp + tt + yy.length
 
@@ -181,7 +181,7 @@ def programSuspendContinuationParamDependent: Int =
 
 def programSuspendContinuationResumeVals: Int =
   def fooTest()(using Suspend): Int =
-    summon[Suspend].shift[Int] { c =>
+    shift[Int] { c =>
       c.resume {
         println("Hello")
         val x = 1
@@ -196,7 +196,7 @@ def programOneContinuationReturnValue: Int =
   def zeroArgumentsSingleResumeContinuationsBeforeAfter()(using Suspend): Int =
     println("Hello")
     val x = 1
-    summon[Suspend].shift[Unit] { continuation =>
+    shift[Unit] { continuation =>
       continuation.resume(println(x))
     }
     println("World")
@@ -225,7 +225,7 @@ object ExampleObject:
     def method2(x: Int) = x + 1
     val z2 = 1
 
-    val suspension1 = s.shift[Int] { continuation =>
+    val suspension1 = shift[Int] { continuation =>
       def method3(x: Int) = x
       val z3 = 1
 
@@ -237,14 +237,12 @@ object ExampleObject:
       }
     }
 
-    s.shift[Int] { continuation => continuation.resume(method1(x) + 1) }
+    shift[Int](_.resume(method1(x) + 1))
 
     val z5 = suspension1
     def method5(x: Int) = x
 
-    val suspension2 = s.shift[Int] { continuation =>
-      continuation.resume(z5 + suspension1 + method5(y))
-    }
+    val suspension2 = shift[Int](_.resume(z5 + suspension1 + method5(y)))
 
     val z6 = 1
     def method6(x: Int) = x
@@ -256,7 +254,7 @@ def programStartContinuation: Unit =
   def fooTest()(using Suspend): Int =
     println("Hello")
     val x = 1
-    summon[Suspend].shift[Unit] { continuation =>
+    shift[Unit] { continuation =>
       continuation.resume(println(x))
     }
     println("World")

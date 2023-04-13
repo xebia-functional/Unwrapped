@@ -4,10 +4,10 @@ import continuations.Suspend
 
 @main def TwoContinuationsUseCodeAboveContinuationInCodeAfterTheContinuation =
   def twoContinuationsUseCodeAboveContinuationInCodeAfterTheContinuation()(
-      using s: Suspend): Int =
+      using Suspend): Int =
     println("Hello")
     val x = 1
-    s.shift(_.resume(println("Resume 1")))
-    s.shift(_.resume(println(s"Resume 2 $x")))
+    shift(_.resume(println("Resume 1")))
+    shift(_.resume(println(s"Resume 2 $x")))
     x + 1
   println(twoContinuationsUseCodeAboveContinuationInCodeAfterTheContinuation())

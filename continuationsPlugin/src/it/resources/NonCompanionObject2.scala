@@ -7,11 +7,11 @@ def program = {
 }
 
 object ExampleObject {
-  def continuations(x: Int)(using s: Suspend): Int = {
+  def continuations(x: Int)(using Suspend): Int = {
     def method1(x: Int) = x + 1
     val z1 = 1
 
-    s.shift[Int] { continuation =>
+    shift[Int] { continuation =>
       def method2(x: Int) = x + 1
       val z2 = 1
 

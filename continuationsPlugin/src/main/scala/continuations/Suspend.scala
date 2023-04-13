@@ -5,9 +5,9 @@ import continuations.Suspend.CompilerRewriteUnsuccessfulException
 sealed trait Suspend:
   def continuation[A](f: Continuation[A] => Unit): A
 
-  extension (s: Suspend)
-    inline def shift[A](f: Continuation[A] => Unit): A =
-      throw CompilerRewriteUnsuccessfulException
+inline def shift[A](using Suspend)(f: Continuation[A] => Unit): A =
+  throw CompilerRewriteUnsuccessfulException
+
 
 object Suspend:
   private[continuations] case object CompilerRewriteUnsuccessfulException
