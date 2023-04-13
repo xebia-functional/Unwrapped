@@ -5,9 +5,14 @@ import dotty.tools.dotc.core.Contexts.Context
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Types.*
 
-final class ExampleTypeMap()(using Context) extends TypeMap {
+final class DefDefAddCompletionType()(using Context) extends TypeMap {
   def hasSuspendClass(s: Symbol)(using ctx: Context): Boolean =
     s.info.hasClassSymbol(requiredClass(suspendFullName))
+  private def makeMethodTypeWithContinuationType(t: Type, continuationType: Type)(using ctx: Context): Type =
+    val resultType = t.finalResultType
+    val completionType = requiredClassRef(continuationFullName).appliedTo(continuationType)
+    MethodType.apply(List(completionType), resultType)
+
   override def apply(tp: Type): Type =
     tp match {
       case t: TypeRef if hasSuspendClass(t.symbol) =>
@@ -33,12 +38,18 @@ final class ExampleTypeMap()(using Context) extends TypeMap {
         }
         val newType =
           if (argsWithoutSuspend.size == 1) argsWithoutSuspend.head
-          else AppliedType(tycon, argsWithoutSuspend)
+          else
+            if (tycon.isContextualMethod) {
+              val contextFunctionTypeName = s"scala.ContextFunction${argsWithoutSuspend.size}"
+              AppliedType(requiredClassRef(contextFunctionTypeName), argsWithoutSuspend)
+            } else AppliedType(tycon, argsWithoutSuspend)
         newType
       case ExprType(resType) =>
-        apply(resType)
+        val withoutSuspend = apply(resType)
+        val completionType = requiredClassRef(continuationFullName).appliedTo(withoutSuspend)
+        MethodType.apply(List(completionType), withoutSuspend)
       case t @ PolyType(lambdaParams, tpe) =>
-          PolyType(t.paramNames)(pt => t.paramInfos, pt => apply(tpe))
+        PolyType(t.paramNames)(pt => t.paramInfos, pt => apply(tpe))
       case t => t
     }
 }

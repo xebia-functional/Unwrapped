@@ -48,9 +48,15 @@ class ContinuationsPhase extends PluginPhase:
   override val runsBefore = Set(ContinuationsCallsPhase.name)
 
   override def transformValDef(tree: ValDef)(using Context): tpd.Tree =
+    println(s"valOrDefDef.show: ${tree.show}")
+    println(s"valOrDefDef.symbol.info.show: ${tree.symbol.info.show}")
+    println(s"valOrDefDef.symbol.info: ${tree.symbol.info}")
     DefDefTransforms.transformSuspendContinuation(tree)
 
   override def transformDefDef(tree: DefDef)(using ctx: Context): tpd.Tree =
+    println(s"valOrDefDef.show: ${tree.show}")
+    println(s"valOrDefDef.symbol.info.show: ${tree.symbol.info.show}")
+    println(s"valOrDefDef.symbol.info: ${tree.symbol.info}")
     try {
       DefDefTransforms.transformSuspendContinuation(tree)
     } catch {

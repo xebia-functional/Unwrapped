@@ -4,7 +4,7 @@ import continuations.Suspend
 import scala.util.Try
 
 @main def main =
-  // def foo[A](x: A)(using Suspend): A = 
+  // def foo[A](x: A)(using Suspend): A =
   // // val polymorphicValDefZeroContinuations
   // //     : Suspend ?=> [A] => List[A] => [B] => List[B] => List[A] => List[A] => Int =
   // //   [A] =>
@@ -17,15 +17,12 @@ import scala.util.Try
   // //               val z = 1
   // //               x.size + y.size + q.size + p.size + z
 
-  def polymorphicDefDefZeroContinuations
-      : Suspend ?=> [A] => List[A] => Int =
-    [A] =>
-      (x: List[A]) => x.size
+  val polymorphicDefDefZeroContinuations: (Suspend) ?=> Int = 1
 
-  // // println(
-  // //   polymorphicValDefZeroContinuations(List(1))(List("A", "B"))(List(1, 1, 1))(
-  // //     List(1, 1, 1, 1)))
+// // println(
+// //   polymorphicValDefZeroContinuations(List(1))(List("A", "B"))(List(1, 1, 1))(
+// //     List(1, 1, 1, 1)))
 
-  // println(
-  //   polymorphicDefDefZeroContinuations(List(1))(List("A", "B"))(List(1, 1, 1))(
-  //     List(1, 1, 1, 1)))
+// println(
+//   polymorphicDefDefZeroContinuations(List(1))(List("A", "B"))(List(1, 1, 1))(
+//     List(1, 1, 1, 1)))
