@@ -8,7 +8,6 @@ sealed trait Suspend:
 inline def shift[A](using Suspend)(f: Continuation[A] => Unit): A =
   throw CompilerRewriteUnsuccessfulException
 
-
 object Suspend:
   private[continuations] case object CompilerRewriteUnsuccessfulException
       extends Exception(

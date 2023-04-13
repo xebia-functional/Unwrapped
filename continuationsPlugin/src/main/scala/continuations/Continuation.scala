@@ -9,7 +9,6 @@ trait Continuation[-A]:
   def raise(error: Throwable): Unit
   def contextService[T](): T | Null =
     context.toList.find(_.isInstanceOf[T]).map(_.asInstanceOf[T]).orNull
-  
 
 object Continuation:
   enum State:
