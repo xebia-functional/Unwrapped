@@ -68,7 +68,7 @@ package continuations {
                   {
                     case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
                     case orThrow @ <empty> =>
-                      x = orThrow.asInstanceOf[Int]
+                      x = orThrow
                       return[label1] ()
                   }
               case 1 =>

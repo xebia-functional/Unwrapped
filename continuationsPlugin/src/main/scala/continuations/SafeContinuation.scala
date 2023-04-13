@@ -4,7 +4,9 @@ import continuations.jvm.internal.ContinuationStackFrame
 
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater
 
-class SafeContinuation[-T](val delegate: Continuation[T], initialResult: Any | Null)
+class SafeContinuation[T] private (
+    val delegate: Continuation[T],
+    initialResult: T | Continuation.State)
     extends SafeContinuationBase,
       Continuation[T],
       ContinuationStackFrame:
@@ -42,7 +44,7 @@ class SafeContinuation[-T](val delegate: Continuation[T], initialResult: Any | N
         }
       } else throw IllegalStateException("Already resumed")
 
-  def getOrThrow(): Any | Null | Continuation.State.Suspended.type =
+  def getOrThrow(): T | Null | Continuation.State.Suspended.type =
     var result = this.result
 
     if (result == Continuation.State.Undecided) {
@@ -57,7 +59,7 @@ class SafeContinuation[-T](val delegate: Continuation[T], initialResult: Any | N
     } else if ((result ne null) && errored) {
       throw result.asInstanceOf[Throwable]
     } else
-      result
+      result.asInstanceOf[T]
 
   override def callerFrame: ContinuationStackFrame | Null =
     if (delegate != null && delegate.isInstanceOf[ContinuationStackFrame]) delegate.asInstanceOf
