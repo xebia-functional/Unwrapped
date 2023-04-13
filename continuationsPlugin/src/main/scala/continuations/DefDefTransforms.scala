@@ -148,7 +148,7 @@ object DefDefTransforms extends TreesChecks:
           tree.paramss.indexWhere(_.exists(_.symbol.isOneOf(GivenOrImplicit)))
         val completionIndex =
           if (maybeCompletionIndex == -1) tree.paramss.size - 1 else maybeCompletionIndex
-        val methodReturnType = new DefDefAddCompletionType().apply(tree.symbol.info)
+        val methodReturnType = new DefDefAddCompletionMap().apply(tree.symbol.info)
         println(s"tree.type: ${tree.symbol.info}")
         
         val newTreeType =

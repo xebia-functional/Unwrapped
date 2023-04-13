@@ -11,7 +11,7 @@ import dotty.tools.dotc.core.TypeComparer
 import dotty.tools.dotc.core.Types.*
 import munit.FunSuite
 
-class DefDefAddCompletionTypeSuite
+class DefDefAddCompletionMapSuite
     extends FunSuite,
       CompilerFixtures,
       TypeMapSuiteFixtures,
@@ -29,7 +29,7 @@ class DefDefAddCompletionTypeSuite
       val zArg = ctx.definitions.IntType
       val paramSymss = List(List(xArg, yArg), List(usingSuspendType), List(zArg))
       val methodType = makeMethodType(paramSymss, ctx.definitions.IntType)
-      val actualType = DefDefAddCompletionType()(methodType)
+      val actualType = DefDefAddCompletionMap()(methodType)
       val expectedType = makeMethodType(
         paramSymss
           .insertAt(1, List(completionType))
@@ -49,7 +49,7 @@ class DefDefAddCompletionTypeSuite
         requiredClass(continuationFullName).typeRef.appliedTo(ctx.definitions.IntType)
       val paramSymss = List(List(usingSuspendType))
       val methodType = makeMethodType(paramSymss, ctx.definitions.IntType)
-      val actualType = DefDefAddCompletionType()(methodType)
+      val actualType = DefDefAddCompletionMap()(methodType)
       val expectedType = makeMethodType(
         paramSymss
           .insertAt(1, List(completionType))
@@ -75,7 +75,7 @@ class DefDefAddCompletionTypeSuite
           makeMethodType(paramSymss, typeParamRef)
         }
       ).appliedTo(ctx.definitions.IntType)
-      val actualType = DefDefAddCompletionType()(polyMethodType)
+      val actualType = DefDefAddCompletionMap()(polyMethodType)
       val expectedType = PolyType(typeParams)(
         pt => List(TypeBounds(ctx.definitions.NothingType, ctx.definitions.AnyType)),
         pt => {
@@ -132,7 +132,7 @@ class DefDefAddCompletionTypeSuite
             )
           )
         ))
-      val actualType = DefDefAddCompletionType()(expressionType)
+      val actualType = DefDefAddCompletionMap()(expressionType)
       val expectedType = makeMethodType(
         List(List(completionSymbol)),
         RefinedType(
@@ -179,7 +179,7 @@ class DefDefAddCompletionTypeSuite
             )
           )
         ))
-      val actualType = DefDefAddCompletionType()(expressionType)
+      val actualType = DefDefAddCompletionMap()(expressionType)
       val expectedType = makeMethodType(
         List(
           List(
@@ -250,7 +250,7 @@ class DefDefAddCompletionTypeSuite
           )
         )
       )
-      val actualType = DefDefAddCompletionType()(contextualMethodType)
+      val actualType = DefDefAddCompletionMap()(contextualMethodType)
       val expectedType = makeMethodType(
         List(
           List(requiredClassRef(continuationFullName).appliedTo(RefinedType(
