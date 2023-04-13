@@ -1030,8 +1030,8 @@ object DefDefTransforms extends TreesChecks:
             ).transform(call)
           case _ => tpd.EmptyTree
 
+        val shiftType = callSuspensionPoint.tpe
         val safeContinuation: tpd.ValDef = {
-          val shiftType = callSuspensionPoint.tpe
 
           val safeContinuationConstructor =
             ref(requiredModule("continuations.SafeContinuation"))
@@ -1088,15 +1088,13 @@ object DefDefTransforms extends TreesChecks:
               newParent,
               termName("orThrow"),
               Flags.Case | Flags.CaseAccessor,
-              anyNullSuspendedType).entered
+              shiftType).entered
 
           val assignGetOrThrowToGlobalVar =
             nonDefDefRowsBeforeSuspensionPoint.keySet.toList(stateIx) match
               case vd: tpd.ValDef =>
-                tpd.Assign(
-                  ref(globalVarsSyms.find(matchesNameCoord(_, vd)).get),
-                  ref(orThrowSymbol).select(nme.asInstanceOf_).appliedToType(vd.symbol.info)
-                ) :: Nil
+                val gv = globalVarsSyms.find(matchesNameCoord(_, vd)).get
+                tpd.Assign(ref(gv), ref(orThrowSymbol)) :: Nil
               case _ =>
                 Nil
 

@@ -80,7 +80,7 @@ package continuations {
                   {
                     case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
                     case orThrow @ <empty> =>
-                      suspension1 = orThrow.asInstanceOf[Int]
+                      suspension1 = orThrow
                       return[label1] ()
                   }
               case 1 =>
@@ -122,7 +122,7 @@ package continuations {
                 safeContinuation.getOrThrow() match
                   {
                     case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
-                    case orThrow @ <empty> => suspension2 = orThrow.asInstanceOf[Int]
+                    case orThrow @ <empty> => suspension2 = orThrow
                   }
               case 3 =>
                 y##1 = $continuation.I$0
