@@ -29,8 +29,3 @@ object ContinuationStub:
         result: Either[Throwable, Any | Null | Continuation.State.Suspended.type]): Any | Null =
       result.fold(t => throw t, or => or)
   }
-
-  def potato: ContinuationImpl = new ContinuationImpl(c, c.context) {
-    override def invokeSuspend(result: Either[Throwable, Any | Null | State.Suspended.type]): Any | Null = ???
-    def invoke[A](continuation: Continuation[A]): Nothing = ???
-  }

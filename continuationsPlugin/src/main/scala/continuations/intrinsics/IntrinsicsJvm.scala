@@ -1,6 +1,6 @@
 package continuations.intrinsics
 
-import continuations.jvm.internal.{BaseContinuationImpl, ContinuationImpl, Thing}
+import continuations.jvm.internal.{BaseContinuationImpl, ContinuationImpl, Starter}
 import continuations.{Continuation, RestrictedContinuation, Suspend}
 
 import scala.concurrent.ExecutionContext
@@ -12,8 +12,7 @@ extension [A](continuation: Continuation[A])
       continuation.asInstanceOf[ContinuationImpl].intercepted(ec).asInstanceOf[Continuation[A]]
     else continuation
 
-
-extension [A](suspendedFn: Thing ?=> A)
+extension [A](suspendedFn: Starter ?=> A)
 
   // inline def shift
   /*
@@ -36,17 +35,17 @@ extension [A](suspendedFn: Thing ?=> A)
       suspendedFn.asInstanceOf[BaseContinuationImpl].create(completion)
     else
       createContinuationFromSuspendFunction(
-        completion
-        // (continuation: Continuation[A]) => {
-          // suspendedFn.asInstanceOf[Thing].invoke(continuation)
-        // }
+        completion,
+        (continuation: Continuation[Int]) => {
+          suspendedFn.asInstanceOf[Starter].invoke(continuation)
+        }
       )
 
 // TODO: call synthetic function invoke here and remove extra param p1
 
 private inline def createContinuationFromSuspendFunction[T](
-    completion: Continuation[T]
-    // block: Continuation[T] => Any | Null
+    completion: Continuation[T],
+    block: Continuation[Int] => Int | Any
 ): Continuation[Unit] =
   val context = completion.context
   if (context == EmptyTuple)
@@ -62,7 +61,8 @@ private inline def createContinuationFromSuspendFunction[T](
               case Left(exception) =>
                 throw exception
               case _ => ()
-            //completion.invoke(null, this.asInstanceOf[Continuation[Any | Null]])
+            block(this)
+
           case 1 =>
             label = 2
             result match
@@ -87,7 +87,8 @@ private inline def createContinuationFromSuspendFunction[T](
               case Left(exception) =>
                 throw exception
               case _ => ()
-            // invoke(null, this)
+            block(this)
+
           case 1 =>
             label = 2
             result match

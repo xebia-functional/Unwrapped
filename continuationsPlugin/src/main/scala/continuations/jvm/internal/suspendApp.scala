@@ -10,33 +10,38 @@ import scala.concurrent
 import scala.concurrent.ExecutionContext
 
 object SuspendApp:
-  private var result: Either[Throwable, Int] = Right(0)
-  def apply[A](block: Thing ?=> A): Unit =
+  var result: Either[Throwable, Any] = Right(0)
+  def apply[A](block: Any): Any =
 
     val count: AtomicLong = new AtomicLong(0)
     val defaultFactory = Executors.defaultThreadFactory()
+
     val customFactory = new ThreadFactory:
       override def newThread(r: Runnable): Thread =
         val thread: Thread = defaultFactory.newThread(r)
         thread.setName(s"custom-thread-pool-${count.getAndIncrement()}")
         thread
+
     val pool = ExecutionContext.fromExecutor(
       Executors.newFixedThreadPool(7, customFactory)
     )
-    // val pool: ExecutionContext = ExecutionContext.global
+
     val latch: CountDownLatch = CountDownLatch(1)
-    println(s"Thread 0 suspendApp: ${Thread.currentThread().getName}")
+
     pool.execute {
       new Runnable:
         override def run(): Unit =
-          println(s"Thread 1 suspendApp: ${Thread.currentThread().getName}")
-          val baseCont = BuildContinuation[A](pool, { res =>
-            res.fold(t => throw t, _ => println(s"Thread builder continuation: ${Thread.currentThread().getName}"))
-            latch.countDown()
-          })
-          block.startContinuation(baseCont/*ContinuationStub.potato*/)
-          println(s"Thread 2 suspendApp: ${Thread.currentThread().getName}")
+          val baseCont = BuildContinuation[Any](
+            pool,
+            { res =>
+              // res.fold(t => throw t, _ => println(s"Thread builder continuation: ${Thread.currentThread().getName}"))
+              result = res
+              latch.countDown()
+            })
+          block.startContinuation(baseCont)
     }
     latch.await()
-    result.fold(throw _, identity)
     println(s"Last thread suspendApp: ${Thread.currentThread().getName}")
+    result match
+      case Left(e) => throw e
+      case Right(Right(v)) => v

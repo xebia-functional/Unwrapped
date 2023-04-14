@@ -2,11 +2,11 @@ package continuations.jvm.internal
 
 import continuations.Continuation
 
-abstract class Thing:
+abstract class Starter:
   def invoke(completion: Continuation[Int]): Int | Any | Null
 
-object Thing:
-  given Thing = Marker
-  
-object Marker extends Thing:
+object Starter:
+  given Starter = Marker
+
+object Marker extends Starter:
   override def invoke(completion: Continuation[Int]): Int | Any | Null = ???

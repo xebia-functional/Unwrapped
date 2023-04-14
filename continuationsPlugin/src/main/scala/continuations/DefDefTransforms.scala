@@ -663,7 +663,7 @@ object DefDefTransforms extends TreesChecks:
 
     val newReturnType =
       Types.OrType(Types.OrNull(returnType), suspendedState.symbol.namedType, false)
-    
+
     val transformedMethodSymbol =
       createTransformedMethodSymbol(parent, transformedMethodParams, newReturnType)
 

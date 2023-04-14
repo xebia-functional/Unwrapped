@@ -52,10 +52,7 @@ abstract class BaseContinuationImpl(
   def create(value: Any | Null, completion: Continuation[Any | Null]): Continuation[Unit] =
     throw UnsupportedOperationException("create(Any?;Continuation) has not been overridden")
 
-  def invoke(
-      p1: Any | Null,
-      p2: Continuation[Any | Null]): Any |
-    Null =
+  def invoke(p1: Any | Null, p2: Continuation[Any | Null]): Any | Null =
     throw UnsupportedOperationException("invoke(Any?,Continuation) has not been overridden")
 
   override def callerFrame: ContinuationStackFrame | Null =
@@ -85,7 +82,7 @@ abstract class ContinuationImpl(
         if (interceptor != null)
           interceptor.interceptContinuation(
             this
-          ) // interceptContinuation(this) -> execute(...) 
+          ) // interceptContinuation(this) -> execute(...)
         else this
       _intercepted = intercepted
       intercepted
