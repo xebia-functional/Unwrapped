@@ -1,12 +1,12 @@
 package continuations {
-  final lazy module val compileFromString$package:
-    continuations.compileFromString$package
-   = new continuations.compileFromString$package()
-  @SourceFile("compileFromString.scala") final module class
-    compileFromString$package
-  () extends Object() { this: continuations.compileFromString$package.type =>
+  final lazy module val compileFromStringpackage:
+    continuations.compileFromStringpackage
+   = new continuations.compileFromStringpackage()
+  @SourceFile("compileFromStringscala") final module class
+    compileFromStringpackage
+  () extends Object() { this: continuations.compileFromStringpackage.type =>
     private def writeReplace(): AnyRef =
-      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromStringpackage.type])
     private class $fooTest$Frame($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion
       ,
     $completion.context) {
@@ -26,7 +26,7 @@ package continuations {
         {
           this.$result = result
           this.$label = this.$label.|(scala.Int.MinValue)
-          continuations.compileFromString$package.fooTest(null, null, this)
+          continuations.compileFromStringpackage.fooTest(null, null, this)
         }
       override def create(value: Any | Null, completion: continuations.Continuation[Any | Null]): continuations.Continuation[Unit] =
         new continuations.jvm.internal.BaseContinuationImpl(completion)
@@ -41,15 +41,15 @@ package continuations {
         var y##1: Int = y
         var z: Int = null
         {
-          val $continuation: continuations.compileFromString$package.$fooTest$Frame =
+          val $continuation: continuations.compileFromStringpackage.$fooTest$Frame =
             completion match
               {
-                case x$0 @ x$0:continuations.compileFromString$package.$fooTest$Frame if
+                case x$0 @ x$0:continuations.compileFromStringpackage.$fooTest$Frame if
                   x$0.$label.&(scala.Int.MinValue).!=(0)
                  =>
                   x$0.$label = x$0.$label.-(scala.Int.MinValue)
                   x$0
-                case _ => new continuations.compileFromString$package.$fooTest$Frame(completion)
+                case _ => new continuations.compileFromStringpackage.$fooTest$Frame(completion)
               }
           $continuation.$label match
             {

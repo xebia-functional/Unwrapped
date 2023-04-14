@@ -1,6 +1,6 @@
 package continuations {
   final lazy module val ExampleObject: continuations.ExampleObject = new continuations.ExampleObject()
-  @SourceFile("compileFromString.scala") final module class ExampleObject() extends Object() {
+  @SourceFile("compileFromStringscala") final module class ExampleObject() extends Object() {
     this: continuations.ExampleObject.type =>
     private def writeReplace(): AnyRef = new scala.runtime.ModuleSerializationProxy(classOf[continuations.ExampleObject.type])
     private[this] def method1(x: Int): Int = x.+(1)
@@ -138,14 +138,14 @@ package continuations {
         1.+(suspension1).+(suspension2).+(z6).+(continuations.ExampleObject.method1(x##1)).+(method2(x##1)).+(method5(x##1)).+(method6(x##1))
       }
   }
-  final lazy module val compileFromString$package:
-    continuations.compileFromString$package
-   = new continuations.compileFromString$package()
-  @SourceFile("compileFromString.scala") final module class
-    compileFromString$package
-  () extends Object() { this: continuations.compileFromString$package.type =>
+  final lazy module val compileFromStringpackage:
+    continuations.compileFromStringpackage
+   = new continuations.compileFromStringpackage()
+  @SourceFile("compileFromStringscala") final module class
+    compileFromStringpackage
+  () extends Object() { this: continuations.compileFromStringpackage.type =>
     private def writeReplace(): AnyRef =
-      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromStringpackage.type])
     def foo: Int = continuations.ExampleObject.continuations(1, 2, continuations.jvm.internal.ContinuationStub.contImpl)
   }
 }

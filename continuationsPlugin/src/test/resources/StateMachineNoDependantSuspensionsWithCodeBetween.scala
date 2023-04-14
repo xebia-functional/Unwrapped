@@ -1,12 +1,12 @@
 package continuations {
-  final lazy module val compileFromString$package: 
-    continuations.compileFromString$package
-   = new continuations.compileFromString$package()
-  @SourceFile("compileFromString.scala") final module class 
-    compileFromString$package
-  () extends Object() { this: continuations.compileFromString$package.type =>
+  final lazy module val compileFromStringpackage: 
+    continuations.compileFromStringpackage
+   = new continuations.compileFromStringpackage()
+  @SourceFile("compileFromStringscala") final module class 
+    compileFromStringpackage
+  () extends Object() { this: continuations.compileFromStringpackage.type =>
     private def writeReplace(): AnyRef = 
-      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromStringpackage.type])
     def program: Int = 
       {
         private class $foo$Frame($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion

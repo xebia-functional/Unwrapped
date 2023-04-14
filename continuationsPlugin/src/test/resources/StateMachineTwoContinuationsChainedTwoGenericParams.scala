@@ -1,5 +1,5 @@
 package continuations {
-  @SourceFile("compileFromString.scala") case class Foo(x: Int) extends Object(), _root_.scala.Product, _root_.
+  @SourceFile("compileFromStringscala") case class Foo(x: Int) extends Object(), _root_.scala.Product, _root_.
     scala
   .Serializable {
     override def hashCode(): Int =
@@ -39,7 +39,7 @@ package continuations {
     def _1: Int = this.x
   }
   final lazy module val Foo: continuations.Foo = new continuations.Foo()
-  @SourceFile("compileFromString.scala") final module class Foo() extends AnyRef(), scala.deriving.Mirror.
+  @SourceFile("compileFromStringscala") final module class Foo() extends AnyRef(), scala.deriving.Mirror.
     Product
    { this: continuations.Foo.type =>
     private def writeReplace(): AnyRef = new scala.runtime.ModuleSerializationProxy(classOf[continuations.Foo.type])
@@ -49,7 +49,7 @@ package continuations {
     type MirroredMonoType = continuations.Foo
     def fromProduct(x$0: Product): continuations.Foo.MirroredMonoType = new continuations.Foo(x$0.productElement(0).$asInstanceOf[Int])
   }
-  @SourceFile("compileFromString.scala") case class Bar(x: Int) extends Object(), _root_.scala.Product, _root_.
+  @SourceFile("compileFromStringscala") case class Bar(x: Int) extends Object(), _root_.scala.Product, _root_.
     scala
   .Serializable {
     override def hashCode(): Int =
@@ -89,7 +89,7 @@ package continuations {
     def _1: Int = this.x
   }
   final lazy module val Bar: continuations.Bar = new continuations.Bar()
-  @SourceFile("compileFromString.scala") final module class Bar() extends AnyRef(), scala.deriving.Mirror.
+  @SourceFile("compileFromStringscala") final module class Bar() extends AnyRef(), scala.deriving.Mirror.
     Product
    { this: continuations.Bar.type =>
     private def writeReplace(): AnyRef = new scala.runtime.ModuleSerializationProxy(classOf[continuations.Bar.type])
@@ -99,14 +99,14 @@ package continuations {
     type MirroredMonoType = continuations.Bar
     def fromProduct(x$0: Product): continuations.Bar.MirroredMonoType = new continuations.Bar(x$0.productElement(0).$asInstanceOf[Int])
   }
-  final lazy module val compileFromString$package:
-    continuations.compileFromString$package
-   = new continuations.compileFromString$package()
-  @SourceFile("compileFromString.scala") final module class
-    compileFromString$package
-  () extends Object() { this: continuations.compileFromString$package.type =>
+  final lazy module val compileFromStringpackage:
+    continuations.compileFromStringpackage
+   = new continuations.compileFromStringpackage()
+  @SourceFile("compileFromStringscala") final module class
+    compileFromStringpackage
+  () extends Object() { this: continuations.compileFromStringpackage.type =>
     private def writeReplace(): AnyRef =
-      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
+      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromStringpackage.type])
     def program: continuations.Bar =
       {
         private class $fooTest$Frame($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl(
