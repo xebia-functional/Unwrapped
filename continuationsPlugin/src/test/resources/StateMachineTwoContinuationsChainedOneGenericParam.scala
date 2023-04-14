@@ -59,9 +59,9 @@ package continuations {
       new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
     def program: continuations.Foo =
       {
-        class program$fooTest$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion
-          , 
-        $completion.context) {
+        private class $fooTest$Frame($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl(
+          $completion
+        , $completion.context) {
           var I$0: Any = _
           var I$1: Any = _
           var I$2: Any = _
@@ -95,13 +95,13 @@ package continuations {
             var b##1: Int = b
             var z: A = null
             {
-              val $continuation: program$fooTest$1 = 
+              val $continuation: $fooTest$Frame =
                 completion match
                   {
-                    case x$0 @ x$0:program$fooTest$1 if x$0.$label.&(scala.Int.MinValue).!=(0) =>
+                    case x$0 @ x$0:$fooTest$Frame if x$0.$label.&(scala.Int.MinValue).!=(0) =>
                       x$0.$label = x$0.$label.-(scala.Int.MinValue)
                       x$0
-                    case _ => new program$fooTest$1(completion)
+                    case _ => new $fooTest$Frame(completion)
                   }
               $continuation.$label match
                 {

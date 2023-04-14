@@ -7,9 +7,9 @@ package continuations {
   () extends Object() { this: continuations.compileFromString$package.type =>
     private def writeReplace(): AnyRef =
       new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-    class compileFromString$package$foo$1($completion: continuations.Continuation[Any | Null]) extends
-      continuations.jvm.internal.ContinuationImpl
-    ($completion, $completion.context) {
+    private class $foo$Frame($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion,
+      $completion.context
+    ) {
       var I$0: Any = _
       def I$0_=(x$0: Any): Unit = ()
       var $result: Either[Throwable, Any | Null | continuations.Continuation.State.Suspended.type] = _
@@ -35,25 +35,15 @@ package continuations {
       {
         var qq##1: Int = qq
         {
-          val $continuation:
-            continuations.compileFromString$package.
-              compileFromString$package$foo$1
-           =
+          val $continuation: continuations.compileFromString$package.$foo$Frame =
             completion match
               {
-                case
-                  x$0 @
-                    x$0:
-                      continuations.compileFromString$package.
-                        compileFromString$package$foo$1
-                 if x$0.$label.&(scala.Int.MinValue).!=(0) =>
+                case x$0 @ x$0:continuations.compileFromString$package.$foo$Frame if
+                  x$0.$label.&(scala.Int.MinValue).!=(0)
+                 =>
                   x$0.$label = x$0.$label.-(scala.Int.MinValue)
                   x$0
-                case _ =>
-                  new
-                    continuations.compileFromString$package.
-                      compileFromString$package$foo$1
-                  (completion)
+                case _ => new continuations.compileFromString$package.$foo$Frame(completion)
               }
           $continuation.$label match
             {

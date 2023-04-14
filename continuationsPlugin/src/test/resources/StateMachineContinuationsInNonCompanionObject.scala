@@ -5,7 +5,7 @@ package continuations {
     private def writeReplace(): AnyRef = new scala.runtime.ModuleSerializationProxy(classOf[continuations.ExampleObject.type])
     private[this] def method1(x: Int): Int = x.+(1)
     protected val z1: Int = 1
-    class ExampleObject$continuations$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl(
+    private class $continuations$Frame($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl(
       $completion
     , $completion.context) {
       var I$0: Any = _
@@ -44,13 +44,13 @@ package continuations {
         def method2(x: Int): Int = x.+(1)
         def method5(x: Int): Int = x.+(1)
         {
-          val $continuation: continuations.ExampleObject.ExampleObject$continuations$1 =
+          val $continuation: continuations.ExampleObject.$continuations$Frame =
             completion match
               {
-                case x$0 @ x$0:continuations.ExampleObject.ExampleObject$continuations$1 if x$0.$label.&(scala.Int.MinValue).!=(0) =>
+                case x$0 @ x$0:continuations.ExampleObject.$continuations$Frame if x$0.$label.&(scala.Int.MinValue).!=(0) =>
                   x$0.$label = x$0.$label.-(scala.Int.MinValue)
                   x$0
-                case _ => new continuations.ExampleObject.ExampleObject$continuations$1(completion)
+                case _ => new continuations.ExampleObject.$continuations$Frame(completion)
               }
           $continuation.$label match
             {
