@@ -5,7 +5,7 @@ package continuations {
     private def writeReplace(): AnyRef = new scala.runtime.ModuleSerializationProxy(classOf[continuations.ExampleObject.type])
     private[this] def method1(x: Int): Int = x.+(1)
     protected val z1: Int = 1
-    class ExampleObject$continuations$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl(
+    private class $continuations$Frame($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl(
       $completion
     , $completion.context) {
       var I$0: Any = _
@@ -31,9 +31,7 @@ package continuations {
       override def create(value: Any | Null, completion: continuations.Continuation[Any | Null]): continuations.Continuation[Unit] =
         new continuations.jvm.internal.BaseContinuationImpl(completion)
       protected def invoke(p1: Any | Null, p2: continuations.Continuation[Any | Null]): Any | Null =
-        this.create(p1, p2).asInstanceOf[(BaseContinuationImpl.this : continuations.jvm.internal.BaseContinuationImpl)].invokeSuspend(
-          new Right[Unit, Unit](())
-        )
+        this.create(p1, p2).asInstanceOf[(BaseContinuationImpl.this : continuations.jvm.internal.BaseContinuationImpl)].invokeSuspendDummy
     }
     def continuations(x: Int, y: Int, completion: continuations.Continuation[Int]):
       Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
@@ -46,13 +44,13 @@ package continuations {
         def method2(x: Int): Int = x.+(1)
         def method5(x: Int): Int = x.+(1)
         {
-          val $continuation: continuations.ExampleObject.ExampleObject$continuations$1 =
+          val $continuation: continuations.ExampleObject.$continuations$Frame =
             completion match
               {
-                case x$0 @ x$0:continuations.ExampleObject.ExampleObject$continuations$1 if x$0.$label.&(scala.Int.MinValue).!=(0) =>
+                case x$0 @ x$0:continuations.ExampleObject.$continuations$Frame if x$0.$label.&(scala.Int.MinValue).!=(0) =>
                   x$0.$label = x$0.$label.-(scala.Int.MinValue)
                   x$0
-                case _ => new continuations.ExampleObject.ExampleObject$continuations$1(completion)
+                case _ => new continuations.ExampleObject.$continuations$Frame(completion)
               }
           $continuation.$label match
             {
@@ -82,7 +80,7 @@ package continuations {
                   {
                     case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
                     case orThrow @ <empty> =>
-                      suspension1 = orThrow.asInstanceOf[Int]
+                      suspension1 = orThrow
                       return[label1] ()
                   }
               case 1 =>
@@ -124,7 +122,7 @@ package continuations {
                 safeContinuation.getOrThrow() match
                   {
                     case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
-                    case orThrow @ <empty> => suspension2 = orThrow.asInstanceOf[Int]
+                    case orThrow @ <empty> => suspension2 = orThrow
                   }
               case 3 =>
                 y##1 = $continuation.I$0

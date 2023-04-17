@@ -9,9 +9,9 @@ package continuations {
   () extends Object() { this: continuations.compileFromString$package.type =>
     private def writeReplace(): AnyRef =
       new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-    class compileFromString$package$fooTest$1($completion: continuations.Continuation[Any | Null]) extends
-      continuations.jvm.internal.ContinuationImpl
-    ($completion, $completion.context) {
+    private class $fooTest$Frame($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion
+      ,
+    $completion.context) {
       var I$0: Any = _
       var I$1: Any = _
       var I$2: Any = _
@@ -35,9 +35,7 @@ package continuations {
       override def create(value: Any | Null, completion: continuations.Continuation[Any | Null]): continuations.Continuation[Unit] =
         new continuations.jvm.internal.BaseContinuationImpl(completion)
       protected def invoke(p1: Any | Null, p2: continuations.Continuation[Any | Null]): Any | Null =
-        this.create(p1, p2).asInstanceOf[(BaseContinuationImpl.this : continuations.jvm.internal.BaseContinuationImpl)].invokeSuspend(
-          new Right[Unit, Unit](())
-        )
+        this.create(p1, p2).asInstanceOf[(BaseContinuationImpl.this : continuations.jvm.internal.BaseContinuationImpl)].invokeSuspendDummy
     }
     def fooTest(x: Int, y: Int, ec: concurrent.ExecutionContext, completion: continuations.Continuation[Int]):
       Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
@@ -48,25 +46,15 @@ package continuations {
         var ec##1: concurrent.ExecutionContext = ec
         var z: Int = null
         {
-          val $continuation:
-            continuations.compileFromString$package.
-              compileFromString$package$fooTest$1
-           =
+          val $continuation: continuations.compileFromString$package.$fooTest$Frame =
             completion match
               {
-                case 
-                  x$0 @ 
-                    x$0:
-                      continuations.compileFromString$package.
-                        compileFromString$package$fooTest$1
-                 if x$0.$label.&(scala.Int.MinValue).!=(0) =>
+                case x$0 @ x$0:continuations.compileFromString$package.$fooTest$Frame if
+                  x$0.$label.&(scala.Int.MinValue).!=(0)
+                 =>
                   x$0.$label = x$0.$label.-(scala.Int.MinValue)
                   x$0
-                case _ =>
-                  new
-                    continuations.compileFromString$package.
-                      compileFromString$package$fooTest$1
-                  (completion)
+                case _ => new continuations.compileFromString$package.$fooTest$Frame(completion)
               }
           $continuation.$label match
             {
@@ -84,7 +72,7 @@ package continuations {
                   {
                     case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
                     case orThrow @ <empty> =>
-                      z = orThrow.asInstanceOf[Int]
+                      z = orThrow
                       return[label1] ()
                   }
               case 1 =>

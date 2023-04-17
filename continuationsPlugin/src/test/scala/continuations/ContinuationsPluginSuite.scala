@@ -32,7 +32,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            | def foo()(using Suspend): Int = 1
            | println(foo())
            |}""".stripMargin
-        
+
       // format: off
       val expectedOutput =
         """package <empty> {
@@ -167,13 +167,13 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       val expected =
         """|package <empty> {
            |  import continuations.*
-           |  final lazy module val compileFromString$package:
+           |  final lazy module val compileFromString$package: 
            |    compileFromString$package
            |   = new compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class
+           |  @SourceFile("compileFromString.scala") final module class 
            |    compileFromString$package
            |  () extends Object() { this: compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef =
+           |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[compileFromString$package.type])
            |    def foo(x: Int, completion: continuations.Continuation[Int | Any]): Any = x.+(1)
            |  }
@@ -1112,13 +1112,13 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations {
            |  import scala.concurrent.ExecutionContext
            |  import concurrent.ExecutionContext.Implicits.global
-           |  final lazy module val compileFromString$package: 
+           |  final lazy module val compileFromString$package:
            |    continuations.compileFromString$package
            |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
+           |  @SourceFile("compileFromString.scala") final module class
            |    compileFromString$package
            |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
+           |    private def writeReplace(): AnyRef =
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
            |    def program: Int =
            |      {
@@ -1134,19 +1134,19 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |package continuations {
            |  import scala.concurrent.ExecutionContext
            |  import concurrent.ExecutionContext.Implicits.global
-           |  final lazy module val compileFromString$package: 
+           |  final lazy module val compileFromString$package:
            |    continuations.compileFromString$package
            |   = new continuations.compileFromString$package()
-           |  @SourceFile("compileFromString.scala") final module class 
+           |  @SourceFile("compileFromString.scala") final module class
            |    compileFromString$package
            |  () extends Object() { this: continuations.compileFromString$package.type =>
-           |    private def writeReplace(): AnyRef = 
+           |    private def writeReplace(): AnyRef =
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
            |    def program: Int =
            |      {
-           |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A]): 
+           |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A]):
            |          Any | Null | continuations.Continuation.State.Suspended.type
-           |         = 
+           |         =
            |          {
            |            val continuation1: continuations.Continuation[A] = completion
            |            val safeContinuation: continuations.SafeContinuation[A] = continuations.SafeContinuation.init[A](continuation1)
@@ -1689,4 +1689,5 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
           )
       }
   }
+
 }

@@ -109,9 +109,9 @@ package continuations {
       new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
     def program: continuations.Bar =
       {
-        class program$fooTest$1($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion
-          , 
-        $completion.context) {
+        private class $fooTest$Frame($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl(
+          $completion
+        , $completion.context) {
           var I$0: Any = _
           var I$1: Any = _
           var I$2: Any = _
@@ -135,9 +135,7 @@ package continuations {
           override def create(value: Any | Null, completion: continuations.Continuation[Any | Null]): continuations.Continuation[Unit] =
             new continuations.jvm.internal.BaseContinuationImpl(completion)
           protected def invoke(p1: Any | Null, p2: continuations.Continuation[Any | Null]): Any | Null =
-            this.create(p1, p2).asInstanceOf[(BaseContinuationImpl.this : continuations.jvm.internal.BaseContinuationImpl)].invokeSuspend(
-              new Right[Unit, Unit](())
-            )
+            this.create(p1, p2).asInstanceOf[(BaseContinuationImpl.this : continuations.jvm.internal.BaseContinuationImpl)].invokeSuspendDummy
         }
         def fooTest(a: A, b: B, completion: continuations.Continuation[B]):
           B | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
@@ -147,13 +145,13 @@ package continuations {
             var b##1: B = b
             var z: A = null
             {
-              val $continuation: program$fooTest$1 =
+              val $continuation: $fooTest$Frame =
                 completion match
                   {
-                    case x$0 @ x$0:program$fooTest$1 if x$0.$label.&(scala.Int.MinValue).!=(0) =>
+                    case x$0 @ x$0:$fooTest$Frame if x$0.$label.&(scala.Int.MinValue).!=(0) =>
                       x$0.$label = x$0.$label.-(scala.Int.MinValue)
                       x$0
-                    case _ => new program$fooTest$1(completion)
+                    case _ => new $fooTest$Frame(completion)
                   }
               $continuation.$label match
                 {
@@ -170,7 +168,7 @@ package continuations {
                       {
                         case continuations.Continuation.State.Suspended => return continuations.Continuation.State.Suspended
                         case orThrow @ <empty> =>
-                          z = orThrow.asInstanceOf[A]
+                          z = orThrow
                           return[label1] ()
                       }
                   case 1 =>
