@@ -180,24 +180,22 @@ class ContinuationsCallsPhase extends PluginPhase:
         DefDef(symbol)
       }
 
-      /*
-      PolyType(List(Names.typeName("A"))(pt => List(TypeBounds(ctx.definitions.NothingType, ctx.definitions.AnyType)), pt => {
-        val paramTypes =  List(List(ctx.definitions.IntType), List(requiredClassRef("scala.collection.immuatable.List").appliedTo(pt.newParamRef(0))))
-      paramTypes.foldRight(ctx.definitions.IntType)(MethodType.apply))
-
-      [A](x$0: Int)(x$0: List[A]): Int
-       */
-
       val invokeSymbol =
         newSymbol(
           starterClassSymbol,
           Names.termName("invoke"),
           Flags.Override | Flags.Method,
-          MethodType(
-            List(termName("completion")),
-            List(continuationClassRef.appliedTo(defn.IntType)),
-            Types.OrNull(OrType(defn.IntType, defn.AnyType, true))
-          )
+          Types.PolyType(
+            List(Names.typeName("A")))
+            (_ => List(Types.TypeBounds(ctx.definitions.NothingType, ctx.definitions.AnyType)),
+              pt => {
+                MethodType(
+                  List(termName("completion")),
+                  List(continuationClassRef.appliedTo(pt.newParamRef(0))),
+                  Types.OrNull(OrType(pt.newParamRef(0), defn.AnyType, true))
+                )
+              }
+            )
         ).entered.asTerm
 
       val invokeMethod: DefDef = tpd.DefDef(
@@ -222,7 +220,7 @@ class ContinuationsCallsPhase extends PluginPhase:
             }
 
           import dotty.tools.dotc.core.Decorators.toTermName
-          val message1 = s"inside invoke ${paramss.head.head}\n"
+          val message1 = s"inside invoke\n"
           val consoleType1 = requiredModule("scala.Console")
           val consoleRef1 = ref(consoleType1)
           val print1 = consoleRef1.select("print".toTermName)
@@ -233,7 +231,7 @@ class ContinuationsCallsPhase extends PluginPhase:
               printMessage1
             ),
             ref(existsTree(tree).get)
-              .appliedToTermArgs(paramsNonCF.flatten :+ paramss.head.head)
+              .appliedToTermArgs(paramsNonCF.flatten :+ paramss.last.head)
           )
       )
 
@@ -249,17 +247,11 @@ class ContinuationsCallsPhase extends PluginPhase:
 
       val substituteContinuationCall = new TreeTypeMap(
         treeMap = {
-
-          case tree @ DefDef(_, paramss, _, _)
-              if tree.existsSubTree(st => applyToChange.exists(_.sameTree(st))) && !paramss
-                .exists(_.exists(_.symbol.info.hasClassSymbol(starterClassSymbol))) =>
-            println(s"case 0: ${tree.show} - owner: ${tree.symbol.maybeOwner.show}")
-            tree
-
-          case tree @ Block(stats @ List(anonFun @ DefDef(_, paramss, _, _)), expr @ _)
+              
+          case tree @ Block(List(anonFun @ DefDef(_, paramss, _, _)), _)
               if tree.existsSubTree(st => applyToChange.exists(_.sameTree(st))) && paramss
                 .exists(_.exists(_.symbol.info.hasClassSymbol(starterClassSymbol))) =>
-            println(s"case 1: ${tree.show}")
+
             anonFun.rhs
 
           case tree if applyToChange.exists(_.sameTree(tree)) =>

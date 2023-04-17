@@ -41,8 +41,6 @@ extension [A](suspendedFn: Starter ?=> A)
         }
       )
 
-// TODO: call synthetic function invoke here and remove extra param p1
-
 private inline def createContinuationFromSuspendFunction[T](
     completion: Continuation[T],
     block: Continuation[Int] => Int | Any

@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext
 
 object SuspendApp:
   var result: Either[Throwable, Any] = Right(0)
-  def apply[A](block: Any): Any =
+  def apply(block: Any): Any =
 
     val count: AtomicLong = new AtomicLong(0)
     val defaultFactory = Executors.defaultThreadFactory()
