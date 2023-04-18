@@ -6,7 +6,7 @@ import continuations.{Continuation, Suspend}
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.{CountDownLatch, Executors, ThreadFactory}
 import scala.concurrent.ExecutionContext
-
+/*
 object ContinuationStub:
   private def c: Continuation[Any | Null] = new Continuation[Any | Null] {
     type Ctx = EmptyTuple
@@ -29,3 +29,4 @@ object ContinuationStub:
         result: Either[Throwable, Any | Null | Continuation.State.Suspended.type]): Any | Null =
       result.fold(t => throw t, or => or)
   }
+*/

@@ -7,7 +7,6 @@ import scala.concurrent.ExecutionContext
 
 extension [A](continuation: Continuation[A])
   def intercepted(ec: ExecutionContext): Continuation[A] =
-    println(s"intrinsics intercepted ${Thread.currentThread().getName}")
     if (continuation.isInstanceOf[ContinuationImpl])
       continuation.asInstanceOf[ContinuationImpl].intercepted(ec).asInstanceOf[Continuation[A]]
     else continuation

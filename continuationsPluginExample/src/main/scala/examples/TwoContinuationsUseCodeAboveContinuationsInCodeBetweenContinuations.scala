@@ -1,6 +1,7 @@
 package examples
 
 import continuations.Suspend
+import continuations.jvm.internal.SuspendApp
 
 @main def TwoContinuationsUseCodeAboveContinuationsInCodeBetweenContinuations =
   def twoContinuationsUseCodeAboveContinuationsInCodeBetweenContinuations()(
@@ -10,4 +11,4 @@ import continuations.Suspend
     val y = 1
     s.shift(_.resume(println(s"Resume 2: ${x + y}")))
     10
-  println(twoContinuationsUseCodeAboveContinuationsInCodeBetweenContinuations())
+  println(SuspendApp(twoContinuationsUseCodeAboveContinuationsInCodeBetweenContinuations()))

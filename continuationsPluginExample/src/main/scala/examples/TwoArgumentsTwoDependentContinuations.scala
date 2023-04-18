@@ -1,6 +1,7 @@
 package examples
 
 import continuations.Suspend
+import continuations.jvm.internal.SuspendApp
 
 @main def TwoArgumentsTwoDependentContinuations =
   def twoArgumentsTwoDependentContinuations(x: Int, y: Int)(using s: Suspend): Int = {
@@ -8,4 +9,4 @@ import continuations.Suspend
     s.shift[Int](_.resume(z + 1))
   }
 
-  println(twoArgumentsTwoDependentContinuations(1, 1))
+  println(SuspendApp(twoArgumentsTwoDependentContinuations(1, 1)))

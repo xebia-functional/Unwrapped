@@ -3,14 +3,13 @@ package examples
 import continuations.Continuation.State
 import continuations.*
 import continuations.intrinsics.*
-import continuations.jvm.internal.ContinuationImpl
+import continuations.jvm.internal.{ContinuationImpl, SuspendApp}
 
 import scala.annotation.switch
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
-
 import concurrent.ExecutionContext.Implicits.global
 
 def await[A](future: Future[A]): A =
@@ -123,18 +122,18 @@ def program$expanded(
   val z: Int = var10000.asInstanceOf[Number].intValue
   c(z)
 
-def programSuspendContinuationNoParamNoSuspendContinuation: Int =
+def programSuspendContinuationNoParamNoSuspendContinuation =
   def fooTest()(using s: Suspend): Int = 1
-  fooTest()
+  SuspendApp(fooTest())
 
-def programSuspendContinuationNoParamResume: Int =
+def programSuspendContinuationNoParamResume =
   def fooTest()(using s: Suspend): Int =
     s.shift[Int] { continuation =>
       println("Hello")
       continuation.resume(1)
     }
 
-  fooTest()
+  SuspendApp(fooTest())
 
 /*
 def programNestedContinuationCompilationError: Int =
@@ -147,7 +146,7 @@ def programNestedContinuationCompilationError: Int =
   fooTest()
  */
 
-def programSuspendContinuationNoParamResumeIgnoreResult: Int =
+def programSuspendContinuationNoParamResumeIgnoreResult =
   def fooTest()(using s: Suspend): Int =
     println("Start")
     s.shift[Unit] { _.resume(println("Hello")) }
@@ -163,9 +162,9 @@ def programSuspendContinuationNoParamResumeIgnoreResult: Int =
 //    }
     10
 
-  fooTest()
+  SuspendApp(fooTest())
 
-def programSuspendContinuationParamDependent: Int =
+def programSuspendContinuationParamDependent =
   def fooTest(qq: Int)(using s: Suspend): Int =
     val pp = 11
     val xx = s.shift[Int] { _.resume(qq - 1) }
@@ -177,9 +176,9 @@ def programSuspendContinuationParamDependent: Int =
     println(xx)
     xx + qq + zz + pp + tt + yy.length
 
-  fooTest(12)
+  SuspendApp(fooTest(12))
 
-def programSuspendContinuationResumeVals: Int =
+def programSuspendContinuationResumeVals =
   def fooTest()(using Suspend): Int =
     summon[Suspend].shift[Int] { c =>
       c.resume {
@@ -190,9 +189,9 @@ def programSuspendContinuationResumeVals: Int =
       }
     }
 
-  fooTest()
+  SuspendApp(fooTest())
 
-def programOneContinuationReturnValue: Int =
+def programOneContinuationReturnValue =
   def zeroArgumentsSingleResumeContinuationsBeforeAfter()(using Suspend): Int =
     println("Hello")
     val x = 1
@@ -201,8 +200,9 @@ def programOneContinuationReturnValue: Int =
     }
     println("World")
     2
-  zeroArgumentsSingleResumeContinuationsBeforeAfter()
+  SuspendApp(zeroArgumentsSingleResumeContinuationsBeforeAfter())
 
+/*
 def programSuspendContinuationNoSuspendContinuationVal: Int =
   val fooTest: Suspend ?=> [A] => List[A] => [B] => List[B] => List[A] => List[A] => Int =
     [A] =>
@@ -215,6 +215,7 @@ def programSuspendContinuationNoSuspendContinuationVal: Int =
                 x.size + y.size + q.size + p.size + z
 
   fooTest(List(1))(List("A", "B"))(List(1, 1, 1))(List(1, 1, 1, 1))
+*/
 
 // runs only with scalac
 object ExampleObject:
@@ -252,7 +253,8 @@ object ExampleObject:
     1 + suspension1 + suspension2 + z6 + method1(x) + method2(x) + method5(x) + method6(x)
 
 end ExampleObject
-def programStartContinuation: Unit =
+
+def programStartContinuation =
   def fooTest()(using Suspend): Int =
     println("Hello")
     val x = 1
@@ -262,5 +264,4 @@ def programStartContinuation: Unit =
     println("World")
     2
 
-  val cont: Continuation[Int] = BuildContinuation[Int](EmptyTuple, { res => res.fold(t => throw t, or => or) })
-  fooTest().startContinuation(cont)
+  SuspendApp(fooTest())

@@ -1,6 +1,7 @@
 package examples
 
 import continuations.Suspend
+import continuations.jvm.internal.SuspendApp
 
 @main def ZeroArgumentsOneContinuationCodeBeforeUsedAfter =
   def zeroArgumentsOneContinuationCodeBeforeUsedAfter()(using s: Suspend): Int =
@@ -8,4 +9,4 @@ import continuations.Suspend
     s.shift[Unit](_.resume(println("Hello")))
     val y = 1
     x + y
-  println(zeroArgumentsOneContinuationCodeBeforeUsedAfter())
+  println(SuspendApp(zeroArgumentsOneContinuationCodeBeforeUsedAfter()))

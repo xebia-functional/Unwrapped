@@ -1,6 +1,7 @@
 package examples
 
 import continuations.Suspend
+import continuations.jvm.internal.SuspendApp
 
 @main def MultipleSuspendWithExpressionsInBody =
   def foo1()(using s: Suspend): Int =
@@ -15,4 +16,4 @@ import continuations.Suspend
     }
     10
 
-  println(foo1())
+  println(SuspendApp(foo1()))

@@ -1,6 +1,7 @@
 package examples
 
 import continuations.*
+import continuations.jvm.internal.SuspendApp
 
 @main def ThreeDependentContinuations =
   def threeDependentContinuations(a: Int, b: Int, c: Int)(using s: Suspend): Int =
@@ -11,4 +12,4 @@ import continuations.*
     val f = 6
     val result: Int = s.shift(_.resume(continuationTwo + f + c))
     result
-  println(threeDependentContinuations(1, 2, 3))
+  println(SuspendApp(threeDependentContinuations(1, 2, 3)))

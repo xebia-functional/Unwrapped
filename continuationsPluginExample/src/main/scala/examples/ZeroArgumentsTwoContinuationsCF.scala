@@ -1,6 +1,7 @@
 package examples
 
 import continuations.Suspend
+import continuations.jvm.internal.SuspendApp
 
 @main def ZeroArgumentsTwoContinuationsCF =
   def zeroArgumentsTwoContinuationsCF(): Suspend ?=> Int =
@@ -8,4 +9,4 @@ import continuations.Suspend
       continuation.resume(println(1))
     }
     summon[Suspend].shift[Int] { continuation => continuation.resume(2) }
-  println(zeroArgumentsTwoContinuationsCF())
+  println(SuspendApp(zeroArgumentsTwoContinuationsCF()))

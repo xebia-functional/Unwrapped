@@ -1,6 +1,7 @@
 package examples
 
 import continuations.Suspend
+import continuations.jvm.internal.SuspendApp
 
 @main def TwoArgumentsSingleResumeContinuationsBeforeUsedInResume =
   def twoArgumentsSingleResumeContinuationsBeforeUsedInResume(x: Int, y: Int)(
@@ -8,4 +9,4 @@ import continuations.Suspend
     println("Hello")
     val z = 1
     s.shift[Int] { continuation => continuation.resume(x + y + z) }
-  println(twoArgumentsSingleResumeContinuationsBeforeUsedInResume(1, 2))
+  println(SuspendApp(twoArgumentsSingleResumeContinuationsBeforeUsedInResume(1, 2)))

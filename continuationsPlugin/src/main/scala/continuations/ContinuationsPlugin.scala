@@ -145,10 +145,10 @@ class ContinuationsCallsPhase extends PluginPhase:
         tree
           .filterSubTrees(st => applyToChange.exists(_.sameTree(st)))
           .map(_.symbol.maybeOwner)
-          .last
+          .lastOption
 
       val owner =
-        if maybeOwner.isDefinedInSource then maybeOwner
+        if maybeOwner.exists(_.isDefinedInSource) then maybeOwner.get
         else {
           val possible = tree.filterSubTrees {
             case tree @ DefDef(_, paramss, _, _)
@@ -247,7 +247,7 @@ class ContinuationsCallsPhase extends PluginPhase:
 
       val substituteContinuationCall = new TreeTypeMap(
         treeMap = {
-              
+
           case tree @ Block(List(anonFun @ DefDef(_, paramss, _, _)), _)
               if tree.existsSubTree(st => applyToChange.exists(_.sameTree(st))) && paramss
                 .exists(_.exists(_.symbol.info.hasClassSymbol(starterClassSymbol))) =>
@@ -255,7 +255,6 @@ class ContinuationsCallsPhase extends PluginPhase:
             anonFun.rhs
 
           case tree if applyToChange.exists(_.sameTree(tree)) =>
-            println(s"case 2: ${tree.show} - owner: ${tree.symbol.maybeOwner.show}")
 
             Block(
               List(
