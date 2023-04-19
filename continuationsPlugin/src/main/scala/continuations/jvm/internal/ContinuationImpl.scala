@@ -11,8 +11,7 @@ abstract class BaseContinuationImpl(
       Serializable:
 
   override val executionContext: ExecutionContext =
-    if completion == null
-    then throw RuntimeException("resume called with no completion")
+    if completion == null then throw RuntimeException("resume called with no completion")
     else completion.executionContext
   final override def resume(result: Any | Null): Unit = resumeAux(Right(result))
   final override def raise(error: Throwable): Unit = resumeAux(Left(error))

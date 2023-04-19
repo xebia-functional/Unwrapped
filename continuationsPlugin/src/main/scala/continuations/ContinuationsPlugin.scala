@@ -185,17 +185,16 @@ class ContinuationsCallsPhase extends PluginPhase:
           starterClassSymbol,
           Names.termName("invoke"),
           Flags.Override | Flags.Method,
-          Types.PolyType(
-            List(Names.typeName("A")))
-            (_ => List(Types.TypeBounds(ctx.definitions.NothingType, ctx.definitions.AnyType)),
-              pt => {
-                MethodType(
-                  List(termName("completion")),
-                  List(continuationClassRef.appliedTo(pt.newParamRef(0))),
-                  Types.OrNull(OrType(pt.newParamRef(0), defn.AnyType, true))
-                )
-              }
-            )
+          Types.PolyType(List(Names.typeName("A")))(
+            _ => List(Types.TypeBounds(ctx.definitions.NothingType, ctx.definitions.AnyType)),
+            pt => {
+              MethodType(
+                List(termName("completion")),
+                List(continuationClassRef.appliedTo(pt.newParamRef(0))),
+                Types.OrNull(OrType(pt.newParamRef(0), defn.AnyType, true))
+              )
+            }
+          )
         ).entered.asTerm
 
       val invokeMethod: DefDef = tpd.DefDef(
@@ -251,11 +250,9 @@ class ContinuationsCallsPhase extends PluginPhase:
           case tree @ Block(List(anonFun @ DefDef(_, paramss, _, _)), _)
               if tree.existsSubTree(st => applyToChange.exists(_.sameTree(st))) && paramss
                 .exists(_.exists(_.symbol.info.hasClassSymbol(starterClassSymbol))) =>
-
             anonFun.rhs
 
           case tree if applyToChange.exists(_.sameTree(tree)) =>
-
             Block(
               List(
                 newStarterClass

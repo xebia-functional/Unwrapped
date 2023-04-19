@@ -29,4 +29,4 @@ object ContinuationStub:
         result: Either[Throwable, Any | Null | Continuation.State.Suspended.type]): Any | Null =
       result.fold(t => throw t, or => or)
   }
-*/
+ */

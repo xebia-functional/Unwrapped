@@ -45,16 +45,18 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
         """
           |package continuations
           |
+          |import continuations.jvm.internal.SuspendApp
+          |
           |case class Foo(x: Int)
           |
-          |def program: Foo = {
+          |def program = {
           |
           |  def fooTest[A](a: A, b: Int)(using s: Suspend): A = {
           |      val z = s.shift[A] { _.resume(a) }
           |      s.shift[A] { _.resume({ println("World"); z }) }
           |  }
           |
-          |  fooTest(Foo(1), 1)
+          |  SuspendApp(fooTest(Foo(1), 1))
           |}
           |""".stripMargin
 
@@ -75,17 +77,19 @@ class ContinuationsChainedTwoArgs extends FunSuite, CompilerFixtures, StateMachi
         """
           |package continuations
           |
+          |import continuations.jvm.internal.SuspendApp
+          |
           |case class Foo(x: Int)
           |case class Bar(x: Int)
           |
-          |def program: Bar = {
+          |def program = {
           |
           |  def fooTest[A, B](a: A, b: B)(using s: Suspend): B = {
           |      val z = s.shift[A] { _.resume(a) }
           |      s.shift[B] { _.resume({ println(z); b }) }
           |  }
           |
-          |  fooTest(Foo(1), Bar(2))
+          |  SuspendApp(fooTest(Foo(1), Bar(2)))
           |}
           |""".stripMargin
 
