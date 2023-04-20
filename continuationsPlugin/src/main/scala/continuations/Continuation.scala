@@ -39,11 +39,7 @@ inline def BuildContinuation[T](
 
     override def resume(value: T): Unit = ec.execute {
       new Runnable:
-        override def run(): Unit = {
-          println(
-            s"resume build continuation $value in thread ${Thread.currentThread().getName}")
-          res(Right(value))
-        }
+        override def run(): Unit = res(Right(value))
     }
 
     override def raise(error: Throwable): Unit = ec.execute {

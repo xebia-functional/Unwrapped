@@ -88,11 +88,7 @@ package continuations {
         continuations.jvm.internal.SuspendApp.apply(
           {
             private final class $anon() extends continuations.jvm.internal.Starter {
-              override def invoke[A](completion: continuations.Continuation[A]): A | Any | Null =
-                {
-                  Console.print("inside invoke\n")
-                  foo(completion)
-                }
+              override def invoke[A](completion: continuations.Continuation[A]): A | Any | Null = foo(completion)
             }
             new continuations.jvm.internal.Starter {...}
           }

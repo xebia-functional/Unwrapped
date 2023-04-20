@@ -95,8 +95,8 @@ class ContinuationsCallsPhase extends PluginPhase:
     n.asTermName == nme.apply &&
       treeExistsAndIsMethod(tree)
 
-  override def prepareForDefDef(tree: DefDef)(using Context): Context = // TODO
-    val starterClassRef = requiredClassRef("continuations.jvm.internal.Starter")
+  override def prepareForDefDef(tree: DefDef)(using Context): Context =
+    val starterClassRef = requiredClassRef(starterClassName)
     tree match
       case tree @ DefDef(_, paramss, _, _)
           if !paramss.exists(
@@ -138,8 +138,8 @@ class ContinuationsCallsPhase extends PluginPhase:
   override def transformApply(tree: Apply)(using ctx: Context): Tree =
     if (tree.symbol.showFullName == "continuations.jvm.internal.SuspendApp.apply")
 
-      val continuationClassRef = requiredClassRef("continuations.Continuation")
-      val starterClassRef = requiredClassRef("continuations.jvm.internal.Starter")
+      val continuationClassRef = requiredClassRef(continuationFullName)
+      val starterClassRef = requiredClassRef(starterClassName)
 
       val maybeOwner =
         tree
@@ -159,7 +159,7 @@ class ContinuationsCallsPhase extends PluginPhase:
             case _ => false
           }
 
-          possible.headOption.fold(updatedMethods.toList.last)(_.symbol) // TODO: empty case
+          possible.headOption.fold(updatedMethods.toList.last)(_.symbol)
         }
 
       val starterClassSymbol = newCompleteClassSymbol(
@@ -218,20 +218,7 @@ class ContinuationsCallsPhase extends PluginPhase:
               case (acc, _) => acc
             }
 
-          import dotty.tools.dotc.core.Decorators.toTermName
-          val message1 = s"inside invoke\n"
-          val consoleType1 = requiredModule("scala.Console")
-          val consoleRef1 = ref(consoleType1)
-          val print1 = consoleRef1.select("print".toTermName)
-          val printMessage1 = print1.appliedTo(tpd.Literal(Constant(message1)))
-
-          Block(
-            List(
-              printMessage1
-            ),
-            ref(existsTree(tree).get)
-              .appliedToTermArgs(paramsNonCF.flatten :+ paramss.last.head)
-          )
+          ref(existsTree(tree).get).appliedToTermArgs(paramsNonCF.flatten :+ paramss.last.head)
       )
 
       val newStarterClass = ClassDefWithParents(

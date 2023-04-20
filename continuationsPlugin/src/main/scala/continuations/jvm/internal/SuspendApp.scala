@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.{CountDownLatch, Executors, ThreadFactory}
 import scala.concurrent
 import scala.concurrent.ExecutionContext
+import scala.util.Right
 
 object SuspendApp:
   var result: Either[Throwable, Any] = Right(0)
@@ -34,14 +35,13 @@ object SuspendApp:
           val baseCont = BuildContinuation[Any](
             pool,
             { res =>
-              // res.fold(t => throw t, _ => println(s"Thread builder continuation: ${Thread.currentThread().getName}"))
               result = res
               latch.countDown()
             })
           block.startContinuation(baseCont)
     }
     latch.await()
-    println(s"Last thread suspendApp: ${Thread.currentThread().getName}")
     result match
       case Left(e) => throw e
       case Right(Right(v)) => v
+      case Right(v) => v

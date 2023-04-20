@@ -35,14 +35,14 @@ extension [A](suspendedFn: Starter ?=> A)
     else
       createContinuationFromSuspendFunction(
         completion,
-        (continuation: Continuation[Int]) => {
+        (continuation: Continuation[A]) => {
           suspendedFn.asInstanceOf[Starter].invoke(continuation)
         }
       )
 
 private inline def createContinuationFromSuspendFunction[T](
     completion: Continuation[T],
-    block: Continuation[Int] => Int | Any
+    block: Continuation[T] => T | Any | Null
 ): Continuation[Unit] =
   val context = completion.context
   if (context == EmptyTuple)
