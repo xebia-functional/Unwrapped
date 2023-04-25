@@ -3,6 +3,7 @@ package continuations
 import continuations.jvm.internal.ContinuationStackFrame
 
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater
+import scala.concurrent.ExecutionContext
 
 class SafeContinuation[T] private (
     val delegate: Continuation[T],
@@ -11,6 +12,8 @@ class SafeContinuation[T] private (
       Continuation[T],
       ContinuationStackFrame:
   override type Ctx = delegate.Ctx
+
+  override val executionContext: ExecutionContext = delegate.executionContext
   override def context: Ctx = delegate.context
   result = initialResult
   var errored: Boolean = false
@@ -71,5 +74,5 @@ class SafeContinuation[T] private (
 object SafeContinuation:
   def init[A](cont: Continuation[A]): SafeContinuation[A] =
     import continuations.intrinsics.intercepted
-    val intrinsic = cont.intercepted()
+    val intrinsic = cont.intercepted(cont.executionContext)
     new SafeContinuation[A](intrinsic, Continuation.State.Undecided)

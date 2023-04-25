@@ -1,6 +1,8 @@
+/*
 package examples
 
 import continuations.Suspend
+import continuations.jvm.internal.SuspendApp
 
 @main def PolymorphicDefsZeroContinuations: Unit =
   val polymorphicValDefZeroContinuations
@@ -28,9 +30,10 @@ import continuations.Suspend
                 x.size + y.size + q.size + p.size + z
 
   println(
-    polymorphicValDefZeroContinuations(List(1))(List("A", "B"))(List(1, 1, 1))(
-      List(1, 1, 1, 1)))
+    SuspendApp(polymorphicValDefZeroContinuations(List(1))(List("A", "B"))(List(1, 1, 1))(
+      List(1, 1, 1, 1))))
 
   println(
-    polymorphicDefDefZeroContinuations(List(1))(List("A", "B"))(List(1, 1, 1))(
-      List(1, 1, 1, 1)))
+    SuspendApp(polymorphicDefDefZeroContinuations(List(1))(List("A", "B"))(List(1, 1, 1))(
+      List(1, 1, 1, 1))))
+*/

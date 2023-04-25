@@ -1,15 +1,17 @@
 package continuations.intrinsics
 
-import continuations.jvm.internal.{BaseContinuationImpl, ContinuationImpl}
+import continuations.jvm.internal.{BaseContinuationImpl, ContinuationImpl, Starter}
 import continuations.{Continuation, RestrictedContinuation, Suspend}
 
+import scala.concurrent.ExecutionContext
+
 extension [A](continuation: Continuation[A])
-  def intercepted(): Continuation[A] =
+  def intercepted(ec: ExecutionContext): Continuation[A] =
     if (continuation.isInstanceOf[ContinuationImpl])
-      continuation.asInstanceOf[ContinuationImpl].intercepted().asInstanceOf[Continuation[A]]
+      continuation.asInstanceOf[ContinuationImpl].intercepted(ec).asInstanceOf[Continuation[A]]
     else continuation
 
-extension [A](suspendedFn: Suspend ?=> A)
+extension [A](suspendedFn: Starter ?=> A)
 
   // inline def shift
   /*
@@ -19,7 +21,7 @@ extension [A](suspendedFn: Suspend ?=> A)
    */
 
   def startContinuation(completion: Continuation[A]): Unit =
-    createContinuation(completion).intercepted().resume(())
+    createContinuation(completion).intercepted(completion.executionContext).resume(())
 
   inline def startContinuationOrSuspend(
       completion: Continuation[A]): Any | Null | Continuation.State.Suspended.type =
@@ -34,14 +36,13 @@ extension [A](suspendedFn: Suspend ?=> A)
       createContinuationFromSuspendFunction(
         completion,
         (continuation: Continuation[A]) => {
-          suspendedFn
-            .asInstanceOf[Continuation[A] => (Any | Null | Continuation.State.Suspended.type)](
-              continuation)
-        })
+          suspendedFn.asInstanceOf[Starter].invoke(continuation)
+        }
+      )
 
 private inline def createContinuationFromSuspendFunction[T](
     completion: Continuation[T],
-    block: Continuation[T] => Any | Null
+    block: Continuation[T] => T | Any | Null
 ): Continuation[Unit] =
   val context = completion.context
   if (context == EmptyTuple)
@@ -58,6 +59,7 @@ private inline def createContinuationFromSuspendFunction[T](
                 throw exception
               case _ => ()
             block(this)
+
           case 1 =>
             label = 2
             result match
@@ -83,6 +85,7 @@ private inline def createContinuationFromSuspendFunction[T](
                 throw exception
               case _ => ()
             block(this)
+
           case 1 =>
             label = 2
             result match

@@ -1,6 +1,7 @@
 package examples
 
 import continuations.Suspend
+import continuations.jvm.internal.SuspendApp
 
 import scala.util.Try
 
@@ -9,4 +10,4 @@ import scala.util.Try
     s.shift[Int] { continuation =>
       continuation.raise(new Exception("error"))
     }
-  println(Try(left()))
+  println(Try(SuspendApp(left())))

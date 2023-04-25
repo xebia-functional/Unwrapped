@@ -1,4 +1,5 @@
 package continuations {
+  import continuations.jvm.internal.SuspendApp
   final lazy module val compileFromString$package: 
     continuations.compileFromString$package
    = new continuations.compileFromString$package()
@@ -7,7 +8,7 @@ package continuations {
   () extends Object() { this: continuations.compileFromString$package.type =>
     private def writeReplace(): AnyRef = 
       new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-    def program: Int = 
+    def program: Any =
       {
         private class $foo$Frame($completion: continuations.Continuation[Any | Null]) extends continuations.jvm.internal.ContinuationImpl($completion
           ,
@@ -28,8 +29,6 @@ package continuations {
             }
           override def create(value: Any | Null, completion: continuations.Continuation[Any | Null]): continuations.Continuation[Unit] =
             new continuations.jvm.internal.BaseContinuationImpl(completion)
-          protected def invoke(p1: Any | Null, p2: continuations.Continuation[Any | Null]): Any | Null =
-            this.create(p1, p2).asInstanceOf[(BaseContinuationImpl.this : continuations.jvm.internal.BaseContinuationImpl)].invokeSuspendDummy
         }
         def foo(completion: continuations.Continuation[Int]): 
           Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
@@ -66,7 +65,14 @@ package continuations {
             }
             10
           }
-        foo(continuations.jvm.internal.ContinuationStub.contImpl)
+        continuations.jvm.internal.SuspendApp.apply(
+          {
+            private final class $anon() extends continuations.jvm.internal.Starter {
+              override def invoke[A](completion: continuations.Continuation[A]): A | Any | Null = foo(completion)
+            }
+            new continuations.jvm.internal.Starter {...}
+          }
+        )
       }
   }
 }

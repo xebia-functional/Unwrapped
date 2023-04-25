@@ -3,7 +3,7 @@ package examples
 import continuations.Continuation
 import continuations.SafeContinuation
 import continuations.Suspend
-
+import continuations.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import scala.util.Random
@@ -28,5 +28,9 @@ given ExecutorService = Executors.newWorkStealingPool()
       })
     }
 
-  val mappedContinuations = (1 to 100).toList.map(twoArgumentsOneContinuationsCFBefore(1, _))
-  println(mappedContinuations)
+  val mappedCont = (1 to 5).toList.map { x =>
+    continuations.jvm.internal.SuspendApp {
+      twoArgumentsOneContinuationsCFBefore(1, x)
+    }
+  }
+  println(mappedCont)

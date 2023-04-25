@@ -2,8 +2,11 @@ package continuations
 
 import continuations.jvm.internal.BaseContinuationImpl
 
+import scala.concurrent.ExecutionContext
+
 trait Continuation[-A]:
   type Ctx <: Tuple
+  val executionContext: ExecutionContext
   def context: Ctx
   def resume(value: A): Unit
   def raise(error: Throwable): Unit
@@ -26,16 +29,25 @@ object Continuation:
 end Continuation
 
 inline def BuildContinuation[T](
-    ctx: Tuple,
+    ec: ExecutionContext,
     res: Either[Throwable, T] => Unit): Continuation[T] =
   new Continuation[T]:
-    override type Ctx = Tuple
+    override type Ctx = EmptyTuple
+    override val executionContext: ExecutionContext = ec
 
-    override def context: Ctx = ctx
+    override def context: Ctx = EmptyTuple
 
-    override def resume(value: T): Unit = res(Right(value))
+    override def resume(value: T): Unit = ec.execute {
+      new Runnable:
+        override def run(): Unit = res(Right(value))
+    }
 
-    override def raise(error: Throwable): Unit = res(Left(error))
+    override def raise(error: Throwable): Unit = ec.execute {
+      new Runnable:
+        override def run(): Unit = res(Left(error))
+    }
+
+    private val ec = ExecutionContext.global
 
 abstract class RestrictedContinuation(
     completion: Continuation[Any | Null] | Null

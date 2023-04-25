@@ -1,6 +1,7 @@
 package examples
 
 import continuations.Suspend
+import continuations.jvm.internal.SuspendApp
 
 @main def ZeroArgumentsValsDefinedInsideContinuation =
   def zeroArgumentsValsDefinedInsideContinuation()(using Suspend): Int =
@@ -13,4 +14,4 @@ import continuations.Suspend
       val x = 2
       continuation.resume(x)
     }
-  println(zeroArgumentsValsDefinedInsideContinuation())
+  println(SuspendApp(zeroArgumentsValsDefinedInsideContinuation()))

@@ -1,6 +1,7 @@
 package examples
 
 import continuations.Suspend
+import continuations.jvm.internal.SuspendApp
 
 @main def ZeroArgumentsCodeAfter =
   def zeroArgumentsCodeAfter()(using Suspend): Int =
@@ -11,4 +12,4 @@ import continuations.Suspend
       continuation.resume(println(2))
     }
     3
-  println(zeroArgumentsCodeAfter())
+  println(SuspendApp(zeroArgumentsCodeAfter()))

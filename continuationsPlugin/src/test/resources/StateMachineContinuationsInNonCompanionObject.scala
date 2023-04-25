@@ -30,8 +30,6 @@ package continuations {
         }
       override def create(value: Any | Null, completion: continuations.Continuation[Any | Null]): continuations.Continuation[Unit] =
         new continuations.jvm.internal.BaseContinuationImpl(completion)
-      protected def invoke(p1: Any | Null, p2: continuations.Continuation[Any | Null]): Any | Null =
-        this.create(p1, p2).asInstanceOf[(BaseContinuationImpl.this : continuations.jvm.internal.BaseContinuationImpl)].invokeSuspendDummy
     }
     def continuations(x: Int, y: Int, completion: continuations.Continuation[Int]):
       Int | Null | (continuations.Continuation.State.Suspended : continuations.Continuation.State)
@@ -146,6 +144,6 @@ package continuations {
   () extends Object() { this: continuations.compileFromString$package.type =>
     private def writeReplace(): AnyRef =
       new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-    def foo: Int = continuations.ExampleObject.continuations(1, 2, continuations.jvm.internal.ContinuationStub.contImpl)
+    def foo: Int = continuations.ExampleObject.continuations(1, 2)(continuations.Suspend.given_Suspend)
   }
 }

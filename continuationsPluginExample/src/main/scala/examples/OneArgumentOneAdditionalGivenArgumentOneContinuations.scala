@@ -1,6 +1,7 @@
 package examples
 
 import continuations.Suspend
+import continuations.jvm.internal.SuspendApp
 
 @main def OneArgumentOneAdditionalGivenArgumentOneContinuations =
   given String = "Output: "
@@ -9,4 +10,4 @@ import continuations.Suspend
     summon[Suspend].shift[String] { continuation =>
       continuation.resume(summon[String] + x)
     }
-  println(oneArgumentOneAdditionalGivenArgumentOneContinuations(1))
+  println(SuspendApp(oneArgumentOneAdditionalGivenArgumentOneContinuations(1)))

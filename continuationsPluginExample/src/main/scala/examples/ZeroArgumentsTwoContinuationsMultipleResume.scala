@@ -1,6 +1,7 @@
 package examples
 
 import continuations.Suspend
+import continuations.jvm.internal.SuspendApp
 
 import scala.util.Try
 
@@ -11,4 +12,4 @@ import scala.util.Try
       c.resume({ println("Resume2"); 1 })
       c.resume({ println("Resume3"); 2 })
     }
-  println(Try(zeroArgumentsTwoContinuationsMultipleResume()))
+  println(Try(SuspendApp(zeroArgumentsTwoContinuationsMultipleResume())))

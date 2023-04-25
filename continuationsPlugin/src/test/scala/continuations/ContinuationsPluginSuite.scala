@@ -48,7 +48,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
           |    def program: Unit =
           |      {
           |        def foo(completion: continuations.Continuation[Int | Any]): Any = 1
-          |        println(foo(continuations.jvm.internal.ContinuationStub.contImpl))
+          |        println(foo()(continuations.Suspend.given_Suspend))
           |      }
           |  }
           |}
@@ -91,7 +91,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |    def program: Unit =
            |      {
            |        def foo(completion: continuations.Continuation[Int | Any]): Any = 1
-           |        println(foo(continuations.jvm.internal.ContinuationStub.contImpl))
+           |        println(foo(continuations.Suspend.given_Suspend))
            |      }
            |  }
            |}
@@ -722,12 +722,14 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         """|
            |package continuations
            |
-           |def program: Int = {
+           |import continuations.jvm.internal.SuspendApp
+           |
+           |def program: Any = {
            |  def foo()(using Suspend): Int = {
            |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |    10
            |  }
-           |  foo()
+           |  SuspendApp(foo())
            |}
            |""".stripMargin
 
@@ -735,12 +737,14 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         """|
            |package continuations
            |
-           |def program: Int = {
+           |import continuations.jvm.internal.SuspendApp
+           |
+           |def program: Any = {
            |  def foo(): Suspend ?=> Int = {
            |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |    10
            |  }
-           |  foo()
+           |  SuspendApp(foo())
            |}
            |""".stripMargin
 
@@ -771,12 +775,14 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         """|
            |package continuations
            |
-           |def program: Int = {
+           |import continuations.jvm.internal.SuspendApp
+           |
+           |def program: Any = {
            |  def foo(x: Int)(using Suspend): Int = {
            |    summon[Suspend].shift[Int] { continuation => continuation.resume(x) }
            |    10
            |  }
-           |  foo(11)
+           |  SuspendApp(foo(11))
            |}
            |""".stripMargin
 
@@ -932,7 +938,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         """|
            |package continuations
            |
-           |def program: Int = {
+           |import continuations.jvm.internal.SuspendApp
+           |
+           |def program: Any = {
            |  def foo()(using Suspend): Int = {
            |    println("Start")
            |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
@@ -943,7 +951,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |    println("End")
            |    10
            |  }
-           |  foo()
+           |  SuspendApp(foo())
            |}
            |""".stripMargin
 
@@ -951,7 +959,9 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         """|
            |package continuations
            |
-           |def program: Int = {
+           |import continuations.jvm.internal.SuspendApp
+           |
+           |def program: Any = {
            |  def foo(): Suspend ?=> Int = {
            |    println("Start")
            |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
@@ -962,7 +972,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |    println("End")
            |    10
            |  }
-           |  foo()
+           |  SuspendApp(foo())
            |}
            |""".stripMargin
 
@@ -1062,7 +1072,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
            |  }
            |
-           |foo()
+           |  foo()
            |}
            |""".stripMargin
 
@@ -1083,12 +1093,13 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         """|
            |package continuations
            |
+           |import continuations.jvm.internal.SuspendApp
            |import scala.concurrent.ExecutionContext
            |import concurrent.ExecutionContext.Implicits.global
            |
-           |def program: Int = {
+           |def program: Any = {
            |  def foo[A, B](x: A, y: B)(z: String)(using s: Suspend, ec: ExecutionContext): A = x
-           |  foo(1,2)("A")
+           |  SuspendApp(foo(1,2)("A"))
            |}
            |""".stripMargin
 
@@ -1096,13 +1107,14 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         """|
            |package continuations
            |
+           |import continuations.jvm.internal.SuspendApp
            |import scala.concurrent.ExecutionContext
            |import concurrent.ExecutionContext.Implicits.global
            |
-           |def program: Int = {
+           |def program: Any = {
            |  def foo[A, B](x: A, y: B)(z: String)(using s: Suspend, ec: ExecutionContext): A =
            |    summon[Suspend].shift[A] { continuation => continuation.resume(x) }
-           |  foo(1,2)("A")
+           |  SuspendApp(foo(1,2)("A"))
            |}
            |""".stripMargin
 
@@ -1110,6 +1122,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       val expectedNoSuspend =
         """|
            |package continuations {
+           |  import continuations.jvm.internal.SuspendApp
            |  import scala.concurrent.ExecutionContext
            |  import concurrent.ExecutionContext.Implicits.global
            |  final lazy module val compileFromString$package:
@@ -1120,10 +1133,18 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef =
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int =
+           |    def program: Any =
            |      {
            |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A | Any]): Any = x
-           |        foo(1, 2, "A", concurrent.ExecutionContext.Implicits.global, continuations.jvm.internal.ContinuationStub.contImpl)
+           |        continuations.jvm.internal.SuspendApp.apply(
+           |          {
+           |            private final class $anon() extends continuations.jvm.internal.Starter {
+           |              override def invoke[A](completion: continuations.Continuation[A]): A | Any | Null =
+           |                foo(1, 2, "A", concurrent.ExecutionContext.Implicits.global, completion)
+           |            }
+           |            new continuations.jvm.internal.Starter {...}
+           |          }
+           |        )
            |      }
            |  }
            |}
@@ -1132,6 +1153,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       val expectedSuspend =
         """|
            |package continuations {
+           |  import continuations.jvm.internal.SuspendApp
            |  import scala.concurrent.ExecutionContext
            |  import concurrent.ExecutionContext.Implicits.global
            |  final lazy module val compileFromString$package:
@@ -1142,7 +1164,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef =
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Int =
+           |    def program: Any =
            |      {
            |        def foo(x: A, y: B, z: String, ec: concurrent.ExecutionContext, completion: continuations.Continuation[A]):
            |          Any | Null | continuations.Continuation.State.Suspended.type
@@ -1157,7 +1179,15 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |            }
            |            safeContinuation.getOrThrow()
            |          }
-           |        foo(1, 2, "A", concurrent.ExecutionContext.Implicits.global, continuations.jvm.internal.ContinuationStub.contImpl)
+           |        continuations.jvm.internal.SuspendApp.apply(
+           |          {
+           |            private final class $anon() extends continuations.jvm.internal.Starter {
+           |              override def invoke[A](completion: continuations.Continuation[A]): A | Any | Null =
+           |                foo(1, 2, "A", concurrent.ExecutionContext.Implicits.global, completion)
+           |            }
+           |            new continuations.jvm.internal.Starter {...}
+           |          }
+           |        )
            |      }
            |  }
            |}
@@ -1408,10 +1438,12 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
         """|
            |package continuations
            |
+           |import continuations.jvm.internal.SuspendApp
+           |
            |def program = {
            |  case class Foo(i: Int)
            |  def foo[A](a: A)(using Suspend): A = a
-           |  foo(Foo(1))
+           |  SuspendApp(foo(Foo(1)))
            |}
            |""".stripMargin
 
@@ -1419,6 +1451,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
       val expected =
         """|
            |package continuations {
+           |  import continuations.jvm.internal.SuspendApp
            |  final lazy module val compileFromString$package: 
            |    continuations.compileFromString$package
            |   = new continuations.compileFromString$package()
@@ -1427,7 +1460,7 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |  () extends Object() { this: continuations.compileFromString$package.type =>
            |    private def writeReplace(): AnyRef = 
            |      new scala.runtime.ModuleSerializationProxy(classOf[continuations.compileFromString$package.type])
-           |    def program: Object = 
+           |    def program: Any = 
            |      {
            |        case class Foo(i: Int) extends Object(), _root_.scala.Product, _root_.scala.Serializable {
            |          override def hashCode(): Int = 
@@ -1476,7 +1509,14 @@ class ContinuationsPluginSuite extends FunSuite, CompilerFixtures, StateMachineF
            |            new Foo(x$0.productElement(0).$asInstanceOf[Int])
            |        }
            |        def foo(a: A, completion: continuations.Continuation[A | Any]): Any = a
-           |        foo(Foo.apply(1), continuations.jvm.internal.ContinuationStub.contImpl):Object & Product & Serializable
+           |        continuations.jvm.internal.SuspendApp.apply(
+           |          {
+           |            private final class $anon() extends continuations.jvm.internal.Starter {
+           |              override def invoke[A](completion: continuations.Continuation[A]): A | Any | Null = foo(Foo.apply(1), completion)
+           |            }
+           |            new continuations.jvm.internal.Starter {...}
+           |          }
+           |        )
            |      }
            |  }
            |}

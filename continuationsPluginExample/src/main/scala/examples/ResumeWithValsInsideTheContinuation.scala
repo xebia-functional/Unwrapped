@@ -1,6 +1,7 @@
 package examples
 
 import continuations.Suspend
+import continuations.jvm.internal.SuspendApp
 
 @main def ResumeWithValsInsideTheContinuation =
   def resumeWithValsInsideTheContinuation()(using s: Suspend): Int =
@@ -9,4 +10,4 @@ import continuations.Suspend
       val y = 2
       continuation.resume(x + y)
     }
-  println(resumeWithValsInsideTheContinuation())
+  println(SuspendApp(resumeWithValsInsideTheContinuation()))

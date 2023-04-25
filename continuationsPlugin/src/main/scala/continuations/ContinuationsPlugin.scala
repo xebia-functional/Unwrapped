@@ -1,11 +1,16 @@
 package continuations
 
+import dotty.tools.dotc.ast.Trees.ParamClause
+import dotty.tools.dotc.ast.{tpd, TreeTypeMap, Trees}
 import dotty.tools.dotc.ast.tpd.*
+import dotty.tools.dotc.ast.untpd.Modifiers
+import dotty.tools.dotc.core.Constants.Constant
 import dotty.tools.dotc.core.Contexts.{ctx, Context}
-import dotty.tools.dotc.core.Flags
-import dotty.tools.dotc.core.Names.Name
-import dotty.tools.dotc.core.StdNames.nme
+import dotty.tools.dotc.core.{Flags, Names, Scopes, Types}
+import dotty.tools.dotc.core.Names.{termName, typeName, Name}
+import dotty.tools.dotc.core.StdNames.{nme, tpnme}
 import dotty.tools.dotc.core.Symbols.*
+import dotty.tools.dotc.core.Types.{MethodType, OrType, PolyType}
 import dotty.tools.dotc.plugins.PluginPhase
 import dotty.tools.dotc.plugins.StandardPlugin
 import dotty.tools.dotc.transform.PickleQuotes
@@ -71,8 +76,8 @@ class ContinuationsCallsPhase extends PluginPhase:
     updatedMethods.find(s => s.name == tree.symbol.name && s.coord == tree.symbol.coord)
 
   private def treeIsSuspendAndNotInApplyToChange(tree: Apply)(using Context): Boolean =
-    tree.filterSubTrees(CallsSuspendParameter.apply).nonEmpty &&
-      !applyToChange.exists(_.filterSubTrees(_.sameTree(tree)).nonEmpty)
+    tree.filterSubTrees(CallsSuspendParameter.apply).nonEmpty
+  // && !applyToChange.exists(_.filterSubTrees(_.sameTree(tree)).nonEmpty)
 
   private def treeExistsIsApplyAndIsNotInApplyToChange(tree: Apply, n: Name)(
       using Context): Boolean =
@@ -91,6 +96,16 @@ class ContinuationsCallsPhase extends PluginPhase:
       treeExistsAndIsMethod(tree)
 
   override def prepareForDefDef(tree: DefDef)(using Context): Context =
+    val starterClassRef = requiredClassRef(starterClassName)
+    tree match
+      case tree @ DefDef(_, paramss, _, _)
+          if !paramss.exists(
+            _.exists(_.symbol.info.hasClassSymbol(starterClassRef.classSymbol))) && tree
+            .symbol
+            .isAnonymousFunction =>
+        updatedMethods.addOne(tree.symbol)
+      case _ => ()
+
     val hasContinuationParam =
       tree.termParamss.flatten.exists { p =>
         !p.symbol.is(Flags.Given) &&
@@ -121,41 +136,124 @@ class ContinuationsCallsPhase extends PluginPhase:
     ctx
 
   override def transformApply(tree: Apply)(using ctx: Context): Tree =
-    val continuation: Tree = ref(
-      requiredModule("continuations.jvm.internal.ContinuationStub").requiredMethod("contImpl"))
+    if (tree.symbol.showFullName == "continuations.jvm.internal.SuspendApp.apply")
 
-    if (applyToChange.exists(_.sameTree(tree)))
-      val (paramsNonCF, paramsCF) =
-        tree.deepFold((List(List.empty[Tree]), List(List.empty[Tree]))) {
-          case (
-                (accNonCF, accCF),
-                Apply(TypeApply(Select(qualifier, selected), argsType), args))
-              if treeExistsIsApplyAndIsMethod(qualifier, selected) =>
-            (accNonCF, accCF.prepended(removeSuspend(args)).prepended(removeSuspend(argsType)))
-          case ((accNonCF, accCF), Apply(Select(qualifier, selected), args))
-              if treeExistsIsApplyAndIsMethod(qualifier, selected) =>
-            (accNonCF, accCF.prepended(removeSuspend(args)))
-          case ((accNonCF, accCF), Apply(fun, args)) if treeExistsAndIsMethod(fun) =>
-            (accNonCF.prepended(removeSuspend(args)), accCF)
-          case (acc, _) => acc
-        }
+      val continuationClassRef = requiredClassRef(continuationFullName)
+      val starterClassRef = requiredClassRef(starterClassName)
 
-      paramsCF
-        .filterNot(_.isEmpty)
-        .foldLeft(ref(existsTree(tree).get)
-          .appliedToTermArgs(paramsNonCF.flatten :+ continuation): Tree) { (parent, value) =>
-          val hasTypeTree = value.exists {
-            case _: TypeTree => true
+      val maybeOwner =
+        tree
+          .filterSubTrees(st => applyToChange.exists(_.sameTree(st)))
+          .map(_.symbol.maybeOwner)
+          .lastOption
+
+      val owner =
+        if maybeOwner.exists(_.isDefinedInSource) then maybeOwner.get
+        else {
+          val possible = tree.filterSubTrees {
+            case tree @ DefDef(_, paramss, _, _)
+                if tree.existsSubTree(st => applyToChange.exists(_.sameTree(st))) && !paramss
+                  .exists(
+                    _.exists(_.symbol.info.hasClassSymbol(starterClassRef.classSymbol))) =>
+              true
             case _ => false
           }
 
-          if (hasTypeTree)
-            parent.select(nme.apply).appliedToTypeTrees(value)
-          else
-            parent match
-              case _: TypeApply => parent.appliedToTermArgs(value)
-              case _ => parent.select(nme.apply).appliedToTermArgs(value)
+          possible.headOption.fold(updatedMethods.toList.last)(_.symbol)
         }
+
+      val starterClassSymbol = newCompleteClassSymbol(
+        owner,
+        tpnme.ANON_CLASS,
+        Flags.SyntheticArtifact | Flags.Private | Flags.Final,
+        List(starterClassRef.classSymbol.typeRef),
+        Scopes.newScope
+      ).entered.asClass
+
+      val constructor = {
+        val symbol = newConstructor(
+          starterClassSymbol,
+          Flags.Synthetic,
+          List.empty,
+          List.empty
+        ).entered.asTerm
+        DefDef(symbol)
+      }
+
+      val invokeSymbol =
+        newSymbol(
+          starterClassSymbol,
+          Names.termName("invoke"),
+          Flags.Override | Flags.Method,
+          Types.PolyType(List(Names.typeName("A")))(
+            _ => List(Types.TypeBounds(ctx.definitions.NothingType, ctx.definitions.AnyType)),
+            pt => {
+              MethodType(
+                List(termName("completion")),
+                List(continuationClassRef.appliedTo(pt.newParamRef(0))),
+                Types.OrNull(OrType(pt.newParamRef(0), defn.AnyType, true))
+              )
+            }
+          )
+        ).entered.asTerm
+
+      val invokeMethod: DefDef = tpd.DefDef(
+        invokeSymbol,
+        paramss =>
+
+          val (paramsNonCF, _) =
+            tree.deepFold((List(List.empty[Tree]), List(List.empty[Tree]))) {
+              case (
+                    (accNonCF, accCF),
+                    Apply(TypeApply(Select(qualifier, selected), argsType), args))
+                  if treeExistsIsApplyAndIsMethod(qualifier, selected) =>
+                (
+                  accNonCF,
+                  accCF.prepended(removeSuspend(args)).prepended(removeSuspend(argsType)))
+              case ((accNonCF, accCF), Apply(Select(qualifier, selected), args))
+                  if treeExistsIsApplyAndIsMethod(qualifier, selected) =>
+                (accNonCF, accCF.prepended(removeSuspend(args)))
+              case ((accNonCF, accCF), Apply(fun, args)) if treeExistsAndIsMethod(fun) =>
+                (accNonCF.prepended(removeSuspend(args)), accCF)
+              case (acc, _) => acc
+            }
+
+          ref(existsTree(tree).get).appliedToTermArgs(paramsNonCF.flatten :+ paramss.last.head)
+      )
+
+      val newStarterClass = ClassDefWithParents(
+        starterClassSymbol,
+        constructor,
+        List(tpd.New(starterClassRef)),
+        List(invokeMethod)
+      )
+
+      val newStarterClassConstructor =
+        tpd.New(tpd.TypeTree(newStarterClass.tpe)).select(nme.CONSTRUCTOR)
+
+      val substituteContinuationCall = new TreeTypeMap(
+        treeMap = {
+
+          case tree @ Block(List(anonFun @ DefDef(_, paramss, _, _)), _)
+              if tree.existsSubTree(st => applyToChange.exists(_.sameTree(st))) && paramss
+                .exists(_.exists(_.symbol.info.hasClassSymbol(starterClassSymbol))) =>
+            anonFun.rhs
+
+          case tree if applyToChange.exists(_.sameTree(tree)) =>
+            Block(
+              List(
+                newStarterClass
+              ),
+              newStarterClassConstructor
+            )
+          case tree => tree
+        }
+      )
+
+      cpy.Apply(tree)(
+        fun = tree.fun,
+        args = substituteContinuationCall.transform(tree.args)
+      )
     else tree
 
 end ContinuationsCallsPhase

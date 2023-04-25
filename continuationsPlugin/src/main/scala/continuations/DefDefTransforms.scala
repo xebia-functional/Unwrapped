@@ -654,6 +654,7 @@ object DefDefTransforms extends TreesChecks:
 
     val newReturnType =
       Types.OrType(Types.OrNull(returnType), suspendedState.symbol.namedType, false)
+
     val transformedMethodSymbol =
       createTransformedMethodSymbol(parent, transformedMethodParams, newReturnType)
 
@@ -867,28 +868,6 @@ object DefDefTransforms extends TreesChecks:
             .appliedTo(paramss.head.drop(1).head)
       )
 
-      val invokeSymbol =
-        newSymbol(
-          frameClassSymbol,
-          Names.termName("invoke"),
-          Flags.Protected | Flags.Method,
-          MethodType(
-            List(termName("p1"), termName("p2")),
-            List(anyOrNullType, continuationClassRef.appliedTo(anyOrNullType)),
-            anyOrNullType
-          )
-        ).entered.asTerm
-
-      val invokeMethod = tpd.DefDef(
-        invokeSymbol,
-        paramss =>
-          ref(createMethod.symbol)
-            .appliedToTermArgs(paramss.head.take(2))
-            .select(nme.asInstanceOf_)
-            .appliedToType(baseContinuationImplClassRef.symbol.thisType)
-            .select(termName("invokeSuspendDummy"))
-      )
-
       val extendsContImpl: tpd.Tree =
         tpd
           .New(ref(continuationImplClass))
@@ -911,8 +890,7 @@ object DefDefTransforms extends TreesChecks:
             tpd.DefDef(resultSetter, tpd.unitLiteral),
             tpd.DefDef(labelSetter, tpd.unitLiteral),
             invokeSuspendMethod,
-            createMethod,
-            invokeMethod
+            createMethod
           )
         ).flatten
       )
