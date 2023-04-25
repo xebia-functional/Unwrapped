@@ -13,34 +13,31 @@ addCommandAlias("ci-it-test", "continuationsPlugin / IntegrationTest / test")
 addCommandAlias("ci-docs", "github; mdoc")
 addCommandAlias("ci-publish", "github; ci-release")
 
-publish / skip := true
+lazy val root =
+  (project in file("./"))
+    .settings(publish / skip := true)
+    .aggregate(
+      benchmarks,
+      continuationsPlugin,
+      documentation,
+      `http-scala-fx`,
+      `java-net-multipart-body-publisher`,
+      `munit-scala-fx`,
+      `scala-fx`,
+      `scalike-jdbc-scala-fx`,
+      `sttp-scala-fx`,
+      `munit-snap`
+    )
 
-lazy val root = // I
-  (project in file("./")).aggregate(
-    benchmarks, // A
-    continuationsPlugin, // C
-    // continuationsPluginExample, // D
-    documentation, // E
-    `http-scala-fx`, // F
-    `java-net-multipart-body-publisher`, // G
-    `munit-scala-fx`, // H
-    `scala-fx`, // J
-    `scalike-jdbc-scala-fx`, // K
-    `sttp-scala-fx`, // L
-    // `zero-arguments-no-continuation-treeview`,
-    // `zero-arguments-one-continuation-code-before-used-after`,
-    // `list-map`,
-    // `two-arguments-two-continuations`,
-    `munit-snap`
+lazy val bypassZinc = (project in file("./bypassZinc"))
+  .settings(publish / skip := true)
+  .aggregate(
+    continuationsPluginExample,
+    `zero-arguments-no-continuation-treeview`,
+    `zero-arguments-one-continuation-code-before-used-after`,
+    `list-map`,
+    `two-arguments-two-continuations`
   )
-
-lazy val bypassZinc = (project in file("./bypassZinc")).aggregate(
-  continuationsPluginExample,
-  `zero-arguments-no-continuation-treeview`,
-  `zero-arguments-one-continuation-code-before-used-after`,
-  `list-map`,
-  `two-arguments-two-continuations`
-)
 
 lazy val `scala-fx` = project.settings(scalafxSettings: _*)
 
@@ -165,6 +162,7 @@ lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
   Defaults.itSettings ++ Seq(
     exportJars := true,
     autoAPIMappings := true,
+    publish / skip := true,
     Test / fork := true,
     libraryDependencies ++= List(
       "org.scala-lang" %% "scala3-compiler" % "3.1.2"
