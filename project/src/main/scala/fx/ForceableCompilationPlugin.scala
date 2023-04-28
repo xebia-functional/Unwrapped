@@ -1,4 +1,4 @@
-package fx
+package unwrapped
 
 import sbt._
 import sbt.util.CacheImplicits._

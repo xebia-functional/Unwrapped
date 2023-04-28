@@ -20,12 +20,12 @@ lazy val root =
       benchmarks,
       continuationsPlugin,
       documentation,
-      `http-scala-fx`,
+      `http-unwrapped`,
       `java-net-multipart-body-publisher`,
-      `munit-scala-fx`,
-      `scala-fx`,
-      `scalike-jdbc-scala-fx`,
-      `sttp-scala-fx`,
+      `munit-unwrapped`,
+      `unwrapped`,
+      `scalike-jdbc-unwrapped`,
+      `sttp-unwrapped`,
       `munit-snap`
     )
 
@@ -39,7 +39,7 @@ lazy val bypassZinc = (project in file("./bypassZinc"))
     `two-arguments-two-continuations`
   )
 
-lazy val `scala-fx` = project.settings(scalafxSettings: _*)
+lazy val `unwrapped` = project.settings(unwrappedSettings: _*)
 
 lazy val continuationsPlugin = project
   .configs(IntegrationTest)
@@ -79,51 +79,51 @@ lazy val `two-arguments-two-continuations` =
     .enablePlugins(ForceableCompilationPlugin)
 
 lazy val benchmarks =
-  project.dependsOn(`scala-fx`).settings(publish / skip := true).enablePlugins(JmhPlugin)
+  project.dependsOn(`unwrapped`).settings(publish / skip := true).enablePlugins(JmhPlugin)
 
 lazy val documentation = project
-  .dependsOn(`scala-fx`)
+  .dependsOn(`unwrapped`)
   .enablePlugins(MdocPlugin)
   .settings(mdocOut := file("."))
   .settings(publish / skip := true)
 
-lazy val `munit-scala-fx` = (project in file("./munit-scalafx"))
+lazy val `munit-unwrapped` = (project in file("./munit-unwrapped"))
   .configs(IntegrationTest)
   .settings(
-    munitScalaFXSettings
+    munitUnwrappedSettings
   )
-  .dependsOn(`scala-fx`)
+  .dependsOn(`unwrapped`)
 
-lazy val `cats-scala-fx` = (project in file("./cats-scalafx"))
+lazy val `cats-unwrapped` = (project in file("./cats-unwrapped"))
   .configs(IntegrationTest)
   .settings(
-    catsScalaFXSettings
+    catsUnwrappedSettings
   )
-  .dependsOn(`scala-fx`)
+  .dependsOn(`unwrapped`)
 
-lazy val `scalike-jdbc-scala-fx` = project
-  .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
+lazy val `scalike-jdbc-unwrapped` = project
+  .dependsOn(`unwrapped`, `munit-unwrapped` % "test -> compile")
   .settings(scalalikeSettings)
 
 lazy val `java-net-multipart-body-publisher` =
   (project in file("./java-net-mulitpart-body-publisher")).settings(commonSettings)
 
-lazy val `http-scala-fx` = (project in file("./http-scala-fx"))
-  .settings(httpScalaFXSettings)
+lazy val `http-unwrapped` = (project in file("./http-unwrapped"))
+  .settings(httpUnwrappedSettings)
   .settings(generateMediaTypeSettings)
   .dependsOn(
     `java-net-multipart-body-publisher`,
-    `scala-fx`,
-    `munit-scala-fx` % "test -> compile")
-  .enablePlugins(HttpScalaFxPlugin)
+    `unwrapped`,
+    `munit-unwrapped` % "test -> compile")
+  .enablePlugins(HttpUnwrappedPlugin)
 
-lazy val `sttp-scala-fx` = (project in file("./sttp-scala-fx"))
-  .settings(sttpScalaFXSettings)
+lazy val `sttp-unwrapped` = (project in file("./sttp-unwrapped"))
+  .settings(sttpUnwrappedSettings)
   .dependsOn(
     `java-net-multipart-body-publisher`,
-    `scala-fx`,
-    `http-scala-fx`,
-    `munit-scala-fx` % "test -> compile")
+    `unwrapped`,
+    `http-unwrapped`,
+    `munit-unwrapped` % "test -> compile")
 
 lazy val `munit-snap` = (project in file("./munit-snap")).settings(munitSnapSettings)
 
@@ -143,7 +143,7 @@ lazy val commonSettings = Seq(
   Test / fork := true
 )
 
-lazy val scalafxSettings: Seq[Def.Setting[_]] =
+lazy val unwrappedSettings: Seq[Def.Setting[_]] =
   Seq(
     classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
     javaOptions ++= javaOptionsSettings,
@@ -212,7 +212,7 @@ lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
     Test / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}"
   )
 
-lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
+lazy val munitUnwrappedSettings = Defaults.itSettings ++ Seq(
   libraryDependencies ++= Seq(
     munitScalacheck,
     hedgehog,
@@ -222,7 +222,7 @@ lazy val munitScalaFXSettings = Defaults.itSettings ++ Seq(
   )
 ) ++ commonSettings
 
-lazy val catsScalaFXSettings = Seq(
+lazy val catsUnwrappedSettings = Seq(
   classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
   javaOptions ++= javaOptionsSettings,
   autoAPIMappings := true,
@@ -250,9 +250,9 @@ lazy val scalalikeSettings: Seq[Def.Setting[_]] =
     )
   )
 
-lazy val httpScalaFXSettings = commonSettings
+lazy val httpUnwrappedSettings = commonSettings
 
-lazy val sttpScalaFXSettings = commonSettings ++ Seq(
+lazy val sttpUnwrappedSettings = commonSettings ++ Seq(
   libraryDependencies += sttp,
   libraryDependencies += httpCore5,
   libraryDependencies += hedgehog % Test
