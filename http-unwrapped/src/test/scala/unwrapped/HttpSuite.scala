@@ -100,23 +100,24 @@ class HttpSuite extends UnwrappedSuite, HttpServerFixtures:
     }
 
   httpServer(getHttpFailureHandler(Option.empty, AtomicInteger(3)))
-    .testUnwrapped("By default, failed requests should retry 3 times") { serverAddressResource =>
-      serverAddressResource.use { baseServerAddress =>
-        assertEqualsUnwrapped(
-          structured(URI.create(s"$baseServerAddress/ping/fail").GET[String]().statusCode),
-          200)
-      }
-    }
-
-  httpServer(getHttpFailureHandler(Option.empty, AtomicInteger(4)))
-    .testUnwrapped("More than three request failures should return the server error by default") {
+    .testUnwrapped("By default, failed requests should retry 3 times") {
       serverAddressResource =>
         serverAddressResource.use { baseServerAddress =>
           assertEqualsUnwrapped(
             structured(URI.create(s"$baseServerAddress/ping/fail").GET[String]().statusCode),
-            500)
+            200)
         }
     }
+
+  httpServer(getHttpFailureHandler(Option.empty, AtomicInteger(4))).testUnwrapped(
+    "More than three request failures should return the server error by default") {
+    serverAddressResource =>
+      serverAddressResource.use { baseServerAddress =>
+        assertEqualsUnwrapped(
+          structured(URI.create(s"$baseServerAddress/ping/fail").GET[String]().statusCode),
+          500)
+      }
+  }
 
   httpServer(postHttpSuccessHandler).testUnwrapped(
     "requests with string post bodies are successuful") { serverAddressResource =>
@@ -158,13 +159,13 @@ class HttpSuite extends UnwrappedSuite, HttpServerFixtures:
       }
   }
 
-  httpServer(optionsHttpSuccessHandler).testUnwrapped("OPTIONS should send an Options request") {
-    serverAddressResource =>
-      serverAddressResource.use { baseServerAddress =>
-        assertEqualsUnwrapped(
-          structured(URI.create(s"$baseServerAddress/ping").OPTIONS[String]().statusCode),
-          200)
-      }
+  httpServer(optionsHttpSuccessHandler).testUnwrapped(
+    "OPTIONS should send an Options request") { serverAddressResource =>
+    serverAddressResource.use { baseServerAddress =>
+      assertEqualsUnwrapped(
+        structured(URI.create(s"$baseServerAddress/ping").OPTIONS[String]().statusCode),
+        200)
+    }
   }
 
   httpServer(traceHttpSuccessHandler).testUnwrapped("TRACE should send a trace request") {

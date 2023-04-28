@@ -103,8 +103,8 @@ trait UnwrappedAssertions:
     liftToUnwrapped(assertNotEquals(obtained, expected, clue))
 
   /**
-   * Lifts munit.Assertions#assertEqualsDoubleUnwrapped into Errors for testing. Will not return until
-   * given an Error[AssertionError], typically within run or structured.
+   * Lifts munit.Assertions#assertEqualsDoubleUnwrapped into Errors for testing. Will not return
+   * until given an Error[AssertionError], typically within run or structured.
    *
    * @param obtained
    *   The actual value under test

@@ -292,7 +292,8 @@ class ToHttpBodyMapperSuite extends UnwrappedSuite, ToHttpBodyMapperFixtures {
 
   stringBody.testUnwrapped(
     s"StringBody#toHttpBodyMapper should have a media type containing ${MediaTypes.text.plain}") {
-    stringBody => assertEqualsUnwrapped(stringBody.toHttpBodyMapper().mediaType.value, "text/plain")
+    stringBody =>
+      assertEqualsUnwrapped(stringBody.toHttpBodyMapper().mediaType.value, "text/plain")
   }
 
   stringBody.testUnwrapped(

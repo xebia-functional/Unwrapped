@@ -163,7 +163,8 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, UnwrappedAssertions:
     "given two items within a tolerance delta range of each other, assertEqualsDoubleUnwrapped should return an `Errors[AssertionError] ?=> Unit` that evaluates to `()` when run") {
     forAll { (givenDouble: Double, givenDelta: Double) =>
       val givenDoubleWithinDelta = givenDouble + givenDelta - Double.MinPositiveValue
-      val obtained = run(assertEqualsDoubleUnwrapped(givenDouble, givenDoubleWithinDelta, givenDelta))
+      val obtained =
+        run(assertEqualsDoubleUnwrapped(givenDouble, givenDoubleWithinDelta, givenDelta))
       obtained match
         case x: ComparisonFailure =>
           fail("assertion raised exception when it shouldn't have")
@@ -199,7 +200,8 @@ class ScalaFxAssertionsSuite extends ScalaCheckSuite, UnwrappedAssertions:
     "given two items within a tolerance delta range of each other, assertEqualsFloatUnwrapped should return an `Errors[AssertionError] ?=> Unit` that evaluates to `()` when run") {
     forAll { (givenFloat: Float, givenDelta: Float) =>
       val givenFloatWithinDelta = givenFloat + givenDelta
-      val obtained = run(assertEqualsFloatUnwrapped(givenFloat, givenFloatWithinDelta, givenDelta))
+      val obtained =
+        run(assertEqualsFloatUnwrapped(givenFloat, givenFloatWithinDelta, givenDelta))
       obtained match
         case x: ComparisonFailure =>
           fail("assertion raised exception when it shouldn't have")
