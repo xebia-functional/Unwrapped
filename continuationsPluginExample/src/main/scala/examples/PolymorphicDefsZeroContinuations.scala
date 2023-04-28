@@ -1,4 +1,3 @@
-/*
 package examples
 
 import continuations.Suspend
@@ -36,4 +35,3 @@ import continuations.jvm.internal.SuspendApp
   println(
     SuspendApp(polymorphicDefDefZeroContinuations(List(1))(List("A", "B"))(List(1, 1, 1))(
       List(1, 1, 1, 1))))
-*/

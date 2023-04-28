@@ -1,11 +1,13 @@
 package examples
 
 import continuations.Suspend
+import continuations.Blocking
+import continuations.Continuation
 
 @main def TwoArgumentsTwoContinuations =
-  def twoArgumentsTwoContinuations(x: Int, y: Int)(using Suspend): Int =
-    summon[Suspend].shift[Unit] { continuation =>
-      continuation.resume(println(x + y))
-    }
-    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
-  println(twoArgumentsTwoContinuations(1, 2))
+  given String = "hi"
+  given Int = 42
+  def threeDependentContinuations(x: Int)(using i: Int)(using s: Suspend, strung: String): Int =
+    s.shift(_.resume(1))
+  println(Blocking(threeDependentContinuations(1)))
+

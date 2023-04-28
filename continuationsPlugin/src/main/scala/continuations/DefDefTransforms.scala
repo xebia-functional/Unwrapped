@@ -23,6 +23,9 @@ import dotty.tools.dotc.transform.ContextFunctionResults
 import scala.annotation.tailrec
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
+import dotty.tools.dotc.core.Types.TypeMap
+import dotty.tools.dotc.core.Names.TermName
+import dotty.tools.dotc.core.Types.ContextualMethodType
 
 object DefDefTransforms extends TreesChecks:
 
@@ -94,7 +97,7 @@ object DefDefTransforms extends TreesChecks:
     newSymbol(
       owner,
       Names.termName(completionParamName),
-      Flags.LocalParam | Flags.SyntheticParam,
+      Flags.LocalParam | Flags.SyntheticParam | Flags.GivenVal,
       requiredPackage("continuations")
         .requiredType("Continuation")
         .typeRef
@@ -312,26 +315,59 @@ object DefDefTransforms extends TreesChecks:
 
     val completion = generateCompletion(parent, returnType)
 
-    val transformedMethodParams = params(tree, completion)
-
-    val transformedMethodSymbol = {
-      val suspendedState =
-        ref(continuationObjectSym).select(termName("State")).select(termName("Suspended"))
-
-      val finalMethodReturnType: tpd.TypeTree =
-        tpd.TypeTree(
-          OrType(
-            OrType(ctx.definitions.AnyType, ctx.definitions.NullType, soft = false),
-            suspendedState.symbol.namedType,
-            soft = false)
-        )
-      createTransformedMethodSymbol(parent, transformedMethodParams, finalMethodReturnType.tpe)
+    val replaceSuspendMap = new TypeMap {
+      override def apply(tp: Type): Type =
+        tp match
+          case t: Type if t.hasClassSymbol(requiredClass(suspendFullName)) =>
+            val newReplacedSuspension = completion.info
+            newReplacedSuspension
+          case t: MethodType
+              if t
+                .paramInfoss
+                .flatten
+                .exists(_.hasClassSymbol(requiredClass(suspendFullName))) && t.isContextualMethod =>
+            val termNames = t.paramNames
+            val paramInfos = t.paramInfos.map(apply)
+            val resultTpe = apply(t.resultType)
+            val newType = ContextualMethodType(termNames, paramInfos, resultTpe)
+            newType
+          case t: MethodType
+              if t
+                .paramInfoss
+                .flatten
+                .exists(_.hasClassSymbol(requiredClass(suspendFullName))) =>
+            val termNames = t.paramNames
+            val paramInfos = t.paramInfos.map(apply)
+            val resultTpe = apply(t.resultType)
+            val newType = MethodType(termNames, paramInfos, resultTpe)
+            newType
+          case t =>
+            t
     }
+    val substSuspend = TreeTypeMap(
+      typeMap = replaceSuspendMap,
+      treeMap = {
+        case t: tpd.ValDef if t.symbol.info.hasClassSymbol(requiredClass(suspendFullName)) =>
+          tpd.ValDef(completion.asTerm, tpd.EmptyTree)
+        case t => t
+      },
+      substFrom = tree
+        .symbol
+        .paramSymss
+        .flatten
+        .find(_.info.hasClassSymbol(requiredClass(suspendFullName)))
+        .toList,
+      substTo = List(completion)
+    )
+    val treeWithTransformedParams = substSuspend.transform(tree)
+
+    val transformedMethodSymbol =
+      replaceSuspendMap.mapOver(List(treeWithTransformedParams.symbol)).head.asTerm.entered
 
     deleteOldSymbol(parent)
 
-    val transformedMethod =
-      tpd.DefDef(sym = transformedMethodSymbol)
+    val transformedMethod = treeWithTransformedParams.subst(List(treeWithTransformedParams.symbol), List(transformedMethodSymbol)).asInstanceOf[tpd.DefDef]
+    println(s"transformedMethod.symbol.info: ${transformedMethod.symbol.info.show}")
 
     val transformedMethodCompletionParam = ref(
       transformedMethod.termParamss.flatten.find(_.symbol.denot.matches(completion)).get.symbol)
@@ -571,6 +607,7 @@ object DefDefTransforms extends TreesChecks:
       "continuations.jvm.internal.BaseContinuationImpl")
 
     val parent = tree.symbol
+
     val treeOwner = parent.owner
     val defName = parent.name
 

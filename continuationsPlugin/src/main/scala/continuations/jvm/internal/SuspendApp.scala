@@ -13,7 +13,6 @@ import scala.util.Right
 object SuspendApp:
   var result: Either[Throwable, Any] = Right(0)
   def apply(block: Any): Any =
-
     val count: AtomicLong = new AtomicLong(0)
     val defaultFactory = Executors.defaultThreadFactory()
 
