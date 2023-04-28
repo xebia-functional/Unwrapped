@@ -103,7 +103,6 @@ lazy val `cats-scala-fx` = (project in file("./cats-scalafx"))
 
 lazy val `scalike-jdbc-scala-fx` = project
   .dependsOn(`scala-fx`, `munit-scala-fx` % "test -> compile")
-  .settings(publish / skip := true)
   .settings(scalalikeSettings)
 
 lazy val `java-net-multipart-body-publisher` =
