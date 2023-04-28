@@ -1,4 +1,4 @@
-package fx
+package unwrapped
 
 import sbt._
 import Keys._
@@ -6,16 +6,16 @@ import com.fasterxml.jackson.dataformat.csv.{CsvMapper, CsvParser, CsvSchema}
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
-object HttpScalaFxPlugin extends AutoPlugin {
+object HttpUnwrappedPlugin extends AutoPlugin {
 
   object autoImport {
-    lazy val generateMediaTypes = taskKey[Seq[File]]("Generate fx/MediaTypes.scala")
+    lazy val generateMediaTypes = taskKey[Seq[File]]("Generate unwrapped/MediaTypes.scala")
     lazy val mediaTypeCsvDir = settingKey[File](
       "The source directory containing the IANA media types. Default is baseDirectory.value/src/main/mediaTypes.")
     lazy val targetPackage = settingKey[String](
-      "the target package for the MediaTypes object generated. Defaults to 'fx'")
+      "the target package for the MediaTypes object generated. Defaults to 'unwrapped'")
     lazy val generateMediaTypeSettings = Seq(
-      Compile / targetPackage := "fx",
+      Compile / targetPackage := "unwrapped",
       Compile / generateMediaTypes := {
         println("generating MediaTypes.scala")
         val schema: CsvSchema =
@@ -34,7 +34,7 @@ object HttpScalaFxPlugin extends AutoPlugin {
 
         val lb = ListBuffer("string")
 
-        sb.append(s"package fx$newline$newline")
+        sb.append(s"package unwrapped$newline$newline")
         sb.append(s"object MediaTypes:$newline")
 
         val entryFiles = IO.listFiles(mediaTypeCsvDir.value)
