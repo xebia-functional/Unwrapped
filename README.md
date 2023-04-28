@@ -1,4 +1,4 @@
-# scala-fx
+# unwrapped
 
 ## BUILD NOTICE
 
@@ -22,12 +22,12 @@ https://github.com/sbt/zinc/pull/1174 is merged and resolved.
 
 ## Getting started
 
-Scala-fx is an effects library for Scala 3 that introduces structured concurrency and an abilities system to describe pure functions and programs. 
+Unwrapped is an effects library for Scala 3 that introduces structured concurrency and an abilities system to describe pure functions and programs. 
 
 The example below is a pure program that returns `Int` and requires the context capability `Bind`. Bind enables the `bind` syntax over values of Either and other types.
 
 ```scala
-import fx.*
+import unwrapped.*
 
 val program: Int =
     Right(1).bind + Right(2).bind
@@ -38,7 +38,7 @@ Using Scala3 features such as context functions we can encode pure programs in t
 Capabilities can be introduced a la carte and will be carried as given contextual evidences through call sites until you proof you can get rid of them.
 
 ```scala
-import fx.*
+import unwrapped.*
 
 def runProgram: Int | String =
     val program: Errors[String] ?=> Int =
@@ -60,13 +60,13 @@ extension [R, A](fa: Either[R, A])
   def bind: Errors[R] ?=> A = fa.fold(_.shift, identity)
 ```
 
-Scala Fx supports a structured concurrency model backed by the non-blocking [StructuredExecutorTask](https://openjdk.java.net/jeps/428)
+Unwrapped supports a structured concurrency model backed by the non-blocking [StructuredExecutorTask](https://openjdk.java.net/jeps/428)
 where you can `fork` and `join` cancellable fibers and scopes.
 
 Popular functions like `parallel` support arbitrary typed arity in arguments and return types.
 
 ```scala
-import fx.*
+import unwrapped.*
 
 def runProgram: (String, Int, Double) =
   val results: Structured ?=> (String, Int, Double) =
