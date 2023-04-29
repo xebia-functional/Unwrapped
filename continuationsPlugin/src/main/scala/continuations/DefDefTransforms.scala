@@ -325,7 +325,8 @@ object DefDefTransforms extends TreesChecks:
               if t
                 .paramInfoss
                 .flatten
-                .exists(_.hasClassSymbol(requiredClass(suspendFullName))) && t.isContextualMethod =>
+                .exists(
+                  _.hasClassSymbol(requiredClass(suspendFullName))) && t.isContextualMethod =>
             val termNames = t.paramNames
             val paramInfos = t.paramInfos.map(apply)
             val resultTpe = apply(t.resultType)
@@ -364,9 +365,17 @@ object DefDefTransforms extends TreesChecks:
     val transformedMethodSymbol =
       replaceSuspendMap.mapOver(List(treeWithTransformedParams.symbol)).head.asTerm.entered
 
-    deleteOldSymbol(parent)
+    // deleteOldSymbol(parent)
 
-    val transformedMethod = treeWithTransformedParams.subst(List(treeWithTransformedParams.symbol), List(transformedMethodSymbol)).asInstanceOf[tpd.DefDef]
+    val transformedMethod = TreeTypeMap(
+      substFrom = List(treeWithTransformedParams.symbol),
+      substTo = List(transformedMethodSymbol),
+      oldOwners = List(treeWithTransformedParams.symbol) ++ treeWithTransformedParams
+        .symbol
+        .ownersIterator
+        .toList,
+      newOwners = List(transformedMethodSymbol) ++ transformedMethodSymbol.ownersIterator.toList
+    )(treeWithTransformedParams).asInstanceOf[tpd.DefDef]
     println(s"transformedMethod.symbol.info: ${transformedMethod.symbol.info.show}")
 
     val transformedMethodCompletionParam = ref(
