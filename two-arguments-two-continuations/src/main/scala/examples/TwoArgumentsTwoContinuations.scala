@@ -5,9 +5,11 @@ import continuations.Blocking
 import continuations.Continuation
 
 @main def TwoArgumentsTwoContinuations =
-  given String = "hi"
-  given Int = 42
-  def threeDependentContinuations(x: Int)(using i: Int)(using s: Suspend, strung: String): Int =
-    s.shift(_.resume(1))
-  println(Blocking(threeDependentContinuations(1)))
+  def twoArgumentsTwoContinuations(x: Int, y: Int)(using Suspend): Int =
+    summon[Suspend].shift[Unit] { continuation =>
+      continuation.resume(println(x + y))
+    }
+    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
+    
+  // println(Blocking(twoArgumentsTwoContinuations(1, 2)))
 
