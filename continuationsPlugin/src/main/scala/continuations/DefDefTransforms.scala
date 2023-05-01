@@ -26,6 +26,9 @@ import scala.collection.mutable.ListBuffer
 import dotty.tools.dotc.core.Types.TypeMap
 import dotty.tools.dotc.core.Names.TermName
 import dotty.tools.dotc.core.Types.ContextualMethodType
+import dotty.tools.dotc.core.Decorators.*
+import dotty.tools.dotc.ast.Trees.This
+import dotty.tools.dotc.core.Types.OrNull
 
 object DefDefTransforms extends TreesChecks:
 
@@ -600,7 +603,10 @@ object DefDefTransforms extends TreesChecks:
       tree: tpd.ValOrDefDef,
       // suspensionPoints: List[tpd.Tree],
       suspensionInReturnedValue: Boolean)(using ctx: Context): tpd.Thicket = {
-    val valDefs = tree.deepFold(List.empty[tpd.Tree]) { (acc, subTree) =>
+    val anyType = ctx.definitions.AnyType
+    val unitType = ctx.definitions.UnitType
+    val nameIterator = Iterator.from(1).map(i => s"##$i")
+    val valDefsAndSuspensions = tree.deepFold(List.empty[tpd.Tree]) { (acc, subTree) =>
       subTree match
         case st: tpd.ValDef
             if st.symbol.ownersIterator.toList.drop(1).head == tree.symbol && !st
@@ -609,17 +615,288 @@ object DefDefTransforms extends TreesChecks:
               .hasClassSymbol(requiredClass(suspendFullName)) =>
           acc.appended(st)
         case t @ tpd.Inlined(call, bindings, expansion) if call.existsSubTree {
-            case tpd.Select(s, n) if s.symbol.info.hasClassSymbol(requiredClass(suspendFullName)) && n.show == "shift" =>
-              true
-            case _ => false
-          } && !acc.exists(_.existsSubTree(_.sameTree(t))) =>
+              case tpd.Select(s, n)
+                  if s
+                    .symbol
+                    .info
+                    .hasClassSymbol(requiredClass(suspendFullName)) && n.show == "shift" =>
+                true
+              case _ => false
+            } && !acc.exists(_.existsSubTree(_.sameTree(t))) =>
           acc.appended(t)
-        case _ => acc
+        case t =>
+          acc
     }
-    println(s"tree.show: ${tree.show}")
-    println(s"valDefs: ${valDefs.mkString("\n")}")
-    println(s"valDefs.show: ${valDefs.map(_.show).mkString("\n")}")
-    
+
+    val filteredValdefs = valDefsAndSuspensions.filterNot {
+      case tpd.Inlined(_, _, _) => true
+      case _ => false
+    }
+    println(s"filteredValdefs: ${filteredValdefs.mkString("\n")}")
+    println(s"filteredValdefs.show: ${filteredValdefs.map(_.show).mkString("\n")}")
+
+    val reservedVariables = filteredValdefs
+      .map {
+        case t: tpd.ValDef if t.symbol.is(flag = Param) =>
+          tpd.ValDef(
+            Symbols
+              .newSymbol(
+                t.symbol.owner,
+                Names.termName(s"${t.symbol.name.show}${nameIterator.next()}"),
+                Flags.Mutable | Flags.Synthetic | Flags.Local,
+                t.symbol.info)
+              .asTerm
+              .entered,
+            ref(t.symbol)
+          )
+        case t: tpd.ValDef =>
+          tpd.ValDef(
+            Symbols
+              .newSymbol(
+                t.symbol.owner,
+                Names.termName(s"${t.symbol.name.show}${nameIterator.next()}"),
+                Flags.Mutable | Flags.Synthetic | Flags.Local,
+                t.symbol.info)
+              .asTerm
+              .entered,
+            tpd.Underscore(t.symbol.info)
+          )
+        case _: tpd.Tree => tpd.EmptyTree
+      }
+      .filterNot(_ == tpd.EmptyTree)
+
+    println(s"reservedVariables: ${reservedVariables.map(_.show).mkString("\n")}")
+
+    val (returnType, rhs, contextFunctionOwner) =
+      getReturnTypeBodyContextFunctionOwner(tree)
+
+    val completion = generateCompletion(tree.symbol, returnType)
+    val replaceSuspendMap = new TypeMap {
+      override def apply(tp: Type): Type =
+        tp match
+          case t: Type if t.hasClassSymbol(requiredClass(suspendFullName)) =>
+            val newReplacedSuspension = completion.info
+            newReplacedSuspension
+          case t: MethodType
+              if t
+                .paramInfoss
+                .flatten
+                .exists(
+                  _.hasClassSymbol(requiredClass(suspendFullName))) && t.isContextualMethod =>
+            val termNames = t.paramNames
+            val paramInfos = t.paramInfos.map(apply)
+            val resultTpe = apply(t.resultType)
+            val newType = ContextualMethodType(termNames, paramInfos, resultTpe)
+            newType
+          case t: MethodType
+              if t
+                .paramInfoss
+                .flatten
+                .exists(_.hasClassSymbol(requiredClass(suspendFullName))) =>
+            val termNames = t.paramNames
+            val paramInfos = t.paramInfos.map(apply)
+            val resultTpe = apply(t.resultType)
+            val newType = MethodType(termNames, paramInfos, resultTpe)
+            newType
+          case t =>
+            t
+    }
+    val substSuspend = TreeTypeMap(
+      typeMap = replaceSuspendMap,
+      treeMap = {
+        case t: tpd.ValDef if t.symbol.info.hasClassSymbol(requiredClass(suspendFullName)) =>
+          tpd.ValDef(completion.asTerm, tpd.EmptyTree)
+        case t => t
+      },
+      substFrom = tree
+        .symbol
+        .paramSymss
+        .flatten
+        .find(_.info.hasClassSymbol(requiredClass(suspendFullName)))
+        .toList,
+      substTo = List(completion)
+    )
+    val treeWithTransformedParams = substSuspend.transform(tree)
+    val transformedMethodSymbol =
+      replaceSuspendMap.mapOver(List(treeWithTransformedParams.symbol)).head.asTerm.entered
+
+    val continuationFrameClassNameStr = s"$$${tree.symbol.name}$$Frame"
+    val continuationFrameClassIterator = Iterator.from(0).map(i => s"I$$$i")
+    val continuationFrameClassName =
+      continuationFrameClassNameStr.sliceToTypeName(0, continuationFrameClassNameStr.size - 1)
+    println(s"continuationFrameClassName: $continuationFrameClassName")
+
+    val continuationFrameSymbol = Symbols
+      .newCompleteClassSymbol(
+        tree.symbol.owner,
+        continuationFrameClassName,
+        Flags.PrivateOrSynthetic,
+        List(requiredClassRef(continuationImplFullName)),
+        Scopes.newScope
+      )
+      .entered
+      .asClass
+    val bodyInputVars = reservedVariables.map { value =>
+      val symbolNameStr = continuationFrameClassIterator.next()
+      tpd.ValDef(
+        newSymbol(
+          continuationFrameSymbol,
+          symbolNameStr.sliceToTermName(0, symbolNameStr.size),
+          Flags.Mutable | Flags.Synthetic,
+          anyType).entered.asTerm,
+        tpd.Underscore(anyType)
+      )
+    }
+    val bodyInputSetters = bodyInputVars.map { value =>
+      tpd.DefDef(
+        newSymbol(
+          continuationFrameSymbol,
+          value.symbol.asTerm.name.asTermName.setterName,
+          Flags.Accessor | Flags.Method,
+          MethodType(List(value.symbol.asTerm.info), unitType)
+        ).entered.asTerm,
+        params =>
+          tpd.Assign(
+            tpd.This(continuationFrameSymbol).select(value.name),
+            ref(params(0)(0).symbol))
+      )
+    }
+    val eitherThrowableAnyNullSuspendedType = OrType(
+      OrType(anyType, ctx.definitions.NullType, false),
+      requiredModuleRef(continuationFullName)
+        .select(termName("State"))
+        .select(termName("Suspended"))
+        .symbol
+        .namedType,
+      false
+    )
+    val $result = tpd.ValDef(
+      newSymbol(
+        continuationFrameSymbol,
+        $resultName.sliceToTermName(0, $resultName.size),
+        Flags.Accessor | Flags.Mutable,
+        requiredClassRef("scala.util.Either").appliedTo(
+          List(
+            ctx.definitions.ThrowableType,
+            eitherThrowableAnyNullSuspendedType
+          ))
+      ))
+    val $resultSetter = tpd.DefDef(
+      newSymbol(
+        continuationFrameSymbol,
+        $result.symbol.asTerm.name.asTermName.setterName,
+        Flags.Accessor | Flags.Method,
+        MethodType(List($result.symbol.asTerm.info), unitType)
+      ).entered.asTerm,
+      params =>
+        tpd.Assign(
+          tpd.This(continuationFrameSymbol).select($result.name),
+          ref(params(0)(0).symbol))
+    )
+    val $label = tpd.ValDef(
+      newSymbol(
+        continuationFrameSymbol,
+        $labelName.sliceToTermName(0, $labelName.size),
+        Flags.Accessor | Flags.Mutable,
+        ctx.definitions.IntType).entered.asTerm,
+      tpd.Underscore(ctx.definitions.IntType)
+    )
+    val $labelSetter = tpd.DefDef(
+      newSymbol(
+        continuationFrameSymbol,
+        $label.symbol.asTerm.name.asTermName.setterName,
+        Flags.Accessor | Flags.Method,
+        MethodType(List($label.symbol.asTerm.info), unitType)
+      ),
+      params =>
+        tpd.Assign(
+          tpd.This(continuationFrameSymbol).select($label.name),
+          ref(params(0)(0).symbol)
+        )
+    )
+    val invokeSuspend = tpd.DefDef(
+      newSymbol(
+        continuationFrameSymbol,
+        invokeSuspendName.sliceToTermName(0, invokeSuspendName.size),
+        Flags.Override | Flags.Protected | Flags.Method,
+        MethodType(List(eitherThrowableAnyNullSuspendedType), OrNull(anyType))
+      ).entered.asTerm,
+      params =>
+        tpd.Block(
+          List(
+            tpd.Assign(
+              tpd.This(continuationFrameSymbol).select($result.name),
+              ref(params(0)(0).symbol.asTerm)
+            ),
+            tpd.Assign(
+              tpd.This(continuationFrameSymbol).select($label.name),
+              tpd
+                .This(continuationFrameSymbol)
+                .select($label.name)
+                .select(
+                  ctx
+                    .definitions
+                    .IntClass
+                    .requiredMethod(nme.OR, List(ctx.definitions.IntType)))
+                .appliedTo(ref(requiredModuleRef("scala.Int")
+                  .select(minValueName.sliceToTermName(0, minValueName.size))
+                  .symbol))
+            )
+          ),
+          ref(transformedMethodSymbol).appliedToArgss(
+            transformedMethodSymbol
+              .paramSymss
+              .map(_.map { s =>
+                if (s.isType)
+                  tpd.TypeTree(anyType)
+                else if (s.info.hasClassSymbol(requiredClass(continuationFullName)))
+                  tpd
+                    .This(continuationFrameSymbol)
+                    .select(nme.asInstanceOf_)
+                    .appliedToType(requiredClassRef(continuationFullName).appliedTo(
+                      transformedMethodSymbol.info.resultType))
+                else nullLiteral
+              }))
+        )
+    )
+    val create = tpd.DefDef(
+      newSymbol(
+        continuationFrameSymbol,
+        createName.sliceToTermName(0, createName.size),
+        Flags.Method | Flags.Override,
+        MethodType(
+          List(
+            OrNull(anyType),
+            requiredClassRef(continuationFullName).appliedTo(List(OrNull(anyType)))),
+          requiredClassRef(continuationFullName).appliedTo(List(ctx.definitions.UnitType))
+        )
+      ).entered.asTerm,
+      params =>
+        tpd.New(requiredClassRef(baseContinuationImplFullName), List(ref(params(0)(1).symbol)))
+    )
+    val transformedMethod = TreeTypeMap(
+      treeMap = {
+        case t @ tpd.DefDef(_, _, _, _) if t.symbol.showFullName == tree.symbol.showFullName =>
+          tpd.Block(reservedVariables, t.rhs)
+        case t @ tpd.Inlined(call, _, _) =>
+          println(s"INLINED")
+          println(s"call: ${call.show}")
+          println(s"END INLINED")
+          t
+        case t =>
+          println(s"unmatched tree: ${t.show}")
+          t
+      },
+      substFrom = List(treeWithTransformedParams.symbol),
+      substTo = List(transformedMethodSymbol),
+      oldOwners = List(treeWithTransformedParams.symbol) ++ treeWithTransformedParams
+        .symbol
+        .ownersIterator
+        .toList,
+      newOwners = List(transformedMethodSymbol) ++ transformedMethodSymbol.ownersIterator.toList
+    )(treeWithTransformedParams).asInstanceOf[tpd.DefDef]
+    println(s"transformedMethod: ${transformedMethod.show}")
+    println(s"transformedMethod type: ${transformedMethod.symbol.info.show}")
     ???
   }
 
