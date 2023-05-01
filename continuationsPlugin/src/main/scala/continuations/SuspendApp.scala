@@ -138,7 +138,9 @@ object Defer extends StarterLib:
       boundary.resume
     )
     new Starter[A] {
-      override def invoke(completion: Continuation[A]): A | Any | Null = block(completion)
+      override def invoke(completion: Continuation[A]): A | Any | Null =
+        given Continuation[A] = completion
+        block
     }.start(baseContinuation)
     boundary
 
