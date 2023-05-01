@@ -131,7 +131,7 @@ object Defer extends StarterLib:
     ExecutionContext.fromExecutorService(Executors.newWorkStealingPool())
   sys.addShutdownHook(this.close)
   def close: Unit = ec.close()
-  def apply[A](block: Continuation[A] => A): Deferred[A] =
+  def apply[A](block: Continuation[A] ?=> A): Deferred[A] =
     val boundary = new Deferred[A] {}
     val baseContinuation = BuildContinuation(
       ec,
