@@ -722,12 +722,12 @@ object DefDefTransforms extends TreesChecks:
 
     val frameClass = transformedMethodSymbol.buildFrame(reservedVariables)
 
+    println(s"frameClass: ${frameClass.show}")
+
     val transformedMethod = TreeTypeMap(
       treeMap = {
         case t @ tpd.DefDef(_, _, _, _) if t.symbol.showFullName == tree.symbol.showFullName =>
-          tpd.Block(
-            reservedVariables ++ List(frameClass.buildInitializer(transformedMethodSymbol)),
-            t.rhs)
+          cpy.DefDef(t)(rhs = tpd.Block(reservedVariables ++ List(frameClass.buildInitializer(t.symbol)), t.rhs))
         case t @ tpd.Inlined(call, _, _) =>
           println(s"INLINED")
           println(s"call: ${call.show}")
@@ -737,13 +737,13 @@ object DefDefTransforms extends TreesChecks:
           println(s"unmatched tree: ${t.show}")
           t
       },
-      substFrom = List(treeWithTransformedParams.symbol),
-      substTo = List(transformedMethodSymbol),
-      oldOwners = List(treeWithTransformedParams.symbol) ++ treeWithTransformedParams
-        .symbol
-        .ownersIterator
-        .toList,
-      newOwners = List(transformedMethodSymbol) ++ transformedMethodSymbol.ownersIterator.toList
+      // substFrom = List(treeWithTransformedParams.symbol),
+      // substTo = List(transformedMethodSymbol),
+      // oldOwners = List(treeWithTransformedParams.symbol) ++ treeWithTransformedParams
+      //   .symbol
+      //   .ownersIterator
+      //   .toList,
+      // newOwners = List(transformedMethodSymbol) ++ transformedMethodSymbol.ownersIterator.toList
     )(treeWithTransformedParams).asInstanceOf[tpd.DefDef]
     println(s"transformedMethod: ${transformedMethod.show}")
     println(s"transformedMethod type: ${transformedMethod.symbol.info.show}")

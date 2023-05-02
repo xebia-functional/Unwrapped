@@ -17,9 +17,7 @@ extension (sym: Symbol)
     val continuationFrameClassNameStr = s"$$${sym.name}$$Frame"
     val continuationFrameClassIterator = Iterator.from(0).map(i => s"I$$$i")
     val continuationFrameClassName =
-      continuationFrameClassNameStr.sliceToTypeName(0, continuationFrameClassNameStr.size - 1)
-    println(s"continuationFrameClassName: $continuationFrameClassName")
-
+      continuationFrameClassNameStr.sliceToTypeName(0, continuationFrameClassNameStr.size)
     val continuationFrameSymbol = newCompleteClassSymbol(
       sym.owner,
       continuationFrameClassName,
@@ -164,7 +162,7 @@ extension (sym: Symbol)
                       This(continuationFrameSymbol)
                         .select(nme.asInstanceOf_)
                         .appliedToType(
-                          requiredClassRef(continuationFullName).appliedTo(sym.info.resultType))
+                          requiredClassRef(continuationFullName).appliedTo(sym.info.finalResultType))
                     else nullLiteral
                   }))
             )

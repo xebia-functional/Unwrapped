@@ -26,16 +26,16 @@ extension (td: TypeDef)
         List(
           {
             val x$0 =
-              newSymbol(owner, nme.x_0, Flags.Case | Flags.CaseAccessor, defn.AnyType).entered
+              newSymbol(owner, nme.x_0, Flags.Case | Flags.CaseAccessor, td.symbol.info).entered
             CaseDef(
               Typed(ref(x$0), ref(td.symbol)),
               ref(x$0)
-                .select($labelName.sliceToTermName(0, $labelName.size))
-                .select(defn.IntClass.requiredMethod(nme.BitwiseAnd))
-                .appliedTo(ref(requiredModuleRef("scala.Int").select(
+              .select($labelName.sliceToTermName(0, $labelName.size))
+              .select(defn.IntClass.requiredMethod(nme.AND, List(defn.IntType)))
+              .appliedTo(ref(requiredModuleRef("scala.Int").select(
                   minValueName.sliceToTermName(0, minValueName.size))))
-                .select(defn.IntClass.requiredMethod(nme.NE, List(defn.IntType)))
-                .appliedTo(Literal(Constant(0))),
+              .select(defn.IntClass.requiredMethod(nme.NE, List(defn.IntType)))
+              .appliedTo(Literal(Constant(0x0))),
               Block(
                 List(
                   Assign(
@@ -54,7 +54,7 @@ extension (td: TypeDef)
             Underscore(defn.AnyType),
             EmptyTree,
             New(
-              td.symbol.info,
+              td.tpe,
               List(
                 ref(
                   owner
