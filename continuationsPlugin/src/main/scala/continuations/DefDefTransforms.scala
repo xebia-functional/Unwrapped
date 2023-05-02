@@ -725,7 +725,9 @@ object DefDefTransforms extends TreesChecks:
     val transformedMethod = TreeTypeMap(
       treeMap = {
         case t @ tpd.DefDef(_, _, _, _) if t.symbol.showFullName == tree.symbol.showFullName =>
-          tpd.Block(reservedVariables, t.rhs)
+          tpd.Block(
+            reservedVariables ++ List(frameClass.buildInitializer(transformedMethodSymbol)),
+            t.rhs)
         case t @ tpd.Inlined(call, _, _) =>
           println(s"INLINED")
           println(s"call: ${call.show}")
