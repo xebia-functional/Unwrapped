@@ -29,6 +29,9 @@ import dotty.tools.dotc.core.Types.ContextualMethodType
 import dotty.tools.dotc.core.Decorators.*
 import dotty.tools.dotc.ast.Trees.This
 import dotty.tools.dotc.core.Types.OrNull
+import dotty.tools.dotc.ast.Trees.ValDef
+import continuations.ContinuationsPhase.TransformedMethodKey
+import continuations.ContinuationsPhase.TransformedMethod
 
 object DefDefTransforms extends TreesChecks:
 
@@ -727,7 +730,106 @@ object DefDefTransforms extends TreesChecks:
     val transformedMethod = TreeTypeMap(
       treeMap = {
         case t @ tpd.DefDef(_, _, _, _) if t.symbol.showFullName == tree.symbol.showFullName =>
-          cpy.DefDef(t)(rhs = tpd.Block(reservedVariables ++ List(frameClass.buildInitializer(t.symbol)), t.rhs))
+          val defWithUpdatedRhs = cpy.DefDef(t)(rhs = tpd.Block(
+            reservedVariables ++ List(frameClass.buildInitializer(t.symbol)),
+            tpd.Thicket(t.rhs.toList.flatMap {
+              case b @ tpd.Block(statements, closure: tpd.Closure) =>
+                List(b)
+              case tpd.Block(statements, expr) =>
+                val asList = statements.appended(expr)
+                asList
+              case tt =>
+                List(t)
+            })
+          ))
+          defWithUpdatedRhs
+            .rhs
+            .foreachSubTree(st =>
+              st.putAttachment(TransformedMethodKey, TransformedMethod(defWithUpdatedRhs)))
+          defWithUpdatedRhs
+        case t @ tpd.Thicket(trees) =>
+          println(s"Not thicket of thickets!!!: ${trees.map(_.show)}")
+          val thickets = ListBuffer.empty[tpd.Thicket]
+          var treesToThicket = Array.empty[tpd.Tree]
+          trees.foreach {
+            case tt @ tpd.ValDef(_, _, _) if tt.existsSubTree {
+                  case tpd.Inlined(call, _, _)
+                      if call.existsSubTree(_.symbol.name.show == "shift") =>
+                    true
+                  case tt => tt.existsSubTree(_.symbol.name.show == "shift")
+                } =>
+              val newThicket = tpd.Thicket(treesToThicket.appended(tt).toList)
+              tt.getAttachment(TransformedMethodKey)
+                .foreach(newThicket.putAttachment(TransformedMethodKey, _))
+              thickets.addOne(newThicket)
+              treesToThicket = Array.empty[tpd.Tree]
+            case tt @ tpd.Inlined(call, _, _)
+                if call.existsSubTree(_.symbol.name.show == "shift") =>
+              val newThicket = tpd.Thicket(treesToThicket.appended(tt).toList)
+              tt.getAttachment(TransformedMethodKey)
+                .foreach(newThicket.putAttachment(TransformedMethodKey, _))
+              thickets.addOne(newThicket)
+              treesToThicket = Array.empty[tpd.Tree]
+            case tt @ tpd.Inlined(call, _, _) =>
+              treesToThicket = treesToThicket.appended(tt)
+            case tt =>
+              treesToThicket = treesToThicket.appended(tt)
+          }
+          if (treesToThicket.nonEmpty) {
+            val transformedMethod = treesToThicket.last.getAttachment(TransformedMethodKey)
+            val newThicket = tpd.Thicket(treesToThicket.toList)
+            transformedMethod.foreach(newThicket.putAttachment(TransformedMethodKey, _))
+            thickets.addOne(newThicket)
+          }
+
+          val thicketLabelIterator = Iterator.from(0)
+
+          (for {
+            firstThecket <- thickets.headOption
+            _ = println(s"firstThecket")
+            method <- firstThecket.getAttachment(TransformedMethodKey)
+            _ = println(s"method")
+            matchRefVal <- method
+              .t
+              .filterSubTrees {
+                case vd: tpd.ValDef if vd.name.show == $continuationName =>
+                  println(s"TRUE!!!!!")
+                  true
+                case t =>
+                  println(s"FALSE!!!!: ${t.show}")
+                  false
+              }
+              .headOption
+            _ = println(s"matchRefVal")
+            vd = matchRefVal.asInstanceOf[tpd.ValDef]
+          } yield tpd.Match(
+            ref(vd.symbol).select($labelName.sliceToTermName(0, $labelName.size)),
+            thickets
+              .map { thicket =>
+                val body =
+                  thicket.trees.foldRight(tpd.Block(List.empty[tpd.Tree], tpd.EmptyTree)) {
+                    case (nextTree, b @ tpd.Block(Nil, tpd.EmptyTree)) =>
+                      cpy.Block(b)(Nil, expr = nextTree)
+                    case (nextTree, b @ tpd.Block(statements, expr)) =>
+                      cpy.Block(b)(stats = nextTree :: statements, expr)
+                  }
+                tpd.CaseDef(
+                  tpd.Literal(Constant(thicketLabelIterator.next())),
+                  tpd.EmptyTree,
+                  body)
+              }
+              .addOne(
+                tpd.CaseDef(
+                  tpd.Underscore(anyType),
+                  tpd.EmptyTree,
+                  tpd.Throw(
+                    tpd.New(
+                      requiredClassRef(illegalArgumentExceptionFullName),
+                      List(tpd.Literal(Constant(resumeBeforeInvokeErrorMessage)))))
+                )
+              )
+              .toList
+          )).getOrElse(tpd.EmptyTree)
         case t @ tpd.Inlined(call, _, _) =>
           println(s"INLINED")
           println(s"call: ${call.show}")
@@ -737,8 +839,8 @@ object DefDefTransforms extends TreesChecks:
           println(s"unmatched tree: ${t.show}")
           t
       },
-      // substFrom = List(treeWithTransformedParams.symbol),
-      // substTo = List(transformedMethodSymbol),
+      substFrom = List(treeWithTransformedParams.symbol),
+      substTo = List(transformedMethodSymbol)
       // oldOwners = List(treeWithTransformedParams.symbol) ++ treeWithTransformedParams
       //   .symbol
       //   .ownersIterator

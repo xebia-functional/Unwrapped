@@ -49,9 +49,25 @@ class ContinuationsPhase extends PluginPhase:
 
 end ContinuationsPhase
 
-object ContinuationsPhase {
+object ContinuationsPhase:
   val name = "continuations"
-}
+
+  /**
+   * A unique value type for holding the method undergoing transformation.
+   *
+   * @param t The The method undergoing transformation. Used in
+   *   attachments to assist in the transformation.
+   */
+  case class TransformedMethod(t: tpd.Tree)
+
+  /**
+   * A dotty Property.Key[V] class to use to add attachments to trees
+   * during transformation.
+   */
+  case object TransformedMethodKey extends Key[TransformedMethod]
+
+
+end ContinuationsPhase
 
 /**
  * Transform calls `foo()` or `foo()(continuations.Suspend.given_Suspend)` to
