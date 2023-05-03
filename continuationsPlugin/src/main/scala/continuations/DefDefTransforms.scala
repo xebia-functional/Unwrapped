@@ -830,11 +830,18 @@ object DefDefTransforms extends TreesChecks:
               )
               .toList
           )).getOrElse(tpd.EmptyTree)
-        case t @ tpd.Inlined(call, _, _) =>
-          println(s"INLINED")
-          println(s"call: ${call.show}")
-          println(s"END INLINED")
-          t
+        case t @ tpd.Inlined(call, _, _) if call.existsSubTree(_.symbol.name.show == "shift") =>
+            (for{
+            outerApply <- call.filterSubTrees(st =>
+            st.symbol.name.show == "shift" && st
+              .symbol
+              .info
+              .existsPart(_.hasClassSymbol(requiredClass(suspendFullName)))).headOption
+            closure <- outerApply.filterSubTrees{
+              case tpd.Block(_, _: tpd.Closure) => true
+              case _ => false
+            }.headOption
+          } yield closure).getOrElse(tpd.EmptyTree)
         case t =>
           println(s"unmatched tree: ${t.show}")
           t
