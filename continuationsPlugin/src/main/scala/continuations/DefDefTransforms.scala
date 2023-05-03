@@ -597,7 +597,7 @@ object DefDefTransforms extends TreesChecks:
         tpd.New(
           defn.IllegalArgumentExceptionType,
           IllegalArgumentExceptionClass_stringConstructor,
-          List(tpd.Literal(Constant("call to 'resume' before 'invoke' with coroutine")))
+          List(tpd.Literal(Constant(resumeBeforeInvokeErrorMessage)))
         )
       )
     )
@@ -806,7 +806,7 @@ object DefDefTransforms extends TreesChecks:
             ref(vd.symbol).select($labelName.sliceToTermName(0, $labelName.size)),
             thickets
               .map { thicket =>
-                val body =
+                val body = // TODO: Insert the initialization of the vars here
                   thicket.trees.foldRight(tpd.Block(List.empty[tpd.Tree], tpd.EmptyTree)) {
                     case (nextTree, b @ tpd.Block(Nil, tpd.EmptyTree)) =>
                       cpy.Block(b)(Nil, expr = nextTree)
@@ -819,28 +819,36 @@ object DefDefTransforms extends TreesChecks:
                   body)
               }
               .addOne(
-                tpd.CaseDef(
-                  tpd.Underscore(anyType),
-                  tpd.EmptyTree,
-                  tpd.Throw(
-                    tpd.New(
-                      requiredClassRef(illegalArgumentExceptionFullName),
-                      List(tpd.Literal(Constant(resumeBeforeInvokeErrorMessage)))))
-                )
+                wrongStateCase
               )
               .toList
           )).getOrElse(tpd.EmptyTree)
         case t @ tpd.Inlined(call, _, _) if call.existsSubTree(_.symbol.name.show == "shift") =>
-            (for{
-            outerApply <- call.filterSubTrees(st =>
-            st.symbol.name.show == "shift" && st
-              .symbol
-              .info
-              .existsPart(_.hasClassSymbol(requiredClass(suspendFullName)))).headOption
-            closure <- outerApply.filterSubTrees{
-              case tpd.Block(_, _: tpd.Closure) => true
+          println(s"Inlined call to replace")
+          (for {
+            outerApply <- call
+              .filterSubTrees(st =>
+                st.symbol.name.show == "shift" && st
+                  .symbol
+                  .info
+                  .existsPart(_.hasClassSymbol(requiredClass(suspendFullName))))
+              .headOption
+            closure @ tpd.Block((dd @ tpd.DefDef(name, paramss, tpt, rhs)) :: _, _: tpd.Closure)  <- outerApply.filterSubTrees {
+              case tpd.Block(_, _: tpd.Closure) =>
+                true
               case _ => false
             }.headOption
+            transformedMethod <- t.getAttachment(TransformedMethodKey)
+            _ = dd.rhs.toList.flatMap{
+              case tpd.Block(statements, expr) =>
+                statements :: expr :: Nil
+              case ddRhs => ddRhs
+            }.map{
+              case a @ tpd.Apply(fn, args) if fn.name.show == "resume" && fn.symbol.info.hasClassSymbol(requiredClass(continuationFullName)) =>
+                println(s"Insert safe resume here.")
+                a
+              case ddrhs => ddrhs
+            }
           } yield closure).getOrElse(tpd.EmptyTree)
         case t =>
           println(s"unmatched tree: ${t.show}")
