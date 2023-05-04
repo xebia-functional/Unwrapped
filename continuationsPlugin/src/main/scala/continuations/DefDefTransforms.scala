@@ -783,13 +783,108 @@ object DefDefTransforms extends TreesChecks:
           }
 
           val thicketLabelIterator = Iterator.from(0)
+          val labelIterator = Iterator.from(1)
 
           (for {
-            firstThecket <- thickets.headOption
-            _ = println(s"firstThecket")
-            method <- firstThecket.getAttachment(TransformedMethodKey)
-            _ = println(s"method")
+            firstThicket <- thickets.headOption
+            method <- firstThicket.getAttachment(TransformedMethodKey)
             matchRefVal <- method
+              .t
+              .filterSubTrees {
+                case vd: tpd.ValDef if vd.name.show == $continuationName =>
+                  true
+                case t =>
+                  false
+              }
+              .headOption
+            vd = matchRefVal.asInstanceOf[tpd.ValDef]
+          } yield tpd.Match(
+            ref(vd.symbol).select($labelName.sliceToTermName(0, $labelName.size)),
+            thickets
+              .map { thicket =>
+                val body =
+                  thicket.trees.foldRight(tpd.Block(List.empty[tpd.Tree], tpd.EmptyTree)) {
+                    case (nextTree, b @ tpd.Block(Nil, tpd.EmptyTree)) =>
+                      cpy.Block(b)(Nil, expr = nextTree)
+                    case (nextTree, b @ tpd.Block(statements, expr)) =>
+                      cpy.Block(b)(stats = nextTree :: statements, expr)
+                  }
+                val callToCheckResult = ref(
+                  requiredClass(continuationFullName)
+                    .companionClass
+                    .requiredMethod(checkResultMethodName)).appliedTo(
+                  ref(matchRefVal.symbol.asTerm).select(
+                    $resultName.sliceToTermName(0, $resultName.size)))
+                val stateMachineLabel = s"$stateMachineLabelPrefix${labelIterator.next()}"
+                val currentLabel = thicketLabelIterator.next()
+                val frameToLocalIterator = Iterator.from(0)
+                val localToFrameIterator = Iterator.from(0)
+                val initialization = tpd.Thicket(
+                  reservedVariables.map { fvd =>
+                    val accessorNumber = frameToLocalIterator.next()
+                    val frameAccessorName = s"I$$$accessorNumber"
+                    tpd.Assign(
+                      ref(fvd.symbol),
+                      ref(matchRefVal.symbol.asTerm).select(
+                        frameAccessorName.sliceToTermName(0, frameAccessorName.size))
+                    )
+                  } ++ List(
+                    callToCheckResult,
+                    tpd.Labeled(
+                      newSymbol(
+                        method.t.symbol,
+                        stateMachineLabel.sliceToTermName(0, stateMachineLabel.size),
+                        Flags.Label,
+                        unitType).entered.asTerm,
+                      tpd.EmptyTree)
+                  ) ++ reservedVariables.map { fvd =>
+                    val accessorNumber = localToFrameIterator.next()
+                    val frameAccessorName = s"I$$$accessorNumber"
+                    tpd.Assign(
+                      ref(matchRefVal.symbol.asTerm).select(
+                        frameAccessorName.sliceToTermName(0, frameAccessorName.size)),
+                      ref(fvd.symbol)
+                    )
+                  } ++ List(
+                    tpd.Assign(
+                      ref(matchRefVal.symbol.asTerm).select(
+                        $labelName.sliceToTermName(0, $labelName.size)),
+                      tpd.Literal(Constant(currentLabel + 1))))
+                )
+
+                tpd.CaseDef(
+                  tpd.Literal(Constant(currentLabel)),
+                  tpd.EmptyTree,
+                  tpd.Block(
+                    initialization.trees ++
+                      body.stats,
+                    body.expr))
+              }
+              .addOne(
+                wrongStateCase
+              )
+              .toList
+          )).getOrElse(tpd.EmptyTree)
+        case t @ tpd.Inlined(call, _, _) if call.existsSubTree(_.symbol.name.show == "shift") =>
+          println(s"Inlined call to replace")
+          val labelIterator = Iterator.from(1)
+          (for {
+            outerApply <- call
+              .filterSubTrees(st =>
+                st.symbol.name.show == "shift" && st
+                  .symbol
+                  .info
+                  .existsPart(_.hasClassSymbol(requiredClass(suspendFullName))))
+              .headOption
+            closure @ tpd.Block(
+              (dd @ tpd.DefDef(name, paramss, tpt, rhs)) :: _,
+              _: tpd.Closure) <- outerApply.filterSubTrees {
+              case tpd.Block(_, _: tpd.Closure) =>
+                true
+              case _ => false
+            }.headOption
+            transformedMethod <- t.getAttachment(TransformedMethodKey)
+            continuationVal <- transformedMethod
               .t
               .filterSubTrees {
                 case vd: tpd.ValDef if vd.name.show == $continuationName =>
@@ -800,55 +895,34 @@ object DefDefTransforms extends TreesChecks:
                   false
               }
               .headOption
-            _ = println(s"matchRefVal")
-            vd = matchRefVal.asInstanceOf[tpd.ValDef]
-          } yield tpd.Match(
-            ref(vd.symbol).select($labelName.sliceToTermName(0, $labelName.size)),
-            thickets
-              .map { thicket =>
-                val body = // TODO: Insert the initialization of the vars here
-                  thicket.trees.foldRight(tpd.Block(List.empty[tpd.Tree], tpd.EmptyTree)) {
-                    case (nextTree, b @ tpd.Block(Nil, tpd.EmptyTree)) =>
-                      cpy.Block(b)(Nil, expr = nextTree)
-                    case (nextTree, b @ tpd.Block(statements, expr)) =>
-                      cpy.Block(b)(stats = nextTree :: statements, expr)
-                  }
-                tpd.CaseDef(
-                  tpd.Literal(Constant(thicketLabelIterator.next())),
-                  tpd.EmptyTree,
-                  body)
-              }
-              .addOne(
-                wrongStateCase
-              )
+            _ = dd
+              .rhs
               .toList
-          )).getOrElse(tpd.EmptyTree)
-        case t @ tpd.Inlined(call, _, _) if call.existsSubTree(_.symbol.name.show == "shift") =>
-          println(s"Inlined call to replace")
-          (for {
-            outerApply <- call
-              .filterSubTrees(st =>
-                st.symbol.name.show == "shift" && st
-                  .symbol
-                  .info
-                  .existsPart(_.hasClassSymbol(requiredClass(suspendFullName))))
-              .headOption
-            closure @ tpd.Block((dd @ tpd.DefDef(name, paramss, tpt, rhs)) :: _, _: tpd.Closure)  <- outerApply.filterSubTrees {
-              case tpd.Block(_, _: tpd.Closure) =>
-                true
-              case _ => false
-            }.headOption
-            transformedMethod <- t.getAttachment(TransformedMethodKey)
-            _ = dd.rhs.toList.flatMap{
-              case tpd.Block(statements, expr) =>
-                statements :: expr :: Nil
-              case ddRhs => ddRhs
-            }.map{
-              case a @ tpd.Apply(fn, args) if fn.name.show == "resume" && fn.symbol.info.hasClassSymbol(requiredClass(continuationFullName)) =>
-                println(s"Insert safe resume here.")
-                a
-              case ddrhs => ddrhs
-            }
+              .flatMap {
+                case tpd.Block(statements, expr) =>
+                  statements :: expr :: Nil
+                case ddRhs => List(ddRhs)
+              }
+              .map {
+                case a @ tpd.Apply(fn, args)
+                    if fn.symbol.name.show == "resume" && fn
+                      .symbol
+                      .info
+                      .hasClassSymbol(requiredClass(continuationFullName)) =>
+                  // println(s"Insert safe resume here.")
+                  // println(s"dd tpt: ${dd.tpt.show}")
+                  // val safeContinuation = tpd.ValDef(newSymbol(
+                  //   transformedMethod.t.symbol,
+                  //   safeContinuationName.sliceToTermName(0, safeContinuationName.size),
+                  //   Flags.Local,
+                  //   requiredClassRef(safeContinuationClassName).appliedTo(
+                  //     ctx.definitions.IntType)
+                  // ), ref(requiredClass(safeContinuationClassName)
+                  //     .companionClass
+                  //     .requiredMethod(initMethodName)).appliedToType(ctx.definitions.IntType).appliedTo(ref(continuationVal.symbol)))
+                  a
+                case ddrhs => ddrhs
+              }
           } yield closure).getOrElse(tpd.EmptyTree)
         case t =>
           println(s"unmatched tree: ${t.show}")
