@@ -55,16 +55,45 @@ object ContinuationsPhase:
   /**
    * A unique value type for holding the method undergoing transformation.
    *
-   * @param t The The method undergoing transformation. Used in
+   * @param t The method undergoing transformation. Used in
    *   attachments to assist in the transformation.
    */
   case class TransformedMethod(t: tpd.Tree)
 
   /**
-   * A dotty Property.Key[V] class to use to add attachments to trees
-   * during transformation.
+   * A dotty Property.Key[V] class to use to add suspended DefDef
+   * attachments to trees during transformation.
    */
   case object TransformedMethodKey extends Key[TransformedMethod]
+
+  /**
+    * A unique value type for holding valdefs with suspension points
+    * undergoing transformation.
+    *
+    * @param t The valdef containing the suspension point. Used in
+    * attatchments to assist in the transformation.
+    */
+  case class SuspensionPointValDef(t: tpd.ValDef)
+
+  /**
+    * A dotty Property.Key[V] class used to add suspension point
+    * attachments to trees during transformation.
+    */
+  case object SuspensionPointValDefKey extends Key[SuspensionPointValDef]
+
+  /**
+    * A unique value type for holding the label number to jump to in
+    * suspension points undergoing transformation.
+    *
+    * @param i The number of the label to jump to.
+    */
+  case class JumpToLabel(i: Int)
+
+  /**
+    * A dotty Property.Key[V] class used to add jump to label
+    * attachments to trees during transformation.
+    */
+  case object JumpToLabelKey extends Key[JumpToLabel]
 
 
 end ContinuationsPhase

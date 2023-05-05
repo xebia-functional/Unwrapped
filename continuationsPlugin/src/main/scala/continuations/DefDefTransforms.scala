@@ -32,9 +32,13 @@ import dotty.tools.dotc.core.Types.OrNull
 import dotty.tools.dotc.ast.Trees.ValDef
 import continuations.ContinuationsPhase.TransformedMethodKey
 import continuations.ContinuationsPhase.TransformedMethod
+import continuations.ContinuationsPhase.SuspensionPointValDefKey
+import continuations.ContinuationsPhase.SuspensionPointValDef
 import dotty.tools.dotc.core.Types.AppliedType
 import dotty.tools.dotc.core.Types.NoType
 import dotty.tools.dotc.util.Spans
+import continuations.ContinuationsPhase.JumpToLabelKey
+import continuations.ContinuationsPhase.JumpToLabel
 
 object DefDefTransforms extends TreesChecks:
 
@@ -642,32 +646,35 @@ object DefDefTransforms extends TreesChecks:
     println(s"filteredValdefs.show: ${filteredValdefs.map(_.show).mkString("\n")}")
 
     val reservedVariables = filteredValdefs
-      .map {
+      .flatMap {
         case t: tpd.ValDef if t.symbol.is(flag = Param) =>
-          tpd.ValDef(
-            Symbols
-              .newSymbol(
-                t.symbol.owner,
-                Names.termName(s"${t.symbol.name.show}${nameIterator.next()}"),
-                Flags.Mutable | Flags.Synthetic | Flags.Local,
-                t.symbol.info)
-              .asTerm
-              .entered,
-            ref(t.symbol)
-          )
+          List(
+            tpd.ValDef(
+              Symbols
+                .newSymbol(
+                  t.symbol.owner,
+                  Names.termName(s"${t.symbol.name.show}${nameIterator.next()}"),
+                  Flags.Mutable | Flags.Synthetic | Flags.Local,
+                  t.symbol.info)
+                .asTerm
+                .entered,
+              ref(t.symbol)
+            ))
         case t: tpd.ValDef =>
-          tpd.ValDef(
-            Symbols
-              .newSymbol(
-                t.symbol.owner,
-                Names.termName(s"${t.symbol.name.show}${nameIterator.next()}"),
-                Flags.Mutable | Flags.Synthetic | Flags.Local,
-                t.symbol.info)
-              .asTerm
-              .entered,
-            tpd.Underscore(t.symbol.info)
+          List(
+            tpd.ValDef(
+              Symbols
+                .newSymbol(
+                  t.symbol.owner,
+                  Names.termName(s"${t.symbol.name.show}${nameIterator.next()}"),
+                  Flags.Mutable | Flags.Synthetic | Flags.Local,
+                  t.symbol.info)
+                .asTerm
+                .entered,
+              tpd.Underscore(t.symbol.info)
+            )
           )
-        case _: tpd.Tree => tpd.EmptyTree
+        case _: tpd.Tree => List(tpd.EmptyTree)
       }
       .filterNot(_ == tpd.EmptyTree)
 
@@ -812,8 +819,33 @@ object DefDefTransforms extends TreesChecks:
               .map { thicket =>
                 val body =
                   thicket.trees.foldRight(tpd.Block(List.empty[tpd.Tree], tpd.EmptyTree)) {
+                    case (vdCase @ tpd.ValDef(_, _, _), b @ tpd.Block(Nil, tpd.EmptyTree))
+                        if vdCase.rhs.existsSubTree { vdst =>
+                          vdst.symbol.info.hasClassSymbol(requiredClass(continuationFullName))
+                        } =>
+                      vdCase.foreachSubTree {
+                        case st @ tpd.Inlined(call, _, _) =>
+                          st.putAttachment(
+                            SuspensionPointValDefKey,
+                            SuspensionPointValDef(vdCase))
+                        case _ => None
+                      }
+                      cpy.Block(b)(Nil, expr = vdCase.rhs)
                     case (nextTree, b @ tpd.Block(Nil, tpd.EmptyTree)) =>
                       cpy.Block(b)(Nil, expr = nextTree)
+                    case (vdCase @ tpd.ValDef(_, _, _), b @ tpd.Block(statements, expr))
+                        if vdCase.rhs.existsSubTree { vdst =>
+                          vdst.symbol.info.hasClassSymbol(requiredClass(continuationFullName))
+                        } =>
+                      vdCase.foreachSubTree {
+                        case st @ tpd.Inlined(call, _, _) =>
+                          st.putAttachment(
+                            SuspensionPointValDefKey,
+                            SuspensionPointValDef(vdCase))
+                        case _ => None
+                      }
+                      cpy.Block(b)(stats = vdCase.rhs :: statements, expr)
+
                     case (nextTree, b @ tpd.Block(statements, expr)) =>
                       cpy.Block(b)(stats = nextTree :: statements, expr)
                   }
@@ -822,6 +854,7 @@ object DefDefTransforms extends TreesChecks:
                 val currentLabel = thicketLabelIterator.next()
                 val frameToLocalIterator = Iterator.from(0)
                 val localToFrameIterator = Iterator.from(0)
+
                 val initializationStatements = if (currentLabel == 0) {
                   List(callToCheckResult) ++ reservedVariables.map { fvd =>
                     val accessorNumber = localToFrameIterator.next()
@@ -868,7 +901,8 @@ object DefDefTransforms extends TreesChecks:
                         $labelName.sliceToTermName(0, $labelName.size)),
                       tpd.Literal(Constant(currentLabel + 1))))
                 }
-
+                body.foreachSubTree(t =>
+                  t.putAttachment(JumpToLabelKey, JumpToLabel(currentLabel + 1)))
                 tpd.CaseDef(
                   tpd.Literal(Constant(currentLabel)),
                   tpd.EmptyTree,
@@ -895,9 +929,10 @@ object DefDefTransforms extends TreesChecks:
                       }
                     } ++ List(callToCheckResult),
                     ref(matchRefVal.symbol).select(
-                      $resultName.sliceToTermName(0, $resultName.size)))
+                      $resultName.sliceToTermName(0, $resultName.size))
                   )
                 )
+              )
               .addOne(
                 wrongStateCase
               )
@@ -952,8 +987,6 @@ object DefDefTransforms extends TreesChecks:
               }
               .flatMap {
                 case a @ tpd.Apply(fn, aargs) if fn.symbol.name.show == resumeMethodName =>
-                  println(s"Insert safe resume here: ${fn.symbol.info}")
-                  println(s"dd param: ${dd.symbol.info.show}")
                   dd.paramss
                     .flatten
                     .find(_.symbol.info.hasClassSymbol(requiredClass(continuationFullName)))
@@ -1002,6 +1035,7 @@ object DefDefTransforms extends TreesChecks:
                                 transformedMethod.t.symbol
                               )
                             ), {
+                              
                               val orThrowSym: TermSymbol =
                                 newSymbol(
                                   transformedMethod.t.symbol,
@@ -1011,7 +1045,58 @@ object DefDefTransforms extends TreesChecks:
                               tpd.CaseDef(
                                 tpd.Bind(orThrowSym, tpd.EmptyTree),
                                 tpd.EmptyTree,
-                                ref(orThrowSym))
+                                (for {
+                                  // TODO: debug which option here is missing
+                                  attachment <- t.getAttachment(SuspensionPointValDefKey)
+                                  suffixRegex = """(#{2}\d+)""".r
+                                  reservedVar <- reservedVariables.find { rvt =>
+                                    val rvtName = rvt.symbol.name.show
+                                    suffixRegex.replaceAllIn(rvtName, "") == attachment
+                                      .t
+                                      .symbol
+                                      .name
+                                      .show
+                                  }
+                                  continuationFrameInputNumber <- suffixRegex
+                                    .findFirstIn(reservedVar.symbol.name.show)
+                                    .map(_.replaceAllLiterally("##", "").toInt - 1)
+                                  continuationFrameInputName =
+                                    s"I$$$continuationFrameInputNumber"
+                                  method <- t.getAttachment(TransformedMethodKey)
+                                  jumpToLabelNum <- t.getAttachment(JumpToLabelKey)
+                                  jumpToLabelName = s"$stateMachineLabelPrefix$jumpToLabelNum"
+                                  jumpToLabel <- method
+                                    .t
+                                    .filterSubTrees {
+                                      case l @ tpd.Labeled(tpd.Bind(name, _), _)
+                                          if name.show == jumpToLabelName =>
+                                        true
+                                      case _ => false
+                                    }
+                                    .headOption
+                                    .map(_.asInstanceOf[tpd.Labeled])
+                                  matchRefVal <- method
+                                    .t
+                                    .filterSubTrees {
+                                      case vd: tpd.ValDef
+                                          if vd.name.show == $continuationName =>
+                                        true
+                                      case t =>
+                                        false
+                                    }
+                                    .headOption
+                                    .map(_.symbol)
+                                } yield tpd.Block(
+                                  List(
+                                    tpd.Assign(
+                                      ref(matchRefVal).select(continuationFrameInputName
+                                        .sliceToTermName(0, continuationFrameInputName.size)),
+                                      ref(orThrowSym)),
+                                    tpd.Assign(ref(reservedVar.symbol), ref(orThrowSym))
+                                  ),
+                                  tpd.Return(tpd.unitLiteral, ref(jumpToLabel.symbol))
+                                )).getOrElse(ref(orThrowSym))
+                              )
                             }
                           )
                         )
@@ -1051,7 +1136,64 @@ object DefDefTransforms extends TreesChecks:
                         safeContinuation,
                         ref(safeContinuation.symbol)
                           .select(raiseMethodName.sliceToTermName(0, raiseMethodName.size))
-                          .appliedToArgs(aargs.asInstanceOf[List[tpd.Tree]])
+                          .appliedToArgs(aargs.asInstanceOf[List[tpd.Tree]]), {
+                          val orThrowSym: TermSymbol =
+                            newSymbol(
+                              transformedMethod.t.symbol,
+                              orThrowName.sliceToTermName(0, orThrowName.size),
+                              Flags.Case | Flags.CaseAccessor,
+                              continuationType).entered
+                          tpd.CaseDef(
+                            tpd.Bind(orThrowSym, tpd.EmptyTree),
+                            tpd.EmptyTree,
+                            (for {
+                              // TODO: debug which option here is missing
+                              attachment <- t.getAttachment(SuspensionPointValDefKey)
+                              suffixRegex = """(#{2}\d+)""".r
+                              reservedVar <- reservedVariables.find { rvt =>
+                                val rvtName = rvt.symbol.name.show
+                                suffixRegex
+                                  .replaceAllIn(rvtName, "") == attachment.t.symbol.name.show
+                              }
+                              continuationFrameInputNumber <- suffixRegex
+                                .findFirstIn(reservedVar.symbol.name.show)
+                                .map(_.replaceAllLiterally("##", "").toInt - 1)
+                              continuationFrameInputName = s"I$$$continuationFrameInputNumber"
+                              method <- t.getAttachment(TransformedMethodKey)
+                              jumpToLabelNum <- t.getAttachment(JumpToLabelKey)
+                              jumpToLabelName = s"$stateMachineLabelPrefix$jumpToLabelNum"
+                              jumpToLabel <- method
+                                .t
+                                .filterSubTrees {
+                                  case l @ tpd.Labeled(tpd.Bind(name, _), _)
+                                      if name.show == jumpToLabelName =>
+                                    true
+                                  case _ => false
+                                }
+                                .headOption
+                                .map(_.asInstanceOf[tpd.Labeled])
+                              matchRefVal <- method
+                                .t
+                                .filterSubTrees {
+                                  case vd: tpd.ValDef if vd.name.show == $continuationName =>
+                                    true
+                                  case t =>
+                                    false
+                                }
+                                .headOption
+                                .map(_.symbol)
+                            } yield tpd.Block(
+                              List(
+                                tpd.Assign(
+                                  ref(matchRefVal).select(continuationFrameInputName
+                                    .sliceToTermName(0, continuationFrameInputName.size)),
+                                  ref(orThrowSym)),
+                                tpd.Assign(ref(reservedVar.symbol), ref(orThrowSym))
+                              ),
+                              tpd.Return(tpd.unitLiteral, ref(jumpToLabel.symbol))
+                            )).getOrElse(ref(orThrowSym))
+                          )
+                        }
                       ))
                     }
                     .toList
