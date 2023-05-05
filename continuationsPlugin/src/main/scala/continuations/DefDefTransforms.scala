@@ -32,6 +32,9 @@ import dotty.tools.dotc.core.Types.OrNull
 import dotty.tools.dotc.ast.Trees.ValDef
 import continuations.ContinuationsPhase.TransformedMethodKey
 import continuations.ContinuationsPhase.TransformedMethod
+import dotty.tools.dotc.core.Types.AppliedType
+import dotty.tools.dotc.core.Types.NoType
+import dotty.tools.dotc.util.Spans
 
 object DefDefTransforms extends TreesChecks:
 
@@ -783,7 +786,7 @@ object DefDefTransforms extends TreesChecks:
           }
 
           val thicketLabelIterator = Iterator.from(0)
-          val labelIterator = Iterator.from(1)
+          val labelIterator = Iterator.from(0)
 
           (for {
             firstThicket <- thickets.headOption
@@ -798,6 +801,11 @@ object DefDefTransforms extends TreesChecks:
               }
               .headOption
             vd = matchRefVal.asInstanceOf[tpd.ValDef]
+            callToCheckResult = ref(
+              requiredClass(continuationFullName)
+                .companionClass
+                .requiredMethod(checkResultMethodName)).appliedTo(ref(matchRefVal.symbol.asTerm)
+              .select($resultName.sliceToTermName(0, $resultName.size)))
           } yield tpd.Match(
             ref(vd.symbol).select($labelName.sliceToTermName(0, $labelName.size)),
             thickets
@@ -809,17 +817,26 @@ object DefDefTransforms extends TreesChecks:
                     case (nextTree, b @ tpd.Block(statements, expr)) =>
                       cpy.Block(b)(stats = nextTree :: statements, expr)
                   }
-                val callToCheckResult = ref(
-                  requiredClass(continuationFullName)
-                    .companionClass
-                    .requiredMethod(checkResultMethodName)).appliedTo(
-                  ref(matchRefVal.symbol.asTerm).select(
-                    $resultName.sliceToTermName(0, $resultName.size)))
+
                 val stateMachineLabel = s"$stateMachineLabelPrefix${labelIterator.next()}"
                 val currentLabel = thicketLabelIterator.next()
                 val frameToLocalIterator = Iterator.from(0)
                 val localToFrameIterator = Iterator.from(0)
-                val initialization = tpd.Thicket(
+                val initializationStatements = if (currentLabel == 0) {
+                  List(callToCheckResult) ++ reservedVariables.map { fvd =>
+                    val accessorNumber = localToFrameIterator.next()
+                    val frameAccessorName = s"I$$$accessorNumber"
+                    tpd.Assign(
+                      ref(matchRefVal.symbol.asTerm).select(
+                        frameAccessorName.sliceToTermName(0, frameAccessorName.size)),
+                      ref(fvd.symbol)
+                    )
+                  } ++ List(
+                    tpd.Assign(
+                      ref(matchRefVal.symbol.asTerm).select(
+                        $labelName.sliceToTermName(0, $labelName.size)),
+                      tpd.Literal(Constant(currentLabel + 1))))
+                } else {
                   reservedVariables.map { fvd =>
                     val accessorNumber = frameToLocalIterator.next()
                     val frameAccessorName = s"I$$$accessorNumber"
@@ -850,16 +867,37 @@ object DefDefTransforms extends TreesChecks:
                       ref(matchRefVal.symbol.asTerm).select(
                         $labelName.sliceToTermName(0, $labelName.size)),
                       tpd.Literal(Constant(currentLabel + 1))))
-                )
+                }
 
                 tpd.CaseDef(
                   tpd.Literal(Constant(currentLabel)),
                   tpd.EmptyTree,
                   tpd.Block(
-                    initialization.trees ++
+                    initializationStatements ++
                       body.stats,
                     body.expr))
               }
+              .addOne(
+                tpd.CaseDef(
+                  tpd.Literal(Constant(thicketLabelIterator.next())),
+                  tpd.EmptyTree,
+                  tpd.Block(
+                    {
+                      val frameToLocalIterator = Iterator.from(0)
+                      reservedVariables.map { fvd =>
+                        val accessorNumber = frameToLocalIterator.next()
+                        val frameAccessorName = s"I$$$accessorNumber"
+                        tpd.Assign(
+                          ref(fvd.symbol),
+                          ref(matchRefVal.symbol.asTerm).select(
+                            frameAccessorName.sliceToTermName(0, frameAccessorName.size))
+                        )
+                      }
+                    } ++ List(callToCheckResult),
+                    ref(matchRefVal.symbol).select(
+                      $resultName.sliceToTermName(0, $resultName.size)))
+                  )
+                )
               .addOne(
                 wrongStateCase
               )
@@ -883,6 +921,15 @@ object DefDefTransforms extends TreesChecks:
                 true
               case _ => false
             }.headOption
+            suspensionContinuation <- dd
+              .symbol
+              .paramSymss
+              .flatten
+              .find(
+                _.info.hasClassSymbol(requiredClass(continuationFullName)) && dd
+                  .symbol
+                  .isAnonymousFunction)
+            _ = println(s"dd: ${dd.show}")
             transformedMethod <- t.getAttachment(TransformedMethodKey)
             continuationVal <- transformedMethod
               .t
@@ -895,7 +942,7 @@ object DefDefTransforms extends TreesChecks:
                   false
               }
               .headOption
-            _ = dd
+            transformedInlined = dd
               .rhs
               .toList
               .flatMap {
@@ -903,27 +950,122 @@ object DefDefTransforms extends TreesChecks:
                   statements :: expr :: Nil
                 case ddRhs => List(ddRhs)
               }
-              .map {
-                case a @ tpd.Apply(fn, args)
-                    if fn.symbol.name.show == "resume" && fn
-                      .symbol
-                      .info
-                      .hasClassSymbol(requiredClass(continuationFullName)) =>
-                  // println(s"Insert safe resume here.")
-                  // println(s"dd tpt: ${dd.tpt.show}")
-                  // val safeContinuation = tpd.ValDef(newSymbol(
-                  //   transformedMethod.t.symbol,
-                  //   safeContinuationName.sliceToTermName(0, safeContinuationName.size),
-                  //   Flags.Local,
-                  //   requiredClassRef(safeContinuationClassName).appliedTo(
-                  //     ctx.definitions.IntType)
-                  // ), ref(requiredClass(safeContinuationClassName)
-                  //     .companionClass
-                  //     .requiredMethod(initMethodName)).appliedToType(ctx.definitions.IntType).appliedTo(ref(continuationVal.symbol)))
-                  a
-                case ddrhs => ddrhs
+              .flatMap {
+                case a @ tpd.Apply(fn, aargs) if fn.symbol.name.show == resumeMethodName =>
+                  println(s"Insert safe resume here: ${fn.symbol.info}")
+                  println(s"dd param: ${dd.symbol.info.show}")
+                  dd.paramss
+                    .flatten
+                    .find(_.symbol.info.hasClassSymbol(requiredClass(continuationFullName)))
+                    .flatMap { continuationParamDD =>
+                      continuationParamDD.symbol.info match {
+                        case AppliedType(_, args) =>
+                          args.headOption
+                        case tpee => None
+                      }
+                    }
+                    .flatMap { continuationType =>
+                      val safeContinuation = tpd.ValDef(
+                        newSymbol(
+                          transformedMethod.t.symbol,
+                          safeContinuationName.sliceToTermName(0, safeContinuationName.size),
+                          Flags.Local,
+                          requiredClassRef(safeContinuationClassName).appliedTo(
+                            continuationType)
+                        ).entered.asTerm,
+                        ref(requiredClass(safeContinuationClassName)
+                          .companionClass
+                          .requiredMethod(initMethodName))
+                          .appliedToType(continuationType)
+                          .appliedTo(ref(continuationVal.symbol))
+                      )
+                      Option(List(
+                        safeContinuation,
+                        ref(safeContinuation.symbol)
+                          .select(resumeMethodName.sliceToTermName(0, resumeMethodName.size))
+                          .appliedToArgs(aargs.asInstanceOf[List[tpd.Tree]]),
+                        tpd.Match(
+                          ref(safeContinuation.symbol)
+                            .select(getOrThrowMethodName
+                              .sliceToTermName(0, getOrThrowMethodName.size))
+                            .appliedToNone,
+                          List(
+                            tpd.CaseDef(
+                              ref(requiredClass(continuationFullName).companionModule)
+                                .select(stateName.sliceToTermName(0, stateName.size))
+                                .select(suspendedName.sliceToTermName(0, suspendedName.size)),
+                              tpd.EmptyTree,
+                              tpd.Return(
+                                ref(requiredClass(continuationFullName).companionModule)
+                                  .select(stateName.sliceToTermName(0, stateName.size))
+                                  .select(suspendedName.sliceToTermName(0, suspendedName.size)),
+                                transformedMethod.t.symbol
+                              )
+                            ), {
+                              val orThrowSym: TermSymbol =
+                                newSymbol(
+                                  transformedMethod.t.symbol,
+                                  orThrowName.sliceToTermName(0, orThrowName.size),
+                                  Flags.Case | Flags.CaseAccessor,
+                                  continuationType).entered
+                              tpd.CaseDef(
+                                tpd.Bind(orThrowSym, tpd.EmptyTree),
+                                tpd.EmptyTree,
+                                ref(orThrowSym))
+                            }
+                          )
+                        )
+                      ))
+                    }
+                    .toList
+                    .flatten
+                case a @ tpd.Apply(fn, aargs) if fn.symbol.name.show == raiseMethodName =>
+                  println(s"Insert safe resume here: ${fn.symbol.info}")
+                  println(s"dd param: ${dd.symbol.info.show}")
+                  dd.paramss
+                    .flatten
+                    .find(_.symbol.info.hasClassSymbol(requiredClass(continuationFullName)))
+                    .flatMap { continuationParamDD =>
+                      continuationParamDD.symbol.info match {
+                        case AppliedType(_, args) =>
+                          args.headOption
+                        case tpee => None
+                      }
+                    }
+                    .flatMap { continuationType =>
+                      val safeContinuation = tpd.ValDef(
+                        newSymbol(
+                          transformedMethod.t.symbol,
+                          safeContinuationName.sliceToTermName(0, safeContinuationName.size),
+                          Flags.Local,
+                          requiredClassRef(safeContinuationClassName).appliedTo(
+                            continuationType)
+                        ).entered.asTerm,
+                        ref(requiredClass(safeContinuationClassName)
+                          .companionClass
+                          .requiredMethod(initMethodName))
+                          .appliedToType(continuationType)
+                          .appliedTo(ref(continuationVal.symbol))
+                      )
+                      Option(List(
+                        safeContinuation,
+                        ref(safeContinuation.symbol)
+                          .select(raiseMethodName.sliceToTermName(0, raiseMethodName.size))
+                          .appliedToArgs(aargs.asInstanceOf[List[tpd.Tree]])
+                      ))
+                    }
+                    .toList
+                    .flatten
+                case ddrhs => List(ddrhs)
               }
-          } yield closure).getOrElse(tpd.EmptyTree)
+              .foldRight(tpd.Block(List.empty, tpd.EmptyTree)) {
+                case (nextTree: tpd.Tree, b @ tpd.Block(stats, tpd.EmptyTree)) =>
+                  cpy.Block(b)(stats, nextTree)
+                case (nextTree: tpd.Tree, b @ tpd.Block(stats, expr)) =>
+                  cpy.Block(b)(nextTree :: stats, expr)
+                case (List(), block) => block
+              }
+          } yield transformedInlined).getOrElse(tpd.EmptyTree)
         case t =>
           println(s"unmatched tree: ${t.show}")
           t
