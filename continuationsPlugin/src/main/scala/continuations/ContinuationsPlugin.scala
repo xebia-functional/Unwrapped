@@ -21,6 +21,7 @@ import scala.collection.mutable.ListBuffer
 import dotty.tools.dotc.util.Property.Key
 import continuations.ContinuationsCallsPhase.CallerKey
 import continuations.ContinuationsCallsPhase.Caller
+import dotty.tools.dotc.util.Property
 
 class ContinuationsPlugin extends StandardPlugin:
 
@@ -87,14 +88,46 @@ object ContinuationsPhase:
     *
     * @param i The number of the label to jump to.
     */
-  case class JumpToLabel(i: Int)
+  case class JumpToLabelNumber(i: Int)
 
   /**
     * A dotty Property.Key[V] class used to add jump to label
     * attachments to trees during transformation.
     */
-  case object JumpToLabelKey extends Key[JumpToLabel]
+  case object JumpToLabelNumberKey extends Key[JumpToLabelNumber]
 
+  /**
+    * The labels created during a suspended transformation.
+    *
+    * @param labels The jump lables produced during a suspend
+    * transformation
+    */
+  case class JumpLabels(labels: Vector[Symbol])
+
+  /**
+    * A dotty Property.Key[V] class used to add the labels generated
+    * during suspend transformation to the suspended tree. Used in the
+    * state machine case defs to drive transition to the next frame
+    * counter state.
+    */
+  case object JumpLabelsKey extends Key[JumpLabels]
+
+
+  /**
+    * The main continuation match value generated during a suspended
+    * transformation. Used in several places to construct the state
+    * machine and state machine case def case exit statements used to
+    * transition the state machine to the next state.
+    *
+    * @param vd The valdef of the continuation match value.
+    */
+  case class ContinuationValMatchVal(vd: tpd.ValDef)
+
+  /**
+    * A dotty Property.Key[V] class used to attach the main continuation
+    * match value during suspend transformations.
+    */
+  case object ContinuationValMatchValKey extends Key[ContinuationValMatchVal] 
 
 end ContinuationsPhase
 
