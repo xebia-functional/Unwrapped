@@ -616,7 +616,6 @@ object DefDefTransforms extends TreesChecks:
 
   private def transformSuspensionsSuspendingStateMachineAux(
       tree: tpd.ValOrDefDef,
-      // suspensionPoints: List[tpd.Tree],
       suspensionInReturnedValue: Boolean)(using ctx: Context): tpd.Thicket = {
     val anyType = ctx.definitions.AnyType
     val unitType = ctx.definitions.UnitType
@@ -647,9 +646,6 @@ object DefDefTransforms extends TreesChecks:
       case tpd.Inlined(_, _, _) => true
       case _ => false
     }
-    println(s"filteredValdefs: ${filteredValdefs.mkString("\n")}")
-    println(s"filteredValdefs.show: ${filteredValdefs.map(_.show).mkString("\n")}")
-
     val reservedVariables = filteredValdefs
       .flatMap {
         case t: tpd.ValDef if t.symbol.is(flag = Param) =>
@@ -682,8 +678,6 @@ object DefDefTransforms extends TreesChecks:
         case _: tpd.Tree => List(tpd.EmptyTree)
       }
       .filterNot(_ == tpd.EmptyTree)
-
-    println(s"reservedVariables: ${reservedVariables.map(_.show).mkString("\n")}")
 
     val (returnType, rhs, contextFunctionOwner) =
       getReturnTypeBodyContextFunctionOwner(tree)
@@ -740,8 +734,6 @@ object DefDefTransforms extends TreesChecks:
 
     val frameClass = transformedMethodSymbol.buildFrame(reservedVariables)
 
-    println(s"frameClass: ${frameClass.show}")
-
     val transformedMethod = TreeTypeMap(
       treeMap = {
         case t @ tpd.DefDef(_, _, _, _) if t.symbol.showFullName == tree.symbol.showFullName =>
@@ -760,10 +752,6 @@ object DefDefTransforms extends TreesChecks:
           t.getAttachment(ContinuationValMatchValKey)
             .foreach(attachment =>
               defWithUpdatedRhs.putAttachment(ContinuationValMatchValKey, attachment))
-          println(
-            s"t.getAttachment(ContinuationValMatchValKey).exists: ${t.getAttachment(ContinuationValMatchValKey).isDefined}")
-          println(
-            s"defWithUpdatedRhs.getAttachment(ContinuationValMatchValKey).exists: ${defWithUpdatedRhs.getAttachment(ContinuationValMatchValKey).isDefined}")
 
           defWithUpdatedRhs
             .rhs
@@ -771,7 +759,6 @@ object DefDefTransforms extends TreesChecks:
               st.putAttachment(TransformedMethodKey, TransformedMethod(defWithUpdatedRhs)))
           defWithUpdatedRhs
         case t @ tpd.Thicket(trees) =>
-          println(s"Not thicket of thickets!!!: ${trees.map(_.show)}")
           val thickets = ListBuffer.empty[tpd.Thicket]
           var treesToThicket = Array.empty[tpd.Tree]
           trees.foreach {
@@ -811,11 +798,9 @@ object DefDefTransforms extends TreesChecks:
           (for {
             firstThicket <- thickets.headOption
             method <- firstThicket.getAttachment(TransformedMethodKey)
-            _ = println(s"method !!!!: ${method.t.show}")
             ContinuationValMatchVal(matchRefVal) <- method
               .t
               .getAttachment(ContinuationValMatchValKey)
-            _ = println(s"matchRefVal!!!: ${matchRefVal.show}")
             callToCheckResult = ref(
               requiredClass(continuationFullName)
                 .companionClass
@@ -825,7 +810,6 @@ object DefDefTransforms extends TreesChecks:
             ref(matchRefVal.symbol).select($labelName.sliceToTermName(0, $labelName.size)),
             thickets
               .map { thicket =>
-                println(s"thicket!!!!!: ${thicket.show}")
                 val body =
                   thicket.trees.foldRight(tpd.Block(List.empty[tpd.Tree], tpd.EmptyTree)) {
                     case (vdCase @ tpd.ValDef(_, _, _), b @ tpd.Block(Nil, tpd.EmptyTree))
@@ -983,13 +967,12 @@ object DefDefTransforms extends TreesChecks:
                   )
                 )
               )
-              .addOne(
-                wrongStateCase
-              )
+              // .addOne(
+              //   // wrongStateCase
+              // )
               .toList
           )).getOrElse(tpd.EmptyTree)
         case t @ tpd.Inlined(call, _, _) if call.existsSubTree(_.symbol.name.show == "shift") =>
-          println(s"Inlined call to replace")
           val labelIterator = Iterator.from(1)
           (for {
             outerApply <- call
@@ -1014,12 +997,10 @@ object DefDefTransforms extends TreesChecks:
                 _.info.hasClassSymbol(requiredClass(continuationFullName)) && dd
                   .symbol
                   .isAnonymousFunction)
-            _ = println(s"dd: ${dd.show}")
             transformedMethod <- t.getAttachment(TransformedMethodKey)
             ContinuationValMatchVal(continuationVal) <- transformedMethod
               .t
               .getAttachment(ContinuationValMatchValKey)
-            _ = println(s"continuationVal: ${continuationVal.show}")
             transformedInlined = dd
               .rhs
               .toList
@@ -1030,7 +1011,6 @@ object DefDefTransforms extends TreesChecks:
               }
               .flatMap {
                 case a @ tpd.Apply(fn, aargs) if fn.symbol.name.show == resumeMethodName =>
-                  println(s"inlined resume apply: ${a.show}")
                   dd.paramss
                     .flatten
                     .find(_.symbol.info.hasClassSymbol(requiredClass(continuationFullName)))
@@ -1056,7 +1036,6 @@ object DefDefTransforms extends TreesChecks:
                           .appliedToType(continuationType)
                           .appliedTo(ref(continuationVal.symbol))
                       )
-                      println(s"safeContinuation: ${safeContinuation.show}")
                       Option(List(
                         safeContinuation,
                         ref(safeContinuation.symbol)
@@ -1111,7 +1090,6 @@ object DefDefTransforms extends TreesChecks:
                                   }
                                   maybeContinuationFrameInputNumber = maybeReservedVar
                                     .flatMap { reservedVar =>
-                                      println(s"reservedVar: $reservedVar")
                                       suffixRegex
                                         .findFirstIn(reservedVar.symbol.name.show)
                                         .map(_.replaceAllLiterally("##", "").toInt - 1)
@@ -1119,7 +1097,6 @@ object DefDefTransforms extends TreesChecks:
                                   mabyContinuationFrameInputName =
                                     maybeContinuationFrameInputNumber.map {
                                       continuationFrameInputNumber =>
-                                        println(s"continuationFrameInputNumber: $continuationFrameInputNumber")
                                         s"I$$$continuationFrameInputNumber"
                                     }
                                   method <- t.getAttachment(TransformedMethodKey)
@@ -1132,7 +1109,6 @@ object DefDefTransforms extends TreesChecks:
                                   jumpToLabel <- jumpToLabels.find { l =>
                                     l.name.show == jumpToLabelName
                                   }
-                                  _ = println(s"jumpToLabel: ${jumpToLabel}")
                                   matchRefVal <- method
                                     .t
                                     .getAttachment(ContinuationValMatchValKey)
@@ -1141,8 +1117,6 @@ object DefDefTransforms extends TreesChecks:
                                     .flatMap { reservedVar =>
                                       mabyContinuationFrameInputName.map {
                                         continuationFrameInputName =>
-                                        println(s"blockWithAssignmentAndReturnFromLabel continuationFrameInputName: ${continuationFrameInputName}")
-
                                           tpd.Block(
                                             List(
                                               tpd.Assign(
@@ -1165,7 +1139,6 @@ object DefDefTransforms extends TreesChecks:
                                         List(ref(orThrowSym)),
                                         tpd.Return(tpd.unitLiteral, jumpToLabel)
                                       )
-                                      println(s"non assignment block: ${block.show}")
                                       block
                                     }
                                 } yield blockWithAssignmentAndReturnFromLabel)
@@ -1194,8 +1167,6 @@ object DefDefTransforms extends TreesChecks:
                     .toList
                     .flatten
                 case a @ tpd.Apply(fn, aargs) if fn.symbol.name.show == raiseMethodName =>
-                  println(s"Insert safe resume here: ${fn.symbol.info}")
-                  println(s"dd param: ${dd.symbol.info.show}")
                   dd.paramss
                     .flatten
                     .find(_.symbol.info.hasClassSymbol(requiredClass(continuationFullName)))
@@ -1263,7 +1234,6 @@ object DefDefTransforms extends TreesChecks:
                                 }
                                 .headOption
                                 .map(_.symbol)
-                              _ = println(s"matchRefVal after jumpLabel: ${matchRefVal.show}")
                             } yield tpd.Block(
                               List(
                                 tpd.Assign(
@@ -1291,7 +1261,6 @@ object DefDefTransforms extends TreesChecks:
               }
           } yield transformedInlined).getOrElse(tpd.EmptyTree)
         case t =>
-          println(s"unmatched tree: ${t.show}")
           t
       },
       substFrom = List(treeWithTransformedParams.symbol),

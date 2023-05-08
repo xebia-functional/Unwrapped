@@ -11,5 +11,5 @@ import continuations.Continuation
     }
     summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
     
-  // println(Blocking(twoArgumentsTwoContinuations(1, 2)))
+  println(Blocking(twoArgumentsTwoContinuations(1, 2)))
 

@@ -9,6 +9,7 @@ import dotty.tools.dotc.core.Scopes
 import dotty.tools.dotc.core.StdNames.nme
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Types.MethodType
+import dotty.tools.dotc.core.Constants.Constant
 
 extension (sym: Symbol)
   def buildFrame(reservedVariables: List[Tree])(using ctx: Context): TypeDef =
@@ -37,23 +38,28 @@ extension (sym: Symbol)
       )
     }
     val eitherThrowableAnyNullSuspendedType =
-      requiredClassRef("scala.util.Either").appliedTo(ctx.definitions.ThrowableType, anyType.? | requiredModuleRef(continuationFullName)
-        .select(stateName.sliceToTermName(0, stateName.size))
-        .select(suspendedName.sliceToTermName(0, suspendedName.size))
-        .symbol
-        .namedType)      
+      requiredClassRef("scala.util.Either").appliedTo(
+        ctx.definitions.ThrowableType,
+        anyType.? | requiredModuleRef(continuationFullName)
+          .select(stateName.sliceToTermName(0, stateName.size))
+          .select(suspendedName.sliceToTermName(0, suspendedName.size))
+          .symbol
+          .namedType
+      )
     val frameResultType = requiredClassRef("scala.util.Either").appliedTo(
-          List(
-            ctx.definitions.ThrowableType,
-            eitherThrowableAnyNullSuspendedType
-          ))
+      List(
+        ctx.definitions.ThrowableType,
+        eitherThrowableAnyNullSuspendedType
+      ))
     val $result = ValDef(
       newSymbol(
         continuationFrameSymbol,
         $resultName.sliceToTermName(0, $resultName.size),
         Flags.Accessor | Flags.Mutable,
         frameResultType
-      ).entered.asTerm)
+      ).entered.asTerm,
+      Underscore(frameResultType)
+    )
     val $label = ValDef(
       newSymbol(
         continuationFrameSymbol,
@@ -95,7 +101,7 @@ extension (sym: Symbol)
             value.symbol.asTerm.name.asTermName.setterName,
             Flags.Accessor | Flags.Method,
             MethodType(List(value.symbol.asTerm.info), unitType)
-          ).entered.asTerm,
+          ).entered,
           params =>
             Assign(This(continuationFrameSymbol).select(value.name), ref(params(0)(0).symbol))
         )
@@ -107,7 +113,7 @@ extension (sym: Symbol)
             $result.symbol.asTerm.name.asTermName.setterName,
             Flags.Accessor | Flags.Method,
             MethodType(List($result.symbol.asTerm.info), unitType)
-          ).entered.asTerm,
+          ).entered,
           params =>
             Assign(This(continuationFrameSymbol).select($result.name), ref(params(0)(0).symbol))
         ),
@@ -118,7 +124,7 @@ extension (sym: Symbol)
             $label.symbol.asTerm.name.asTermName.setterName,
             Flags.Accessor | Flags.Method,
             MethodType(List($label.symbol.asTerm.info), unitType)
-          ),
+          ).entered,
           params =>
             Assign(
               This(continuationFrameSymbol).select($label.name),
@@ -162,8 +168,8 @@ extension (sym: Symbol)
                     else if (s.info.hasClassSymbol(requiredClass(continuationFullName)))
                       This(continuationFrameSymbol)
                         .select(nme.asInstanceOf_)
-                        .appliedToType(
-                          requiredClassRef(continuationFullName).appliedTo(sym.info.finalResultType))
+                        .appliedToType(requiredClassRef(continuationFullName).appliedTo(
+                          sym.info.finalResultType))
                     else nullLiteral
                   }))
             )

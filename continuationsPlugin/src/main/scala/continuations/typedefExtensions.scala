@@ -14,12 +14,14 @@ import dotty.tools.dotc.core.Symbols.*
 extension (td: TypeDef)
   private[continuations] def buildInitializer(fromTree: tpd.Tree)(using ctx: Context): ValDef =
     val owner = fromTree.symbol
+    println(s"td.symbol.info: ${td.tpe.show}")
     val initializationMatchTree = ValDef(
       newSymbol(
         owner,
         $continuationName.sliceToTermName(0, $continuationName.size),
         Flags.Local,
-        td.symbol.info).entered.asTerm,
+        td.tpe
+      ).entered.asTerm,
       Match(
         ref(
           owner
@@ -30,9 +32,9 @@ extension (td: TypeDef)
         List(
           {
             val x$0 =
-              newSymbol(owner, nme.x_0, Flags.Case | Flags.CaseAccessor, td.symbol.info).entered
+              newSymbol(owner, nme.x_0, Flags.Case | Flags.CaseAccessor, td.tpe).entered
             CaseDef(
-              Typed(ref(x$0), ref(td.symbol)),
+              Bind(x$0, Typed(ref(x$0), ref(td.symbol))),
               ref(x$0)
                 .select($labelName.sliceToTermName(0, $labelName.size))
                 .select(defn.IntClass.requiredMethod(nme.AND, List(defn.IntType)))
@@ -53,20 +55,27 @@ extension (td: TypeDef)
                 ref(x$0)
               )
             )
-          },
-          CaseDef(
-            Underscore(defn.AnyType),
-            EmptyTree,
-            New(
-              td.tpe,
-              List(
-                ref(
-                  owner
-                    .paramSymss
-                    .flatten
-                    .iterator
-                    .findSymbol(_.info.hasClassSymbol(requiredClass(continuationFullName))))))
-          )
+          }, {
+            val x$1 =
+              newSymbol(
+                owner,
+                nme.x_1,
+                Flags.Case | Flags.CaseAccessor,
+                ctx.definitions.AnyType).entered
+            CaseDef(
+              Bind(x$1, Underscore(ctx.definitions.AnyType)),
+              EmptyTree,
+              New(
+                td.tpe,
+                List(
+                  ref(
+                    owner
+                      .paramSymss
+                      .flatten
+                      .iterator
+                      .findSymbol(_.info.hasClassSymbol(requiredClass(continuationFullName))))))
+            )
+          }
         )
       )
     )

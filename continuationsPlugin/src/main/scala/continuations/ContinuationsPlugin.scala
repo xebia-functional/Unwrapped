@@ -235,7 +235,6 @@ class ContinuationsCallsPhase extends PluginPhase:
           }
           println(s"caller: ${caller}")
           println(s"existsTree(fn).get: ${existsTree(fn).get}")
-          // val replacement = deconstructNestedApply(tree, Nil)
           TreeTypeMap(
             substTo = List(existsTree(fn).get) ++ caller.toList,
             substFrom = List(fn.symbol) ++ args
