@@ -37,22 +37,23 @@ extension (sym: Symbol)
       )
     }
     val eitherThrowableAnyNullSuspendedType =
-      anyType.? | requiredModuleRef(continuationFullName)
+      requiredClassRef("scala.util.Either").appliedTo(ctx.definitions.ThrowableType, anyType.? | requiredModuleRef(continuationFullName)
         .select(stateName.sliceToTermName(0, stateName.size))
         .select(suspendedName.sliceToTermName(0, suspendedName.size))
         .symbol
-        .namedType
+        .namedType)      
+    val frameResultType = requiredClassRef("scala.util.Either").appliedTo(
+          List(
+            ctx.definitions.ThrowableType,
+            eitherThrowableAnyNullSuspendedType
+          ))
     val $result = ValDef(
       newSymbol(
         continuationFrameSymbol,
         $resultName.sliceToTermName(0, $resultName.size),
         Flags.Accessor | Flags.Mutable,
-        requiredClassRef("scala.util.Either").appliedTo(
-          List(
-            ctx.definitions.ThrowableType,
-            eitherThrowableAnyNullSuspendedType
-          ))
-      ))
+        frameResultType
+      ).entered.asTerm)
     val $label = ValDef(
       newSymbol(
         continuationFrameSymbol,

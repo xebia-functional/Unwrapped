@@ -951,7 +951,33 @@ object DefDefTransforms extends TreesChecks:
                             frameAccessorName.sliceToTermName(0, frameAccessorName.size))
                         )
                       }
-                    } ++ List(callToCheckResult),
+                    } ++ List(
+                      callToCheckResult, {
+                        val stateMachineLabel =
+                          s"$stateMachineLabelPrefix${labelIterator.next()}"
+                        val labelSymbol = newSymbol(
+                          method.t.symbol,
+                          stateMachineLabel.sliceToTermName(0, stateMachineLabel.size),
+                          Flags.Label,
+                          unitType).entered.asTerm
+                        val label = tpd.Labeled(labelSymbol, tpd.EmptyTree)
+                        method
+                          .t
+                          .getAttachment(JumpLabelsKey)
+                          .map {
+                            case JumpLabels(jumpLabels) =>
+                              method
+                                .t
+                                .putAttachment(
+                                  JumpLabelsKey,
+                                  JumpLabels(jumpLabels.appended(labelSymbol)))
+                          }
+                          .orElse(method
+                            .t
+                            .putAttachment(JumpLabelsKey, JumpLabels(Vector(labelSymbol))))
+                        label
+                      }
+                    ),
                     ref(matchRefVal.symbol).select(
                       $resultName.sliceToTermName(0, $resultName.size))
                   )
@@ -1036,8 +1062,13 @@ object DefDefTransforms extends TreesChecks:
                         ref(safeContinuation.symbol)
                           .select(resumeMethodName.sliceToTermName(0, resumeMethodName.size))
                           .appliedToArgs(TreeTypeMap(treeMap = {
-                            case tpd.Ident(tp) if reservedVariables.exists(_.symbol.name.show.startsWith(tp.show + "##")) =>
-                              ref(reservedVariables.find(_.symbol.name.show.startsWith(tp.show + "##")).get.symbol)
+                            case tpd.Ident(tp)
+                                if reservedVariables.exists(
+                                  _.symbol.name.show.startsWith(tp.show + "##")) =>
+                              ref(reservedVariables
+                                .find(_.symbol.name.show.startsWith(tp.show + "##"))
+                                .get
+                                .symbol)
                             case t => t
                           }).transform(aargs.asInstanceOf[List[tpd.Tree]])),
                         tpd.Match(
@@ -1068,10 +1099,9 @@ object DefDefTransforms extends TreesChecks:
                                 tpd.Bind(orThrowSym, tpd.EmptyTree),
                                 tpd.EmptyTree,
                                 (for {
-                                  // TODO: debug which option here is missing
                                   attachment <- t.getAttachment(SuspensionPointValDefKey)
                                   suffixRegex = """(#{2}\d+)""".r
-                                  reservedVar <- reservedVariables.find { rvt =>
+                                  maybeReservedVar = reservedVariables.find { rvt =>
                                     val rvtName = rvt.symbol.name.show
                                     suffixRegex.replaceAllIn(rvtName, "") == attachment
                                       .t
@@ -1079,11 +1109,19 @@ object DefDefTransforms extends TreesChecks:
                                       .name
                                       .show
                                   }
-                                  continuationFrameInputNumber <- suffixRegex
-                                    .findFirstIn(reservedVar.symbol.name.show)
-                                    .map(_.replaceAllLiterally("##", "").toInt - 1)
-                                  continuationFrameInputName =
-                                    s"I$$$continuationFrameInputNumber"
+                                  maybeContinuationFrameInputNumber = maybeReservedVar
+                                    .flatMap { reservedVar =>
+                                      println(s"reservedVar: $reservedVar")
+                                      suffixRegex
+                                        .findFirstIn(reservedVar.symbol.name.show)
+                                        .map(_.replaceAllLiterally("##", "").toInt - 1)
+                                    }
+                                  mabyContinuationFrameInputName =
+                                    maybeContinuationFrameInputNumber.map {
+                                      continuationFrameInputNumber =>
+                                        println(s"continuationFrameInputNumber: $continuationFrameInputNumber")
+                                        s"I$$$continuationFrameInputNumber"
+                                    }
                                   method <- t.getAttachment(TransformedMethodKey)
                                   JumpToLabelNumber(jumpToLabelNum) <- t.getAttachment(
                                     JumpToLabelNumberKey)
@@ -1099,21 +1137,55 @@ object DefDefTransforms extends TreesChecks:
                                     .t
                                     .getAttachment(ContinuationValMatchValKey)
                                     .map(_.vd.symbol)
-                                } yield tpd.Block(
-                                  List(
-                                    tpd.Assign(
-                                      ref(matchRefVal).select(continuationFrameInputName
-                                        .sliceToTermName(0, continuationFrameInputName.size)),
-                                      ref(orThrowSym)),
-                                    tpd.Assign(ref(reservedVar.symbol), ref(orThrowSym))
-                                  ), {
-                                    val ret = tpd.Return(tpd.unitLiteral, jumpToLabel)
-                                    println(s"ret: ${ret}")
-                                    ret
+                                  blockWithAssignmentAndReturnFromLabel = maybeReservedVar
+                                    .flatMap { reservedVar =>
+                                      mabyContinuationFrameInputName.map {
+                                        continuationFrameInputName =>
+                                        println(s"blockWithAssignmentAndReturnFromLabel continuationFrameInputName: ${continuationFrameInputName}")
 
-                                  }
-                                )).getOrElse(ref(orThrowSym))
-                              )
+                                          tpd.Block(
+                                            List(
+                                              tpd.Assign(
+                                                ref(matchRefVal).select(
+                                                  continuationFrameInputName.sliceToTermName(
+                                                    0,
+                                                    continuationFrameInputName.size)),
+                                                ref(orThrowSym)),
+                                              tpd.Assign(
+                                                ref(reservedVar.symbol),
+                                                ref(orThrowSym))
+                                            ), {
+                                              tpd.Return(tpd.unitLiteral, jumpToLabel)
+                                            }
+                                          )
+                                      }
+                                    }
+                                    .getOrElse{
+                                      val block = tpd.Block(
+                                        List(ref(orThrowSym)),
+                                        tpd.Return(tpd.unitLiteral, jumpToLabel)
+                                      )
+                                      println(s"non assignment block: ${block.show}")
+                                      block
+                                    }
+                                } yield blockWithAssignmentAndReturnFromLabel)
+                                  .orElse{
+                                    for{
+                                      method <- t.getAttachment(TransformedMethodKey)
+                                      JumpToLabelNumber(jumpToLabelNum) <- t.getAttachment(
+                                        JumpToLabelNumberKey)
+                                      jumpToLabelName = s"$stateMachineLabelPrefix$jumpToLabelNum"
+                                      JumpLabels(jumpToLabels) <- method
+                                      .t
+                                      .getAttachment(JumpLabelsKey)
+                                      jumpToLabel <- jumpToLabels.find { l =>
+                                        l.name.show == jumpToLabelName
+                                      }
+                                    } yield tpd.Block(
+                                      List(ref(orThrowSym)),
+                                        tpd.Return(tpd.unitLiteral, jumpToLabel)
+                                    )
+                                  }.getOrElse(ref(orThrowSym)))
                             }
                           )
                         )
@@ -1232,7 +1304,7 @@ object DefDefTransforms extends TreesChecks:
     )(treeWithTransformedParams).asInstanceOf[tpd.DefDef]
     println(s"transformedMethod: ${transformedMethod.show}")
     println(s"transformedMethod type: ${transformedMethod.symbol.info.show}")
-    ???
+    tpd.Thicket(List(frameClass, transformedMethod))
   }
 
 // val suspensionPointsVal: List[tpd.Tree] =
