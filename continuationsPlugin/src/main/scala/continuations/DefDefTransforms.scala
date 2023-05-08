@@ -672,7 +672,7 @@ object DefDefTransforms extends TreesChecks:
                   t.symbol.info)
                 .asTerm
                 .entered,
-              tpd.Underscore(t.symbol.info)
+              tpd.nullLiteral
             )
           )
         case _: tpd.Tree => List(tpd.EmptyTree)
@@ -967,9 +967,9 @@ object DefDefTransforms extends TreesChecks:
                   )
                 )
               )
-              // .addOne(
-              //   // wrongStateCase
-              // )
+              .addOne(
+                wrongStateCase
+              )
               .toList
           )).getOrElse(tpd.EmptyTree)
         case t @ tpd.Inlined(call, _, _) if call.existsSubTree(_.symbol.name.show == "shift") =>
@@ -1207,7 +1207,6 @@ object DefDefTransforms extends TreesChecks:
                             tpd.Bind(orThrowSym, tpd.EmptyTree),
                             tpd.EmptyTree,
                             (for {
-                              // TODO: debug which option here is missing
                               attachment <- t.getAttachment(SuspensionPointValDefKey)
                               suffixRegex = """(#{2}\d+)""".r
                               reservedVar <- reservedVariables.find { rvt =>
@@ -1264,12 +1263,12 @@ object DefDefTransforms extends TreesChecks:
           t
       },
       substFrom = List(treeWithTransformedParams.symbol),
-      substTo = List(transformedMethodSymbol)
-      // oldOwners = List(treeWithTransformedParams.symbol) ++ treeWithTransformedParams
-      //   .symbol
-      //   .ownersIterator
-      //   .toList,
-      // newOwners = List(transformedMethodSymbol) ++ transformedMethodSymbol.ownersIterator.toList
+      substTo = List(transformedMethodSymbol),
+       oldOwners = List(treeWithTransformedParams.symbol) ++ treeWithTransformedParams
+         .symbol
+         .ownersIterator
+         .toList,
+       newOwners = List(transformedMethodSymbol) ++ transformedMethodSymbol.ownersIterator.toList
     )(treeWithTransformedParams).asInstanceOf[tpd.DefDef]
     println(s"transformedMethod: ${transformedMethod.show}")
     println(s"transformedMethod type: ${transformedMethod.symbol.info.show}")

@@ -103,7 +103,7 @@ extension (sym: Symbol)
             MethodType(List(value.symbol.asTerm.info), unitType)
           ).entered,
           params =>
-            Assign(This(continuationFrameSymbol).select(value.name), ref(params(0)(0).symbol))
+            unitLiteral
         )
       } ++ List(
         $result,
@@ -115,7 +115,7 @@ extension (sym: Symbol)
             MethodType(List($result.symbol.asTerm.info), unitType)
           ).entered,
           params =>
-            Assign(This(continuationFrameSymbol).select($result.name), ref(params(0)(0).symbol))
+            unitLiteral
         ),
         $label,
         DefDef(
@@ -126,10 +126,7 @@ extension (sym: Symbol)
             MethodType(List($label.symbol.asTerm.info), unitType)
           ).entered,
           params =>
-            Assign(
-              This(continuationFrameSymbol).select($label.name),
-              ref(params(0)(0).symbol)
-            )
+            unitLiteral
         ),
         DefDef(
           newSymbol(
