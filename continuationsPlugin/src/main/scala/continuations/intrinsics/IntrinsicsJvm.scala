@@ -44,7 +44,7 @@ private inline def createContinuationFromSuspendFunction[T](
     completion: Continuation[T],
     block: Continuation[T] => T | Any | Null
 ): Continuation[Unit] =
-  val context = completion.context
+  val context = completion.context()
   if (context == EmptyTuple)
     new RestrictedContinuation(completion.asInstanceOf) {
       private var label = 0

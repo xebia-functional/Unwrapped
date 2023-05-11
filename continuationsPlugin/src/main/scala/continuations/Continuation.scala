@@ -7,11 +7,11 @@ import scala.concurrent.ExecutionContext
 trait Continuation[-A]:
   type Ctx <: Tuple
   val executionContext: ExecutionContext
-  def context: Ctx
+  def context(): Ctx
   def resume(value: A): Unit
   def raise(error: Throwable): Unit
   def contextService[T](): T | Null =
-    context.toList.find(_.isInstanceOf[T]).map(_.asInstanceOf[T]).orNull
+    context().toList.find(_.isInstanceOf[T]).map(_.asInstanceOf[T]).orNull
 
 object Continuation:
   enum State:
@@ -35,7 +35,7 @@ inline def BuildContinuation[T](
     override type Ctx = EmptyTuple
     override val executionContext: ExecutionContext = ec
 
-    override def context: Ctx = EmptyTuple
+    override def context(): Ctx = EmptyTuple
 
     override def resume(value: T): Unit = ec.execute {
       new Runnable:
@@ -50,11 +50,8 @@ inline def BuildContinuation[T](
     private val ec = ExecutionContext.global
 
 abstract class RestrictedContinuation(
-    completion: Continuation[Any | Null] | Null
-) extends BaseContinuationImpl(completion):
+  completion: Continuation[Any | Null] | Null,
+) extends BaseContinuationImpl(completion, EmptyTuple):
 
   if (completion != null)
-    require(completion.context == EmptyTuple)
-
-  override type Ctx = EmptyTuple
-  override val context: EmptyTuple = EmptyTuple
+    require(completion.context() == EmptyTuple)

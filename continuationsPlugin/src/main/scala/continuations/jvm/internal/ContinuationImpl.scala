@@ -5,11 +5,13 @@ import continuations.{Continuation, ContinuationInterceptor}
 import scala.concurrent.ExecutionContext
 
 abstract class BaseContinuationImpl(
-    val completion: Continuation[Any | Null] | Null
+  val completion: Continuation[Any | Null] | Null,
+  icontext: Tuple
 ) extends Continuation[Any | Null],
       ContinuationStackFrame,
       Serializable:
-
+  override type Ctx = Tuple
+  override def context() = icontext
   override val executionContext: ExecutionContext =
     if completion == null then throw RuntimeException("resume called with no completion")
     else completion.executionContext
@@ -64,9 +66,10 @@ abstract class BaseContinuationImpl(
  */
 abstract class ContinuationImpl(
     completion: Continuation[Any | Null],
-    override val context: Tuple
-) extends BaseContinuationImpl(completion):
+    icontext: Tuple
+) extends BaseContinuationImpl(completion, icontext):
   override type Ctx = Tuple
+  override def context() = icontext
   override val executionContext: ExecutionContext = completion.executionContext
   private var _intercepted: Continuation[Any | Null] = null
 

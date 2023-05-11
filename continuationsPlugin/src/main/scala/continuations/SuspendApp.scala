@@ -33,7 +33,7 @@ trait StarterLib extends ContinuationLib:
       else
         starter.createFromCompletion(completion)
     def createFromCompletion(completion: Continuation[A]): Continuation[Unit] =
-      val context = completion.context
+      val context = completion.context()
       if (context == EmptyTuple)
         new RestrictedContinuation(completion.asInstanceOf):
           private var label = 0

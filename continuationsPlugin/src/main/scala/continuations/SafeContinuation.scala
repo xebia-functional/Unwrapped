@@ -14,7 +14,7 @@ class SafeContinuation[T] private (
   override type Ctx = delegate.Ctx
 
   override val executionContext: ExecutionContext = delegate.executionContext
-  override def context: Ctx = delegate.context
+  override def context(): Ctx = delegate.context()
   result = initialResult
   var errored: Boolean = false
 

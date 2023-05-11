@@ -20,9 +20,9 @@ extension (sym: Symbol)
     val continuationFrameClassName =
       continuationFrameClassNameStr.sliceToTypeName(0, continuationFrameClassNameStr.size)
     val continuationFrameSymbol = newCompleteClassSymbol(
-      sym.owner,
+      sym,
       continuationFrameClassName,
-      Flags.PrivateOrSynthetic,
+      Flags.Artifact,
       List(requiredClassRef(continuationImplFullName)),
       Scopes.newScope
     ).entered.asClass
@@ -85,15 +85,20 @@ extension (sym: Symbol)
         .iterator
         .findSymbol(_.info.hasClassSymbol(requiredClass(continuationFullName))))
 
+    println(s"extension primary constructor: ${$completionRef.select(
+      contextName.sliceToTermName(0, contextName.size)).symbol.show}")
     ClassDefWithParents(
       continuationFrameSymbol,
       frameClassConstructor,
       List(
         New(requiredClassRef(continuationImplFullName))
           .select(nme.CONSTRUCTOR)
-          .appliedToArgss(List(List(
-            $completionRef,
-            $completionRef.select(contextName.sliceToTermName(0, contextName.size)))))),
+          .appliedToArgs(
+            List(
+              $completionRef,
+              $completionRef.select(
+                contextName.sliceToTermName(0, contextName.size)).appliedToNone)
+          )),
       bodyInputVars ++ bodyInputVars.map { value =>
         DefDef(
           newSymbol(
@@ -102,8 +107,7 @@ extension (sym: Symbol)
             Flags.Accessor | Flags.Method,
             MethodType(List(value.symbol.asTerm.info), unitType)
           ).entered,
-          params =>
-            unitLiteral
+          unitLiteral
         )
       } ++ List(
         $result,
@@ -114,8 +118,7 @@ extension (sym: Symbol)
             Flags.Accessor | Flags.Method,
             MethodType(List($result.symbol.asTerm.info), unitType)
           ).entered,
-          params =>
-            unitLiteral
+          unitLiteral
         ),
         $label,
         DefDef(
@@ -125,8 +128,7 @@ extension (sym: Symbol)
             Flags.Accessor | Flags.Method,
             MethodType(List($label.symbol.asTerm.info), unitType)
           ).entered,
-          params =>
-            unitLiteral
+          unitLiteral
         ),
         DefDef(
           newSymbol(
@@ -176,7 +178,10 @@ extension (sym: Symbol)
             continuationFrameSymbol,
             createName.sliceToTermName(0, createName.size),
             Flags.Method | Flags.Override,
-            MethodType(
+            MethodType.apply(
+              List(
+                "value".sliceToTermName(0, "value".size),
+                "completion".sliceToTermName(0, "completion".size)),
               List(
                 anyType.?,
                 requiredClassRef(continuationFullName).appliedTo(List(anyType.?))),
@@ -184,7 +189,13 @@ extension (sym: Symbol)
             )
           ).entered.asTerm,
           params =>
-            New(requiredClassRef(baseContinuationImplFullName), List(ref(params(0)(1).symbol)))
+            New(requiredClassRef(baseContinuationImplFullName))
+              .select(nme.CONSTRUCTOR)
+              .appliedTo(
+                ref(params(0)(1).symbol),
+                ref(params(0)(1).symbol)
+                  .select(contextName.sliceToTermName(0, contextName.size))
+                  .appliedToNone)
         )
       )
     )

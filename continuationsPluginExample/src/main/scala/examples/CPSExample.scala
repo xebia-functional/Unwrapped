@@ -31,7 +31,7 @@ def await$expanded[A](future: Future[A])(using completion: Continuation[Any | Nu
   var10000
 
 final class await$2$1(completion: Continuation[Any | Null])
-    extends ContinuationImpl(completion, completion.context):
+    extends ContinuationImpl(completion, completion.context()):
   // $FF: synthetic field
   val $continuation = completion
 
@@ -60,7 +60,8 @@ def program: Suspend ?=> Int =
 import continuations.jvm.internal.ContinuationImpl
 
 final class program$continuation$1(override val completion: Continuation[Any | Null])
-    extends ContinuationImpl(completion, completion.context) {
+    extends ContinuationImpl(completion, completion.
+      context()) {
   var I$0 = 0
   // $FF: synthetic field
   var result: Any = null

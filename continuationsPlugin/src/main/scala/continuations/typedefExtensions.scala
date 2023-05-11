@@ -14,70 +14,54 @@ import dotty.tools.dotc.core.Symbols.*
 extension (td: TypeDef)
   private[continuations] def buildInitializer(fromTree: tpd.Tree)(using ctx: Context): ValDef =
     val owner = fromTree.symbol
-    println(s"td.symbol.info: ${td.tpe.show}")
     val initializationMatchTree = ValDef(
       newSymbol(
         owner,
         $continuationName.sliceToTermName(0, $continuationName.size),
         Flags.Local,
         td.tpe
-      ).entered.asTerm,
-      Match(
-        ref(
+      ).entered.asTerm, {
+        val completionParam = ref(
           owner
             .paramSymss
             .flatten
             .iterator
-            .findSymbol(_.info.hasClassSymbol(requiredClass(continuationFullName)))),
-        List(
-          {
-            val x$0 =
-              newSymbol(owner, nme.x_0, Flags.Case | Flags.CaseAccessor, td.tpe).entered
-            CaseDef(
-              Bind(x$0, Typed(ref(x$0), ref(td.symbol))),
-              ref(x$0)
+            .findSymbol(_.info.hasClassSymbol(requiredClass(continuationFullName))))
+        If(
+          completionParam
+            .select(nme.isInstanceOf_)
+            .appliedToType(td.tpe)
+            .select(nme.ZAND)
+            .appliedTo(
+              completionParam
+                .select(nme.asInstanceOf_)
+                .appliedToType(td.tpe)
                 .select($labelName.sliceToTermName(0, $labelName.size))
                 .select(defn.IntClass.requiredMethod(nme.AND, List(defn.IntType)))
                 .appliedTo(ref(requiredModuleRef("scala.Int").select(
                   minValueName.sliceToTermName(0, minValueName.size))))
                 .select(defn.IntClass.requiredMethod(nme.NE, List(defn.IntType)))
-                .appliedTo(Literal(Constant(0x0))),
-              Block(
-                List(
-                  Assign(
-                    ref(x$0).select($labelName.sliceToTermName(0, $labelName.size)),
-                    ref(x$0)
-                      .select($labelName.sliceToTermName(0, $labelName.size))
-                      .select(defn.Int_-)
-                      .appliedTo(ref(requiredModuleRef("scala.Int").select(
-                        minValueName.sliceToTermName(0, minValueName.size))))
-                  )),
-                ref(x$0)
-              )
-            )
-          }, {
-            val x$1 =
-              newSymbol(
-                owner,
-                nme.x_1,
-                Flags.Case | Flags.CaseAccessor,
-                ctx.definitions.AnyType).entered
-            CaseDef(
-              Bind(x$1, Underscore(ctx.definitions.AnyType)),
-              EmptyTree,
-              New(
-                td.tpe,
-                List(
-                  ref(
-                    owner
-                      .paramSymss
-                      .flatten
-                      .iterator
-                      .findSymbol(_.info.hasClassSymbol(requiredClass(continuationFullName))))))
-            )
-          }
+                .appliedTo(Literal(Constant(0x0)))),
+          Block(
+            List(
+              Assign(
+                completionParam
+                  .select(nme.asInstanceOf_)
+                  .appliedToType(td.tpe)
+                  .select($labelName.sliceToTermName(0, $labelName.size)),
+                completionParam
+                  .select(nme.asInstanceOf_)
+                  .appliedToType(td.tpe)
+                  .select($labelName.sliceToTermName(0, $labelName.size))
+                  .select(defn.Int_-)
+                  .appliedTo(ref(requiredModuleRef("scala.Int").select(
+                    minValueName.sliceToTermName(0, minValueName.size))))
+              )),
+            completionParam
+          ),
+          New(td.tpe, List(completionParam))
         )
-      )
+      }
     )
     fromTree.putAttachment(
       ContinuationValMatchValKey,

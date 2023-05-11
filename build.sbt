@@ -197,9 +197,9 @@ lazy val continuationsPluginExampleShowTreeSettings: Seq[Def.Setting[_]] =
     resolvers += Resolver.mavenLocal,
     forceCompilation := false,
     Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
-    Compile / scalacOptions += "-Xprint:continuations,elimRepeated",
+    Compile / scalacOptions += "-Xprint:all",
     Test / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
-    Test / scalacOptions += "-Xprint:continuations,elimRepeated"
+    Test / scalacOptions += "-Xprint:all"
   )
 
 lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
