@@ -1001,7 +1001,7 @@ object DefDefTransforms extends TreesChecks:
             ContinuationValMatchVal(continuationVal) <- transformedMethod
               .t
               .getAttachment(ContinuationValMatchValKey)
-            transformedInlined = dd
+            transformedInlined:List[tpd.Tree] = dd
               .rhs
               .toList
               .flatMap {
@@ -1235,16 +1235,9 @@ object DefDefTransforms extends TreesChecks:
                     }
                     .toList
                     .flatten
-                case ddrhs => List(ddrhs)
+                case ddrhs:List[tpd.Tree] => ddrhs
               }
-              .foldRight(tpd.Block(List.empty, tpd.EmptyTree)) {
-                case (nextTree: tpd.Tree, b @ tpd.Block(stats, tpd.EmptyTree)) =>
-                  cpy.Block(b)(stats, nextTree)
-                case (nextTree: tpd.Tree, b @ tpd.Block(stats, expr)) =>
-                  cpy.Block(b)(nextTree :: stats, expr)
-                case (List(), block) => block
-              }
-          } yield transformedInlined).getOrElse(tpd.EmptyTree)
+          } yield blockOf(transformedInlined)).getOrElse(tpd.EmptyTree)
         case t =>
           t
       },

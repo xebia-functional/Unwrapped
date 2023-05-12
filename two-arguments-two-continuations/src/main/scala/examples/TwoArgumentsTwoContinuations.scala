@@ -10,10 +10,12 @@ import continuations.Continuation
       continuation.resume(println(x + y))
     }
     summon[Suspend].shift[Int] { continuation =>
-      continuation.resume({
-        println(1)
+      println(s"woot")
+      // Thread.ofVirtual().start(new Runnable{ override def run(): Unit = 
+        continuation.resume({
         1
-      })
+      })// })
+      
     }
     
   println(Blocking(twoArgumentsTwoContinuations(1, 2)))
