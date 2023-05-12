@@ -20,48 +20,53 @@ extension (td: TypeDef)
         $continuationName.sliceToTermName(0, $continuationName.size),
         Flags.Local,
         td.tpe
-      ).entered.asTerm, {
-        val completionParam = ref(
+      ).entered.asTerm,
+      Match(
+        ref(
           owner
             .paramSymss
             .flatten
             .iterator
-            .findSymbol(_.info.hasClassSymbol(requiredClass(continuationFullName))))
-        If(
-          completionParam
-            .select(nme.isInstanceOf_)
-            .appliedToType(td.tpe)
-            .select(nme.ZAND)
-            .appliedTo(
-              completionParam
-                .select(nme.asInstanceOf_)
-                .appliedToType(td.tpe)
+            .findSymbol(_.info.hasClassSymbol(requiredClass(continuationFullName)))),
+        List(
+          {
+            val x$0 =
+              newSymbol(owner, nme.x_0, Flags.Case | Flags.CaseAccessor, td.tpe).entered.asTerm
+            CaseDef(
+              tpd.BindTyped(x$0, td.tpe),
+              ref(x$0)
                 .select($labelName.sliceToTermName(0, $labelName.size))
                 .select(defn.IntClass.requiredMethod(nme.AND, List(defn.IntType)))
                 .appliedTo(ref(requiredModuleRef("scala.Int").select(
                   minValueName.sliceToTermName(0, minValueName.size))))
                 .select(defn.IntClass.requiredMethod(nme.NE, List(defn.IntType)))
-                .appliedTo(Literal(Constant(0x0)))),
-          Block(
-            List(
-              Assign(
-                completionParam
-                  .select(nme.asInstanceOf_)
-                  .appliedToType(td.tpe)
-                  .select($labelName.sliceToTermName(0, $labelName.size)),
-                completionParam
-                  .select(nme.asInstanceOf_)
-                  .appliedToType(td.tpe)
-                  .select($labelName.sliceToTermName(0, $labelName.size))
-                  .select(defn.Int_-)
-                  .appliedTo(ref(requiredModuleRef("scala.Int").select(
-                    minValueName.sliceToTermName(0, minValueName.size))))
-              )),
-            completionParam
-          ),
-          New(td.tpe, List(completionParam))
+                .appliedTo(Literal(Constant(0x0))),
+              Block(
+                List(
+                  Assign(
+                    ref(x$0).select($labelName.sliceToTermName(0, $labelName.size)),
+                    ref(x$0)
+                      .select($labelName.sliceToTermName(0, $labelName.size))
+                      .select(defn.Int_-)
+                      .appliedTo(ref(requiredModuleRef("scala.Int").select(
+                        minValueName.sliceToTermName(0, minValueName.size))))
+                  )),
+                ref(x$0)
+              )
+            )
+          },
+            CaseDef(
+              Underscore(ctx.definitions.AnyType),
+              EmptyTree,
+                New(td.tpe, List(
+                  ref(
+                    owner
+                      .paramSymss
+                      .flatten
+                      .iterator
+                      .findSymbol(_.info.hasClassSymbol(requiredClass(continuationFullName)))))))
         )
-      }
+      )
     )
     fromTree.putAttachment(
       ContinuationValMatchValKey,

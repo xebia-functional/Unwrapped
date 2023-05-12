@@ -9,7 +9,12 @@ import continuations.Continuation
     val z = summon[Suspend].shift[Unit] { continuation =>
       continuation.resume(println(x + y))
     }
-    summon[Suspend].shift[Int] { continuation => continuation.resume(1) }
+    summon[Suspend].shift[Int] { continuation =>
+      continuation.resume({
+        println(1)
+        1
+      })
+    }
     
-  // println(Blocking(twoArgumentsTwoContinuations(1, 2)))
+  println(Blocking(twoArgumentsTwoContinuations(1, 2)))
 

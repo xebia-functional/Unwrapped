@@ -874,7 +874,7 @@ object DefDefTransforms extends TreesChecks:
                   } ++ List(
                     callToCheckResult, {
                       val labelSymbol = newSymbol(
-                        method.t.symbol,
+                        transformedMethodSymbol,
                         stateMachineLabel.sliceToTermName(0, stateMachineLabel.size),
                         Flags.Label,
                         unitType).entered.asTerm
@@ -940,7 +940,7 @@ object DefDefTransforms extends TreesChecks:
                         val stateMachineLabel =
                           s"$stateMachineLabelPrefix${labelIterator.next()}"
                         val labelSymbol = newSymbol(
-                          method.t.symbol,
+                          transformedMethodSymbol,
                           stateMachineLabel.sliceToTermName(0, stateMachineLabel.size),
                           Flags.Label,
                           unitType).entered.asTerm
@@ -1141,26 +1141,9 @@ object DefDefTransforms extends TreesChecks:
                                       )
                                       block
                                     }
-                                } yield blockWithAssignmentAndReturnFromLabel)
-                                  .orElse {
-                                    for {
-                                      method <- t.getAttachment(TransformedMethodKey)
-                                      JumpToLabelNumber(jumpToLabelNum) <- t.getAttachment(
-                                        JumpToLabelNumberKey)
-                                      jumpToLabelName =
-                                        s"$stateMachineLabelPrefix$jumpToLabelNum"
-                                      JumpLabels(jumpToLabels) <- method
-                                        .t
-                                        .getAttachment(JumpLabelsKey)
-                                      jumpToLabel <- jumpToLabels.find { l =>
-                                        l.name.show == jumpToLabelName
-                                      }
-                                    } yield tpd.Block(
-                                      List(ref(orThrowSym)),
-                                      tpd.Return(tpd.unitLiteral, jumpToLabel)
-                                    )
-                                  }
-                                  .getOrElse(ref(orThrowSym))
+                                } yield blockWithAssignmentAndReturnFromLabel).getOrElse(
+                                  ref(orThrowSym)
+                                )
                               )
                             }
                           )
@@ -1273,15 +1256,17 @@ object DefDefTransforms extends TreesChecks:
         .toList,
       newOwners = List(transformedMethodSymbol) ++ transformedMethodSymbol.ownersIterator.toList
     )(treeWithTransformedParams).asInstanceOf[tpd.DefDef]
-    val newSym:Symbol = transformedMethod.symbol.entered
+    val newSym: Symbol = transformedMethod.symbol.entered
     println(s"transformedMethod tree: ${transformedMethod}")
     println(s"frameClass tree: ${frameClass}")
     transformedMethod.foreachSubTree(st =>
       List(TransformedMethodKey, SuspensionPointValDefKey, JumpToLabelNumberKey, JumpLabelsKey)
         .foreach(st.removeAttachment(_)))
-    tpd.Thicket(List(frameClass, // TreeTypeMap(substTo = List(newSym), substFrom = List(transformedMethodSymbol), oldOwners = transformedMethodSymbol :: transformedMethodSymbol.ownersIterator.toList, newOwners = newSym :: newSym.ownersIterator.toList)(
-      transformedMethod// )
-    ))
+    tpd.Thicket(
+      List(
+        frameClass, // TreeTypeMap(substTo = List(newSym), substFrom = List(transformedMethodSymbol), oldOwners = transformedMethodSymbol :: transformedMethodSymbol.ownersIterator.toList, newOwners = newSym :: newSym.ownersIterator.toList)(
+        transformedMethod // )
+      ))
   }
 
 // val suspensionPointsVal: List[tpd.Tree] =
