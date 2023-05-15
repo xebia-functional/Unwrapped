@@ -16,7 +16,8 @@ abstract class BaseContinuationImpl(
     if completion == null then throw RuntimeException("resume called with no completion")
     else completion.executionContext
   final override def resume(result: Any | Null): Unit = resumeAux(Right(result))
-  final override def raise(error: Throwable): Unit = resumeAux(Left(error))
+  final override def raise(error: Throwable): Unit =
+    resumeAux(Left(error))
 
   private def resumeAux(result: Either[Throwable, Any | Null]): Unit = {
     var current = this
@@ -37,8 +38,12 @@ abstract class BaseContinuationImpl(
         case base: BaseContinuationImpl =>
           current = base
           param = outcome
+           println(s"base raise/resume")
+          outcome.fold(current.raise, current.resume)
+          return
         case _ =>
-          completion.resume(outcome)
+          println(s"completion raise/resume")
+          outcome.fold(completion.raise, completion.resume)
           return
   }
 

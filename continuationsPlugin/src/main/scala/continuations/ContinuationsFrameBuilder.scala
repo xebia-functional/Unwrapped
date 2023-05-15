@@ -75,7 +75,8 @@ extension (sym: Symbol)
         Flags.Synthetic,
         List(completionParamName.sliceToTermName(0, completionParamName.size)),
         List(requiredClassRef(continuationFullName).appliedTo(anyType.?))
-      ).entered.asTerm
+      ).entered.asTerm,
+
     )
     val $completionRef = ref(
       frameClassConstructor

@@ -29,7 +29,7 @@ class ContinuationsPlugin extends StandardPlugin:
   override val description: String = "CPS transformations"
 
   def init(options: List[String]): List[PluginPhase] =
-    (new ContinuationsPhase) :: new ContinuationsCallsPhase :: Nil
+    (new ContinuationsPhase) :: new ContinuationsCallsPhase :: new ContinuationsAfterPhase :: Nil
 
 class ContinuationsPhase extends PluginPhase:
 
@@ -129,6 +129,41 @@ object ContinuationsPhase:
     */
   case object ContinuationValMatchValKey extends Key[ContinuationValMatchVal] 
 
+  /**
+    * A dotty Property.Key[V] class used to attach the captured
+    * continuation parameter during the transformation of inlined
+    * suspend calls.
+    */
+  case object InlinedContinuationParameterKey extends Key[InlinedContinuationParameter]
+
+  /**
+    * An inlined Suspend#shift call's anonymous continuation parameter
+    * captured during a suspended transformation. Used to construct
+    * the SafeContinuation#resume and SafeContinuation#raise apply
+    * trees that hook the suspension into the passed frame and the
+    * frame's delegation to allow for interception, transformation,
+    * and resumption of the continuation.
+    *
+    * @param vd The valdef containing the captured continuation
+    * parameter.
+    */
+  case class InlinedContinuationParameter(vd: tpd.ValDef)
+
+
+  /**
+    * A safe continuation val that can be used to call the completion
+    * in an inlined shift call.
+    *
+    * @param kd The suspension val def
+    */
+  case class SafeContinuationVal(kd: tpd.ValDef)
+
+  /**
+    * The attatchment key used to attatch the safe continuation to the
+    * subtrees of an inlined call.
+    */
+  case object SafeContinuationValKey extends Key[SafeContinuationVal]
+
 end ContinuationsPhase
 
 /**
@@ -143,7 +178,7 @@ class ContinuationsCallsPhase extends PluginPhase:
   override def phaseName: String = ContinuationsCallsPhase.name
 
   override val runsAfter = Set(ContinuationsPhase.name)
-  override val runsBefore = Set(PickleQuotes.name)
+  // override val runsBefore = Set(PickleQuotes.name)
 
   private val updatedMethods: mutable.ListBuffer[Symbol] = mutable.ListBuffer.empty
   private val applyToChange: mutable.ListBuffer[Tree] = ListBuffer.empty
@@ -273,3 +308,37 @@ object ContinuationsCallsPhase:
    * closest caller to a suspended definition.
    */
   case object CallerKey extends Key[Caller]
+
+
+class ContinuationsAfterPhase extends PluginPhase:
+
+  override def phaseName: String = ContinuationsAfterPhase.name
+
+  override val runsAfter = Set(ContinuationsCallsPhase.name)
+
+  override val runsBefore = Set(PickleQuotes.name)
+
+  override def prepareForSelect(tree: tpd.Select)(using Context): Context =
+    if(tree.qualifier.symbol.name.show == "safeContinuation"){
+      println(s"tree.symbol.ownersIterator.exists: ${tree.qualifier.symbol.ownersIterator.toList.map(_.exists)} ${tree.qualifier.symbol.ownersIterator.toList.map(_.show)}")
+      val twoArgumentsTwoContinuations = tree.qualifier.symbol.ownersIterator.find(_.name.show == "twoArgumentsTwoContinuations")
+      println(s"twoArgumentsTwoContinuations type: ${twoArgumentsTwoContinuations.get.info.show}")
+      println(s"twoArgumentsTwoContinuations type: ${twoArgumentsTwoContinuations.get.denot.exists}")
+    }
+    
+    summon[Context]
+
+  // override def prepareForApply(tree: tpd.Apply)(using Context): Context =
+  //   if(tree.fun.symbol.name.show == resumeMethodName && tree.fun
+  //             .symbol
+  //             .owner
+  //             .info
+  //             .hasClassSymbol(requiredClass(safeContinuationClassName))){
+  //     println(s"After continuations ${tree.symbol.show} tree.symbol.ownersIterator.toList.map(_.exists) ${tree.symbol.ownersIterator.toList.map(_.exists)} ${tree.symbol.ownersIterator.toList.map(_.show)}")
+    // summon[Context]
+    
+end ContinuationsAfterPhase
+
+object ContinuationsAfterPhase:
+    val name: String = "continuationsAfterPhase"
+end ContinuationsAfterPhase

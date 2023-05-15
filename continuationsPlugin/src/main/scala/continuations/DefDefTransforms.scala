@@ -44,6 +44,10 @@ import continuations.ContinuationsPhase.JumpLabels
 import continuations.ContinuationsPhase.ContinuationValMatchValKey
 import continuations.ContinuationsPhase.ContinuationValMatchVal
 import dotty.tools.dotc.core.Types.TermRef
+import continuations.ContinuationsPhase.InlinedContinuationParameterKey
+import continuations.ContinuationsPhase.InlinedContinuationParameter
+import continuations.ContinuationsPhase.SafeContinuationValKey
+import continuations.ContinuationsPhase.SafeContinuationVal
 
 object DefDefTransforms extends TreesChecks:
 
@@ -998,246 +1002,290 @@ object DefDefTransforms extends TreesChecks:
                   .symbol
                   .isAnonymousFunction)
             transformedMethod <- t.getAttachment(TransformedMethodKey)
+            inlinedContinuationParameter <- dd
+              .termParamss
+              .flatten
+              .find(_.symbol.info.hasClassSymbol(requiredClass(continuationFullName)))
             ContinuationValMatchVal(continuationVal) <- transformedMethod
               .t
               .getAttachment(ContinuationValMatchValKey)
-            transformedInlined:List[tpd.Tree] = dd
-              .rhs
-              .toList
-              .flatMap {
-                case tpd.Block(statements, expr) =>
-                  statements :: expr :: Nil
-                case ddRhs => List(ddRhs)
-              }
-              .flatMap {
-                case a @ tpd.Apply(fn, aargs) if fn.symbol.name.show == resumeMethodName =>
-                  dd.paramss
-                    .flatten
-                    .find(_.symbol.info.hasClassSymbol(requiredClass(continuationFullName)))
-                    .flatMap { continuationParamDD =>
-                      continuationParamDD.symbol.info match {
-                        case AppliedType(_, args) =>
-                          args.headOption
-                        case tpee => None
-                      }
-                    }
-                    .flatMap { continuationType =>
-                      val safeContinuation = tpd.ValDef(
-                        newSymbol(
-                          transformedMethod.t.symbol,
-                          safeContinuationName.sliceToTermName(0, safeContinuationName.size),
-                          Flags.Local,
-                          requiredClassRef(safeContinuationClassName).appliedTo(
-                            continuationType)
-                        ).entered.asTerm,
-                        ref(requiredClass(safeContinuationClassName)
-                          .companionClass
-                          .requiredMethod(initMethodName))
-                          .appliedToType(continuationType)
-                          .appliedTo(ref(continuationVal.symbol))
-                      )
-                      Option(List(
-                        safeContinuation,
-                        ref(safeContinuation.symbol)
-                          .select(resumeMethodName.sliceToTermName(0, resumeMethodName.size))
-                          .appliedToArgs(TreeTypeMap(treeMap = {
-                            case tpd.Ident(tp)
-                                if reservedVariables.exists(
-                                  _.symbol.name.show.startsWith(tp.show + "##")) =>
-                              ref(reservedVariables
-                                .find(_.symbol.name.show.startsWith(tp.show + "##"))
-                                .get
-                                .symbol)
-                            case t => t
-                          }).transform(aargs.asInstanceOf[List[tpd.Tree]])),
-                        tpd.Match(
-                          ref(safeContinuation.symbol)
-                            .select(getOrThrowMethodName
-                              .sliceToTermName(0, getOrThrowMethodName.size))
-                            .appliedToNone,
-                          List(
-                            tpd.CaseDef(
-                              ref(requiredClass(continuationFullName).companionModule)
-                                .select(stateName.sliceToTermName(0, stateName.size))
-                                .select(suspendedName.sliceToTermName(0, suspendedName.size)),
-                              tpd.EmptyTree,
-                              tpd.Return(
-                                ref(requiredClass(continuationFullName).companionModule)
-                                  .select(stateName.sliceToTermName(0, stateName.size))
-                                  .select(suspendedName.sliceToTermName(0, suspendedName.size)),
-                                transformedMethod.t.symbol
-                              )
-                            ), {
-                              val orThrowSym: TermSymbol =
-                                newSymbol(
-                                  transformedMethod.t.symbol,
-                                  orThrowName.sliceToTermName(0, orThrowName.size),
-                                  Flags.Case | Flags.CaseAccessor,
-                                  continuationType).entered.asTerm
-                              tpd.CaseDef(
-                                tpd.Bind(orThrowSym, tpd.EmptyTree),
-                                tpd.EmptyTree,
-                                (for {
-                                  attachment <- t.getAttachment(SuspensionPointValDefKey)
-                                  suffixRegex = """(#{2}\d+)""".r
-                                  maybeReservedVar = reservedVariables.find { rvt =>
-                                    val rvtName = rvt.symbol.name.show
-                                    suffixRegex.replaceAllIn(rvtName, "") == attachment
-                                      .t
-                                      .symbol
-                                      .name
-                                      .show
-                                  }
-                                  maybeContinuationFrameInputNumber = maybeReservedVar
-                                    .flatMap { reservedVar =>
-                                      suffixRegex
-                                        .findFirstIn(reservedVar.symbol.name.show)
-                                        .map(_.replaceAllLiterally("##", "").toInt - 1)
-                                    }
-                                  mabyContinuationFrameInputName =
-                                    maybeContinuationFrameInputNumber.map {
-                                      continuationFrameInputNumber =>
-                                        s"I$$$continuationFrameInputNumber"
-                                    }
-                                  method <- t.getAttachment(TransformedMethodKey)
-                                  JumpToLabelNumber(jumpToLabelNum) <- t.getAttachment(
-                                    JumpToLabelNumberKey)
-                                  jumpToLabelName = s"$stateMachineLabelPrefix$jumpToLabelNum"
-                                  JumpLabels(jumpToLabels) <- method
-                                    .t
-                                    .getAttachment(JumpLabelsKey)
-                                  jumpToLabel <- jumpToLabels.find { l =>
-                                    l.name.show == jumpToLabelName
-                                  }
-                                  matchRefVal <- method
-                                    .t
-                                    .getAttachment(ContinuationValMatchValKey)
-                                    .map(_.vd.symbol)
-                                  blockWithAssignmentAndReturnFromLabel = maybeReservedVar
-                                    .flatMap { reservedVar =>
-                                      mabyContinuationFrameInputName.map {
-                                        continuationFrameInputName =>
-                                          tpd.Block(
-                                            List(
-                                              tpd.Assign(
-                                                ref(matchRefVal).select(
-                                                  continuationFrameInputName.sliceToTermName(
-                                                    0,
-                                                    continuationFrameInputName.size)),
-                                                ref(orThrowSym)),
-                                              tpd.Assign(
-                                                ref(reservedVar.symbol),
-                                                ref(orThrowSym))
-                                            ), {
-                                              tpd.Return(tpd.unitLiteral, jumpToLabel)
-                                            }
-                                          )
-                                      }
-                                    }
-                                    .getOrElse {
-                                      val block = tpd.Block(
-                                        List(ref(orThrowSym)),
-                                        tpd.Return(tpd.unitLiteral, jumpToLabel)
-                                      )
-                                      block
-                                    }
-                                } yield blockWithAssignmentAndReturnFromLabel).getOrElse(
-                                  ref(orThrowSym)
-                                )
+            suspensionPointValDef = t.getAttachment(SuspensionPointValDefKey)
+
+            jumpLabelNum = t.getAttachment(JumpToLabelNumberKey)
+            AppliedType(_, args) = inlinedContinuationParameter.symbol.info
+            continuationType <- args.headOption
+            safeContinuation = tpd.ValDef(
+              newSymbol(
+                transformedMethodSymbol,
+                safeContinuationName.sliceToTermName(0, safeContinuationName.size),
+                Flags.Local,
+                requiredClassRef(safeContinuationClassName).appliedTo(continuationType)
+              ).entered.asTerm,
+              ref(
+                requiredClass(safeContinuationClassName)
+                  .companionClass
+                  .requiredMethod(initMethodName))
+                .appliedToType(continuationType)
+                .appliedTo(ref(continuationVal.symbol))
+            )
+            _ = dd.rhs.foreachSubTree { ddst =>
+              ddst.putAttachment(TransformedMethodKey, TransformedMethod(transformedMethod.t))
+              ddst.putAttachment(
+                ContinuationValMatchValKey,
+                ContinuationValMatchVal(continuationVal))
+              ddst.putAttachment(
+                InlinedContinuationParameterKey,
+                InlinedContinuationParameter(inlinedContinuationParameter))
+              ddst.putAttachment(SafeContinuationValKey, SafeContinuationVal(safeContinuation))
+              jumpLabelNum.foreach(i => ddst.putAttachment(JumpToLabelNumberKey, i))
+              suspensionPointValDef.foreach(s =>
+                ddst.putAttachment(SuspensionPointValDefKey, s))
+            }
+          } yield tpd.Block(List(safeContinuation), dd.rhs)).getOrElse(tpd.EmptyTree)
+        case a @ tpd.Apply(fn, aargs)
+            if fn.symbol.name.show == resumeMethodName && !fn
+              .symbol
+              .owner
+              .info
+              .hasClassSymbol(requiredClass(safeContinuationClassName)) =>
+          (for {
+            InlinedContinuationParameter(continuationParam) <- a.getAttachment(
+              InlinedContinuationParameterKey)
+            TransformedMethod(method) <- a.getAttachment(TransformedMethodKey)
+            ContinuationValMatchVal(continuationVal) <- a.getAttachment(
+              ContinuationValMatchValKey)
+            SafeContinuationVal(safeContinuation) <- a.getAttachment(SafeContinuationValKey)
+            AppliedType(_, args) = continuationParam.symbol.info
+            continuationType <- args.headOption
+          } yield {
+            tpd.Block(
+              List(
+                ref(safeContinuation.symbol)
+                  .select(resumeMethodName.sliceToTermName(0, resumeMethodName.size))
+                  .appliedToArgs(TreeTypeMap(treeMap = {
+                    case tpd.Ident(tp)
+                        if reservedVariables.exists(
+                          _.symbol.name.show.startsWith(tp.show + "##")) =>
+                      ref(
+                        reservedVariables
+                          .find(_.symbol.name.show.startsWith(tp.show + "##"))
+                          .get
+                          .symbol)
+                    case t => t
+                  }).transform(aargs.asInstanceOf[List[tpd.Tree]]))
+              ),
+              tpd.Match(
+                ref(safeContinuation.symbol)
+                  .select(getOrThrowMethodName.sliceToTermName(0, getOrThrowMethodName.size))
+                  .appliedToNone,
+                List(
+                  tpd.CaseDef(
+                    ref(requiredClass(continuationFullName).companionModule)
+                      .select(stateName.sliceToTermName(0, stateName.size))
+                      .select(suspendedName.sliceToTermName(0, suspendedName.size)),
+                    tpd.EmptyTree,
+                    tpd.Return(
+                      ref(requiredClass(continuationFullName).companionModule)
+                        .select(stateName.sliceToTermName(0, stateName.size))
+                        .select(suspendedName.sliceToTermName(0, suspendedName.size)),
+                      method.symbol
+                    )
+                  ), {
+                    val orThrowSym: TermSymbol =
+                      newSymbol(
+                        transformedMethodSymbol,
+                        orThrowName.sliceToTermName(0, orThrowName.size),
+                        Flags.Case | Flags.CaseAccessor,
+                        continuationType).entered.asTerm
+                    tpd.CaseDef(
+                      tpd.Bind(orThrowSym, tpd.EmptyTree),
+                      tpd.EmptyTree,
+                      (for {
+                        attachment <- a.getAttachment(SuspensionPointValDefKey)
+                        suffixRegex = """(#{2}\d+)""".r
+                        maybeReservedVar = reservedVariables.find { rvt =>
+                          val rvtName = rvt.symbol.name.show
+                          suffixRegex.replaceAllIn(rvtName, "") == attachment.t.symbol.name.show
+                        }
+                        maybeContinuationFrameInputNumber = maybeReservedVar
+                          .flatMap { reservedVar =>
+                            suffixRegex
+                              .findFirstIn(reservedVar.symbol.name.show)
+                              .map(_.replaceAllLiterally("##", "").toInt - 1)
+                          }
+                        mabyContinuationFrameInputName =
+                          maybeContinuationFrameInputNumber.map {
+                            continuationFrameInputNumber => s"I$$$continuationFrameInputNumber"
+                          }
+                        JumpToLabelNumber(jumpToLabelNum) <- a.getAttachment(
+                          JumpToLabelNumberKey)
+                        jumpToLabelName = s"$stateMachineLabelPrefix$jumpToLabelNum"
+                        JumpLabels(jumpToLabels) <- method.getAttachment(JumpLabelsKey)
+                        jumpToLabel <- jumpToLabels.find { l => l.name.show == jumpToLabelName }
+                        matchRefVal = continuationVal.symbol
+                        blockWithAssignmentAndReturnFromLabel = maybeReservedVar
+                          .flatMap { reservedVar =>
+                            mabyContinuationFrameInputName.map { continuationFrameInputName =>
+                              tpd.Block(
+                                List(
+                                  tpd.Assign(
+                                    ref(matchRefVal).select(continuationFrameInputName
+                                      .sliceToTermName(0, continuationFrameInputName.size)),
+                                    ref(orThrowSym)),
+                                  tpd.Assign(ref(reservedVar.symbol), ref(orThrowSym))
+                                ), {
+                                  tpd.Return(tpd.unitLiteral, jumpToLabel)
+                                }
                               )
                             }
-                          )
-                        )
-                      ))
-                    }
-                    .toList
-                    .flatten
-                case a @ tpd.Apply(fn, aargs) if fn.symbol.name.show == raiseMethodName =>
-                  dd.paramss
-                    .flatten
-                    .find(_.symbol.info.hasClassSymbol(requiredClass(continuationFullName)))
-                    .flatMap { continuationParamDD =>
-                      continuationParamDD.symbol.info match {
-                        case AppliedType(_, args) =>
-                          args.headOption
-                        case tpee => None
-                      }
-                    }
-                    .flatMap { continuationType =>
-                      val safeContinuation = tpd.ValDef(
-                        newSymbol(
-                          transformedMethod.t.symbol,
-                          safeContinuationName.sliceToTermName(0, safeContinuationName.size),
-                          Flags.Local,
-                          requiredClassRef(safeContinuationClassName).appliedTo(
-                            continuationType)
-                        ).entered.asTerm,
-                        ref(requiredClass(safeContinuationClassName)
-                          .companionClass
-                          .requiredMethod(initMethodName))
-                          .appliedToType(continuationType)
-                          .appliedTo(ref(continuationVal.symbol))
+                          }
+                          .getOrElse {
+                            val block = tpd.Block(
+                              List(ref(orThrowSym)),
+                              tpd.Return(tpd.unitLiteral, jumpToLabel)
+                            )
+                            block
+                          }
+                      } yield blockWithAssignmentAndReturnFromLabel).getOrElse(
+                        ref(orThrowSym)
                       )
-                      Option(List(
-                        safeContinuation,
-                        ref(safeContinuation.symbol)
-                          .select(raiseMethodName.sliceToTermName(0, raiseMethodName.size))
-                          .appliedToArgs(aargs.asInstanceOf[List[tpd.Tree]]), {
-                          val orThrowSym: TermSymbol =
-                            newSymbol(
-                              transformedMethod.t.symbol,
-                              orThrowName.sliceToTermName(0, orThrowName.size),
-                              Flags.Case | Flags.CaseAccessor,
-                              continuationType).entered.asTerm
-                          tpd.CaseDef(
-                            tpd.Bind(orThrowSym, tpd.EmptyTree),
-                            tpd.EmptyTree,
-                            (for {
-                              attachment <- t.getAttachment(SuspensionPointValDefKey)
-                              suffixRegex = """(#{2}\d+)""".r
-                              reservedVar <- reservedVariables.find { rvt =>
-                                val rvtName = rvt.symbol.name.show
-                                suffixRegex
-                                  .replaceAllIn(rvtName, "") == attachment.t.symbol.name.show
-                              }
-                              continuationFrameInputNumber <- suffixRegex
-                                .findFirstIn(reservedVar.symbol.name.show)
-                                .map(_.replaceAllLiterally("##", "").toInt - 1)
-                              continuationFrameInputName = s"I$$$continuationFrameInputNumber"
-                              method <- t.getAttachment(TransformedMethodKey)
-                              jumpToLabelNum <- t.getAttachment(JumpToLabelNumberKey)
-                              jumpToLabelName = s"$stateMachineLabelPrefix$jumpToLabelNum"
-                              JumpLabels(jumpToLabels) <- method.t.getAttachment(JumpLabelsKey)
-                              jumpToLabel <- jumpToLabels.find(_.name.show == jumpToLabelName)
-                              matchRefVal <- method
-                                .t
-                                .filterSubTrees {
-                                  case vd: tpd.ValDef if vd.name.show == $continuationName =>
-                                    true
-                                  case t =>
-                                    false
-                                }
-                                .headOption
-                                .map(_.symbol)
-                            } yield tpd.Block(
+                    )
+                  }
+                )
+              )
+            )
+          }).getOrElse(tpd.EmptyTree)
+        case a @ tpd.Apply(fn, aargs)
+            if fn.symbol.name.show == raiseMethodName && !fn
+              .symbol
+              .owner
+              .info
+              .hasClassSymbol(requiredClass(safeContinuationClassName)) =>
+          (for {
+            InlinedContinuationParameter(continuationParam) <- a.getAttachment(
+              InlinedContinuationParameterKey)
+            TransformedMethod(method) <- a.getAttachment(TransformedMethodKey)
+            ContinuationValMatchVal(continuationVal) <- a.getAttachment(
+              ContinuationValMatchValKey)
+            SafeContinuationVal(safeContinuation) <- a.getAttachment(SafeContinuationValKey)
+            AppliedType(_, args) = continuationParam.symbol.info
+            continuationType <- args.headOption
+          } yield tpd.Block(
+            List(
+              ref(safeContinuation.symbol)
+                .select(raiseMethodName.sliceToTermName(0, raiseMethodName.size))
+                .appliedToArgs(TreeTypeMap(treeMap = {
+                  case tpd.Ident(tp)
+                      if reservedVariables.exists(
+                        _.symbol.name.show.startsWith(tp.show + "##")) =>
+                    ref(
+                      reservedVariables
+                        .find(_.symbol.name.show.startsWith(tp.show + "##"))
+                        .get
+                        .symbol)
+                  case t => t
+                }).transform(aargs.asInstanceOf[List[tpd.Tree]]))
+            ),
+            tpd.Match(
+              ref(safeContinuation.symbol)
+                .select(getOrThrowMethodName.sliceToTermName(0, getOrThrowMethodName.size))
+                .appliedToNone,
+              List(
+                tpd.CaseDef(
+                  ref(requiredClass(continuationFullName).companionModule)
+                    .select(stateName.sliceToTermName(0, stateName.size))
+                    .select(suspendedName.sliceToTermName(0, suspendedName.size)),
+                  tpd.EmptyTree,
+                  tpd.Return(
+                    ref(requiredClass(continuationFullName).companionModule)
+                      .select(stateName.sliceToTermName(0, stateName.size))
+                      .select(suspendedName.sliceToTermName(0, suspendedName.size)),
+                    method.symbol
+                  )
+                ), {
+                  val orThrowSym: TermSymbol =
+                    newSymbol(
+                      transformedMethodSymbol,
+                      orThrowName.sliceToTermName(0, orThrowName.size),
+                      Flags.Case | Flags.CaseAccessor,
+                      continuationType).entered.asTerm
+                  tpd.CaseDef(
+                    tpd.Bind(orThrowSym, tpd.EmptyTree),
+                    tpd.EmptyTree,
+                    (for {
+                      attachment <- a.getAttachment(SuspensionPointValDefKey)
+                      suffixRegex = """(#{2}\d+)""".r
+                      maybeReservedVar = reservedVariables.find { rvt =>
+                        val rvtName = rvt.symbol.name.show
+                        suffixRegex.replaceAllIn(rvtName, "") == attachment.t.symbol.name.show
+                      }
+                      maybeContinuationFrameInputNumber = maybeReservedVar
+                        .flatMap { reservedVar =>
+                          suffixRegex
+                            .findFirstIn(reservedVar.symbol.name.show)
+                            .map(_.replaceAllLiterally("##", "").toInt - 1)
+                        }
+                      mabyContinuationFrameInputName =
+                        maybeContinuationFrameInputNumber.map { continuationFrameInputNumber =>
+                          s"I$$$continuationFrameInputNumber"
+                        }
+                      JumpToLabelNumber(jumpToLabelNum) <- a.getAttachment(JumpToLabelNumberKey)
+                      jumpToLabelName = s"$stateMachineLabelPrefix$jumpToLabelNum"
+                      JumpLabels(jumpToLabels) <- method.getAttachment(JumpLabelsKey)
+                      jumpToLabel <- jumpToLabels.find { l => l.name.show == jumpToLabelName }
+                      matchRefVal = continuationVal.symbol
+                      blockWithAssignmentAndReturnFromLabel = maybeReservedVar
+                        .flatMap { reservedVar =>
+                          mabyContinuationFrameInputName.map { continuationFrameInputName =>
+                            tpd.Block(
                               List(
                                 tpd.Assign(
                                   ref(matchRefVal).select(continuationFrameInputName
                                     .sliceToTermName(0, continuationFrameInputName.size)),
                                   ref(orThrowSym)),
                                 tpd.Assign(ref(reservedVar.symbol), ref(orThrowSym))
-                              ),
-                              tpd.Return(tpd.unitLiteral, jumpToLabel)
-                            )).getOrElse(ref(orThrowSym))
-                          )
+                              ), {
+                                tpd.Return(tpd.unitLiteral, jumpToLabel)
+                              }
+                            )
+                          }
                         }
-                      ))
-                    }
-                    .toList
-                    .flatten
-                case ddrhs:List[tpd.Tree] => ddrhs
-              }
-          } yield blockOf(transformedInlined)).getOrElse(tpd.EmptyTree)
+                        .getOrElse {
+                          val block = tpd.Block(
+                            List(
+                              ref(orThrowSym)
+                            ),
+                            tpd.Return(tpd.unitLiteral, jumpToLabel)
+                          )
+                          block
+                        }
+                    } yield blockWithAssignmentAndReturnFromLabel).getOrElse(
+                      (for {
+                        JumpToLabelNumber(jumpToLabelNum) <- a.getAttachment(
+                          JumpToLabelNumberKey)
+                        jumpToLabelName = s"$stateMachineLabelPrefix$jumpToLabelNum"
+                        JumpLabels(jumpToLabels) <- method.getAttachment(JumpLabelsKey)
+                        jumpToLabel <- jumpToLabels.find { l => l.name.show == jumpToLabelName }
+                      } yield tpd.Return(tpd.unitLiteral, jumpToLabel))
+                        .map(ret =>
+                          tpd.Block(
+                            List(
+                              ref(orThrowSym)
+                            ),
+                            ret
+                          ))
+                        .getOrElse(
+                          tpd.Block(
+                            List(
+                            ),
+                            ref(orThrowSym)
+                          ))
+                    )
+                  )
+                }
+              )
+            )
+          )).getOrElse(tpd.EmptyTree)
         case t =>
           t
       },
@@ -1249,9 +1297,6 @@ object DefDefTransforms extends TreesChecks:
         .toList,
       newOwners = List(transformedMethodSymbol) ++ transformedMethodSymbol.ownersIterator.toList
     )(treeWithTransformedParams).asInstanceOf[tpd.DefDef]
-    val newSym: Symbol = transformedMethod.symbol.entered
-    println(s"transformedMethod tree: ${transformedMethod}")
-    println(s"frameClass tree: ${frameClass}")
     transformedMethod.foreachSubTree(st =>
       List(TransformedMethodKey, SuspensionPointValDefKey, JumpToLabelNumberKey, JumpLabelsKey)
         .foreach(st.removeAttachment(_)))

@@ -38,7 +38,8 @@ class SafeContinuation[T] private (
       val cur = this.result
       if (cur == Continuation.State.Undecided) {
         if (CAS_RESULT(Continuation.State.Undecided, error))
-          return ()
+          errored = true
+          return delegate.raise(error)
       } else if (cur == Continuation.State.Suspended) {
         if (CAS_RESULT(Continuation.State.Suspended, Continuation.State.Resumed)) {
           errored = true
