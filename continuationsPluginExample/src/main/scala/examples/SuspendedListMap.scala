@@ -10,6 +10,6 @@ import continuations.Suspend
     }
   def suspendIncrement(x: Int): Suspend ?=> Int =
     val z = 1
-    summon[Suspend].suspendContinuation[Int](_.resume(Right(x + z)))
+    summon[Suspend].shift[Int](_.resume(x + z))
   val mappedContinuations = suspendMap(List(1, 2, 3, 4), suspendIncrement)
   println(mappedContinuations)

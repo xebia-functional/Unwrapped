@@ -8,37 +8,16 @@ import scala.annotation.tailrec
   * indicate whether it really needs to suspend or not. 
   */
 sealed trait Colour
-sealed trait Red extends Colour
-sealed trait Green extends Red // green is stronger than red: 
+type Green = Colour
+sealed trait Red extends Green
 
-trait Suspend[- L <: Colour] // suspend: we want Suspend[Red] to substitute for a Suspend[Green]
+// green is stronger than red: green
+
+trait Suspend[+ L <: Colour] // suspend: we want Suspend[Red] to substitute for a Suspend[Green]
 
 implicit def greenWash[A, B](f: A => B): (A => Suspend[Green] => B) = ???
 
 extension [A](list: List[A]) {
-  def greenMap[B](f: A => B): List[B] =
-    val buf = ListBuffer.empty[B]
-    @tailrec
-    def go(ys: List[A]): Unit = ys match {
-      case Nil => ()
-      case y :: ys =>
-        buf += f(y)
-        go(ys)
-    }
-    go(list)
-    buf.toList
-
-  def redMap[B](f: A => Suspend[Red] ?=> B)(using Suspend[Red]): List[B] =
-    val buf = ListBuffer.empty[B]
-    @tailrec
-    def go(ys: List[A]): Unit = ys match {
-      case Nil => ()
-      case y :: ys =>
-        buf += f(y)
-        go(ys)
-    }
-    go(list)
-    buf.toList
 
   def mapC[B, C <: Colour](f: A => Suspend[C] ?=> B)(using Suspend[C]): List[B] = {
     val buf = ListBuffer.empty[B]
@@ -97,55 +76,8 @@ def kilisSQ(using Suspend[Red]) = sudoku.mapSq(kili)
 def composeC[X, Y, Z, C <: Colour, D <: Colour](
   pre: X => Suspend[C] ?=> Y,
   post: Y => Suspend[D] ?=> Z):
-    X => Suspend[C | D] ?=> Z =
+    X => Suspend[C & D] ?=> Z =
   (x: X) => post(pre(x))
-
-
-// 
-
-// composeC Red Lane:
-
-class composeCRedLaneFSM {
-
-  // state machine
-
-  def invoke(
-    pre: (X, Y => K) => K,
-    post: (Y, (Z => K)) => K,
-    x: X,
-    k: Z => K
-  ): Suspended | Either[Throwable, Any] =
-    pre(x, (y => post(y, k)))
-    
-}
-// 
-//  |invoke(pre, post, x, k)|
-//  |pre(x, (\ y -> post(y, k))) |
-//  ----------
-//  |(\ y -> post(y, k)) @ yy |
-//  |post(yy, k) |
-//  ----------
-//  |k(z)|
-//
-
-
-//
-// |ComposeC 0| -----> pre(x, comp)
-// |ComposeC 1 (y)|
-// |ComposeC 2| -----> post(y, comp)
-// |ComposeC 3 (z)|
-// z
-
-// Red ComposeC:
-   
-def composeC_Red[X, Y, Z](
-  pre: (X, Comp) => Y | Stop,
-  post: (Y, Comp) => Z | Stop,
-  k: Comp,
-  x: X
-): Z | Stop =
-  val y = await(pre(x, k), k)
-  post(y, k)
 
 
 
@@ -165,7 +97,7 @@ def compose3C[W, X, Y, Z, C <: Colour, D <: Colour, E <: Colour](
   pre: W => Suspend[C] ?=> X,
   mid: X => Suspend[D] ?=> Y,
   pos: Y => Suspend[E] ?=> Z
-): W => Suspend[C | D | E] ?=> Z =
+): W => Suspend[C & D & E] ?=> Z =
   composeC(composeC(pre, mid), pos)
 
 // Full red lane: all three are suspended
@@ -189,24 +121,15 @@ def oridorinori(i: Int)(using Suspend[Red]): Int = compose3C(ori, dori, nori)(i)
 def orioriori(i: Int)(using Suspend[Green]): Int = compose3C(ori, ori, ori)(i)
 
 // two variants: green, red
-def orioriNext[E <: Colour]
-  (next: Int => Suspend[E] ?=> Int)
-  (i: Int)
-  (using Suspend[E])
-    : Int =
-  compose3C(ori, ori, next)
+def orioriNext[E <: Colour](next: Int => Suspend[E] ?=> Int)(i: Int)(using Suspend[E]): Int =
+  compose3C(ori, ori, next)(i)
 
 // Red / Green variants: 
-
-def orioriNextGreen(next: Int => Int)(i: Int): Int =
-  compose3C_Green(ori, ori, next)
+def orioriNextGreen(next: Int => Suspend[Green] ?=> Int)(i: Int)(using Suspend[Green]): Int =
+  orioriNext(next)(i)
 
 def orioriNextRed(next: Int => Suspend[Red] ?=> Int)(i: Int)(using Suspend[Red]): Int =
-  compose3C_Red( redrun(ori), redrun(ori), next)
-
-
-
-
+  orioriNext(next)(i)
 
 /** Potentially we can also build point-free declarations.
   * 
@@ -238,7 +161,7 @@ def valentine[C <: Colour, D <: Colour, E <: Colour](plants: List[Int])(
   select: Int => Suspend[C] ?=> Boolean,
   roses: Int => Suspend[D] ?=> Char)(
   violets: Int => Suspend[E] ?=> Char)(
-  using Suspend[C | D | E]
+  using Suspend[C & D & E]
 ): List[Char] =
   plants.map( (p: Int) => if (select(p)) roses(p) else violets(p))
 
@@ -292,6 +215,13 @@ extension [A] (list: List[A])
       case Nil => ()
     }
 
-
 def invokeAll(actions: List[Unit => Suspend[Red] ?=> Unit])(using Suspend[Red]) =
   actions.foreach(_.apply(()))
+
+
+def gcd(
+  a: Int, b: Int,
+  isZero: Int => Suspend[Red] ?=> Boolean,
+  mod: (Int, Int) => Suspend[Red] ?=> Int,
+)(using Suspend[Red]): Int =
+  if isZero(b) then a else gcd(b, mod(a, b), isZero, mod) + 1
