@@ -80,7 +80,6 @@ def composeC[X, Y, Z, C <: Colour, D <: Colour](
   (x: X) => post(pre(x))
 
 
-
 // Delimit ---> fooo --> ComposeC(comp) ---> pre(comp)  //
 //
 // PreFSM (completion, local variables/parameters of source pre, state Label) ----> SafeContinuation(preFSM)
