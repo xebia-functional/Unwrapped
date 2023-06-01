@@ -5,11 +5,7 @@ ThisBuild / scalaVersion := "3.1.2"
 ThisBuild / organization := "com.47deg"
 ThisBuild / versionScheme := Some("early-semver")
 
-addCommandAlias(
-  "plugin-example",
-  "reload; clean; publishLocal; continuationsPluginExample/compile")
 addCommandAlias("ci-test", "scalafmtCheckAll; scalafmtSbtCheck; github; mdoc; root / test")
-addCommandAlias("ci-it-test", "continuationsPlugin / IntegrationTest / test")
 addCommandAlias("ci-docs", "github; mdoc")
 addCommandAlias("ci-publish", "github; ci-release")
 
@@ -18,65 +14,16 @@ lazy val root =
     .settings(publish / skip := true)
     .aggregate(
       benchmarks,
-      continuationsPlugin,
       documentation,
       `http-unwrapped`,
       `java-net-multipart-body-publisher`,
       `munit-unwrapped`,
       `unwrapped`,
       `scalike-jdbc-unwrapped`,
-      `sttp-unwrapped`,
-      `munit-snap`
+      `sttp-unwrapped`
     )
 
-lazy val bypassZinc = (project in file("./bypassZinc"))
-  .settings(publish / skip := true)
-  .aggregate(
-    continuationsPluginExample,
-    `zero-arguments-no-continuation-treeview`,
-    `zero-arguments-one-continuation-code-before-used-after`,
-    `list-map`,
-    `two-arguments-two-continuations`
-  )
-
 lazy val `unwrapped` = project.settings(unwrappedSettings: _*)
-
-lazy val continuationsPlugin = project
-  .configs(IntegrationTest)
-  .settings(
-    continuationsPluginSettings: _*
-  )
-  .dependsOn(`munit-snap`)
-
-lazy val continuationsPluginExample = project
-  .dependsOn(continuationsPlugin)
-  .settings(
-    continuationsPluginExampleSettings: _*
-  )
-  .enablePlugins(ForceableCompilationPlugin)
-
-lazy val `zero-arguments-no-continuation-treeview` =
-  (project in file("./zero-arguments-no-continuation-treeview"))
-    .settings(continuationsPluginExampleShowTreeSettings: _*)
-    .dependsOn(continuationsPlugin)
-    .enablePlugins(ForceableCompilationPlugin)
-
-lazy val `zero-arguments-one-continuation-code-before-used-after` =
-  (project in file("./zero-arguments-one-continuation-code-before-used-after"))
-    .settings(continuationsPluginExampleShowTreeSettings: _*)
-    .dependsOn(continuationsPlugin)
-    .enablePlugins(ForceableCompilationPlugin)
-
-lazy val `list-map` = (project in file("./list-map"))
-  .settings(continuationsPluginExampleShowTreeSettings: _*)
-  .dependsOn(continuationsPlugin)
-  .enablePlugins(ForceableCompilationPlugin)
-
-lazy val `two-arguments-two-continuations` =
-  (project in file("./two-arguments-two-continuations"))
-    .settings(continuationsPluginExampleShowTreeSettings: _*)
-    .dependsOn(continuationsPlugin)
-    .enablePlugins(ForceableCompilationPlugin)
 
 lazy val benchmarks =
   project.dependsOn(`unwrapped`).settings(publish / skip := true).enablePlugins(JmhPlugin)
@@ -125,18 +72,6 @@ lazy val `sttp-unwrapped` = (project in file("./sttp-unwrapped"))
     `http-unwrapped`,
     `munit-unwrapped` % "test -> compile")
 
-lazy val `munit-snap` = (project in file("./munit-snap")).settings(munitSnapSettings)
-
-lazy val munitSnapSettings = Seq(
-  name := "munit-snap",
-  autoAPIMappings := true,
-  Test / fork := true,
-  libraryDependencies += munit,
-  libraryDependencies += circe,
-  libraryDependencies += circeParser,
-  libraryDependencies += circeGeneric % Test
-)
-
 lazy val commonSettings = Seq(
   javaOptions ++= javaOptionsSettings,
   autoAPIMappings := true,
@@ -151,65 +86,6 @@ lazy val unwrappedSettings: Seq[Def.Setting[_]] =
     libraryDependencies ++= Seq(
       scalacheck % Test
     )
-  )
-
-def testAndIntegrationTest(m: ModuleID): List[ModuleID] = List(m).flatMap { m =>
-  List(m % Test, m % IntegrationTest)
-}
-
-lazy val continuationsPluginSettings: Seq[Def.Setting[_]] =
-  Defaults.itSettings ++ Seq(
-    exportJars := true,
-    autoAPIMappings := true,
-    publish / skip := true,
-    Test / fork := true,
-    libraryDependencies ++= List(
-      "org.scala-lang" %% "scala3-compiler" % "3.1.2"
-    ) ++ testAndIntegrationTest(munit),
-    Test / javaOptions += {
-      val `scala-compiler-classpath` =
-        (Compile / dependencyClasspath)
-          .value
-          .files
-          .map(_.toPath().toAbsolutePath().toString())
-          .mkString(":")
-      s"-Dscala-compiler-classpath=${`scala-compiler-classpath`}"
-    },
-    Test / javaOptions += {
-      s"""-Dcompiler-scalacOptions=\"${scalacOptions.value.mkString(" ")}\""""
-    },
-    Test / javaOptions += Def.taskDyn {
-      Def.task {
-        val _ = (Compile / Keys.`package`).value
-        val `scala-compiler-options` =
-          s"${(continuationsPlugin / Compile / packageBin).value}"
-        s"""-Dscala-compiler-plugin=${`scala-compiler-options`}"""
-      }
-    }.value,
-    IntegrationTest / fork := true,
-    IntegrationTest / javaOptions := (Test / javaOptions).value
-  )
-
-lazy val continuationsPluginExampleShowTreeSettings: Seq[Def.Setting[_]] =
-  Seq(
-    publish / skip := true,
-    autoCompilerPlugins := true,
-    resolvers += Resolver.mavenLocal,
-    forceCompilation := true,
-    Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
-    Compile / scalacOptions += "-Xprint:continuationsCallsPhase",
-    Test / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
-    Test / scalacOptions += "-Xprint:continuationsCallsPhase"
-  )
-
-lazy val continuationsPluginExampleSettings: Seq[Def.Setting[_]] =
-  Seq(
-    publish / skip := true,
-    autoCompilerPlugins := true,
-    forceCompilation := true,
-    resolvers += Resolver.mavenLocal,
-    Compile / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}",
-    Test / scalacOptions += s"-Xplugin:${(continuationsPlugin / Compile / packageBin).value}"
   )
 
 lazy val munitUnwrappedSettings = Defaults.itSettings ++ Seq(
