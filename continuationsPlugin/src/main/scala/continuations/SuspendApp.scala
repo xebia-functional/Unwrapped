@@ -143,6 +143,7 @@ object Defer extends StarterLib:
         block
     }.start(baseContinuation)
     boundary
+end Defer
 
 extension [A](deferreds: scala.collection.IterableOnce[Deferred[A]])
   def awaitAll: List[A] =
@@ -161,3 +162,32 @@ extension [A](deferreds: scala.collection.IterableOnce[Deferred[A]])
     }
     latch.await()
     results
+  end awaitAll
+
+object Basic extends StarterLib:
+  private def c: Continuation[Any | Null] = new Continuation[Any | Null] {
+    type Ctx = EmptyTuple
+    def resume(value: Any | Null): Unit =
+      ()
+    val executionContext: ExecutionContextExecutorService = 
+      ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
+    sys.addShutdownHook(executionContext.close)
+    def raise(error: Throwable): Unit =
+      ()
+    override def context(): Ctx = EmptyTuple
+  }
+  def apply[A](block: Continuation[A] ?=> A): A | Continuation.State.Suspended.type =
+    var res: Either[Throwable, Any] = null
+    val baseContinuation = new ContinuationImpl(c, c.context()) {
+      protected def invokeSuspend(
+          result: Either[Throwable, Any | Null | Continuation.State.Suspended.type]): Any |
+        Null =
+        res = result
+    }
+    new Starter[A] {
+      override def invoke(completion: Continuation[A]): A | Any | Null =
+        given Continuation[A] = completion
+        block
+    }.start(baseContinuation)
+    res.fold(t => throw t, or => or.asInstanceOf[A | Continuation.State.Suspended.type])
+end Basic

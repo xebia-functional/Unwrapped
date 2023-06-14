@@ -2,6 +2,7 @@ package examples
 
 import continuations.Suspend
 import continuations.Blocking
+import continuations.Basic
 import continuations.Continuation
 
 @main def TwoArgumentsTwoContinuations =
@@ -14,5 +15,5 @@ import continuations.Continuation
       continuation.resume(x+y)
     }
     
-  println(Blocking(twoArgumentsTwoContinuations(1, 2)))
+  println(Basic(twoArgumentsTwoContinuations(1, 2)))
 
